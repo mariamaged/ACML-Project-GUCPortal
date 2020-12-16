@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const slotSchema = require('SlotSchema.js');
 
-const AcademicStaffSchema = mongoose.Schema({
+const CourseInstructorSchema = mongoose.Schema({
     // Personal Information.
     name: {type: String, required: true}, // No staff can change that.
     id: {type: String, required: true, unique: true}, // No staff can change that.
@@ -33,4 +33,4 @@ const AcademicStaffSchema = mongoose.Schema({
     timestamps: true
 });
 
-module.exports.model = mongoose.model('AcademicStaff', AcademicStaffSchema);
+module.exports.model = mongoose.model('CourseInstructor', CourseInstructorSchema);
