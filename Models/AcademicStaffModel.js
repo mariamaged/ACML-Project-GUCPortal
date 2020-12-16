@@ -33,4 +33,4 @@ const AcademicStaffSchema = mongoose.Schema({
     timestamps: true
 });
 
-module.exports.model = mongoose.model('AcademicStuff', AcademicStaffSchema);
+module.exports.model = mongoose.model('AcademicStaff', AcademicStaffSchema);

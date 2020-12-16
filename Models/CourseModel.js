@@ -5,7 +5,7 @@ const CourseSchema = mongoose.Schema({
     id: {type: String, unique: true, required: true},
     name: {type: String, required: true},
     department: {type: ObjectID, ref: 'Department'}, // Not sure if it should be required.
-    academicStuff: {type: ObjectID, ref: 'AcademicStuff'},
+    academicStaff: {type: ObjectID, ref: 'AcademicStaff'},
     slots_needed: {type: Number, min: 1, required: true}, 
     slots_covered: {type: Number, default: 0}
 },
