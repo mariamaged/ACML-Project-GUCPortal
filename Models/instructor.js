@@ -46,7 +46,7 @@ const instSchema=mongoose.Schema({
     ,day_off: {type:String}
     ,type: {type:String}
     ,office: {type:String}
-   // ,attendance:[attendaceSchema]
+    ,attendance:[attendaceSchema]
     ,gender: {type:String}
     ,annual_days: {type:Number}
     ,last_updated_annual:{type: Date}
@@ -56,7 +56,7 @@ const instSchema=mongoose.Schema({
     ,schedule:[slotSchema]
     ,department: {type:String}
     ,faculty: {type:String}
-   // ,courses:[courseSchema]
+    ,courses:[courseSchema]
 
     // ,sent_requests: [requestSchema]
     // ,recieved_requests:[requestSchema]
