@@ -13,7 +13,7 @@ const connectionParams={
     useUnifiedTopology: true 
 }
 //process.env.db_test_URL
-mongoose.connect(db_URL,connectionParams).then(()=>{
+mongoose.connect(process.env.db_URL, connectionParams).then(()=>{
     console.log("db successfully connected");
 }).catch(()=>{
     console.log("db is not connected");
