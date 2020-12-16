@@ -13,7 +13,7 @@ const connectionParams={
     useUnifiedTopology: true 
 }
 //process.env.db_test_URL
-mongoose.connect("mongodb+srv://monica:mo123@cluster0.t0aiw.mongodb.net/instructors?retryWrites=true&w=majority",connectionParams).then(()=>{
+mongoose.connect(db_URL,connectionParams).then(()=>{
     console.log("db successfully connected");
 }).catch(()=>{
     console.log("db is not connected");
