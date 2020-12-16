@@ -38,3 +38,18 @@ app.post('/signup',async(req,res)=>{
     res.json(savedInstr);
 })
 
+app.post('/postInst',async(req,res)=>{
+    const newInstr=new instModel({
+        name:req.body.name
+        ,id:req.body.id
+        ,schedule:req.body.schedule
+        //{"day":"Monday" ,"number":3,"location":"C1.101","academic_member_id":"AC-1","course_id": 2}      
+         
+    
+    //,courses:[courseSchema]
+    });
+    //res.json(req.body.schedule)
+    const savedInstr=await newInstr.save();
+    res.json(savedInstr);
+})
+
