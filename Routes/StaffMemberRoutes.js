@@ -4,6 +4,8 @@ const AcademicStaff=require('../Models/AcademicStaffModel.js')
 const StaffMember=require('../Models/StaffMemberModel.js')
 const HR=require('../Models/HRModel.js')
 
+
+
 router.post('/login',async(req,res)=>{
     try{
         const{email,password}=req.body;

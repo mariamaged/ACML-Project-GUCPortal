@@ -30,7 +30,7 @@ const StaffMemberSchema = mongoose.Schema({
     gender: {type: String},
 
     // Academic Information.
-    schedule: [slotSchema],
+    
     staff_type:{type: String, enum: ['HR', 'Academic Member'], required: true},
     // Login Information.
     newStaffMember: {type: Boolean, default: true},
