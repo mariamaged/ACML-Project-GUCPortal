@@ -1,4 +1,4 @@
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const attendanceSchema = require('AttendanceSchema.js');
 
