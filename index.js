@@ -33,25 +33,6 @@ mongoose.connect(process.env.db_URL, connectionParams).then(()=>{
 app.listen(3000);
 app.use(StaffMemberRoutes);
 
-app.post('/signup',async(req,res)=>{
-  //  const{name,id,email,salary,staff_type,department,faculty,type}=req.body;
-    const name=req.body.name
-    const id=req.body.id
-    const email=req.body.email
-    const salary=req.body.salary
-    const type=req.body.staff_type
-    const departmentI=new department(req.body.department)
-    const facultyI=new faculty(req.body.faculty)
-    const typeTA=req.body.type
-    try{const user=new AcademicStaff(name,id,email,salary,type,departmentI,facultyI,typeTA)
-        await user.save();
-        res.json(user);
-    }
-        catch(error){
-          console.log(error);
-        }
-    
-})
 
 //for testin only------------------------------------REMOVE AFTERRRRRRRRRRR TESTINGGGGGGGGGGGGGGGGGGGGG--
 //---------------------------------------------------INSERTING IN TABLES DEPARTMENT ,FACULTY ,STAFF MEMBER ,ACADEMIC MEMBER
@@ -112,9 +93,6 @@ app.post('/Member',async(req,res)=>{
 //    ,"office":"c7.101"
 //    ,"staff_type":"Assistant"
 })
-
- 
-
 
 app.post('/addAc',async(req,res)=>{
    // res.json(req.body)
