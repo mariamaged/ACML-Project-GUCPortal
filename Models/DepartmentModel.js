@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const ObjectID = mongoose.Schema.Types.ObjectId;
 
 const DepartmentSchema = mongoose.Schema({
     name: {type: String, required: true, unique: true},
