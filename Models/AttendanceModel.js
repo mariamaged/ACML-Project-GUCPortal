@@ -3,7 +3,7 @@
 const attendaceSchema=mongoose.Schema({
     date: {type: Date}
    ,hours: {type:Number}
-   ,last_sign_in: {type:Timestamp}
-   ,last_sign_out: {type:Timestamp}
+   ,last_signIn: {type:Timestamp}
+   ,last_signOut: {type:Timestamp}
    ,day: {type: String}
 })
