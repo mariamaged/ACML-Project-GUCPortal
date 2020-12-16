@@ -1,11 +1,17 @@
 const express = require('express');
 const app =express();
 const mongoose =require('mongoose');
-const instModel=require('./Models/instructor')
 
+//for testing
+const StaffMemberRoutes=require('./Routes/StaffMemberRoutes')
+const department=require('./Models/DepartmentModel')
+const AcademicStaff=require('./Models/AcademicStaffModel')
+const faculty=require('./Models/FacultyModel')
+//
 require('dotenv').config()
 
 app.use(express.json())
+
 app.use(express.urlencoded({extended:false}));
 const connectionParams={
     useNewUrlParser: true,
@@ -20,36 +26,30 @@ mongoose.connect(process.env.db_URL, connectionParams).then(()=>{
 });
 
 
-app.listen(app.listen(3000));
+app.listen(3000);
+app.use(StaffMemberRoutes);
 
 app.post('/signup',async(req,res)=>{
-    const newInstr=new instModel({
-        name:req.body.name
-        ,id:req.body.id
-        ,password: req.body.password
-        ,schedule:req.body.schedule
-        //{"day":"Monday" ,"number":3,"location":"C1.101","academic_member_id":"AC-1","course_id": 2}      
-         
+  //  const{name,id,email,salary,staff_type,department,faculty,type}=req.body;
+    const name=req.body.name
+    const id=req.body.id
+    const email=req.body.email
+    const salary=req.body.salary
+    const type=req.body.staff_type
+    const departmentI=new department(req.body.department)
+    const facultyI=new faculty(req.body.faculty)
+    const typeTA=req.body.type
+    try{const user=new AcademicStaff(name,id,email,salary,type,departmentI,facultyI,typeTA)
+        await user.save();
+        res.json(user);
+    }
+        catch(error){
+          console.log(error);
+        }
     
-    //,courses:[courseSchema]
-    });
-    //res.json(req.body.schedule)
-    const savedInstr=await newInstr.save();
-    res.json(savedInstr);
 })
 
-app.post('/postInst',async(req,res)=>{
-    const newInstr=new instModel({
-        name:req.body.name
-        ,id:req.body.id
-        ,schedule:req.body.schedule
-        //{"day":"Monday" ,"number":3,"location":"C1.101","academic_member_id":"AC-1","course_id": 2}      
-         
-    
-    //,courses:[courseSchema]
-    });
-    //res.json(req.body.schedule)
-    const savedInstr=await newInstr.save();
-    res.json(savedInstr);
-})
+
+
+
 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
-const attendanceSchema = require('AttendanceSchema.js');
+//const attendanceSchema = require('AttendanceSchema.js');
 
 const HRSchema = mongoose.Schema({
     // Personal Information.
