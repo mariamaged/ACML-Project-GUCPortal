@@ -19,8 +19,18 @@ const AcademicStaffModel = require('./Models/AcademicStaffModel.js');
 const LocationModel = require('./Models/LocationModel.js');
 const FacultyModel = require('./Models/FacultyModel.js');
 const DepartmentModel = require('./Models/DepartmentModel.js');
+const CourseModel = require('./Models/CourseModel.js');
 
 // Listen on port.
+app.post('/addCourse', async (req, res) => {
+    const course = new CourseModel({
+        id: "C7.203",
+        type: "Office",
+        maximum_capacity: 4
+    });
+    await course.save();
+});
+
 app.post('/addLocation', async (req, res) => {
     const location = new LocationModel({
         id: "C7.203",

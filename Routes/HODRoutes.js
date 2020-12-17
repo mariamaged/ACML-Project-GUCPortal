@@ -22,7 +22,9 @@ router.route('/CourseInstructorforCourse')
             if(courseInstructorAcademicModel.type == 'Course Instructor') {
             const HOD = await AcademicStaffModel.find({member: req.user._id});
             const HODDepartment = HOD.department;
-            if(HODDepartment == courseInstructorAcademicModel.department) {
+            const CourseDepartment = course.department;
+
+            if(HODDepartment == CourseDepartment) {
                 await CourseModel.findOneAndUpdate({id: courseID}, {$push: {academic_staff: courseInstructorStaffModel._id}}, {new: true}, (error, doc) => {
                     if(error) console.log("Something wrong happened while updating the course with course instructor");
                     console.log(doc);
@@ -33,8 +35,8 @@ router.route('/CourseInstructorforCourse')
             }
         }
         else {
-            return res.status(400).send('Staff member is not a course instructor!');
-        }
+                return res.status(400).send('Staff member is not a course instructor!');
+            }
         }
    // }
  /*   else {
