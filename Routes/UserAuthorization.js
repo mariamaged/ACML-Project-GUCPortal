@@ -35,15 +35,19 @@ router.route('/login')
     }
 
     if(existingUser.staff_type === "HR"){
-        const token = jwt.sign({_id: existingUser._id, role: existingUser.staff_type}, process.env.TOKEN_SECRET);
+        const token = jwt.sign({_id: existingUser._id, role: existingUser.staff_type, isHOD: false, isCourseCoordinator: false}, process.env.TOKEN_SECRET);
         res.header('auth-token', token).send(token);
     }
     else {
-        const jwt = {_id: existingUser._id, role: existingUser.staff_type};
+        const loginToken = {_id: existingUser._id, role: existingUser.staff_type};
         const academicUser = AcademicStaffModel.findOne({member: existingUser._id});
-        if(academicUser.isHOD) jwt.isHOD = true;
-        if(academicUser.isCourseCoordinator) jwt.isCourseCoordinator = true;
-        const token = jwt.sign(jwt, process.env.TOKEN_SECRET);
+        if(academicUser.isHOD) loginToken.isHOD = true;
+        else loginToken.isHOD = false;
+        
+        if(academicUser.isCourseCoordinator) loginToken.isCourseCoordinator = true;
+        else loginToken.isCourseCoordinator = false;
+
+        const token = jwt.sign(loginToken, process.env.TOKEN_SECRET);
         res.header('auth-token', token).send(token);
     }
      
