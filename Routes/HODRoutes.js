@@ -16,10 +16,12 @@ router.route('/CourseInstructorforCourse')
             return res.status(400).send('Course does not exist!');
         }
         else {
-            const HOD = await AcademicStaffModel.find({member: req.user._id});
-            const HODDepartment = HOD.department;
             const courseInstructorStaffModel = await StaffMemberModel.findOne({id: courseInstructorID});
             const courseInstructorAcademicModel = await AcademicStaffModel.findOne({member: courseInstructorStaffModel._id});
+
+            if(courseInstructorAcademicModel.type == 'Course Instructor') {
+            const HOD = await AcademicStaffModel.find({member: req.user._id});
+            const HODDepartment = HOD.department;
             if(HODDepartment == courseInstructorAcademicModel.department) {
                 await CourseModel.findOneAndUpdate({id: courseID}, {$push: {academic_staff: courseInstructorStaffModel._id}}, {new: true}, (error, doc) => {
                     if(error) console.log("Something wrong happened while updating the course with course instructor");
@@ -27,8 +29,12 @@ router.route('/CourseInstructorforCourse')
                 });
             }
             else {
-                return res.status(400).send('Course not under your department!');
+                return res.status(401).send('Course not under your department!');
             }
+        }
+        else {
+            return res.status(400).send('Staff member is not a course instructor!');
+        }
         }
    // }
  /*   else {
