@@ -16,18 +16,61 @@ mongoose.connect(process.env.DB_URL, databaseParameters)
 const StaffMemberModel = require('./Models/StaffMemberModel.js');
 const HRModel = require('./Models/HRModel.js');
 const AcademicStaffModel = require('./Models/AcademicStaffModel.js');
+const LocationModel = require('./Models/LocationModel.js');
+const FacultyModel = require('./Models/FacultyModel.js');
+const DepartmentModel = require('./Models/DepartmentModel.js');
 
 // Listen on port.
+app.post('/addLocation', async (req, res) => {
+    const location = new LocationModel({
+        id: "C7.203",
+        type: "Office",
+        maximum_capacity: 4
+    });
+    await location.save();
+});
+
+app.post('/addFaculty', async (req, res) => {
+    const faculty = new FacultyModel({
+        name: "Engineering"
+    });
+    await faculty.save();
+});
+
+app.post('/addDepartment', async (req, res) => {
+    const department = new DepartmentModel({
+        name: "Computer Science"
+    });
+    await department.save();
+});
+
+// Data hardcoded now but will put as endpoint params.
 app.post('/addAcademicStaffMember', async (req, res) => {
+    // Search for location id.
+    const location = await LocationModel.findOne({id: "C7.203"});
+    
+    // Add to StaffMemberModelFirst.
     const staffMember = new StaffMemberModel({
         name: "Maria Maged",
         id: "ac-1",
-        email: "Maria Maged",
+        email: "maria@gmail.com",
         salary: 1000,
-        office: 1,
+        office: location._id,
         staff_type: "Academic Member"
     });
     await staffMember.save();
+
+    // Then add to AcademicStaffModel.
+    staffMember = await StaffMemberModel.findOne({email: "maria@gmail.com"}); // Find the id JavaScript added to the tuple we inserted.
+    const faculty = await FacultyModel.findOne({name: "Engineering"}); // Find the id JavaScript added to the tuple we inserted.
+    const department = await DepartmentModel.findOne({name: "Computer Science"}); // Find the id JavaScript added to the tuple we inserted.
+    const academicMember = new AcademicStaffModel({
+        member: staffMember._id,
+        faculty: faculty._id,
+        department: department._id,
+        type: "Course Instructor"
+    });
+    await academicMember.save();
     
 });
 app.listen(process.env.PORT);
