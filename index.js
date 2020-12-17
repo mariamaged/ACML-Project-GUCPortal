@@ -1,4 +1,64 @@
-const express = require('express');
+// For environmental variables.
+require('dotenv').config();
+
+// For database instance.
+const mongoose = require('mongoose');
+
+// For app singleton instance.
+const {app} = require('./app.js')
+
+// Database connection parameters.
+const databaseParameters = { useNewUrlParser: true, useUnifiedTopology: true };
+mongoose.connect(process.env.DB_URL, databaseParameters)
+.then(console.log('Successfully Connected to The Database'));
+
+// Models.
+const StaffMemberModel = require('./Models/StaffMemberModel.js');
+const HRModel = require('./Models/HRModel.js');
+const AcademicStaffModel = require('./Models/AcademicStaffModel.js');
+
+// Listen on port.
+app.post('/addAcademicStaffMember', async (req, res) => {
+    const staffMember = new StaffMemberModel({
+        name: "Maria Maged",
+        id: "ac-1",
+        email: "Maria Maged",
+        salary: 1000,
+        office: 1,
+        staff_type: "Academic Member"
+    });
+    await staffMember.save();
+    
+});
+app.listen(process.env.PORT);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*const express = require('express');
 const app =express();
 const mongoose =require('mongoose');
 
@@ -149,3 +209,4 @@ app.post('/addAc',async(req,res)=>{
 //    ,"faculty":"met"
 //    ,"type":"Academic Member"
 })
+*/
