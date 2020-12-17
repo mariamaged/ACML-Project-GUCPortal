@@ -12,11 +12,11 @@ const StaffMemberModel = require('./Models/StaffMemberModel');
 //----------------------------------------------
 require('dotenv').config()
 
-app.use(express.json())
-
-
-
-app.use(express.urlencoded({extended:false}));
+//app.use(express.json())
+var bodyParser = require('body-parser')
+app.use(bodyParser.json())
+//app.use(bodyParser.urlencoded({ extended: false}));
+//app.use(express.urlencoded({extended: false}));
 const connectionParams={
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -46,7 +46,8 @@ app.post('/addFaculty',async(req,res)=>{
 
 app.post('/addDepart',async(req,res)=>{
     // fac=faculty.find({name:"met"})
-    const dep=new department({name:req.body.name,faculty:faculty.find({name:req.body.facName})._id})
+    const fac=(await faculty.find({name:req.body.facName}))[0]._id
+    const dep=new department({name:req.body.name,faculty:fac})
     await dep.save();
     res.json(dep)
 
@@ -64,27 +65,42 @@ app.post('/addLoc',async(req,res)=>{
     // "type":"Tutorial Room",
     // "maximum_capacity":"15"
 })
+
+
+
 app.post('/Member',async(req,res)=>{
-    res.json(req.body)
-    if(!req.body.id){
-        res.json("please enter id")
-    }
-    else{
+    // const office3=(await location.find({id:req.body.office}))[0]._id
+    // console.log(office3)
+    // const fac=(await faculty.find({name:"met"}))[0]._id;
+    // console.log(fac)
+    //res.json(req.body)
+    // if(!req.body.id){
+    //     res.json("please enter id")
+    // }
+    // else res.json(req.body.id)
+   // console.log("lala")
+    //else{
     const name2=req.body.name
     const id2=req.body.id
     const email2=req.body.email
     const salary2=req.body.salary
-    const office2=location.find({id:req.body.loc})._id
+    const office2=(await location.find({id:req.body.office}))[0]._id
     const staff_type2=req.body.staff_type
+    console.log(name2)
+    console.log(id2)
+    console.log(email2)
+    console.log(salary2)
+    console.log(office2)
+    console.log(staff_type2)
     const mem=new StaffMemberModel({name:name2},{id:id2},{email:email2},{salary:salary2},{office:office2},{staff_type:staff_type2});
     try{
     await mem.save();
     res.json(mem)
-    }
+        }
     catch(err){
         res.json(err)
-    }
-}
+       }
+    // //}
     
 //    "name":"nada"
 //    ,"id":"ac-2"
@@ -93,6 +109,8 @@ app.post('/Member',async(req,res)=>{
 //    ,"office":"c7.101"
 //    ,"staff_type":"Assistant"
 })
+
+
 
 app.post('/addAc',async(req,res)=>{
    // res.json(req.body)
