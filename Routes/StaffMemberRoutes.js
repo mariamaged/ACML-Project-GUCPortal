@@ -6,13 +6,7 @@ const AcademicStaff = require('../Models/AcademicStaffModel.js');
 const HR = require('../Models/HRModel.js');
 const StaffMemberModel = require('../Models/StaffMemberModel.js');
 
-//for first time login will save email
-// let emailFirst="";
-// let currentUser;
-// let currentUserID;
 
-
-//router.use(express.json())
 router.post('/login',async(req,res,next)=>{
     console.log("here in login")
     try{
@@ -24,27 +18,15 @@ router.post('/login',async(req,res,next)=>{
         return res.status(400).json("Please enter valid  password");
 
         const existingUser=await StaffMemberModel.findOne({email:email})
-        currentUser=existingUser
-        currentUserID=existingUser._id
-
         if(!existingUser){
-            return res.status(400).json({msg:"You are not registered"});
+            return res.status(400).json({msg:"This user is not registered"});
         }
         else{
             //user first login original pass='123456'
-            console.log(existingUser.newStaffMember)
             if(existingUser.newStaffMember===true)
                 res.json("Please enter new Password")
-            //    console.log("enter new pass")
-            //     req.url = '/enterNewPass'
-            //     /* Uncomment the next line if you want to change the method */
-            //     // req.method = 'POST'
-            //     return router.handle(req, res, next)
-            // return res.redirect('localhost://3000/Routes/StaffMemberRoutes/enterNewPass');
-              //  next()
             
-           // const isMatched=await bcrypt.compare(password,existingUser.password);       //comparing password entered text with password of the user we got from the database
-            const isMatched=true;
+            const isMatched=await bcrypt.compare(password,existingUser.password);       //comparing password entered text with password of the user we got from the database            
             if(isMatched===false){
                  return res.status(400).json({msg:"Please enter correct password"});
              }
@@ -52,20 +34,20 @@ router.post('/login',async(req,res,next)=>{
              else if(existingUser.staff_type=="HR"){
                 const token=jwt.sign({id:existingUser._id,role:existingUser.staff_type},process.env.TOKEN_SECRET);
                 res.header('auth-token', token).send(token);
-                res.json({token,existingUser});
+             return   res.json({token,existingUser});
             }
             else{
                 const user=AcademicStaff.findById(existingUser._id);
                 const token=jwt.sign({id:existingUser._id,role:user.type,isHead:user.isHOD,isCoordinator:user.isCoordinator},process.env.TOKEN_SECRET);
                 res.header('auth-token', token).send(token);
-                res.json({token});
+             return   res.json({token});
             }
 
          }
         
     }
         catch(err){
-            res.status(500).json({error:err.message});
+          return  res.status(500).json({error:err.message});
         }
     
 })
@@ -74,33 +56,35 @@ router.post('/login',async(req,res,next)=>{
 router.post('/enterNewPass',authenticateToken,async(req,res)=>{
 
     
-   const passNew=req.body.newPassword;
+    const passNew=req.body.newPassword;
     const passCheck=req.body.passCheck;
-    console.log(token.id)
-    const user=(await StaffMemberModel.findById(req.user.id))[0]
-    console.log(user.email)
-    console.log(passNew)
-    console.log(passCheck)
+    const user=await StaffMemberModel.findById(req.user.id)
     if(passNew!=passCheck){
         return res.status(400).json({msg:"Passwords should match"});
     }
     else{
+        console.log("in else")
+        console.log(req.user.id)
         const salt=await bcrypt.genSalt();             //in case password is weak
         const hashedPassword=await bcrypt.hash(passNew,salt);
-        StaffMemberModel.findByIdAndUpdate(req.user.id,{password:passNew,newStaffMember:false})
-        res.json( StaffMemberModel.findByIdAndUpdate(req.user.id))
+        console.log("hashed pass= "+hashedPassword)
+        try{
+      await  StaffMemberModel.findByIdAndUpdate(req.user.id,{password:hashedPassword,newStaffMember:false})
+      return  res.json( await StaffMemberModel.findById(req.user.id))
+        }
+        catch(err){
+           return res.json(err)
+        }
+      
     }
 
-
+   
         
 })
 
 function authenticateToken(req,res,next){
-   const token=req.headers.token;
-  //  const token=req.header('x-auth-token');
-    console.log("token= "+token)
+    const token=req.header('x-auth-token');
     if(!token){
-       console.log("here no token")
     return res.sendStatus(401).status('Access deined')
     
     }
