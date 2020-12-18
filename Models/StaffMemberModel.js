@@ -25,13 +25,13 @@ const StaffMemberSchema = mongoose.Schema({
     id: {type: String, required: true, unique: true}, // No staff can change that.
     email: {type: String, required: true, unique: true},
     password: {type: String, default: "123456"},
-    salary: {type: Number, required: true}, // No academic member can change that.
+   salary: {type: Number, required: true}, // No academic member can change that.
     office: {type: ObjectID, ref: 'Location', required: true},
     gender: {type: String},
 
     // Login Information.
     newStaffMember: {type: Boolean, default: true},
-    staff_type:{type: String, enum: ['HR', 'Academic Member'], required: true},
+    staff_type:{type: String, required: true},
     
     // Attendance Information.
     attendance:[attendanceSchema],
@@ -45,5 +45,6 @@ const StaffMemberSchema = mongoose.Schema({
     strict: false,
     timestamps: true
 });
+StaffMemberSchema.index({ user: 1, name: 1 }, { unique: true });
 
 module.exports = mongoose.model('Staff', StaffMemberSchema);
