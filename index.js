@@ -182,7 +182,7 @@ app.post('/addLocation',async(req,res)=>{
 
 
 
-app.post('/AddStaffMember',async(req,res)=>{
+app.post('/addStaffMember',async(req,res)=>{
     //res.json(req.body)
     // if(req.body.id)
     // console.log("id here")
