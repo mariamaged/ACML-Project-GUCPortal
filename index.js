@@ -122,12 +122,14 @@ const AcademicStaffModel=require('./Models/AcademicStaffModel')
 const faculty=require('./Models/FacultyModel')
 const location=require('./Models/LocationModel');
 const StaffMemberModel = require('./Models/StaffMemberModel');
+const HRModel = require('./Models/HRModel');
+const CourseModel = require('./Models/CourseModel');
 //----------------------------------------------
 require('dotenv').config()
 
 //app.use(express.json())
 var bodyParser = require('body-parser');
-const HRModel = require('./Models/HRModel');
+
 app.use(bodyParser.json())
 //app.use(bodyParser.urlencoded({ extended: false}));
 //app.use(express.urlencoded({extended: false}));
@@ -151,6 +153,7 @@ app.use(StaffMemberRoutes);
 //for testin only------------------------------------REMOVE AFTERRRRRRRRRRR TESTINGGGGGGGGGGGGGGGGGGGGG--
 //---------------------------------------------------INSERTING IN TABLES DEPARTMENT ,FACULTY ,STAFF MEMBER ,ACADEMIC MEMBER
 app.post('/addFaculty',async(req,res)=>{
+    console.log("fac")
     const fac=new faculty({name:req.body.name})
    await fac.save();
    res.json(fac)
@@ -160,7 +163,7 @@ app.post('/addFaculty',async(req,res)=>{
 
 app.post('/addDepartment',async(req,res)=>{
     // fac=faculty.find({name:"met"})
-    const fac=(await faculty.find({name:req.body.facName}))[0]._id
+    const fac=(await faculty.find({name:req.body.faculty}))[0]._id
     const dep=new department({name:req.body.name,faculty:fac})
     await dep.save();
     res.json(dep)
@@ -187,7 +190,7 @@ app.post('/addStaffMember',async(req,res)=>{
     // if(req.body.id)
     // console.log("id here")
     const name2=req.body.name
-    const id2=req.body.staff_id
+    const id2=req.body.id
     const email2=req.body.email
     const salary2=req.body.salary
     const office2=(await location.find({id:req.body.office}))[0]._id
@@ -228,17 +231,22 @@ app.post('/addAcademicMember',async(req,res)=>{
         res.json("need faculty and type")
     }
     else{
-     const memb=(await StaffMemberModel.find({email:req.body.email}))[0]._id;
-     const membID=(await StaffMemberModel.find({email:req.body.email}))[0]
-    const dep=(await department.find({name:req.body.dep}))[0]._id;
-    const fac=(await faculty.find({name:req.body.faculty}))[0]._id;
-    const type=req.body.type;
-    
-    console.log(membID)
-    console.log(memb)
+        const membID=(await StaffMemberModel.findOne({email:req.body.email}))
+     console.log(membID)
+     const memb=(await StaffMemberModel.findOne({email:req.body.email}))._id;
+     console.log(memb)
+     
+    const dep=(await department.findOne({name:req.body.dep}))._id;
     console.log(dep)
+    const fac=(await faculty.findOne({name:req.body.faculty}))._id;
     console.log(fac)
+    const type=req.body.type;
     console.log(type)
+    
+    
+    
+    
+   
     
     try{
         const user=new AcademicStaffModel({member:memb,department:dep,faculty:fac,type:req.body.type});
@@ -255,3 +263,33 @@ app.post('/addAcademicMember',async(req,res)=>{
 //    ,"type":"Course Instructor"
 })
 
+app.post('/addHR',async(req,res)=>{
+    const memb=(await StaffMemberModel.findOne({email:req.body.email}))._id;
+    try{
+        const user=new HRModel({member:memb});
+        await user.save();
+        res.json(user)
+    }
+    catch(err){
+        res.json(err)
+    }
+})
+
+app.post('/addCourse',async(req,res)=>{
+   const id=req.body.id
+   const name= req.body.name
+   const department2= (await department.findOne({name:req.body.dep}))._id; 
+   const temp=(await StaffMemberModel.findOne({name:req.body.academic}))._id
+   const temp2=(await StaffMemberModel.findOne({name:req.body.coordinator}))._id
+  // const academic_staff=(await AcademicStaffModel.findOne({member:temp}))._id;
+   console.log(temp)
+   const slots_needed=req.body.slots_needed
+   try{
+    const user=new CourseModel({id:id,name:name,department:department2,academic_staff:temp,slots_needed:slots_needed,course_coordinator:temp2});
+    await user.save();
+    res.json(user)
+}
+catch(err){
+    res.json(err)
+}
+})

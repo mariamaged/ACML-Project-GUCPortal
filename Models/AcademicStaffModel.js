@@ -28,6 +28,7 @@ const AcademicStaffSchema = mongoose.Schema({
     // Academic Information.
     department: {type: ObjectID, ref: 'Department', required: true}, // No academic member can change that.
     faculty: {type: ObjectID, ref: 'Faculty', required: true}, // No academic member can change that.
+    
     courses: [{type: ObjectID, ref: 'Course'}],
     schedule: [slotSchema],
 
