@@ -11,7 +11,7 @@ const Course=require('../Models/CourseModel.js')
 const location=require('../Models/LocationModel.js')
 const department=require('../Models/DepartmentModel.js')
 const faculty=require('../Models/FacultyModel.js')
-
+const AttendanceSchema=StaffMemberModel.attendanceSchema
 
 function authenticateToken(req,res,next){
     const token=req.header('x-auth-token');
@@ -298,8 +298,82 @@ router.put('/resetPassword',authenticateToken,async(req,res)=>{
         res.json(userUpdated2)
 })
 
+router.put('/signin',authenticateToken,async(req,res)=>{
+    var datetime = new Date();
+    const check=false;
+    const SignIn=Date.now();
+    //console.log(datetime.toISOString().slice(0,10))
+   
+    const user=StaffMemberModel.findbyID({member:"5fdd11e1f4e4d03ed83f8ac9"})
+    console.log("user  "+user.name)
+    if(user.attendance){
+        const attndance=user.attendance
+        console.log("attendance= "+attendace)
+        for(var i=0;i<attendance.length;i++){
+            if(attendance[i].date==date.setUTCHours(0,0,0,0)){
+             //   const newSignInDate=new Date(year, month, day);
+               
+                attendance[i].last_signIn=SignIn
+                console.log("new attendance= "+attendance[i])
+                check=true;
+            }
+        }
+    }
+    if(check===false || !user.attendance){
+        const newSignInDate=new Date().toDateString();
 
+            const newAttendance=new AttendanceSchema({
+                date:newSignInDate,
+                last_signIn:SignIn
+            })
+            console.log("newAttendance "+newAttendance)
+        if(check===false)
+            user.attendance[attendance.length]=newAttendance
+        else{
+           const attendanceArr=new Array()
+           attendance[0]=newAttendance
+            user.attendance=attendanceArr   
+        }
+        console.log("attendance= "+user.attendance)
 
+    }
+    
+})
 
+const date=Date()
+// console.log("OLD= "+date)
+
+// const newDate=new Date()
+// console.log("OLD= "+newDate)
+
+// console.log(date.setHours(0,0,0,0)==newDate.setHours(0,0,0,0))
+
+// console.log(date.toDateString());
+var today = new Date(new Date().setUTCHours(0,0,0,0));
+//var todaynew = today.toISOString();
+//console.log(today);
+
+// var date1='2020-1-12'
+// var date2='2020-10-10'
+// console.log(date1>date2)
+
+// // {
+//     "_id": "5fdd11ddf4e4d03ed83f8ac6",
+//     "date": "2020-12-12T00:00:00.000Z",
+//     "last_signIn": "2020-12-18T20:32:29.193Z",
+//     "last_signOut": "2020-12-18T20:32:29.193Z"
+// },
+// {
+//     "_id": "5fdd11ddf4e4d03ed83f8ac7",
+//     "date": "2020-10-10T00:00:00.000Z",
+//     "last_signIn": "2020-12-18T20:32:29.194Z",
+//     "last_signOut": "2020-12-18T20:32:29.194Z"
+// },
+// {
+//     "_id": "5fdd11ddf4e4d03ed83f8ac8",
+//     "date": "2020-09-08T22:00:00.000Z",
+//     "last_signIn": "2020-12-18T20:32:29.194Z",
+//     "last_signOut": "2020-12-18T20:32:29.194Z"
+// }
 
 module.exports=router;

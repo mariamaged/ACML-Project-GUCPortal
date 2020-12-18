@@ -5,6 +5,9 @@ const ObjectID = mongoose.Schema.Types.ObjectId;
 
 const attendanceSchema = mongoose.Schema({
     date: {type: Date}
+    ,time:{time:Date}
+    //var datetime = new Date();
+    //console.log(datetime.toISOString().slice(0,10)); ----->2020-12-18
    ,hours: {type:Number}
    ,last_signIn: {type:Date ,default:Date.now}
    ,last_signOut: {type:Date ,default:Date.now}
@@ -34,7 +37,7 @@ const StaffMemberSchema = mongoose.Schema({
     staff_type:{type: String, required: true},
     
     // Attendance Information.
-    attendance:[attendanceSchema],
+    attendance:{type:[attendanceSchema],default:[]},
     annual_days: {type:Number},
     lastUpdatedAnnual:{type: Date},
     accidentalDaysLeft: {type:Number},
@@ -48,3 +51,5 @@ const StaffMemberSchema = mongoose.Schema({
 StaffMemberSchema.index({ user: 1, name: 1 }, { unique: true });
 
 module.exports = mongoose.model('Staff', StaffMemberSchema);
+
+module.exports.attendanceSchema = mongoose.model('attendance', attendanceSchema);

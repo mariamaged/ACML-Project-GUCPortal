@@ -124,6 +124,7 @@ const location=require('./Models/LocationModel');
 const StaffMemberModel = require('./Models/StaffMemberModel');
 const HRModel = require('./Models/HRModel');
 const CourseModel = require('./Models/CourseModel');
+const attendanceSchema=StaffMemberModel.attendanceSchema
 //----------------------------------------------
 require('dotenv').config()
 
@@ -148,6 +149,9 @@ mongoose.connect(process.env.DB_URL_Monica2, connectionParams).then(()=>{
 
 app.listen(3000);
 app.use(StaffMemberRoutes);
+
+
+
 
 
 //for testin only------------------------------------REMOVE AFTERRRRRRRRRRR TESTINGGGGGGGGGGGGGGGGGGGGG--
@@ -189,19 +193,35 @@ app.post('/addStaffMember',async(req,res)=>{
     //res.json(req.body)
     // if(req.body.id)
     // console.log("id here")
+    const attArr=new Array()
+    var a=''
+    const dates=req.body.dates
+    if(dates){
+        for(var i=0;i<dates.length;i++){
+             a=new attendanceSchema({
+                date:dates[i],
+                time:new Date(),
+            })
+            attArr[i]=a
+        }
+    }
+
     const name2=req.body.name
     const id2=req.body.id
     const email2=req.body.email
     const salary2=req.body.salary
     const office2=(await location.find({id:req.body.office}))[0]._id
     const staff_type2=req.body.staff_type
+    const attendance=attArr
+
+    console.log(attArr)
     console.log(name2)
     console.log(id2)
     console.log(email2)
     console.log(salary2)
     console.log(office2)
     console.log(staff_type2)
-    const mem=new StaffMemberModel({name:name2,id:id2,email:email2,salary:salary2,office:office2,staff_type:req.body.staff_type});
+    const mem=new StaffMemberModel({name:name2,id:id2,email:email2,salary:salary2,office:office2,staff_type:req.body.staff_type,attendance:attArr});
   //  res.json(mem)
        try{
     await mem.save();
