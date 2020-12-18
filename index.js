@@ -69,37 +69,39 @@ app.post('/addLoc',async(req,res)=>{
 
 
 app.post('/Member',async(req,res)=>{
-    // const office3=(await location.find({id:req.body.office}))[0]._id
-    // console.log(office3)
+  //  console.log((await location.find({id:"c7.101"}))[0])
+    //  const office3=(await location.find({id:req.body.office}))[0]._id
+    //  console.log(office3)
     // const fac=(await faculty.find({name:"met"}))[0]._id;
     // console.log(fac)
 //     //res.json(req.body)
-//     // if(!req.body.id){
-//     //     res.json("please enter id")
-//     // }
+    // if(!req.body.id){
+    //     res.json("please enter id")
+    // }
 //     // else res.json(req.body.id)
 //    // console.log("lala")
 //     //else{
-//     const name2=req.body.name
-//     const id2=req.body.id
-//     const email2=req.body.email
-//     const salary2=req.body.salary
-//     const office2=(await location.find({id:req.body.office}))[0]._id
-//     const staff_type2=req.body.staff_type
-//     console.log(name2)
-//     console.log(id2)
-//     console.log(email2)
-//     console.log(salary2)
-//     console.log(office2)
-//     console.log(staff_type2)
-//     const mem=new StaffMemberModel({name:name2},{id:id2},{email:email2},{salary:salary2},{office:office2},{staff_type:staff_type2});
-//     try{
-//     await mem.save();
-//     res.json(mem)
-//         }
-//     catch(err){
-//         res.json(err)
-//        }
+    const name2=req.body.name
+    const id2=req.body.id
+    const email2=req.body.email
+    const salary2=req.body.salary
+    const office2=(await location.find({id:req.body.office}))[0]._id
+    const staff_type2=req.body.staff_type
+    console.log(name2)
+    console.log(id2)
+    console.log(email2)
+    console.log(salary2)
+    console.log(office2)
+    console.log(staff_type2)
+    const mem=new StaffMemberModel({name:name2},{id:id2},{email:email2},{salary:salary2},{office:office2},{staff_type:staff_type2});
+  try{
+    await mem.save();
+    res.json(mem)
+       }
+    catch(err){
+        console.log("err here")
+        res.json(err)
+       }
     // //}
     
 //    "name":"nada"
@@ -110,17 +112,17 @@ app.post('/Member',async(req,res)=>{
 //    ,"staff_type":"Assistant"
 })
 
-const  memeee=new StaffMemberModel({
-    name:"asdad",
-    id:1,
-    email:"dasdasd",
-    salary:22,
-    office:"5fda77733d34934a248e3e08",
-    staff_type:"HR"
+// const  memeee=new StaffMemberModel({
+//     name:"kokokokoa",
+//     id:3,
+//     email:"plplpl",
+//     salary:22,
+//     office:"5fda77733d34934a248e3e08",
+//     staff_type:"Academic Member"
 
-})
-memeee.save();
-console.log(memeee)
+// })
+// memeee.save();
+// console.log(memeee)
 
 
 app.post('/addAc',async(req,res)=>{
