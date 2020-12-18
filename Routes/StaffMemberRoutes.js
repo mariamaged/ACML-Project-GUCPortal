@@ -297,29 +297,41 @@ router.put('/resetPassword',authenticateToken,async(req,res)=>{
         // console.log(userUpdated.password)
         res.json(userUpdated2)
 })
-
+//USE MOMENT LIBRARY moment().utc().format('hh:mm:ss') 
 router.put('/signin',authenticateToken,async(req,res)=>{
     var datetime = new Date();
-    const check=false;
+    var check=false;
     const SignIn=Date.now();
     //console.log(datetime.toISOString().slice(0,10))
-   
-    const user=StaffMemberModel.findbyID({member:"5fdd11e1f4e4d03ed83f8ac9"})
-    console.log("user  "+user.name)
+   // console.log(req.user.id)
+    const user=await StaffMemberModel.findById(req.user.id)
     if(user.attendance){
-        const attndance=user.attendance
-        console.log("attendance= "+attendace)
+       var attendance=user.attendance
+       // console.log("attendance= "+attendance)
         for(var i=0;i<attendance.length;i++){
-            if(attendance[i].date==date.setUTCHours(0,0,0,0)){
+            console.log("date i= "+attendance[i].date.toISOString().substring(0, 10))
+            console.log(new Date().toISOString().substring(0, 10))
+            if(attendance[i].date.toISOString().substring(0, 10)==(new Date().toISOString().substring(0, 10))){
              //   const newSignInDate=new Date(year, month, day);
                
-                attendance[i].last_signIn=SignIn
-                console.log("new attendance= "+attendance[i])
+               // (user.attendance)[i].set(last_signIn,SignIn)
+                // user.set(user.attendance[i].last_signIn,SignIn)
+                console.log("herer")
+                try{
+                    console.log(new Date())
+                const newSignIn=await AttendanceSchema.findOneAndUpdate({date:attendance[i].date},{last_signIn:new Date()})
                 check=true;
+                console.log("new attendance= "+user.attendance[i])
+                return  res.json(user.attendance[i])
+                }
+                catch(err){
+                    return res.json("error "+err)
+                }
+                
             }
         }
     }
-    if(check===false || !user.attendance){
+    if(check===false || user.attendance.length==0){
         const newSignInDate=new Date().toDateString();
 
             const newAttendance=new AttendanceSchema({
@@ -327,14 +339,22 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_signIn:SignIn
             })
             console.log("newAttendance "+newAttendance)
-        if(check===false)
-            user.attendance[attendance.length]=newAttendance
+        if(check===false){
+           const attArr=user.attendance
+           attArr[attArr.length]=newAttendance
+           console.log("attArr "+attArr)
+           const update=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+            return res.json(await StaffMemberModel.findById(req.user.id))
+
+        }
         else{
            const attendanceArr=new Array()
            attendance[0]=newAttendance
-            user.attendance=attendanceArr   
+           console.log(attendance)
+           const update=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attendance})
+           return res.json(await StaffMemberModel.findById(req.user.id))  
         }
-        console.log("attendance= "+user.attendance)
+        
 
     }
     
@@ -349,14 +369,21 @@ const date=Date()
 // console.log(date.setHours(0,0,0,0)==newDate.setHours(0,0,0,0))
 
 // console.log(date.toDateString());
-var today = new Date(new Date().setUTCHours(0,0,0,0));
-//var todaynew = today.toISOString();
-//console.log(today);
+// var today = new Date(new Date().setUTCHours(0,0,0,0));
+// var todaynew = today.toString();
+// var c=today.toISOString().substring(0, 10);
+
+//console.log(dateCompare<c)
+
+
+// var groupedData = _.groupBy(datas, function(d){
+//     return d.startedAt.toISOString().substring(0, 10);
+//  });
 
 // var date1='2020-1-12'
 // var date2='2020-10-10'
 // console.log(date1>date2)
-
+//console.log((new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).toISOString));
 // // {
 //     "_id": "5fdd11ddf4e4d03ed83f8ac6",
 //     "date": "2020-12-12T00:00:00.000Z",

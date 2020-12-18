@@ -202,6 +202,7 @@ app.post('/addStaffMember',async(req,res)=>{
                 date:dates[i],
                 time:new Date(),
             })
+            a.save();
             attArr[i]=a
         }
     }
@@ -256,7 +257,7 @@ app.post('/addAcademicMember',async(req,res)=>{
      const memb=(await StaffMemberModel.findOne({email:req.body.email}))._id;
      console.log(memb)
      
-    const dep=(await department.findOne({name:req.body.dep}))._id;
+    const dep=(await department.findOne({name:req.body.department}))._id;
     console.log(dep)
     const fac=(await faculty.findOne({name:req.body.faculty}))._id;
     console.log(fac)
@@ -271,10 +272,10 @@ app.post('/addAcademicMember',async(req,res)=>{
     try{
         const user=new AcademicStaffModel({member:memb,department:dep,faculty:fac,type:req.body.type});
         await user.save();
-        res.json(user)
+      return  res.json(user)
     }
     catch(err){
-        res.json(err)
+      return  res.json(err)
     }
     }
 //    ,"id":"ac-3"
