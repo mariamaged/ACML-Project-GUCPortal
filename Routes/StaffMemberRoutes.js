@@ -52,12 +52,12 @@ router.post('/login',async(req,res,next)=>{
              else if(existingUser.staff_type=="HR"){
                 const token=jwt.sign({id:existingUser._id,role:existingUser.staff_type},process.env.TOKEN_SECRET);
                 res.header('auth-token', token).send(token);
-              //  res.json({token,existingUser});
+                res.json({token,existingUser});
             }
             else{
                 const user=AcademicStaff.findById(existingUser._id);
                 const token=jwt.sign({id:existingUser._id,role:user.type,isHead:user.isHOD,isCoordinator:user.isCoordinator},process.env.TOKEN_SECRET);
-              //  res.header('auth-token', token).send(token);
+                res.header('auth-token', token).send(token);
                 res.json({token});
             }
 
@@ -96,8 +96,8 @@ router.post('/enterNewPass',authenticateToken,async(req,res)=>{
 })
 
 function authenticateToken(req,res,next){
-   // const token=req.headers.token;
-    const token=req.header('x-auth-token');
+   const token=req.headers.token;
+  //  const token=req.header('x-auth-token');
     console.log("token= "+token)
     if(!token){
        console.log("here no token")
