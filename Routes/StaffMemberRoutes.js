@@ -277,6 +277,27 @@ router.put('/updateProfile',authenticateToken,async(req,res)=>{
 }
 })
 
+router.put('/resetPassword',authenticateToken,async(req,res)=>{
+        const user=await StaffMemberModel.findById(req.user.id)
+        const userPass=user.password
+        //console.log(user+" userPass= "+userPass)
+        const oldPass=req.body.oldPass
+        const isMatched=await bcrypt.compare(oldPass,user.password); 
+        console.log(isMatched)
+        if(!isMatched)
+        return res.json("Please enter correct old password")
+        const newPass=req.body.newPass
+        const checkPass=req.body.checkPass
+        if(newPass!=checkPass)
+       return res.json("Passwords do not match")
+        const salt=await bcrypt.genSalt();     
+        const hashedPassword=await bcrypt.hash(newPass,salt);
+        const userUpdated=await StaffMemberModel.findByIdAndUpdate(req.user.id,{password:hashedPassword})
+        const userUpdated2=await StaffMemberModel.findById(req.user.id)
+        // console.log(userUpdated.password)
+        res.json(userUpdated2)
+})
+
 
 
 
