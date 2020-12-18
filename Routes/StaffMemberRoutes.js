@@ -1,9 +1,9 @@
-const express=require('express')
-const router=express.Router()
-const AcademicStaff=require('../Models/AcademicStaffModel.js')
-const StaffMember=require('../Models/StaffMemberModel.js')
-const HR=require('../Models/HRModel.js')
-const StaffMemberModel = require('../Models/StaffMemberModel.js')
+const express = require('express');
+const router = express.Router();
+const AcademicStaff = require('../Models/AcademicStaffModel.js');
+const StaffMember = require('../Models/StaffMemberModel.js');
+const HR = require('../Models/HRModel.js');
+const StaffMemberModel = require('../Models/StaffMemberModel.js');
 
 //for first time login will save email
 let emailFirst="";
