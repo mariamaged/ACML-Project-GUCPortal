@@ -4,7 +4,7 @@ const ObjectID = mongoose.Schema.Types.ObjectId;
 
 const HRSchema = mongoose.Schema({
     // Personal Information.
-    member:{type:ObjectID,ref:'Staff'},
+    member: {type:ObjectID,ref:'Staff'},
     // Login Information.
     
     // Attendance Information.

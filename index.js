@@ -1,17 +1,3 @@
-// For environmental variables.
-require('dotenv').config();
-
-// For database instance.
-const mongoose = require('mongoose');
-
-// For app singleton instance.
-const {app} = require('./app.js')
-
-// Database connection parameters.
-const databaseParameters = { useNewUrlParser: true, useUnifiedTopology: true };
-mongoose.connect(process.env.DB_URL, databaseParameters)
-.then(console.log('Successfully Connected to The Database'));
-
 // Models.
 const StaffMemberModel = require('./Models/StaffMemberModel.js');
 const HRModel = require('./Models/HRModel.js');
@@ -21,12 +7,74 @@ const FacultyModel = require('./Models/FacultyModel.js');
 const DepartmentModel = require('./Models/DepartmentModel.js');
 const CourseModel = require('./Models/CourseModel.js');
 
+// For environmental variables.
+require('dotenv').config();
+
+// For database instance.
+const mongoose = require('mongoose');
+
+// For app singleton instance.
+const {app} = require('./app.js');
+
+// Database connection parameters.
+const databaseParameters = { useNewUrlParser: true, useUnifiedTopology: true };
+mongoose.connect(process.env.DB_URL, databaseParameters)
+.then(console.log('Successfully Connected to The Database'));
+
 // Listen on port.
+app.post('/viewDepartmentStaffPerCourse', async (req, res) => {
+        //  if(req.user.isHod) {
+            const {courseID} = req.body;
+            console.log(courseID);
+            console.log(typeof courseID);
+            const course = await CourseModel.findOne({id: courseID});
+            console.log(course);
+            const CourseDepartment = course.department;
+            const HODStaffModel = await StaffMemberModel.findOne({id: "ac-1"}); // Delete later.
+            const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+            const HODDepartment = HODAcademicModel.department;
+
+            if(HODDepartment.equals(CourseDepartment)) {
+            const academicArray = course.academic_staff;
+            const returnArray = [];
+            for(let index = 0; index < academicArray.length; index++) {
+              const staffTemp = await StaffMemberModel.findById(academicArray.member);
+              const officeTemp = await LocationModel.findById(staffTemp.office);
+              const departmentTemp = await DepartmentModel.findById(academicArray.department);
+              const facultyTemp = await FacultyModel.findById(academicArray.faculty);
+              
+              const returnObject = {};
+              returnObject.name = staffTemp.name;
+              returnObject.email = staffTemp.email;
+              returnObject.id = staffTemp.id;
+              returnObject.salary = staffTemp.salary;
+              returnObject.office = officeTemp.id;
+              returnObject.department = departmentTemp.name;
+              returnObject.faculty = facultyTemp.id;
+              if(staffTemp.hasOwnProperty('gender')) returnObject.gender = staffTemp.gender;
+              returnArray.push(returnObject);
+          }
+            return res.send(returnArray);
+        }
+        else {
+            return res.status(401).send('Course not under your department!');
+        }
+       // }
+        /*else {
+            res.status(401).send('Access Denied!');
+        }*/
+});
+
+
 app.post('/addCourse', async (req, res) => {
+    const departmentName = req.body.departmentName;
+    const department = await DepartmentModel.findOne({name: departmentName});
+
     const course = new CourseModel({
-        id: "C7.203",
-        type: "Office",
-        maximum_capacity: 4
+        id: "CSEN704",
+        name: "Advanced Computer Lab",
+        department: department._id,
+        slots_needed: 4
     });
     await course.save();
 });
@@ -49,7 +97,7 @@ app.post('/addFaculty', async (req, res) => {
 
 app.post('/addDepartment', async (req, res) => {
     const department = new DepartmentModel({
-        name: "Computer Science"
+        name: "DMET"
     });
     await department.save();
 });
@@ -60,18 +108,18 @@ app.post('/addAcademicStaffMember', async (req, res) => {
     const location = await LocationModel.findOne({id: "C7.203"});
     
     // Add to StaffMemberModelFirst.
-    const staffMember = new StaffMemberModel({
-        name: "Maria Maged",
-        id: "ac-1",
-        email: "maria@gmail.com",
-        salary: 1000,
+    const staffMemberTemp = new StaffMemberModel({
+        name: "Manal Mounir",
+        id: "ac-3",
+        email: "manal@gmail.com",
+        salary: 3000,
         office: location._id,
         staff_type: "Academic Member"
     });
-    await staffMember.save();
+    await staffMemberTemp.save();
 
     // Then add to AcademicStaffModel.
-    staffMember = await StaffMemberModel.findOne({email: "maria@gmail.com"}); // Find the id JavaScript added to the tuple we inserted.
+    const staffMember = await StaffMemberModel.findOne({email: "manal@gmail.com"}); // Find the id JavaScript added to the tuple we inserted.
     const faculty = await FacultyModel.findOne({name: "Engineering"}); // Find the id JavaScript added to the tuple we inserted.
     const department = await DepartmentModel.findOne({name: "Computer Science"}); // Find the id JavaScript added to the tuple we inserted.
     const academicMember = new AcademicStaffModel({
