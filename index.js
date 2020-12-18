@@ -24,6 +24,7 @@ mongoose.connect(process.env.DB_URL, databaseParameters)
 // Listen on port.
 app.post('/viewDepartmentStaffPerCourse', async (req, res) => {
         //  if(req.user.isHod) {
+            
             const {courseID} = req.body;
             console.log(courseID);
             console.log(typeof courseID);
