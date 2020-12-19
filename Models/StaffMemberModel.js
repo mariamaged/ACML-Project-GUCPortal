@@ -10,10 +10,13 @@ const attendanceSchema = mongoose.Schema({
     //var datetime = new Date();
     //console.log(datetime.toISOString().slice(0,10)); ----->2020-12-18,
     ,attended:{type:Boolean, default:false},
-    signedOut:{type:Boolean, default:false}
-   ,hours: {type:Number}
+    signedIn:{type:Boolean, default:false},
+    signedOut:{type:Boolean, default:true}
+   ,hours: {type:Number,default:0},
+   minutes:{type:Number,default:0}
    ,last_signIn: {type:Date }
    ,last_signOut: {type:Date }
+   ,last_calculated_signOut: {type:Date }
    ,day: {type: String}
 });
 
