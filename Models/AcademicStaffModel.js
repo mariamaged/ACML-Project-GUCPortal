@@ -5,10 +5,13 @@ const ObjectID = mongoose.Schema.Types.ObjectId;
 
 
 const attendanceSchema = mongoose.Schema({
-    date: {type: Date}
+    date: {type: String}
+    ,time:{time:Date}
+    //var datetime = new Date();
+    //console.log(datetime.toISOString().slice(0,10)); ----->2020-12-18
    ,hours: {type:Number}
-   ,last_signIn: {type:Date ,default:Date.now}
-   ,last_signOut: {type:Date ,default:Date.now}
+   ,last_signIn: {type:Date }
+   ,last_signOut: {type:Date }
    ,day: {type: String}
 });
 

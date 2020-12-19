@@ -393,7 +393,67 @@ router.put('/signin',authenticateToken,async(req,res)=>{
     
 })
 
+router.put('/signout',authenticateToken,async(req,res)=>{
+    var datetime = new Date();
+    var check=false;
+    const SignOut=moment()
+    //(moment(currentTime).format("HH:mm"))
+    var currentTime = moment();
+    console.log("SignIn= "+SignOut)
+    const user=await StaffMemberModel.findById(req.user.id)
+    if(user.attendance){
+       var attendance=user.attendance
+       var date=new Date()
+       var time=new Date()
+       var hours=0
+       var last_signIn =0
+       var last_signOut=0
+       var day="Saturday";
+        var idx=-1;
+        var attArr=new Array()
+        for(var i=0;i<attendance.length;i++){
 
+            var momentA = attendance[i].date;
+            var momentB = currentTime.format('YYYY-MM-DD')
+    
+            if(momentA==momentB && attendance[i].last_signIn ){
+                console.log("herer")
+                date=attendance[i].date
+                time=attendance[i].time
+                 hours=attendance[i].hours
+                 last_signIn =attendance[i].last_signIn
+                 last_signOut=SignOut
+                 day=attendance[i].day
+                check=true;
+                idx=i;
+                
+            }
+            attArr[i]=attendance[i];
+
+        }
+        if(check===true){
+            const newAtt=new AttendanceSchema({
+                date:date,
+                time:time,
+                hours:hours,
+                last_signIn:last_signIn,
+                last_signOut:last_signOut,
+                day:day
+            })
+            attArr[idx]=newAtt
+            const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+            const user= await StaffMemberModel.findById(req.user.id)
+            const signin=user.attendance[idx].last_signIn
+            const signout=user.attendance[idx].last_signOut
+            const dateToday=user.attendance[idx].date
+            return res.json({name:user.name,date:dateToday,last_signIn:(moment(signin).format("HH:mm")),last_signOut:(moment(signout).format("HH:mm"))})
+        }
+    }
+    if(check===false || user.attendance.length==0){
+            return res.json("Cannot sign out without prior signin")
+        
+    }
+})
 
 
 module.exports=router;

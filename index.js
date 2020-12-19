@@ -204,7 +204,7 @@ app.post('/addStaffMember',async(req,res)=>{
         for(var i=0;i<dates.length;i++){
              a=new attendanceSchema({
                 date:dates[i],
-                time:moment()
+                time:moment(),
               //  time: (moment(currentTime).format("HH:mm")),
             })
             a.save();

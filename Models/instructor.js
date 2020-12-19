@@ -23,16 +23,16 @@ const slotSchema=mongoose.Schema({
     ,course_id: {type:Number}
 })
 
-const attendaceSchema=mongoose.Schema({
-     date: {type: Date}
-    ,hours: {type:Number}
-
-    //--------------------------------------------------------CHECK BELOW CODE SUBSTITUTION OF TIMESTAMP--------------------------------
-    ,last_sign_in: { type : Date, default: Date.now }
-    ,last_sign_out: { type : Date, default: Date.now }
-    //---------------------------------------------------------------------------------------------------------
-    ,day: {type: String}
-})
+const attendanceSchema = mongoose.Schema({
+    date: {type: String}
+    ,time:{time:Date}
+    //var datetime = new Date();
+    //console.log(datetime.toISOString().slice(0,10)); ----->2020-12-18
+   ,hours: {type:Number}
+   ,last_signIn: {type:Date }
+   ,last_signOut: {type:Date }
+   ,day: {type: String}
+});
 
 
 
