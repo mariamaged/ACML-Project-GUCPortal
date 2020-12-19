@@ -125,6 +125,7 @@ const StaffMemberModel = require('./Models/StaffMemberModel');
 const HRModel = require('./Models/HRModel');
 const CourseModel = require('./Models/CourseModel');
 const attendanceSchema=StaffMemberModel.attendanceSchema
+const moment=require('moment')
 //----------------------------------------------
 require('dotenv').config()
 
@@ -196,11 +197,15 @@ app.post('/addStaffMember',async(req,res)=>{
     const attArr=new Array()
     var a=''
     const dates=req.body.dates
+   
+     var currentTime = moment();
+     
     if(dates){
         for(var i=0;i<dates.length;i++){
              a=new attendanceSchema({
                 date:dates[i],
-                time:new Date(),
+                time:moment()
+              //  time: (moment(currentTime).format("HH:mm")),
             })
             a.save();
             attArr[i]=a

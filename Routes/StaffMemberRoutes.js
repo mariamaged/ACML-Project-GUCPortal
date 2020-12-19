@@ -12,6 +12,7 @@ const location=require('../Models/LocationModel.js')
 const department=require('../Models/DepartmentModel.js')
 const faculty=require('../Models/FacultyModel.js')
 const AttendanceSchema=StaffMemberModel.attendanceSchema
+var moment = require('moment');
 
 function authenticateToken(req,res,next){
     const token=req.header('x-auth-token');
@@ -301,34 +302,63 @@ router.put('/resetPassword',authenticateToken,async(req,res)=>{
 router.put('/signin',authenticateToken,async(req,res)=>{
     var datetime = new Date();
     var check=false;
-    const SignIn=Date.now();
+    const SignIn=moment()
+    //(moment(currentTime).format("HH:mm"))
+    var currentTime = moment();
     //console.log(datetime.toISOString().slice(0,10))
-   // console.log(req.user.id)
+    console.log("SignIn= "+SignIn)
     const user=await StaffMemberModel.findById(req.user.id)
     if(user.attendance){
        var attendance=user.attendance
-       // console.log("attendance= "+attendance)
+       var date=new Date()
+       var time=new Date()
+       var hours=0
+       var last_signIn =0
+       var last_signOut=0
+       var day="Saturday";
+        var idx=-1;
+        var attArr=new Array()
         for(var i=0;i<attendance.length;i++){
-            console.log("date i= "+attendance[i].date.toISOString().substring(0, 10))
-            console.log(new Date().toISOString().substring(0, 10))
-            if(attendance[i].date.toISOString().substring(0, 10)==(new Date().toISOString().substring(0, 10))){
-             //   const newSignInDate=new Date(year, month, day);
-               
-               // (user.attendance)[i].set(last_signIn,SignIn)
-                // user.set(user.attendance[i].last_signIn,SignIn)
+            // console.log("date i= "+attendance[i].date.toISOString().substring(0, 10))
+            // console.log(new Date().toISOString().substring(0, 10))
+
+            var momentA = attendance[i].date;
+            var momentB = currentTime.format('YYYY-MM-DD')
+            console.log("momA= "+momentA)
+            console.log("momB= "+momentB)
+
+
+           // if(attendance[i].date.toISOString().substring(0, 10)==(new Date().toISOString().substring(0, 10))){
+            if(momentA==momentB){
                 console.log("herer")
-                try{
-                    console.log(new Date())
-                const newSignIn=await AttendanceSchema.findOneAndUpdate({date:attendance[i].date},{last_signIn:new Date()})
+                date=attendance[i].date
+                time=attendance[i].time
+                 hours=attendance[i].hours
+                 last_signIn =SignIn
+                 last_signOut=attendance[i].last_signOut
+                 day=attendance[i].day
                 check=true;
-                console.log("new attendance= "+user.attendance[i])
-                return  res.json(user.attendance[i])
-                }
-                catch(err){
-                    return res.json("error "+err)
-                }
+                idx=i;
                 
             }
+            attArr[i]=attendance[i];
+
+        }
+        if(check===true){
+            const newAtt=new AttendanceSchema({
+                date:date,
+                time:time,
+                hours:hours,
+                last_signIn:last_signIn,
+                last_signOut:last_signOut,
+                day:day
+            })
+            attArr[idx]=newAtt
+            const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+            const user= await StaffMemberModel.findById(req.user.id)
+            const att=user.attendance[idx].last_signIn
+            const dateToday=user.attendance[idx].date
+            return res.json({name:user.name,date:dateToday,last_signIn:(moment(att).format("HH:mm"))})
         }
     }
     if(check===false || user.attendance.length==0){
@@ -336,23 +366,35 @@ router.put('/signin',authenticateToken,async(req,res)=>{
 
             const newAttendance=new AttendanceSchema({
                 date:newSignInDate,
-                last_signIn:SignIn
+                time,
+                hours,
+                last_signIn:SignIn,
+                last_signOut,
+                day
             })
+            console.log("SignIn= "+SignIn)
             console.log("newAttendance "+newAttendance)
         if(check===false){
            const attArr=user.attendance
            attArr[attArr.length]=newAttendance
            console.log("attArr "+attArr)
            const update=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
-            return res.json(await StaffMemberModel.findById(req.user.id))
-
+            const userNow= await StaffMemberModel.findById(req.user.id)
+            const dateToday=userNow.attendance[attendance.length-1].date
+            const att=userNow.attendance[attendance.length-1].last_signIn
+            console.log("att= "+(moment(att).format("HH:mm")))
+            return res.json({name:userNow.name,date:dateToday,last_signIn:(moment(att).format("HH:mm"))})
+            //return res.json("done")
         }
         else{
-           const attendanceArr=new Array()
-           attendance[0]=newAttendance
+           const attArr=new Array()
+           attArr[0]=newAttendance
            console.log(attendance)
-           const update=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attendance})
-           return res.json(await StaffMemberModel.findById(req.user.id))  
+           const update=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+           const user= await StaffMemberModel.findById(req.user.id)
+           const att=user.attendance[0].last_signIn
+           const dateToday=user.attendance[0].date
+           return res.json({name:user.name,date:dateToday,last_signIn:(moment(att).format("HH:mm"))})
         }
         
 
@@ -360,30 +402,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
     
 })
 
-const date=Date()
-// console.log("OLD= "+date)
 
-// const newDate=new Date()
-// console.log("OLD= "+newDate)
-
-// console.log(date.setHours(0,0,0,0)==newDate.setHours(0,0,0,0))
-
-// console.log(date.toDateString());
-// var today = new Date(new Date().setUTCHours(0,0,0,0));
-// var todaynew = today.toString();
-// var c=today.toISOString().substring(0, 10);
-
-//console.log(dateCompare<c)
-
-
-// var groupedData = _.groupBy(datas, function(d){
-//     return d.startedAt.toISOString().substring(0, 10);
-//  });
-
-// var date1='2020-1-12'
-// var date2='2020-10-10'
-// console.log(date1>date2)
-//console.log((new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).toISOString));
 // // {
 //     "_id": "5fdd11ddf4e4d03ed83f8ac6",
 //     "date": "2020-12-12T00:00:00.000Z",
@@ -402,5 +421,32 @@ const date=Date()
 //     "last_signIn": "2020-12-18T20:32:29.194Z",
 //     "last_signOut": "2020-12-18T20:32:29.194Z"
 // }
+
+// console.log(moment(currentTime).format("hh:mm"))
+//   var currentTime = moment().format('YYYY-MM-DD');
+//     const time=moment().toDate().getTime()
+//     console.log(time)
+//     console.log(time<currentTime)
+
+// const time="2020-12-11"
+// console.log(currentTime<time)
+
+// const currentTime=moment()
+// const min=moment(currentTime).format("hh:mm")
+// console.log(min)
+
+
+// const currentTime2=moment()
+// const min2=moment(currentTime2).format("HH:mm")
+// console.log(currentTime2)
+
+// const da=moment('2020-12-18T01:21:29.657Z')
+// console.log(da)
+
+// console.log(da.format("HH:mm"))
+// console.log(currentTime2.format("HH:mm"))
+// console.log(da.format("hh:mm")>currentTime2.format("HH:mm"))
+//console.log(moment('2020-12-19T10:48:25.569Z').format("HH:mm"))
+
 
 module.exports=router;
