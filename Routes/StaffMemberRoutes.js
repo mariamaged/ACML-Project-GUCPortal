@@ -422,7 +422,6 @@ router.put('/signout',authenticateToken,async(req,res)=>{
     var datetime = new Date();
     var check=false;
     const SignOut=moment()
-    //(moment(currentTime).format("HH:mm"))
     var currentTime = moment();
     const user=await StaffMemberModel.findById(req.user.id)
     if(user.attendance){
@@ -435,23 +434,19 @@ router.put('/signout',authenticateToken,async(req,res)=>{
        var last_signOut=0
        var day="Saturday";
        var signedIn=false;
-      // var last_calculated_signOut;
         var idx=-1;
         var attArr=new Array()
         for(var i=0;i<attendance.length;i++){
 
             var momentA = attendance[i].date;
             var momentB = currentTime.format('YYYY-MM-DD')
-            // console.log("momentA= "+momentA)
-            // console.log("momentB= "+momentB)
             
             if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
 
-                   //subtract signout and signin to get hours
+             
                    var start = moment(attendance[i].last_signIn);
                    console.log("start= "+start.format('HH:mm'))
                    var end = moment(SignOut); 
-                //    console.log("start "+start.format("HH:mm"))
                     console.log("end "+end.format("HH:mm"))
                    
                    //get date today and time at 7 form new moment object to compare 
@@ -507,18 +502,8 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     }
 
 
-                
-
                     console.log("hours= "+hrs)
                     console.log("minutes= "+minute)
-
-                //     if(minute=='0' && hrs=='0'){
-                //         last_calculated_signOut=attendance[i].last_calculated_signOut
-                //         console.log("inside if"+moment(last_calculated_signOut).format("HH:mm"))
-                // }
-                //     else 
-                //     last_calculated_signOut=SignOut
-
 
                   var fin=minute+attendance[i].minutes
                  console.log("attendance[i].signedIn= "+attendance[i].signedIn)
@@ -535,7 +520,6 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                  hours=hrs+attendance[i].hours
                  minutes=fin
                  signedIn=false
-                 
                  last_signIn =attendance[i].last_signIn
                  console.log(moment(last_signIn).format("HH:mm"))
                  last_signOut=SignOut
@@ -559,7 +543,6 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 signedIn:false,
                 signedOut:true,
                 last_signIn:last_signIn,
-               // last_calculated_signOut:last_calculated_signOut,
                 last_signOut:last_signOut,
                 day:day
             })
