@@ -310,7 +310,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
     const user=await StaffMemberModel.findById(req.user.id)
     if(user.attendance){
        var attendance=user.attendance
-       var date=new Date()
+       var date=new moment()
        var time=new Date()
        var hours=0
        var minutes=0
@@ -367,12 +367,13 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const hour=user.attendance[idx].hours
             const minute=user.attendance[idx].minutes
           //  console.log("signed in true= "+signedInToday)
-            return res.json({name:user.name,date:dateToday,last_signIn:(moment(att).format("HH:mm")),
+            return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
             signedIn:signedInToday,hours:hour,minutes:minute})
         }
     }
     if(check===false || user.attendance.length==0){
-        const newSignInDate=moment.utc(new moment()).format('YYYY-MM-DD');
+        const newSignInDate=new moment()
+       // moment.utc( //).format('YYYY-MM-DD');
            // console.log("new date= "+newSignInDate)
             const newAttendance=new AttendanceSchema({
                 date:newSignInDate,
@@ -397,7 +398,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const att=userNow.attendance[attendance.length-1].last_signIn
             const signedInToday=userNow.attendance[attendance.length-1].signedIn
             console.log("att= "+(moment(att).format("HH:mm")))
-            return res.json({name:userNow.name,date:dateToday,last_signIn:(moment(att).format("HH:mm")),
+            return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
             signedIn:signedInToday})
         }
         else{
@@ -409,7 +410,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            const att=user.attendance[0].last_signIn
            const dateToday=user.attendance[0].date
            const signedInToday=user.attendance[0].signedIn
-           return res.json({name:user.name,date:dateToday,last_signIn:(moment(att).format("HH:mm")),
+           return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
                             signedIn:signedInToday})
         }
         
@@ -419,14 +420,14 @@ router.put('/signin',authenticateToken,async(req,res)=>{
 })
 
 router.put('/signout',authenticateToken,async(req,res)=>{
-    var datetime = new Date();
+    var datetime = new moment();
     var check=false;
     const SignOut=moment()
     var currentTime = moment();
     const user=await StaffMemberModel.findById(req.user.id)
     if(user.attendance){
        var attendance=user.attendance
-       var date=new Date()
+       var date=new moment()
        var time=new Date()
        var hours=0
        var minutes=0
@@ -553,7 +554,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             const signout=user.attendance[idx].last_signOut
             const dateToday=user.attendance[idx].date
             const lastCal=user.attendance[idx].last_calculated_signOut
-            return res.json({name:user.name,date:dateToday,last_signIn:(moment(signin).format("HH:mm")),last_signOut:(moment(signout).format("HH:mm")),
+            return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(signin).format("HH:mm")),last_signOut:(moment(signout).format("HH:mm")),
         hours:hours,minutes:minutes,signedIn:signedIn})
         }
     }
@@ -566,18 +567,46 @@ router.put('/signout',authenticateToken,async(req,res)=>{
 router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
     const user=await StaffMemberModel.findById(req.user.id)
    // if(user.attendance){
-        
-        const attendace=user.attendance.sort(compare)
+        const attendance=user.attendance
+        const sorted=attendance.sort(compare)
+        var month=false;
+        if(req.body.month){
+            month=true;
+            if(req.body.month<=0 || req.body.month>=13)
+                return res.send("Please enter correct month")
+        }
+       // console.log(sorted)
+        //console.log(attendance)
+        var arr=new Array()
+
         if(user.attendance.length>0){
-            console.log("in attendance list")
+            // console.log("in attendance list")
+            // console.log("length "+user.attendance.length)
             for(var i=0;i<user.attendance.length;i++){
                 const currDay=user.attendance[i]
-                res.json({date:currDay.date,attended:currDay.attended,
+                //console.log("currday= "+currDay)
+                if(month ){
+                     const dateMonth=moment(currDay.date).format("M")
+                     console.log("month= "+dateMonth)
+                    if(dateMonth==req.body.month)
+                     arr[i]=({date:moment(currDay.date).format("YYYY-MM-DD"),attended:currDay.attended,
+                                last_signIn:(moment(currDay.last_signIn).format("HH:mm")),
+                                last_signOut:(moment(currDay.last_signOut).format("HH:mm")),
+                                 hours:currDay.hours,minutes:currDay.minutes})
+
+                }
+
+                 else
+                arr[i]=({date:moment(currDay.date).format("YYYY-MM-DD"),attended:currDay.attended,
                     last_signIn:(moment(currDay.last_signIn).format("HH:mm")),
                     last_signOut:(moment(currDay.last_signOut).format("HH:mm")),
                 hours:currDay.hours,minutes:currDay.minutes})
             }
+            res.json({attendance:arr})
         }
+
+
+
 //}
     else{
         console.log("in else empty")
@@ -586,53 +615,40 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
     
 })
 function compare( a, b ) {
-    if ( a.date < b.date ){
-      return -1;
+   
+    // if (parseInt( a.date) < parseInt(b.date) ){
+    //     console.log("inside compare")
+    //   return -1;
+    // }
+    // if ( parseInt(a.date )>parseInt( b.date) ){
+    //   return 1;
+    // }
+    // return 0;
+    // if(moment(a.date).isBefore(moment(b.date)))
+    // return -1;
+    // if(moment(b.date).isBefore(moment(a.date)))
+    // return 1;
+    // return 0;
+
+    if((moment(a.date).format("YYYY-MM-DD"))<((moment(b.date).format("YYYY-MM-DD")))){
+        
+    return 1;
+
     }
-    if ( a.date > b.date ){
-      return 1;
+    if((moment(b.date).format("YYYY-MM-DD"))<((moment(a.date).format("YYYY-MM-DD")))){
+        console.log("b= "+(moment(b.date).format("YYYY-MM-DD")))
+        console.log("a= "+(moment(a.date).format("YYYY-MM-DD")))
+        return -1;
     }
     return 0;
   }
 module.exports=router;
 
-
-// var start = moment("2020-12-19T12:00:14.362+00:00");
-// var end = moment("2020-12-19T17:59:40.765+00:00"); 
-// console.log("start "+start.format("HH:mm"))
-// console.log("end "+end.format("HH:mm"))
-
-
-// var date = new moment().format('YYYY-MM-DD')
-// console.log("date= "+date)
-// var time = "19:00";
-// datetime = moment(date + ' ' + time).format();
-// console.log("datetime= "+datetime)
-// var minutes = end.diff(datetime, 'minutes');
-// var interval = moment().hour(0).minute(minutes);
-// console.log("down "+minutes)
-// //console.log(moment('2020-12-19T14:48:06.775+00:00').diff(moment('2020-12-19T14:48:06.775+00:00'),'minutes'))
-// console.log("check= "+end.isBefore(datetime));
-
-// if((end.isBefore(datetime))==false){
-// var date = new moment().format('YYYY-MM-DD')
-// console.log("date= "+date)
-// var time = "19:00";
-// end = moment(date + ' ' + time);
-// console.log("end= "+end)
-
-// }
-// var minutes = end.diff(start, 'minutes');
-// var interval = moment().hour(0).minute(minutes);
-// console.log(interval.format("HH:mm"));
-// console.log(moment.duration(interval.format("HH:mm")).get('hours'))
-// console.log(moment.duration(interval.format("HH:mm")).get('minutes'))
-///////////////////////////////////////////////////
-// var ms = moment(end,"DD/MM/YYYY HH:mm").diff(moment(start,"DD/MM/YYYY HH:mm"));
-// var d = moment.duration(ms);
-// var dh=d.get('hours')
-// var dm=d.get('minutes')
-// // var s = Math.floor(d.asHours()) + moment.utc(ms).format("HH:mm")
-// //  console.log('dh= '+dh+" dm= "+dm)
-
-/////////////////////////////////////////////////////////////////////////////////
+//console.log('2020-10-10'<'2020-12-17')
+//console.log((parseInt("2020-10-1")>parseInt("2019-12-78")))
+// const x=moment("2020-09-09")
+// const y=moment("2020-10-01")
+// console.log(y.isBefore(x))
+// var month = new moment()
+// console.log(month.format("M"))
+//console.log(month.month())

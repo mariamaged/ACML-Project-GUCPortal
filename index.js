@@ -203,7 +203,7 @@ app.post('/addStaffMember',async(req,res)=>{
     if(dates){
         for(var i=0;i<dates.length;i++){
              a=new attendanceSchema({
-                date:dates[i],
+                date:moment(dates[i]),
                 time:moment(),
               //  time: (moment(currentTime).format("HH:mm")),
             })
