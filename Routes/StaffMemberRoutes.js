@@ -364,10 +364,11 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const att=user.attendance[idx].last_signIn
             const dateToday=user.attendance[idx].date
             const signedInToday=user.attendance[idx].signedIn
-            const lastCal=user.attendance[idx].last_calculated_signOut
+            const hour=user.attendance[idx].hours
+            const minute=user.attendance[idx].minutes
           //  console.log("signed in true= "+signedInToday)
             return res.json({name:user.name,date:dateToday,last_signIn:(moment(att).format("HH:mm")),
-            signedIn:signedInToday,last_calculated_signOut:(moment(lastCal).format("HH:mm"))})
+            signedIn:signedInToday,hours:hour,minutes:minute})
         }
     }
     if(check===false || user.attendance.length==0){
@@ -444,10 +445,10 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             // console.log("momentA= "+momentA)
             // console.log("momentB= "+momentB)
             
-            if(momentA==momentB && attendance[i].last_signIn ){
+            if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
 
                    //subtract signout and signin to get hours
-                   var start = moment(attendance[i].last_calculated_signOut);
+                   var start = moment(attendance[i].last_signIn);
                    console.log("start= "+start.format('HH:mm'))
                    var end = moment(SignOut); 
                 //    console.log("start "+start.format("HH:mm"))
@@ -455,41 +456,68 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                    
                    //get date today and time at 7 form new moment object to compare 
                    //if person is signing out after 7 we will not count extra hours will set end=19:00
+
+                   //datetime at 7pm
                    var date = new moment().format('YYYY-MM-DD')
-                  // console.log("date= "+date)
                    var time = "19:00";
                    datetime = moment(date + ' ' + time).format();
-                 //  console.log("datetime= "+datetime)
                    var minutes = end.diff(datetime, 'minutes');
                    var interval = moment().hour(0).minute(minutes);
-                   
-                 //  console.log("check= "+end.isBefore(datetime));
+
+
+                   //datetime at 7am
+                   var date = new moment().format('YYYY-MM-DD')
+                   var time = "07:00";
+                   datetime2 = moment(date + ' ' + time).format();
+                   var minutes = end.diff(datetime, 'minutes');
+                   var interval = moment().hour(0).minute(minutes);
+                    console.log("datetime2= "+moment(datetime2).format("HH:mm"))
+
                    //if person is signingout after 7 
                    if((end.isBefore(datetime))==false){
                    var date = new moment().format('YYYY-MM-DD')
                  //  console.log("date= "+date)
                    var time = "19:00";
                    end = moment(date + ' ' + time);
-                 //  console.log("end= "+end)
-                   
+                   console.log("new end= "+moment(end).format("HH:mm"))
                    }
-                   var minutes = end.diff(start, 'minutes');
-                   var interval = moment().hour(0).minute(minutes);
-                //   console.log(interval.format("HH:mm"));
+                  
+
+                   //if person is signing in before 7
+                   if((start.isBefore(datetime2))==true){
+                    var date = new moment().format('YYYY-MM-DD')
+                  //  console.log("date= "+date)
+                    var time = "07:00";
+                    start = moment(date + ' ' + time);
+                    console.log("new start= "+moment(start).format("HH:mm"))
+                    }
+
+                    //calculating difference between start and end
+                    if((start.isBefore(end))==true){
+                    console.log("new start= "+moment(start).format("HH:mm"))
+                    console.log("new end= "+moment(end).format("HH:mm"))
+                    var minutes = end.diff(start, 'minutes');
+                    var interval = moment().hour(0).minute(minutes);
+                    var hrs=moment.duration(interval.format("HH:mm")).get('hours')
+                    var minute=moment.duration(interval.format("HH:mm")).get('minutes')
+                    }
+                    else{
+                        var hrs=0
+                        var minute=0 
+                    }
 
 
-                  var hrs=moment.duration(interval.format("HH:mm")).get('hours')
-                   var minute=moment.duration(interval.format("HH:mm")).get('minutes')
+                
 
                     console.log("hours= "+hrs)
                     console.log("minutes= "+minute)
 
-                    if(minute=='0' && hrs=='0'){
-                        last_calculated_signOut=attendance[i].last_calculated_signOut
-                        console.log("inside if"+moment(last_calculated_signOut).format("HH:mm"))
-                }
-                    else 
-                    last_calculated_signOut=SignOut
+                //     if(minute=='0' && hrs=='0'){
+                //         last_calculated_signOut=attendance[i].last_calculated_signOut
+                //         console.log("inside if"+moment(last_calculated_signOut).format("HH:mm"))
+                // }
+                //     else 
+                //     last_calculated_signOut=SignOut
 
 
                   var fin=minute+attendance[i].minutes
@@ -516,6 +544,8 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 idx=i;
                 
             }
+            else if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==true )
+            return res.send("This user has already signed out")
             attArr[i]=attendance[i];
 
         }
@@ -527,8 +557,9 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 hours:hours,
                 minutes:minutes,
                 signedIn:false,
+                signedOut:true,
                 last_signIn:last_signIn,
-                last_calculated_signOut:last_calculated_signOut,
+               // last_calculated_signOut:last_calculated_signOut,
                 last_signOut:last_signOut,
                 day:day
             })
@@ -540,12 +571,10 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             const dateToday=user.attendance[idx].date
             const lastCal=user.attendance[idx].last_calculated_signOut
             return res.json({name:user.name,date:dateToday,last_signIn:(moment(signin).format("HH:mm")),last_signOut:(moment(signout).format("HH:mm")),
-        hours:hours,minutes:minutes,signedIn:signedIn,
-    last_calculated_signOut:(moment(lastCal).format("HH:mm"))})
+        hours:hours,minutes:minutes,signedIn:signedIn})
         }
     }
     if(check===false || user.attendance.length==0){
-            //console.log("check= "+check)
             return res.json("Cannot sign out without prior signin")
         
     }
