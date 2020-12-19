@@ -6,6 +6,7 @@ const LocationModel = require('./Models/LocationModel.js');
 const FacultyModel = require('./Models/FacultyModel.js');
 const DepartmentModel = require('./Models/DepartmentModel.js');
 const CourseModel = require('./Models/CourseModel.js');
+const CounterModel = require('./Models/CounterModel.js');
 
 // For environmental variables.
 require('dotenv').config();
@@ -22,14 +23,48 @@ mongoose.connect(process.env.DB_URL, databaseParameters)
 .then(console.log('Successfully Connected to The Database'));
 
 // Listen on port.
+app.post('/CourseInstructorforCourse', async (req, res) => {
+ //   if(req.user.isHOD) {
+        const {courseID, courseInstructorID} = req.body;
+        const course = await CourseModel.findOne({id: courseID});
+        if(!course) {
+            return res.status(400).send('Course does not exist!');
+        }
+        else {
+            const courseInstructorStaffModel = await StaffMemberModel.findOne({id: courseInstructorID});
+            const courseInstructorAcademicModel = await AcademicStaffModel.findOne({member: courseInstructorStaffModel._id});
+
+            if(courseInstructorAcademicModel.type == 'Course Instructor') {
+            const HODStaffModel = await StaffMemberModel.findOne({id: "ac-4"});
+            const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id});
+            const HODDepartment = HODAcademicModel.department;
+            const CourseDepartment = course.department;
+
+            if(HODDepartment.equals(CourseDepartment)) {
+                await CourseModel.findOneAndUpdate({id: courseID}, {$addToSet: {academic_staff: courseInstructorAcademicModel._id}}, {new: true}, (error, doc) => {
+                    if(error) console.log("Something wrong happened while updating the course with course instructor");
+                    console.log(doc);
+                });
+            }
+            else {
+                return res.status(401).send('Course not under your department!');
+            }
+        }
+        else {
+                return res.status(400).send('Staff member is not a course instructor!');
+            }
+        }
+ //   }
+   /* else {
+        res.status(401).send('Access Denied!');
+    }*/
+});
+
 app.post('/viewDepartmentStaffPerCourse', async (req, res) => {
         //  if(req.user.isHod) {
             
             const {courseID} = req.body;
-            console.log(courseID);
-            console.log(typeof courseID);
             const course = await CourseModel.findOne({id: courseID});
-            console.log(course);
             const CourseDepartment = course.department;
             const HODStaffModel = await StaffMemberModel.findOne({id: "ac-1"}); // Delete later.
             const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
@@ -37,12 +72,14 @@ app.post('/viewDepartmentStaffPerCourse', async (req, res) => {
 
             if(HODDepartment.equals(CourseDepartment)) {
             const academicArray = course.academic_staff;
+            
             const returnArray = [];
             for(let index = 0; index < academicArray.length; index++) {
-              const staffTemp = await StaffMemberModel.findById(academicArray.member);
+              const academicTemp = await AcademicStaffModel.findById(academicArray[index]);
+              const staffTemp = await StaffMemberModel.findById(academicTemp.member);
               const officeTemp = await LocationModel.findById(staffTemp.office);
-              const departmentTemp = await DepartmentModel.findById(academicArray.department);
-              const facultyTemp = await FacultyModel.findById(academicArray.faculty);
+              const departmentTemp = await DepartmentModel.findById(academicTemp.department);
+              const facultyTemp = await FacultyModel.findById(academicTemp.faculty);
               
               const returnObject = {};
               returnObject.name = staffTemp.name;
@@ -51,7 +88,7 @@ app.post('/viewDepartmentStaffPerCourse', async (req, res) => {
               returnObject.salary = staffTemp.salary;
               returnObject.office = officeTemp.id;
               returnObject.department = departmentTemp.name;
-              returnObject.faculty = facultyTemp.id;
+              returnObject.faculty = facultyTemp.name;
               if(staffTemp.hasOwnProperty('gender')) returnObject.gender = staffTemp.gender;
               returnArray.push(returnObject);
           }
@@ -66,14 +103,117 @@ app.post('/viewDepartmentStaffPerCourse', async (req, res) => {
         }*/
 });
 
+app.get('/viewDepartmentStaffAllCourses', async (req, res) => {
+     //  if(req.user.isHod) {
+        const HODStaffModel = await StaffMemberModel.findOne({id: "ac-4"}); // Delete later.
+        const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+        const HODDepartment = HODAcademicModel.department;
+
+        const courses = await CourseModel.find({department: HODDepartment});
+        const returnArray = [];
+
+        for(let index = 0; index < courses.length; index++) {
+            const course = courses[index];
+
+            const returnObject = {};
+            returnObject.courseID = course.id;
+            returnObject.courseName = course.name;
+
+            const tempArray = [];
+
+            const academicArray = course.academic_staff;
+            for(let j = 0; j < academicArray.length; j++) {
+                const academicTemp = await AcademicStaffModel.findById(academicArray[j]);
+                const staffTemp = await StaffMemberModel.findById(academicTemp.member);
+                const officeTemp = await LocationModel.findById(staffTemp.office);
+                const departmentTemp = await DepartmentModel.findById(academicTemp.department);
+                const facultyTemp = await FacultyModel.findById(academicTemp.faculty);
+                
+                const tempObject = {};
+                tempObject.name = staffTemp.name;
+                tempObject.email = staffTemp.email;
+                tempObject.id = staffTemp.id;
+                tempObject.salary = staffTemp.salary;
+                tempObject.office = officeTemp.id;
+                tempObject.department = departmentTemp.name;
+                tempObject.faculty = facultyTemp.name;
+                if(staffTemp.hasOwnProperty('gender')) tempObject.gender = staffTemp.gender;
+                tempArray.push(tempObject);
+            }
+
+            returnObject.academicStaff = tempArray;
+            returnArray.push(returnObject);
+        }
+        return res.send(returnArray);
+
+     // }
+        /*else {
+            res.status(401).send('Access Denied!');
+        }*/
+
+});
+
+app.get('/viewDepartmentStaffDayOff', async (req, res) => {
+    //  if(req.user.isHod) {
+        const HODStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
+        const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+        const HODDepartment = HODAcademicModel.department;
+        const staffInDepartmentAcademicModel = await AcademicStaffModel.find({department: HODDepartment});
+
+        const returnArray = [];
+        for(let index = 0; index < staffInDepartmentAcademicModel.length; index++) {
+          const staffTemp = await StaffMemberModel.findById(staffInDepartmentAcademicModel[index].member);
+          
+          const returnObject = {
+            academicStaffMemberID: staffTemp.id,
+            academicStaffMemberName: staffTemp.name,
+            dayOff: staffInDepartmentAcademicModel[index].day_off
+          };
+
+          returnArray.push(returnObject);
+      }
+        return res.send(returnArray);         
+ // }
+  /*else {
+      res.status(401).send('Access Denied!');
+  }*/
+});
+
+app.post('/viewDepartmentStaffMemberDayOff', async (req, res) => {
+    //  if(req.user.isHod) {
+        const {memberID} = req.body;
+        const HODStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
+        const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+        const HODDepartment = HODAcademicModel.department;
+
+        const staffMemberModel = await StaffMemberModel.findOne({id: memberID});
+        const academicMemberModel = await AcademicStaffModel.findOne({member: staffMemberModel._id});
+
+        if(academicMemberModel.department.equals(HODDepartment)) {
+            const returnObject = {
+            academicStaffMemberName: staffMemberModel.name,
+            dayOff: academicMemberModel.day_off
+          };
+          return res.send(returnObject);
+        }
+        else {
+            res.status(401).send("Staff member not in your department!");
+        }
+
+                
+ // }
+  /*else {
+      res.status(401).send('Access Denied!');
+  }*/
+});
 
 app.post('/addCourse', async (req, res) => {
     const departmentName = req.body.departmentName;
     const department = await DepartmentModel.findOne({name: departmentName});
 
     const course = new CourseModel({
-        id: "CSEN704",
-        name: "Advanced Computer Lab",
+        id: "DMET502",
+        name: "Computer Graphics",
         department: department._id,
         slots_needed: 4
     });
@@ -105,24 +245,31 @@ app.post('/addDepartment', async (req, res) => {
 
 // Data hardcoded now but will put as endpoint params.
 app.post('/addAcademicStaffMember', async (req, res) => {
+    const doc = await CounterModel.findById('ac-');
+    if(!doc) {
+        const counterAcademic = new CounterModel({
+            _id: 'ac-'
+        });
+        await counterAcademic.save();
+    }
     // Search for location id.
     const location = await LocationModel.findOne({id: "C7.203"});
     
     // Add to StaffMemberModelFirst.
     const staffMemberTemp = new StaffMemberModel({
-        name: "Manal Mounir",
-        id: "ac-3",
-        email: "manal@gmail.com",
-        salary: 3000,
+        name: "Sarah Maged",
+        email: "sarah@gmail.com",
+        salary: 5000,
         office: location._id,
-        staff_type: "Academic Member"
+        staff_type: "Academic Member",
+        day_off: "Wednesday"
     });
     await staffMemberTemp.save();
 
     // Then add to AcademicStaffModel.
-    const staffMember = await StaffMemberModel.findOne({email: "manal@gmail.com"}); // Find the id JavaScript added to the tuple we inserted.
+    const staffMember = await StaffMemberModel.findOne({email: "sarah@gmail.com"}); // Find the id JavaScript added to the tuple we inserted.
     const faculty = await FacultyModel.findOne({name: "Engineering"}); // Find the id JavaScript added to the tuple we inserted.
-    const department = await DepartmentModel.findOne({name: "Computer Science"}); // Find the id JavaScript added to the tuple we inserted.
+    const department = await DepartmentModel.findOne({name: "DMET"}); // Find the id JavaScript added to the tuple we inserted.
     const academicMember = new AcademicStaffModel({
         member: staffMember._id,
         faculty: faculty._id,

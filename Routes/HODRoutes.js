@@ -27,7 +27,7 @@ router.route('/CourseInstructorforSingleCourse')
             const CourseDepartment = course.department;
 
             if(HODDepartment.equals(CourseDepartment)) {
-                await CourseModel.findOneAndUpdate({id: courseID}, {$addToSet: {academic_staff: courseInstructorStaffModel._id}}, {new: true}, (error, doc) => {
+                await CourseModel.findOneAndUpdate({id: courseID}, {$addToSet: {academic_staff: courseInstructorAcademicModel._id}}, {new: true}, (error, doc) => {
                     if(error) console.log("Something wrong happened while updating the course with course instructor");
                     console.log(doc);
                 });
@@ -85,20 +85,6 @@ router.route('/CourseInstructorforSingleCourse')
 });
 
 // Route 2.
-router.route('/viewStaffinDepartment')
-.get(async (req, res) => {
-    //  if(req.user.isHod) {
-          const HODStaffModel = await StaffMemberModel.findOne({id: "ac-1"});
-          const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id});
-          const HODDepartment = HODAcademicModel.department;
-          const staffInDepartment = await AcademicStaffModel.find({department: HODDepartment});
-          return res.send(staffInDepartment);
-     // }
-      /*else {
-          res.status(401).send('Access Denied!');
-      }*/
-  });
-
 router.route('/viewDepartmentStaff')
 .get(async (req, res) => {
     //  if(req.user.isHod) {
@@ -131,6 +117,7 @@ router.route('/viewDepartmentStaff')
       res.status(401).send('Access Denied!');
   }*/
 });
+
 
 // Export the router.
 module.exports = router;
