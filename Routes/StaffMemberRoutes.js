@@ -302,6 +302,7 @@ router.put('/resetPassword',authenticateToken,async(req,res)=>{
 router.put('/signin',authenticateToken,async(req,res)=>{
     var datetime = new Date();
     var check=false;
+    
     const SignIn=moment()
     //(moment(currentTime).format("HH:mm"))
     var currentTime = moment();
@@ -315,6 +316,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
        var last_signIn =0
        var last_signOut=0
        var day="Saturday";
+       var signedOut=false;
         var idx=-1;
         var attArr=new Array()
         for(var i=0;i<attendance.length;i++){
@@ -342,6 +344,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 date:date,
                 time:time,
                 hours:hours,
+                signedOut:false,
                 last_signIn:last_signIn,
                 last_signOut:last_signOut,
                 day:day
@@ -355,12 +358,13 @@ router.put('/signin',authenticateToken,async(req,res)=>{
         }
     }
     if(check===false || user.attendance.length==0){
-        const newSignInDate=new Date().toDateString();
-
+        const newSignInDate=moment.utc(new moment()).format('YYYY-MM-DD');
+           // console.log("new date= "+newSignInDate)
             const newAttendance=new AttendanceSchema({
                 date:newSignInDate,
                 time,
                 hours,
+                signedOut:false,
                 last_signIn:SignIn,
                 last_signOut,
                 day
@@ -399,6 +403,11 @@ router.put('/signout',authenticateToken,async(req,res)=>{
     const SignOut=moment()
     //(moment(currentTime).format("HH:mm"))
     var currentTime = moment();
+
+   
+
+
+
     console.log("SignIn= "+SignOut)
     const user=await StaffMemberModel.findById(req.user.id)
     if(user.attendance){
@@ -409,18 +418,27 @@ router.put('/signout',authenticateToken,async(req,res)=>{
        var last_signIn =0
        var last_signOut=0
        var day="Saturday";
+       var signedOut=true;
         var idx=-1;
         var attArr=new Array()
         for(var i=0;i<attendance.length;i++){
 
             var momentA = attendance[i].date;
             var momentB = currentTime.format('YYYY-MM-DD')
-    
+            console.log("momentA= "+momentA)
+            console.log("momentB= "+momentB)
+            
             if(momentA==momentB && attendance[i].last_signIn ){
+
+                   //subtract signout and signin to get hours
+                
+
+
                 console.log("herer")
                 date=attendance[i].date
                 time=attendance[i].time
                  hours=attendance[i].hours
+                 signedOut=true,
                  last_signIn =attendance[i].last_signIn
                  last_signOut=SignOut
                  day=attendance[i].day
@@ -435,7 +453,9 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             const newAtt=new AttendanceSchema({
                 date:date,
                 time:time,
+                attended:true,
                 hours:hours,
+                signedOut:true,
                 last_signIn:last_signIn,
                 last_signOut:last_signOut,
                 day:day
@@ -450,10 +470,51 @@ router.put('/signout',authenticateToken,async(req,res)=>{
         }
     }
     if(check===false || user.attendance.length==0){
+            //console.log("check= "+check)
             return res.json("Cannot sign out without prior signin")
         
     }
 })
 
-
+router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
+    const user=await StaffMemberModel.findById(req.user.id)
+   // if(user.attendance){
+        
+        const attendace=user.attendance.sort(compare)
+        if(user.attendance.length>0){
+            console.log("in attendance list")
+            for(var i=0;i<user.attendance.length;i++){
+                const currDay=user.attendance[i]
+                res.json({date:currDay.date,attended:currDay.attended,last_signIn:(moment(currDay.last_signIn).format("HH:mm")),last_signOut:(moment(currDay.last_signOut).format("HH:mm"))})
+            }
+        }
+//}
+    else{
+        console.log("in else empty")
+        return res.json(user.attendance)
+    }
+    
+})
+function compare( a, b ) {
+    if ( a.date < b.date ){
+      return -1;
+    }
+    if ( a.date > b.date ){
+      return 1;
+    }
+    return 0;
+  }
 module.exports=router;
+
+
+// var start = moment("2020-12-19T12:34:14.362+00:00").format ("HH:mm");
+// var end = moment("2020-12-19T12:29:40.765+00:00").format ("HH:mm"); 
+// console.log("start "+start)
+// console.log("end "+end)
+// if(end>"19:00"){
+//  end="19:00"
+// }
+//  var d = moment.duration(end.diff(start));
+//  var s = moment.utc(+d).format('HH:mm');
+//  console.log(d)
+//  console.log(s)
