@@ -12,6 +12,7 @@ const location=require('../Models/LocationModel.js')
 const department=require('../Models/DepartmentModel.js')
 const faculty=require('../Models/FacultyModel.js')
 const AttendanceSchema=StaffMemberModel.attendanceSchema
+const monthlyHoursSchema=StaffMemberModel.monthlyHoursSchema
 var moment = require('moment');
 
 function authenticateToken(req,res,next){
@@ -427,7 +428,9 @@ router.put('/signout',authenticateToken,async(req,res)=>{
     const SignOut=moment()
     var currentTime = moment();
     const user=await StaffMemberModel.findById(req.user.id)
-    if(user.attendance){
+    console.log("req.user.id= "+req.user.id)
+    //if there is attendance to check
+    if(user.attendance.length>0){
        var attendance=user.attendance
        var date=new moment()
        var time=new Date()
@@ -439,14 +442,12 @@ router.put('/signout',authenticateToken,async(req,res)=>{
        var signedIn=false;
         var idx=-1;
         var attArr=new Array()
+        //searching for a record with this date to check if previously signed in
         for(var i=0;i<attendance.length;i++){
-
             var momentA = moment(attendance[i].date).format('YYYY-MM-DD');
             var momentB = currentTime.format('YYYY-MM-DD')
             console.log("understand "+ attendance[i].last_signIn )
             if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
-
-             
                    var start = moment(attendance[i].last_signIn);
                    console.log("start= "+start.format('HH:mm'))
                    var end = moment(SignOut); 
@@ -504,12 +505,14 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                         var minute=0 
                     }
 
+                    var monthlyHours=hrs
+                    var monthlyMin=minute
 
                     console.log("hours= "+hrs)
                     console.log("minutes= "+minute)
 
-                  var fin=minute+attendance[i].minutes
-                 console.log("attendance[i].signedIn= "+attendance[i].signedIn)
+                    var fin=minute+attendance[i].minutes
+                    console.log("attendance[i].signedIn= "+attendance[i].signedIn)
                     if(attendance[i].miuntes+minutes>60){
                         console.log("signedin true")
                         hrs=hrs+1
@@ -517,27 +520,103 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     }
 
 
-                console.log("herer")
-                date=attendance[i].date
-                time=attendance[i].time
-                 hours=hrs+attendance[i].hours
-                 minutes=fin
-                 signedIn=false
-                 last_signIn =attendance[i].last_signIn
-                 console.log(moment(last_signIn).format("HH:mm"))
-                 last_signOut=SignOut
-                 day=attendance[i].day
-                check=true;
-                idx=i;
+                    console.log("herer")
+                    date=attendance[i].date
+                    time=attendance[i].time
+                    hours=hrs+attendance[i].hours
+                    minutes=fin
+                    signedIn=false
+                    last_signIn =attendance[i].last_signIn
+                    console.log(moment(last_signIn).format("HH:mm"))
+                    last_signOut=SignOut
+                    day=attendance[i].day
+                    check=true;
+                    idx=i;
                 
             }
-            else if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==true )
-                return res.send("This user has already signed out")
+             else if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==true )
+                 return res.send("This user has already signed out")
 
             attArr[i]=attendance[i];
 
         }
-        if(check===true){
+        
+        
+        if(check==true){
+            const user= await StaffMemberModel.findById(req.user.id)
+            /////////////////////////////////////////////////////////////////////////////
+           //we can signout so get hours attended and add to monthly
+            const currMonth=new moment().format("M")
+            var c=false;
+            var newMonthlyArr=new Array()
+           // console.log("user= "+user)
+            //search in months hours for this person then add new hours and minutesif there is already a record
+            //const user=await StaffMemberModel.findById(req.user.id)
+            console.log("length= "+user.time_attended.length)
+            if(user.time_attended.length>0){
+                for(var l=0;l<user.time_attended.length;l++){
+                    if(user.time_attended[l].num==currMonth){
+                        console.log("found one= "+user.time_attended[l])
+                        const prevHours=user.time_attended[l].hours
+                        const prevMin=user.time_attended[l].minutes
+                        var minTotal=prevMin+monthlyMin
+                        if(prevMin+monthlyMin>60){
+                            monthlyHours+=1
+                            minTotal=prevMin+monthlyMin-60
+
+                        }
+                        console.log("prevMin= "+prevMin)
+                        console.log("monthlyMin= "+monthlyMin)
+                        console.log("minTotal= "+minTotal)
+                        //new monthlyTime with updated hours and minutes
+                        const newMonthly=new monthlyHoursSchema({
+                            num:user.time_attended[l].num
+                             ,hours:user.time_attended[l].hours+monthlyHours
+                            ,minutes:minTotal
+                            ,mustAttendHours:user.time_attended[l].mustAttendHours
+                            ,mustAttendMinutes:user.time_attended[l].mustAttendMinutes
+                        })
+                        //adding updated month to array
+                        c=true
+                        newMonthlyArr[l]=newMonthly
+                    }
+                    //adding other months in the array
+                    else
+                    newMonthlyArr[l]=user.time_attended[l]
+                }
+                //updating staff member info'
+                console.log("will update "+ newMonthlyArr)
+                const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:newMonthlyArr})
+  
+            }
+        
+            //didn't find record for this month or any records at all should add new record
+            if(c==false || user.time_attended.length==0){
+                const newMonthly=new monthlyHoursSchema({
+                    num:parseInt(currMonth)
+                     ,hours:monthlyHours
+                    ,minutes:monthlyMin
+                })
+                //if month array is empty simply add this new record
+                if(user.time_attended.length==0){
+                    console.log("newMonthly= "+newMonthly)
+                    const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:newMonthly})
+                //  res.json({monthly:up.time_attended[0]})
+                }
+                //if array not empty but doesn't contain this month update it
+                else {
+                    var oldMonthUp=user.time_attended
+                    oldMonthUp[oldMonthUp.length-1]=newMonthly
+                
+                    const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:oldMonthUp})
+                  //  res.json(up)
+                }
+            }
+
+
+
+
+            ///////////////////////////////////////////////////////////////////////////////////
             const newAtt=new AttendanceSchema({
                 date:date,
                 time:time,
@@ -552,21 +631,24 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             })
             attArr[idx]=newAtt
             const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
-            const user= await StaffMemberModel.findById(req.user.id)
+           // const user= await StaffMemberModel.findById(req.user.id)
             const signin=user.attendance[idx].last_signIn
             const signout=user.attendance[idx].last_signOut
             const dateToday=user.attendance[idx].date
             const lastCal=user.attendance[idx].last_calculated_signOut
             return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(signin).format("HH:mm")),last_signOut:(moment(signout).format("HH:mm")),
-        hours:hours,minutes:minutes,signedIn:signedIn})
+                hours:hours,minutes:minutes,signedIn:signedIn})
         }
     }
-    if(check===false || user.attendance.length==0){
-            return res.json("Cannot sign out without prior signin")
-        
-    }
-})
 
+
+    //no attendance or this day is not found so no prior signin
+    if(check===false || user.attendance.length==0){
+        return res.json("Cannot sign out without prior signin")
+    }
+
+        
+})
 router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
     const user=await StaffMemberModel.findById(req.user.id)
    // if(user.attendance){
@@ -841,3 +923,12 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
 
 module.exports=router;
 
+// console.log(new moment("2020-01-01").format("M"))
+// const x=new moment("2020-01-01").format("M")
+// const check=(x==1)
+// console.log(check)
+// async  function z(){
+// const c=await StaffMemberModel.findById("5fdc24861418851510805d28")
+// const g=c.time_attended[0]
+// console.log("her "+g.minutes)
+// }z()

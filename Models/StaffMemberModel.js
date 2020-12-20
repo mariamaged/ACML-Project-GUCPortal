@@ -28,6 +28,15 @@ const slotSchema = mongoose.Schema({
     course: {type: ObjectID, ref:'Course'}
 });
 
+const monthlyHoursSchema = mongoose.Schema({
+   num:{type:Number}
+   ,hours:{type:Number ,default:0}
+   ,minutes:{type:Number ,default:0}
+    ,mustAttendHours:{type:Number}
+    ,mustAttendMinutes:{type:Number}
+    ,
+});
+
 const StaffMemberSchema = mongoose.Schema({
     // Personal Information.
     name: {type: String, required: true}, // No staff can change that.
@@ -48,7 +57,8 @@ const StaffMemberSchema = mongoose.Schema({
     lastUpdatedAnnual:{type: Date},
     accidentalDaysLeft: {type:Number},
     attendCompensationDay:{type:Boolean},
-     missingDays:{type:[String],default:[]}
+    missingDays:{type:[String],default:[]},
+    time_attended:{type:[monthlyHoursSchema],default:[]}
 },
 
 {
@@ -60,3 +70,4 @@ StaffMemberSchema.index({ user: 1, name: 1 }, { unique: true });
 module.exports = mongoose.model('Staff', StaffMemberSchema);
 
 module.exports.attendanceSchema = mongoose.model('attendance', attendanceSchema);
+module.exports.monthlyHoursSchema = mongoose.model('monthlyHour', monthlyHoursSchema);
