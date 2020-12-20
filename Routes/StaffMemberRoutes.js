@@ -338,6 +338,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 var dayOffBool=false
 
                 console.log("herer")
+                console.log("dayOfBool at singin "+dayOffBool)
                 date=attendance[i].date
                 time=attendance[i].time
                  hours=attendance[i].hours
@@ -377,9 +378,10 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const signedInToday=user.attendance[idx].signedIn
             const hour=user.attendance[idx].hours
             const minute=user.attendance[idx].minutes
+            const dayoff=user.attendance[idx].dayOffBool
           //  console.log("signed in true= "+signedInToday)
             return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
-            signedIn:signedInToday,hours:hour,minutes:minute})
+            signedIn:signedInToday,hours:hour,minutes:minute,dayOffBool:dayOffBool})
         }
     }
     if(check===false || user.attendance.length==0){
@@ -391,6 +393,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            }
            else
            var dayOffBool=false
+
+           console.log("dayofBool at signin= "+dayOffBool)
             const newAttendance=new AttendanceSchema({
                 date:newSignInDate,
                 time,
@@ -448,7 +452,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
     else
     day_off=(await AcademicStaffModel.findOne({member:req.user.id})).day_off
     
-    console.log("req.user.id= "+req.user.id)
+ //  console.log("req.user.id= "+req.user.id)
     //if there is attendance to check
     if(user.attendance.length>0){
        var attendance=user.attendance
@@ -467,9 +471,11 @@ router.put('/signout',authenticateToken,async(req,res)=>{
         for(var i=0;i<attendance.length;i++){
             var momentA = moment(attendance[i].date).format('YYYY-MM-DD');
             var momentB = currentTime.format('YYYY-MM-DD')
-            console.log("understand "+ attendance[i].last_signIn )
+           // console.log("understand "+ attendance[i].last_signIn )
             if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
                 var dayOffBool=attendance[i].dayOffBool
+                console.log(attendance[i])
+                console.log("dayofBool at signout= "+dayOffBool)
                 OldSignIn=attendance[i].last_signIn
                    var start = moment(attendance[i].last_signIn);
                    console.log("start= "+start.format('HH:mm'))
@@ -515,6 +521,11 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     }
 
                     //calculating difference between start and end
+                    // const check1=((start.isBefore(end))==true)
+                    // const check2=dayOffBool
+                    // console.log("check1= "+check1)
+                    // console.log("check2= "+check2)
+
                     if((start.isBefore(end))==true && dayOffBool==false){
                     console.log("new start= "+moment(start).format("HH:mm"))
                     console.log("new end= "+moment(end).format("HH:mm"))
@@ -522,21 +533,37 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     var interval = moment().hour(0).minute(minutes);
                     var hrs=moment.duration(interval.format("HH:mm")).get('hours')
                     var minute=moment.duration(interval.format("HH:mm")).get('minutes')
-                    var Hrs=hrs-8
-                    var Min=minute-24
+                    // var Hrs=hrs-8
+                    // var Min=minute-24
                     }
                     else{
                         var hrs=0
                         var minute=0 
-                        var Hrs=0
-                        var Min=0
+                        // var Hrs=0
+                        // var Min=0
                     }
 
-                    // var monthlyHours=hrs
-                    // var monthlyMin=minute
                    
-                    // var missingHrs=8-hrs
-                    // var missingMin=24-minute
+
+
+
+                     
+
+
+                    var fin=minute+attendance[i].minutes
+                    var finH=hrs+attendance[i].hours
+                    console.log("attendance[i].signedIn= "+attendance[i].signedIn)
+                    if(attendance[i].miuntes+minutes>60){
+                        console.log("signedin true")
+                        hrs=hrs+1
+                        finH++
+                        fin=minute+attendance[i].minutes-60
+                    }
+
+                    var Hrs=finH-8
+                    var Min=fin-24
+                    console.log("extraHrs= "+Hrs)
+                    console.log("extraMin= "+Min)
                     var extraHrs=0;
                     var extraMin=0
                     var missingHrs=0
@@ -553,29 +580,17 @@ router.put('/signout',authenticateToken,async(req,res)=>{
 
 
 
-                    console.log("hours= "+hrs)
-                    console.log("minutes= "+minute)
 
-
-                    var fin=minute+attendance[i].minutes
-                    console.log("attendance[i].signedIn= "+attendance[i].signedIn)
-                    if(attendance[i].miuntes+minutes>60){
-                        console.log("signedin true")
-                        hrs=hrs+1
-                        fin=minute+attendance[i].minutes-60
-                    }
-
-
-                    console.log("herer")
+                   // console.log("herer")
                     date=attendance[i].date
                     time=attendance[i].time
                     hours=hrs+attendance[i].hours
                     minutes=fin
                     signedIn=false
                     last_signIn =attendance[i].last_signIn
-                    console.log(moment(last_signIn).format("HH:mm"))
+                   // console.log(moment(last_signIn).format("HH:mm"))
                     last_signOut=SignOut
-                    console.log("check signout= "+moment(last_signOut).format("HH:mm"))
+                    //console.log("check signout= "+moment(last_signOut).format("HH:mm"))
                     day=attendance[i].day
                     check=true;
                     idx=i;
@@ -600,15 +615,29 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             //search in months hours for this person then add new hours and minutesif there is already a record
             //const user=await StaffMemberModel.findById(req.user.id)
             console.log("length= "+user.time_attended.length)
+            const check=(user.time_attended.length>0)
+            console.log("check= "+check)
             if(user.time_attended.length>0){
+                console.log("inside first if")
                 for(var l=0;l<user.time_attended.length;l++){
                     if(user.time_attended[l].num==currMonth){
-                        
+                        console.log("inside if")
                         var currExtraH=user.time_attended[l].extraHours
                         var currExtraM=user.time_attended[l].extraMinutes
                         var currMissH=user.time_attended[l].missingHours
                         var currMissM=user.time_attended[l].missingMinutes
-                        
+                        if(extraMin>0 && missingHrs>0){
+                            missingHrs--
+                            missingMin=60-extraMin
+                            console.log("her paleeeeease")
+                        }
+                        if(extraHrs>0 && missingMin>0){
+                           extraHrs--
+                            extraMin=60-missingMin
+                            missingMin=0
+                        }
+
+
                         if(extraMin>0){
                             if(extraMin<currMissM){
                                 currMissM=currMissM-extraMin
@@ -654,20 +683,21 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                         }
 
                         
-                        var finEM=extraMin+currExtraM
-                        var finMM=missingMin+currMissM
-                        var finEH=extraHrs+currExtraH
-                        var finMH=missingHrs+currMissH
-                        if(extraMin+currExtraM>60){
-                            extraHrs++
-                            finEM=extraMin+currExtraM-60
-                        }
-                        if(missingMin+currMissM>60){
-                            extraHrs++
-                            finMM=missingMin+currMissM-60
-                        }
-
-
+                        var finEM=extraMin
+                        var finMM=missingMin
+                        var finEH=extraHrs
+                        var finMH=missingHrs
+                        // if(extraMin+currExtraM>60){
+                        //     extraHrs++
+                        //     finEM=extraMin+currExtraM-60
+                        // }
+                        // if(missingMin+currMissM>60){
+                        //     extraHrs++
+                        //     finMM=missingMin+currMissM-60
+                        // }
+                        console.log("finEM= "+finEM)
+                     console.log("inEH= "+finEH)
+                       // console.log("extras= "+finEM+" "+finEH)
 
                         //new monthlyTime with updated hours and minutes
                         const newMonthly=new monthlyHoursSchema({

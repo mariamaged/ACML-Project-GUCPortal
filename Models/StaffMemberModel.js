@@ -6,8 +6,8 @@ const moment=require('moment')
 
 const attendanceSchema = mongoose.Schema({
     date: {type: Date}
-    ,time:{time:Date}
-    ,dayOffBool:{time:Boolean ,default:false}
+    ,time:{type:Date}
+    ,dayOffBool:{type:Boolean ,default:false}
     //var datetime = new Date();
     //console.log(datetime.toISOString().slice(0,10)); ----->2020-12-18,
     ,attended:{type:Boolean, default:false},
