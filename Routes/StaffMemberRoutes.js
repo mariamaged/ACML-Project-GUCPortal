@@ -18,7 +18,7 @@ var moment = require('moment');
 function authenticateToken(req,res,next){
     const token=req.header('x-auth-token');
     if(!token){
-    return res.sendStatus(401).status('Access deined')
+    return res.sendStatus(401).status('Access deined please log in first')
     
     }
     const verified= jwt.verify(token, process.env.TOKEN_SECRET)
@@ -248,7 +248,7 @@ router.put('/updateProfile',authenticateToken,async(req,res)=>{
     //     day_off=academicUser.day_off         
     
    const staff1= (await StaffMemberModel.findByIdAndUpdate(req.user.id,{email:email,password:password,staff_type:staff_type}))
-    const academic1=(await AcademicStaffModel.findOneAndUpdate({id:academicUserID},{courses:courses,day_off:day_off}))
+    const academic1=(await AcademicStaffModel.findOneAndUpdate({id:academicUserID},{courses:courses}))
     //I had to do it on 2 steps otherwise old results were produced
      const staff=await StaffMemberModel.findById(req.user.id);
     const academic=await AcademicStaffModel.findOne({member:req.user.id})
@@ -303,6 +303,7 @@ router.put('/resetPassword',authenticateToken,async(req,res)=>{
 router.put('/signin',authenticateToken,async(req,res)=>{
     var datetime = new Date();
     var check=false;
+    const today=new moment().format('dddd')
     
     const SignIn=moment()
     //(moment(currentTime).format("HH:mm"))
@@ -330,6 +331,12 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             console.log("momentB= "+momentB)
 
             if(momentA==momentB &&attendance[i].signedOut==true ){
+                if(today=="Friday"){
+                    var dayOffBool=true
+                }
+                else
+                var dayOffBool=false
+
                 console.log("herer")
                 date=attendance[i].date
                 time=attendance[i].time
@@ -358,7 +365,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_signIn:last_signIn,
                 last_signOut:last_signOut,
                 last_calculated_signOut:last_signIn,
-                day:day
+                day:day,
+                dayOffBool:dayOffBool
             })
             attArr[idx]=newAtt
             
@@ -378,6 +386,11 @@ router.put('/signin',authenticateToken,async(req,res)=>{
         const newSignInDate=new moment()
        // moment.utc( //).format('YYYY-MM-DD');
            // console.log("new date= "+newSignInDate)
+           if(today=="Friday"){
+               var dayOffBool=true
+           }
+           else
+           var dayOffBool=false
             const newAttendance=new AttendanceSchema({
                 date:newSignInDate,
                 time,
@@ -388,7 +401,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_signIn:SignIn,
                 last_calculated_signOut:SignIn,
                 last_signOut,
-                day
+                day,
+                dayOffBool:dayOffBool
             })
             console.log("SignIn= "+SignIn)
             console.log("newAttendance "+newAttendance)
@@ -428,6 +442,12 @@ router.put('/signout',authenticateToken,async(req,res)=>{
     const SignOut=moment()
     var currentTime = moment();
     const user=await StaffMemberModel.findById(req.user.id)
+   var day_off=""
+    if(user.staff_type=="HR")
+    day_off=(await HRModel.findOne({member:req.user.id})).day_off
+    else
+    day_off=(await AcademicStaffModel.findOne({member:req.user.id})).day_off
+    
     console.log("req.user.id= "+req.user.id)
     //if there is attendance to check
     if(user.attendance.length>0){
@@ -448,6 +468,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             var momentB = currentTime.format('YYYY-MM-DD')
             console.log("understand "+ attendance[i].last_signIn )
             if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
+                var dayOffBool=attendance[i].dayOffBool
                    var start = moment(attendance[i].last_signIn);
                    console.log("start= "+start.format('HH:mm'))
                    var end = moment(SignOut); 
@@ -492,7 +513,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     }
 
                     //calculating difference between start and end
-                    if((start.isBefore(end))==true){
+                    if((start.isBefore(end))==true && dayOffBool==false){
                     console.log("new start= "+moment(start).format("HH:mm"))
                     console.log("new end= "+moment(end).format("HH:mm"))
                     var minutes = end.diff(start, 'minutes');
@@ -510,6 +531,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
 
                     console.log("hours= "+hrs)
                     console.log("minutes= "+minute)
+
 
                     var fin=minute+attendance[i].minutes
                     console.log("attendance[i].signedIn= "+attendance[i].signedIn)
@@ -750,13 +772,20 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     const dateMonth=moment().format("M")
     const dateYear=moment().format("Y")
         const user=await StaffMemberModel.findById(req.user.id)
+        var day=""
+        if(user.staff_type=="HR")
+         day=(await HRModel.findOne({member:req.user.id})).day_off
+        else
+       day=(await AcademicStaffModel.findOne({member:req.user.id})).day_off
+
         const userAttendance=user.attendance
         var userDays=new Array()
         var missedDays=new Array()
         var idx=0;
         var k=0;
         var check=false;
-        const day_off=user.day_off
+        const day_off=day
+        console.log("dayoff= "+day_off)
         var nextMonth=0;
         var nextYear=0;
         if(dateMonth==12){
@@ -821,11 +850,11 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     const lastYear=moment(sortedUserDays[j-1].date).format('Y')
     console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
     var lastDay=parseInt(lastD)+1
- console.log("missed till now= "+missedDays)
+ //console.log("missed till now= "+missedDays)
         //get last day present from 1st month then fill the rest according to each month's number of days
     if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
         while(lastDay<32){
-            if(lastDName!='Friday'){
+            if(lastDName!='Friday' && lastDName!=day_off){
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             console.log("added= "+missedDays[k-1])
             }
@@ -835,8 +864,8 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         }
     }
     if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 ){
-        while(lastDay<31){
-            if(lastDName!='Friday'){
+        while(lastDay<31 ){
+            if(lastDName!='Friday' && lastDName!=day_off){
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             }
             lastDay++;
@@ -847,7 +876,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
        if(moment(dateYear).isLeapYear() )
         {
             while(lastDay<30){
-             if(lastDName!='Friday'){
+             if(lastDName!='Friday'&& lastDName!=day_off){
               missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             }
             lastDay++;
@@ -856,7 +885,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         }
         else {
             while(lastDay<29){
-                if(lastDName!='Friday'){
+                if(lastDName!='Friday'&& lastDName!=day_off){
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
                 }
             lastDay++;
@@ -869,7 +898,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         var currDay2=1
         lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
         for(var g=1;g<=10;g++){
-            if(lastDName!='Friday'){
+            if(lastDName!='Friday'&& lastDName!=day_off){
             missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
             }
             currDay2++
@@ -909,7 +938,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     
      for(last2day;last2day<=10;last2day++){
         lastDName=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("dddd");
-         if(lastDName!='Friday'){
+         if(lastDName!='Friday' && lastDName!=day_off){
         missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("YYYY-MM-DD");
          }
         
@@ -920,6 +949,129 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
  
         return res.json(missedDays)
 })
+
+
+router.put('/missingHours',authenticateToken,async(req,res)=>{
+    
+    const month=new moment().format('M')
+    const user=await StaffMemberModel.findById(req.user.id)
+    var day_off
+    if(user.staff_type=="HR")
+    day_off=(await HRModel.findOne({member:req.user.id})).day_off
+    else
+    day_off=(await AcademicStaffModel.findOne({member:req.user.id})).day_off
+    const time_attended=user.time_attended
+    var monArr=[]
+    var check=false;
+    console.log("length= "+time_attended.length)
+    for(var i=0;i<time_attended.length;i++){
+        console.log("time_attened[i].num= "+time_attended[i].num)
+        console.log("month "+month)
+        if(time_attended[i].num==parseInt(month)){
+            console.log("found it")
+            if(!time_attended[i].mustAttendHours && !time_attended[i].mustAttendMinutes){
+            const {hrs,min}= calculateHrs(time_attended[i].num,day_off)
+            console.log("hrs= "+hrs)
+            console.log("min= "+min)
+                const newMonthly=new monthlyHoursSchema({
+                    num:time_attended[i].num,
+                    hours:time_attended[i].hours,
+                    minutes:time_attended[i].minutes,
+                    mustAttendHours:hrs,
+                    mustAttendMinutes:min,
+                    missingHours:hrs-time_attended[i].hours,
+                    missingMinutes:min-time_attended[i].minutes
+                })
+                monArr[i]=newMonthly
+                check=true
+            }
+            else{
+            monArr[i]=time_attended[i]
+            check=true
+            }
+        }
+        else
+            monArr[i]=time_attended[i]
+    }
+    const user2=user
+    
+    if(check===true){
+       // console.log("user2= "+user)
+        const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,monArr)
+        const newMonth=(await StaffMemberModel.findById(req.user.id)).time_attended
+        console.log("newMonth= "+newMonth)
+        const h=newMonth.missingHours
+        const m=newMonth.missingMinutes
+        console.log("newMonthly.missingHours found= "+newMonth.missingHours)
+        console.log("newMonthly.missingMin found= "+newMonth.missingMinutes)
+        return res.json({missing_hours:h,missing_minutes:m})
+    }
+    if(check==false){
+        const {hrs,min}= calculateHrs(time_attended[i].num,day_off)
+        const newMonthly=new monthlyHoursSchema({
+            num:time_attended[i].num,
+            hours:time_attended[i].hours,
+            minutes:time_attended[i].minutes,
+            mustAttendHours:hrs,
+            mustAttendMinutes:min,
+            missingHours:hrs-time_attended[i].hours,
+            missingMinutes:min-time_attended[i].minutes
+        })
+        var newAtt=time_attended
+        newAtt[newAtt.length-1]=newMonthly
+        const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,newAtt)
+        console.log("newMonthly.missingHours not fond= "+newMonthly.missingHours)
+        console.log("newMonthly.missingMin not found= "+newMonthly.missingMinutes)
+        return res.json({missing_hours:newMonthly.missingHours,missing_minutes:newMonthly.missingMinutes})
+    }
+
+
+
+})
+
+function calculateHrs(dateMonth,day_off){
+    console.log("inside cal= "+dateMonth)
+    console.log("inside "+day_off)
+    var start=11
+    var end=0;
+    var hours=0;
+    var minutes=0;
+    if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12)
+        end=31
+    if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 )
+    end=30
+    if(dateMonth==2 ){
+        if(moment(dateYear).isLeapYear())
+        end=29
+        else
+        end=28
+    }
+    const currYear=new moment().format("Y")
+    for(var i=11;i<=end;i++){
+       var currDay= new moment(currYear+"-"+dateMonth+"-"+i).format("dddd");
+       if(currDay!= day_off && currDay!="Friday"){
+            hours+=8
+            if(minutes+24>60){
+                hours++
+                minutes=(minutes+24)-60
+            }
+       }
+    }
+
+    for(var j=1;j<=10;j++){
+        var currDay= new moment(currYear+"-"+dateMonth+"-"+j).format("dddd");
+        if(currDay!= day_off && currDay!="Friday"){
+             hours+=8
+             if(minutes+24>60){
+                 hours++
+                 minutes=(minutes+24)-60
+             }
+        }
+     }
+     console.log("inside "+hours+' m='+minutes)
+     return {hours,minutes}
+}
+
 
 module.exports=router;
 
@@ -932,3 +1084,5 @@ module.exports=router;
 // const g=c.time_attended[0]
 // console.log("her "+g.minutes)
 // }z()
+
+//console.log(calculateHrs(9,"Monday"))

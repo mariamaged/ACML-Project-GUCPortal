@@ -275,7 +275,7 @@ app.post('/addAcademicMember',async(req,res)=>{
    
     
     try{
-        const user=new AcademicStaffModel({member:memb,department:dep,faculty:fac,type:req.body.type});
+        const user=new AcademicStaffModel({member:memb,department:dep,faculty:fac,type:req.body.type,day_off:req.body.day_off});
         await user.save();
       return  res.json(user)
     }
@@ -284,7 +284,7 @@ app.post('/addAcademicMember',async(req,res)=>{
     }
     }
 //    ,"id":"ac-3"
-//    ,"dep":"engineering"
+//    ,"department":"engineering"
 //    ,"faculty":"met"
 //    ,"type":"Course Instructor"
 })

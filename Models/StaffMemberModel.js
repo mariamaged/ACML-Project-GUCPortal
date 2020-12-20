@@ -7,6 +7,7 @@ const moment=require('moment')
 const attendanceSchema = mongoose.Schema({
     date: {type: Date}
     ,time:{time:Date}
+    ,dayOffBool:{time:Boolean ,default:false}
     //var datetime = new Date();
     //console.log(datetime.toISOString().slice(0,10)); ----->2020-12-18,
     ,attended:{type:Boolean, default:false},
@@ -34,7 +35,8 @@ const monthlyHoursSchema = mongoose.Schema({
    ,minutes:{type:Number ,default:0}
     ,mustAttendHours:{type:Number}
     ,mustAttendMinutes:{type:Number}
-    ,
+    ,missingHours:{type:Number ,default:0},
+    missingMinutes:{type:Number ,default:0},
 });
 
 const StaffMemberSchema = mongoose.Schema({
