@@ -16,7 +16,8 @@ const attendanceSchema = mongoose.Schema({
     minutes:{type:Number,default:0}
    ,last_signIn: {type:Date }
    ,last_signOut: {type:Date }
-   ,day: {type: String}
+   ,day: {type: String},
+   accepted_leave:{type:Boolean,default:false}
 });
 
 const slotSchema = mongoose.Schema({
@@ -46,7 +47,8 @@ const StaffMemberSchema = mongoose.Schema({
     annual_days: {type:Number},
     lastUpdatedAnnual:{type: Date},
     accidentalDaysLeft: {type:Number},
-    attendCompensationDay:{type:Boolean}
+    attendCompensationDay:{type:Boolean},
+     missingDays:{type:[String],default:[]}
 },
 
 {

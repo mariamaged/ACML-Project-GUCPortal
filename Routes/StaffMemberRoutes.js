@@ -323,8 +323,10 @@ router.put('/signin',authenticateToken,async(req,res)=>{
         var attArr=new Array()
         for(var i=0;i<attendance.length;i++){
 
-            var momentA = attendance[i].date;
-            var momentB = currentTime.format('YYYY-MM-DD')
+            var momentA =moment(attendance[i].date).format('YYYY-MM-DD');
+            var momentB = currentTime.format('YYYY-MM-DD');
+            console.log("momentA= "+momentA)
+            console.log("momentB= "+momentB)
 
             if(momentA==momentB &&attendance[i].signedOut==true ){
                 console.log("herer")
@@ -439,9 +441,9 @@ router.put('/signout',authenticateToken,async(req,res)=>{
         var attArr=new Array()
         for(var i=0;i<attendance.length;i++){
 
-            var momentA = attendance[i].date;
+            var momentA = moment(attendance[i].date).format('YYYY-MM-DD');
             var momentB = currentTime.format('YYYY-MM-DD')
-            
+            console.log("understand "+ attendance[i].last_signIn )
             if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
 
              
@@ -530,7 +532,8 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 
             }
             else if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==true )
-            return res.send("This user has already signed out")
+                return res.send("This user has already signed out")
+
             attArr[i]=attendance[i];
 
         }
@@ -575,21 +578,18 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
             if(req.body.month<=0 || req.body.month>=13)
                 return res.send("Please enter correct month")
         }
-       // console.log(sorted)
-        //console.log(attendance)
+      
         var arr=new Array()
-
+        var idx=0;
         if(user.attendance.length>0){
-            // console.log("in attendance list")
-            // console.log("length "+user.attendance.length)
+           
             for(var i=0;i<user.attendance.length;i++){
                 const currDay=user.attendance[i]
-                //console.log("currday= "+currDay)
                 if(month ){
                      const dateMonth=moment(currDay.date).format("M")
-                     console.log("month= "+dateMonth)
+                    // console.log("month= "+dateMonth)
                     if(dateMonth==req.body.month)
-                     arr[i]=({date:moment(currDay.date).format("YYYY-MM-DD"),attended:currDay.attended,
+                     arr[idx++]=({date:moment(currDay.date).format("YYYY-MM-DD"),attended:currDay.attended,
                                 last_signIn:(moment(currDay.last_signIn).format("HH:mm")),
                                 last_signOut:(moment(currDay.last_signOut).format("HH:mm")),
                                  hours:currDay.hours,minutes:currDay.minutes})
@@ -597,7 +597,7 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
                 }
 
                  else
-                arr[i]=({date:moment(currDay.date).format("YYYY-MM-DD"),attended:currDay.attended,
+                arr[idx++]=({date:moment(currDay.date).format("YYYY-MM-DD"),attended:currDay.attended,
                     last_signIn:(moment(currDay.last_signIn).format("HH:mm")),
                     last_signOut:(moment(currDay.last_signOut).format("HH:mm")),
                 hours:currDay.hours,minutes:currDay.minutes})
@@ -609,7 +609,6 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
 
 //}
     else{
-        console.log("in else empty")
         return res.json(user.attendance)
     }
     
@@ -636,19 +635,205 @@ function compare( a, b ) {
 
     }
     if((moment(b.date).format("YYYY-MM-DD"))<((moment(a.date).format("YYYY-MM-DD")))){
-        console.log("b= "+(moment(b.date).format("YYYY-MM-DD")))
-        console.log("a= "+(moment(a.date).format("YYYY-MM-DD")))
+        // console.log("b= "+(moment(b.date).format("YYYY-MM-DD")))
+        // console.log("a= "+(moment(a.date).format("YYYY-MM-DD")))
         return -1;
     }
     return 0;
   }
+
+  function compareAsc( a, b ) {
+   
+
+    if((moment(a.date).format("YYYY-MM-DD"))<((moment(b.date).format("YYYY-MM-DD")))){
+        
+    return -1;
+
+    }
+    if((moment(b.date).format("YYYY-MM-DD"))<((moment(a.date).format("YYYY-MM-DD")))){
+        // console.log("b= "+(moment(b.date).format("YYYY-MM-DD")))
+        // console.log("a= "+(moment(a.date).format("YYYY-MM-DD")))
+        return 1;
+    }
+    return 0;
+  }
+
+
+  
+// router.get('/missingHours',authenticateToken,async(req,res)=>{
+//     const dateMonth=moment().format("M")
+//     const user=await StaffMemberModel.findById(req.user.id)
+//     const userAttendance=user.attendance
+//     const userAttendanceSorted=userAttendance.sort(compare)
+//     const userDays=new Array()
+//     const missedDays=new Array()
+//     var idx=0;
+//     var k=0;
+//     var check=false;
+//     var i=0
+//     const day_off=user.day_off
+//     while(i<userAttendanceSorted.length){
+//         const currDay=userAttendanceSorted[i]
+//         const attMonth=moment(currDay.date).format("M")
+
+//         if(dateMonth==attMonth){
+//             userDays[idx++]=userAttendanceSorted[i]
+//             var j = moment(userAttendanceSorted[i++].date);
+//              j.add('1','days').calendar()
+//              var day=j.format("D")
+//              console.log("j= "+j)
+//              const currDay2=userAttendanceSorted[i]
+//              const attMonth2=moment(currDay2.date).format("M")
+//              const attDay2=moment(currDay2.date).format("D")
+//              if(attMonth2>dateMonth){
+//                  break;
+//              }
+//              else if(attMonth2==dateMonth){
+//                  while(attDay2>day){
+//                    const date=new moment()
+//                     const day=date.format('dddd');
+//                     if(day!=day_off)
+//                      missedDays[k++]=userAttendanceSorted[i]
+//                      var j = moment(userAttendanceSorted[i++].date);
+//                     j.add('1','days').calendar()
+//                      day=j.format("D")
+//                     console.log("j= "+j)
+                     
+//                  }
+//                  i++;
+//              }
+
+
+//         }
+//         else if(attMonth>dateMonth)
+//             return res.json(missedDays)
+//         else 
+//             i++;    
+//     }
+// })
+
+
+///SHOULD HANDLE DIFFERENT NUMBER OF DAYS IN EVER MONTH 
+router.get('/missingDays',authenticateToken,async(req,res)=>{
+    const dateMonth=moment().format("M")
+    const dateYear=moment().format("Y")
+        const user=await StaffMemberModel.findById(req.user.id)
+        const userAttendance=user.attendance
+        var userDays=new Array()
+        var missedDays=new Array()
+        var idx=0;
+        var k=0;
+        var check=false;
+        const day_off=user.day_off
+        var nextMonth=0;
+        var nextYear=0;
+        if(dateMonth==12){
+            nextMonth=1
+            nextYear=(parseInt(dateYear)+1) 
+        }
+         else{
+         nextMonth=(parseInt(dateMonth)+1)  
+         nextYear=dateYear
+        }
+
+        for(var i=0;i<userAttendance.length;i++){
+           // console.log("now"+userAttendance[i])
+            const currDay=userAttendance[i]
+            const year=moment(currDay.date).format("Y")
+            const month=moment(currDay.date).format("M")
+            
+            const dayNum=moment(currDay.date).format("D")
+            // console.log("moth tes= "+month+" d= "+dayNum+" y= "+year)
+            // console.log("moth tes= "+nextMonth+" d= "+dayNum+" y= "+(parseInt(dateYear)+1))
+            const day=moment(currDay.date).format("dddd")
+            if(year==dateYear &&month==dateMonth && dayNum>=11){
+               // console.log("in "+userAttendance[i])
+                    userDays[idx++]=userAttendance[i]
+            }
+            if(year==dateYear && month==nextMonth && nextMonth<=12 && dayNum<=10){
+               // console.log("in "+userAttendance[i])
+                userDays[idx++]=userAttendance[i]
+            }
+            if(year==(parseInt(dateYear)+1) && month==nextMonth && nextMonth==1 && dayNum<=10){
+                // console.log("here")
+                // console.log("in "+userAttendance[i])
+                userDays[idx++]=userAttendance[i]
+            }
+        }
+        const sortedUserDays=userDays.sort(compareAsc)
+        console.log(" sortedUserDays"+sortedUserDays)
+        var j=0
+        var currDay=11
+        //var Day=
+        while(j<sortedUserDays.length){
+           // console.log("soreted= "+moment(sortedUserDays[j].date).format('D'))
+            const d= moment(sortedUserDays[j].date).format('D')
+            const m= moment(sortedUserDays[j].date).format('M')
+           // console.log("d= "+d)
+                while(d>currDay && m==dateMonth ){
+                    // console.log("d= "+d)
+                    // console.log("currDAY= "+currDay)
+                   const currYear=new moment().format("Y")
+                   const currDate=new moment(currYear+"-"+dateMonth+"-"+currDay).format('dddd')
+                   if(currDate!=day_off){
+                       missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+currDay).format("YYYY-MM-DD");
+                   }
+                   currDay++
+                }
+                
+                currDay++
+                j++
+                 m= moment(sortedUserDays[j].date).format('M')
+
+        }
+    var lastDay= moment(sortedUserDays[sortedUserDays.length-1].date).format('D')
+    const lastMonth=moment(sortedUserDays[sortedUserDays.length-1].date).format('M')
+    const lastYear=moment(sortedUserDays[sortedUserDays.length-1].date).format('Y')
+    console.log("ld= "+lastDay+" lm= "+lastMonth+" ly= "+lastYear)
+   if(lastMonth==dateMonth ){
+    if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
+        if(lastDay<32){
+            missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+            lastDay++;
+        }
+    }
+    if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 ){
+        if(lastDay<31){
+            missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+            lastDay++;
+        }
+    }
+    if(dateMonth==2 ){
+        if(moment(dateYear).isLeapYear() && (lastDay<30) ){
+            missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+            lastDay++;
+        }
+        else if(lastDay<29){
+            missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+            lastDay++;
+        }
+    }
+    const z=missedDays.length-1
+    var lastDay=1
+    for(var l=0;l<10;l++){
+        missedDays[z++]=new moment(nextYear+"-"+nextMonth+"-"+lastDay).format("YYYY-MM-DD");
+            lastDay++;
+    }
+   }
+   else if(lastMonth==nextMonth &&lastDay<=11){
+    missedDays[k++]=new moment(lastYear+"-"+lastMonth+"-"+lastDay).format("YYYY-MM-DD");
+    lastDay++;
+   }
+
+    
+        return res.json(missedDays)
+})
+
 module.exports=router;
 
-//console.log('2020-10-10'<'2020-12-17')
-//console.log((parseInt("2020-10-1")>parseInt("2019-12-78")))
-// const x=moment("2020-09-09")
-// const y=moment("2020-10-01")
-// console.log(y.isBefore(x))
-// var month = new moment()
-// console.log(month.format("M"))
-//console.log(month.month())
+//console.log(new moment("2020-12-22").format('dddd'));
+
+
+const currDate=new moment("2020-12-29T22:00:00.000+00:00").format('YYYY-MM-DD')
+ //console.log(new moment(currYear+"-"+dateMonth+"-"+currDay))
+ console.log("currDate= "+(currDate))
