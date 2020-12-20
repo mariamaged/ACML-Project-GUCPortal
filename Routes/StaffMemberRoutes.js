@@ -660,60 +660,10 @@ function compare( a, b ) {
 
 
   
-// router.get('/missingHours',authenticateToken,async(req,res)=>{
-//     const dateMonth=moment().format("M")
-//     const user=await StaffMemberModel.findById(req.user.id)
-//     const userAttendance=user.attendance
-//     const userAttendanceSorted=userAttendance.sort(compare)
-//     const userDays=new Array()
-//     const missedDays=new Array()
-//     var idx=0;
-//     var k=0;
-//     var check=false;
-//     var i=0
-//     const day_off=user.day_off
-//     while(i<userAttendanceSorted.length){
-//         const currDay=userAttendanceSorted[i]
-//         const attMonth=moment(currDay.date).format("M")
-
-//         if(dateMonth==attMonth){
-//             userDays[idx++]=userAttendanceSorted[i]
-//             var j = moment(userAttendanceSorted[i++].date);
-//              j.add('1','days').calendar()
-//              var day=j.format("D")
-//              console.log("j= "+j)
-//              const currDay2=userAttendanceSorted[i]
-//              const attMonth2=moment(currDay2.date).format("M")
-//              const attDay2=moment(currDay2.date).format("D")
-//              if(attMonth2>dateMonth){
-//                  break;
-//              }
-//              else if(attMonth2==dateMonth){
-//                  while(attDay2>day){
-//                    const date=new moment()
-//                     const day=date.format('dddd');
-//                     if(day!=day_off)
-//                      missedDays[k++]=userAttendanceSorted[i]
-//                      var j = moment(userAttendanceSorted[i++].date);
-//                     j.add('1','days').calendar()
-//                      day=j.format("D")
-//                     console.log("j= "+j)
-                     
-//                  }
-//                  i++;
-//              }
 
 
-//         }
-//         else if(attMonth>dateMonth)
-//             return res.json(missedDays)
-//         else 
-//             i++;    
-//     }
-// })
 
-
-///SHOULD HANDLE DIFFERENT NUMBER OF DAYS IN EVER MONTH 
+//---------------------------SHOULD ADD CONDITION LEAVE REQUEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 router.get('/missingDays',authenticateToken,async(req,res)=>{
     const dateMonth=moment().format("M")
     const dateYear=moment().format("Y")
@@ -736,104 +686,158 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
          nextYear=dateYear
         }
 
+        //first get list of present days in both months
         for(var i=0;i<userAttendance.length;i++){
-           // console.log("now"+userAttendance[i])
             const currDay=userAttendance[i]
             const year=moment(currDay.date).format("Y")
             const month=moment(currDay.date).format("M")
             
             const dayNum=moment(currDay.date).format("D")
-            // console.log("moth tes= "+month+" d= "+dayNum+" y= "+year)
-            // console.log("moth tes= "+nextMonth+" d= "+dayNum+" y= "+(parseInt(dateYear)+1))
             const day=moment(currDay.date).format("dddd")
-            if(year==dateYear &&month==dateMonth && dayNum>=11){
-               // console.log("in "+userAttendance[i])
+
+            //if 1st month will get starting from 11th day
+            if(year==dateYear && month==dateMonth && dayNum>=11){
                     userDays[idx++]=userAttendance[i]
             }
-            if(year==dateYear && month==nextMonth && nextMonth<=12 && dayNum<=10){
-               // console.log("in "+userAttendance[i])
-                userDays[idx++]=userAttendance[i]
-            }
-            if(year==(parseInt(dateYear)+1) && month==nextMonth && nextMonth==1 && dayNum<=10){
-                // console.log("here")
-                // console.log("in "+userAttendance[i])
+             //if 1st month will get till the 10th day
+            if(year==nextYear && month==nextMonth  && dayNum<=10){
                 userDays[idx++]=userAttendance[i]
             }
         }
+
+        //sort this array to be able to fill missing days in between present days
         const sortedUserDays=userDays.sort(compareAsc)
-        console.log(" sortedUserDays"+sortedUserDays)
+      //console.log(" sortedUserDays"+sortedUserDays)
         var j=0
         var currDay=11
-        //var Day=
-        while(j<sortedUserDays.length){
-           // console.log("soreted= "+moment(sortedUserDays[j].date).format('D'))
-            const d= moment(sortedUserDays[j].date).format('D')
-            const m= moment(sortedUserDays[j].date).format('M')
-           // console.log("d= "+d)
+        var m= moment(sortedUserDays[j].date).format('M')
+
+        //start looping on days of first month to get missing days in between present days
+        while(j<sortedUserDays.length && m==dateMonth){
+            var d= moment(sortedUserDays[j].date).format('D')
+             m= moment(sortedUserDays[j].date).format('M')
                 while(d>currDay && m==dateMonth ){
-                    // console.log("d= "+d)
-                    // console.log("currDAY= "+currDay)
                    const currYear=new moment().format("Y")
                    const currDate=new moment(currYear+"-"+dateMonth+"-"+currDay).format('dddd')
-                   if(currDate!=day_off){
+                   if(currDate!=day_off && currDate!='Friday'){
                        missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+currDay).format("YYYY-MM-DD");
-                   }
+                        console.log("adding "+missedDays[k-1])
+                    }
                    currDay++
                 }
-                
                 currDay++
                 j++
+                if(j<sortedUserDays.length){
                  m= moment(sortedUserDays[j].date).format('M')
 
         }
-    var lastDay= moment(sortedUserDays[sortedUserDays.length-1].date).format('D')
-    const lastMonth=moment(sortedUserDays[sortedUserDays.length-1].date).format('M')
-    const lastYear=moment(sortedUserDays[sortedUserDays.length-1].date).format('Y')
-    console.log("ld= "+lastDay+" lm= "+lastMonth+" ly= "+lastYear)
-   if(lastMonth==dateMonth ){
+        }
+   
+    var lastD= moment(sortedUserDays[j-1].date).format('D')
+    var lastDName= moment(sortedUserDays[j-1].date).format('dddd')           
+    const lastMonth=moment(sortedUserDays[j-1].date).format('M')
+    const lastYear=moment(sortedUserDays[j-1].date).format('Y')
+    console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
+    var lastDay=parseInt(lastD)+1
+ console.log("missed till now= "+missedDays)
+        //get last day present from 1st month then fill the rest according to each month's number of days
     if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
-        if(lastDay<32){
-            missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
-            lastDay++;
+        while(lastDay<32){
+            if(lastDName!='Friday'){
+            missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+            console.log("added= "+missedDays[k-1])
+            }
+           lastDay++
+           lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+           console.log("now= "+lastDay)
         }
     }
     if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 ){
-        if(lastDay<31){
-            missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+        while(lastDay<31){
+            if(lastDName!='Friday'){
+            missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+            }
             lastDay++;
+            lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
         }
     }
     if(dateMonth==2 ){
-        if(moment(dateYear).isLeapYear() && (lastDay<30) ){
-            missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+       if(moment(dateYear).isLeapYear() )
+        {
+            while(lastDay<30){
+             if(lastDName!='Friday'){
+              missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+            }
             lastDay++;
+            lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
         }
-        else if(lastDay<29){
-            missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+        }
+        else {
+            while(lastDay<29){
+                if(lastDName!='Friday'){
+            missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                }
             lastDay++;
+            lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
         }
     }
-    const z=missedDays.length-1
-    var lastDay=1
-    for(var l=0;l<10;l++){
-        missedDays[z++]=new moment(nextYear+"-"+nextMonth+"-"+lastDay).format("YYYY-MM-DD");
-            lastDay++;
     }
-   }
-   else if(lastMonth==nextMonth &&lastDay<=11){
-    missedDays[k++]=new moment(lastYear+"-"+lastMonth+"-"+lastDay).format("YYYY-MM-DD");
-    lastDay++;
-   }
+    //if only present in first month then fill 2nd month manually
+    if(moment(sortedUserDays[sortedUserDays.length-1].date).format("M")==dateMonth){
+        var currDay2=1
+        lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
+        for(var g=1;g<=10;g++){
+            if(lastDName!='Friday'){
+            missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
+            }
+            currDay2++
+            lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
+        }
+    }
 
+    //else will need to check and only insert absent days
+    else{    
+    //first fill days missed in the middle
+    while(j<sortedUserDays.length && m==nextMonth){
+        var currDay2=1
+        var last2day=currDay2
+         var d2= moment(sortedUserDays[j].date).format('D')
+         var m2= moment(sortedUserDays[j].date).format('M')
+             while(d2>currDay2 ){
+               
+                const currDate2=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
+                console.log("inside 2nd= "+currDay2+" "+currDate2)
+
+                if(currDate2!=day_off && currDate2!='Friday'){
+                    console.log("accepted 2nd= "+currDay2+" "+currDate2)
+                    missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
+                }
+                currDay2++
+                last2day=currDay2
+             }
+             
+             currDay2++
+             j++
+            
+     }
+    //  console.log("missed till now= "+missedDays)
+     //then start looping from last present day till the 10th of 2nd month
+     var last2D=moment(sortedUserDays[sortedUserDays.length-1].date).format("D")
+     var last2day=parseInt(last2D)+1
     
+     for(last2day;last2day<=10;last2day++){
+        lastDName=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("dddd");
+         if(lastDName!='Friday'){
+        missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("YYYY-MM-DD");
+         }
+        
+     }
+    }
+
+
+ 
         return res.json(missedDays)
 })
 
 module.exports=router;
 
-//console.log(new moment("2020-12-22").format('dddd'));
-
-
-const currDate=new moment("2020-12-29T22:00:00.000+00:00").format('YYYY-MM-DD')
- //console.log(new moment(currYear+"-"+dateMonth+"-"+currDay))
- console.log("currDate= "+(currDate))
