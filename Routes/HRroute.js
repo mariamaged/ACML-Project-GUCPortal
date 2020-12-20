@@ -7,7 +7,9 @@ const location= require('../Models/LocationModel.js')
 const HR=require('../Models/HRModel.js');
 const faculty=require('../Models/FacultyModel');
 const department=require('../Models/DepartmentModel');
+const course=require('../Models/CourseModel');
 const jwt=require('jsonwebtoken');
+const { off } = require('../Models/AcademicStaffModel.js');
 
 
 //Locations Adding,deleting, and updating
@@ -193,7 +195,182 @@ router.route('/department').post(async(req,res)=>{
         res.status(500).json({error:err.message});
     }
 })
+//courses addition,deletion, and updating
+//adding
+app.route('/course').post(async(req,res)=>{
+    try{
+        const{id,name,departmentname}=req.body;
+        if(!id||!name||!departmentname) res.status(400).json({msg:"please fill all the fields"});
+        else{
+            const dep= await department.findOne({"name":departmentname});
+            if(dep==null) res.status(400).json({msg:"there is no department with that name"});
+            else{
+                const ob=await course.findOne({"id":id});
+                if(ob==null){  
+                const toAdd=new course({"id":id,"name":name,"department":dep._id}); 
+                await toAdd.save();
+                res.json(toAdd);
+                console.log(toAdd);
+                }
+                else{
+                    res.status(400).json({msg:"a course with this id already exists"});
+                }
+            }
+        }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+//deleting
+.delete(async(req,res)=>{
+    try{
+       const{id}=req.body;
+       if(!id)res.status(400).json({msg:"please enter the id of the course you want to delete"});
+       else{
+           await course.deleteOne({"id":id});
+           res.send("done");
+       }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+//updating
+.put(async (req,res)=>{
+    try{
+        //academic staff is a list of staff members ids
+       const{oldid,id,name,departmentname,academicStaff,slotsneeded,slotscovered,schedule,coordinator}=req.body;
+       if(!oldid||!id||!name||!departmentname) res.status(400).json({msg:"please fill all the fields"});
+       else{
+           const ob=await course.findOne({"id":oldid});
+           if(ob==null) res.status(400).json({msg:"there is no course with that id"});
+           else{
+               const obnew= await course.findOne({"id":id});
+               const dep=await department.findOne({"name":departmentname});
+               if(dep==null) res.status(400).json({msg:"there is no department with the given name"});
+               else{
+                   if(obnew==null||id==oldid){
+                      if(slotsneeded) ob.slots_needed=slotsneeded;
+                      if(slotscovered) ob.slots_covered=slotscovered;
+                      if(coordinator){
+                          const co=(await StaffMember.findOne({"id":coordinator}));
+                          if(co==null) res.status(400).json({msg:"the coordinator id does not exist"});
+                          else{
+                          const ca=await AcademicStaff.findOne({"member":co._id});
+                          if(ca==null || ca.type!= 'Teaching Assistant') res.status(400).json({msg:"the id of coordinator doesn't belong to a TA"});
+                          else
+                              ob.coordinator=co._id;
+                      }
+                    }
+                      //to test
+                      if(academicStaff){
+                        var acStaff=new [academicStaff.length];
+                        for(var i=0;i<academicStaff.length;i++){
+                            var sm= (await StaffMember.findOne({"id":academicStaff[i]}))._id
+                            var ac=await AcademicStaff.findOne({"member":sm});
+                            if(ac!=null) acStaff[i]=sm;
+                            else{
+                                res.status(400).json({msg:"one of the academic staff you are adding doesn't exist"});
+                                break;
+                            }
+                        } 
+                      }
+                      //to test w check the logic
+                      if(schedule) ob.schedule=schedule;
+                        (await ob).id=id;
+                        (await ob).name=name;
+                         (await ob).department=(await dep)._id
+                         await ob.save();
+                         res.send("done");
+                   }
+                   else
+                   res.status(400).json({msg:"a course with this new id already exists"});
+               }
+           }
+       }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+//staffmember
+//elmafrood a bcrypt el password hatta lw default?
+router.route('/staffmember').post(async(req,res)=>{
+    try{
+       const{name,email,salary,officelocation,type,dayoff,gender}=req.body;
+       if(!email||!salary||!officelocation|| !gender) res.status(400).json({msg:"please fill all the fields"});
+       else{
+           const isemail=await StaffMember.findOne({"email":email});
+           if(isemail==null){
+            const office=await location.findOne({"id":officelocation,"type":"Office"});
+             if(office==null) res.status(400).json({msg:"there is no office in this location"});
+             else{
+                 if(office.current_capacity==office.maximum_capacity) res.status(400).json({msg:"the office in the location provided is already at maximum capacity"}); 
+                 else{
+                     var message="done";
+                     var doff=dayoff;
+                     var sid=null;
+                     if(type=="HR" && dayoff!="Saturday") {message="Saturday is automatically assigned to HR members as dayoff"; doff="Saturday";}
+                     const num=await StaffMember.countDocuments();
+                     console.log(num);
+                     if(type=='HR'){
+                     for(var i=num;i>=0;i--){
+                        if(i==0){
+                            sid="hr-1";
+                            break;
+                        }
+                         var tuple=await StaffMember.findOne({"id":"hr-"+i});
+                         if(tuple!=null) {sid="hr-"+(i+1); break;}
+                     }}else{
+                        for(var i=num;i>=0;i--){
+                            if(i==0){
+                                sid="ac-1";
+                                break;
+                            }
+                            var tuple=await StaffMember.findOne({"id":"ac-"+i});
+                            if(tuple!=null) {sid="ac-"+(i+1); break;} 
+                        }
+                     }
+                     const toAdd=await new StaffMember({"id":sid,"email":email,"salary":salary,"name":name,"office":office._id,"staff_type":type,"dayoff":doff,"gender":gender});
+                     await toAdd.save();
+                     res.send(message);
+                 }
+             }
+           }
+           else res.status(400).json({msg:"this email is already registered"})
+       }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+.delete(async (req,res)=>{
+    try{
+        //ydeeny email wla id?
+        const{email}=req.body;
+        if(!email) res.status(400).json({msg:"please insert the email of the staff member you want to delete"});
+        else{
+          await StaffMember.deleteOne({"email":email});
+          res.send("done");
+        }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+.put((req,res)=>{
 
+})
 
-
+router.route('/updatesalary').put((req,res)=>{
+    try{
+       const{email,salary}=req.body;
+       if(!email||!salary) res.status(400).json({msg:"please fill all the fields"});
+       else{
+           const ob=await StaffMember.findOne({"email":email});
+           if(ob==null) res.status(400).json({msg:"a staff member with this email is not found"});
+           else (await ob).salary=salary;
+           await ob.save();
+           res.send("done");
+       }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
 module.exports=router;

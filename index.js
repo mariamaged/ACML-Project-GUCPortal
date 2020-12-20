@@ -8,8 +8,9 @@ const department=require('./Models/DepartmentModel')
 const AcademicStaffModel=require('./Models/AcademicStaffModel')
 const faculty=require('./Models/FacultyModel')
 const location=require('./Models/LocationModel');
-const StaffMemberModel = require('./Models/StaffMemberModel');
+const StaffMember = require('./Models/StaffMemberModel');
 //maya zawedt da
+const course=require('./Models/CourseModel');
 const HRrouter=('./Routes/HRroute');
 //----------------------------------------------
 require('dotenv').config()
@@ -151,5 +152,3 @@ app.use(StaffMemberRoutes);
 // //    ,"faculty":"met"
 // //    ,"type":"Academic Member"
 // })
-//department addition,deletion,and updating
-//addition
