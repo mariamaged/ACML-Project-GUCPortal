@@ -462,6 +462,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
        var signedIn=false;
         var idx=-1;
         var attArr=new Array()
+        var OldSignIn=new moment().format("HH:mm")
         //searching for a record with this date to check if previously signed in
         for(var i=0;i<attendance.length;i++){
             var momentA = moment(attendance[i].date).format('YYYY-MM-DD');
@@ -469,6 +470,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             console.log("understand "+ attendance[i].last_signIn )
             if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
                 var dayOffBool=attendance[i].dayOffBool
+                OldSignIn=attendance[i].last_signIn
                    var start = moment(attendance[i].last_signIn);
                    console.log("start= "+start.format('HH:mm'))
                    var end = moment(SignOut); 
@@ -520,14 +522,36 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     var interval = moment().hour(0).minute(minutes);
                     var hrs=moment.duration(interval.format("HH:mm")).get('hours')
                     var minute=moment.duration(interval.format("HH:mm")).get('minutes')
+                    var Hrs=hrs-8
+                    var Min=minute-24
                     }
                     else{
                         var hrs=0
                         var minute=0 
+                        var Hrs=0
+                        var Min=0
                     }
 
-                    var monthlyHours=hrs
-                    var monthlyMin=minute
+                    // var monthlyHours=hrs
+                    // var monthlyMin=minute
+                   
+                    // var missingHrs=8-hrs
+                    // var missingMin=24-minute
+                    var extraHrs=0;
+                    var extraMin=0
+                    var missingHrs=0
+                    var missingMin=0
+
+                    if(Hrs<0)
+                    missingHrs=-Hrs
+                    else
+                    extraHrs=Hrs
+                    if(Min<0)
+                    missingMin=-Min
+                    else
+                   extraMin=Min
+
+
 
                     console.log("hours= "+hrs)
                     console.log("minutes= "+minute)
@@ -551,6 +575,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     last_signIn =attendance[i].last_signIn
                     console.log(moment(last_signIn).format("HH:mm"))
                     last_signOut=SignOut
+                    console.log("check signout= "+moment(last_signOut).format("HH:mm"))
                     day=attendance[i].day
                     check=true;
                     idx=i;
@@ -567,7 +592,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
         if(check==true){
             const user= await StaffMemberModel.findById(req.user.id)
             /////////////////////////////////////////////////////////////////////////////
-           //we can signout so get hours attended and add to monthly
+           //we can signout so get extra and missing hours and minutes and add them
             const currMonth=new moment().format("M")
             var c=false;
             var newMonthlyArr=new Array()
@@ -578,25 +603,79 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             if(user.time_attended.length>0){
                 for(var l=0;l<user.time_attended.length;l++){
                     if(user.time_attended[l].num==currMonth){
-                        console.log("found one= "+user.time_attended[l])
-                        const prevHours=user.time_attended[l].hours
-                        const prevMin=user.time_attended[l].minutes
-                        var minTotal=prevMin+monthlyMin
-                        if(prevMin+monthlyMin>60){
-                            monthlyHours+=1
-                            minTotal=prevMin+monthlyMin-60
-
+                        
+                        var currExtraH=user.time_attended[l].extraHours
+                        var currExtraM=user.time_attended[l].extraMinutes
+                        var currMissH=user.time_attended[l].missingHours
+                        var currMissM=user.time_attended[l].missingMinutes
+                        
+                        if(extraMin>0){
+                            if(extraMin<currMissM){
+                                currMissM=currMissM-extraMin
+                                extraMin=0
+                            }
+                            else{
+                                extraMin=extraMin-currMissM
+                                currMissM=0
+                            }
                         }
-                        console.log("prevMin= "+prevMin)
-                        console.log("monthlyMin= "+monthlyMin)
-                        console.log("minTotal= "+minTotal)
+
+                        if(extraHrs>0){
+                            if(extraHrs>currMissH){
+                                extraHrs=extraHrs-currMissH
+                                currMissH=0
+                            }
+                            else{
+                                currMissH=currMissH-extraHrs
+                                extraHrs=0
+                            }
+                        }
+
+                        if(missingMin>0){
+                            if(missingMin>currExtraM){
+                                missingMin=missingMin-currExtraM
+                                currExtraM=0
+                            }
+                            else{
+                                currExtraM=currExtraM-missingMin
+                                missingMin=0 
+                            }
+                        }
+
+                        if(missingHrs>0){
+                            if(missingHrs>currExtraH){
+                                missingHrs=missingHrs-currExtraH
+                                currExtraH=0
+                            }
+                            else{
+                                currExtraH=currExtraH-missingHrs
+                                missingHrs=0 
+                            }
+                        }
+
+                        
+                        var finEM=extraMin+currExtraM
+                        var finMM=missingMin+currMissM
+                        var finEH=extraHrs+currExtraH
+                        var finMH=missingHrs+currMissH
+                        if(extraMin+currExtraM>60){
+                            extraHrs++
+                            finEM=extraMin+currExtraM-60
+                        }
+                        if(missingMin+currMissM>60){
+                            extraHrs++
+                            finMM=missingMin+currMissM-60
+                        }
+
+
+
                         //new monthlyTime with updated hours and minutes
                         const newMonthly=new monthlyHoursSchema({
                             num:user.time_attended[l].num
-                             ,hours:user.time_attended[l].hours+monthlyHours
-                            ,minutes:minTotal
-                            ,mustAttendHours:user.time_attended[l].mustAttendHours
-                            ,mustAttendMinutes:user.time_attended[l].mustAttendMinutes
+                            ,extraHours:finEH
+                            ,extraMinutes:finEM
+                             ,missingHours:finMH
+                             ,missingMinutes:finMM
                         })
                         //adding updated month to array
                         c=true
@@ -616,8 +695,10 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             if(c==false || user.time_attended.length==0){
                 const newMonthly=new monthlyHoursSchema({
                     num:parseInt(currMonth)
-                     ,hours:monthlyHours
-                    ,minutes:monthlyMin
+                    ,extraHours:extraHrs
+                    ,extraMinutes:extraMin
+                     ,missingHours:missingHrs
+                     ,missingMinutes:missingMin
                 })
                 //if month array is empty simply add this new record
                 if(user.time_attended.length==0){
@@ -648,17 +729,19 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 signedIn:false,
                 signedOut:true,
                 last_signIn:last_signIn,
-                last_signOut:last_signOut,
+                last_signOut:SignOut,
                 day:day
             })
+            console.log("signout down= "+moment(SignOut).format("HH:mm"))
             attArr[idx]=newAtt
             const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
            // const user= await StaffMemberModel.findById(req.user.id)
             const signin=user.attendance[idx].last_signIn
             const signout=user.attendance[idx].last_signOut
+            console.log("signing out at"+moment(SignOut).format("HH:mm"))
             const dateToday=user.attendance[idx].date
             const lastCal=user.attendance[idx].last_calculated_signOut
-            return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(signin).format("HH:mm")),last_signOut:(moment(signout).format("HH:mm")),
+            return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(OldSignIn).format("HH:mm")),last_signOut:(moment(SignOut).format("HH:mm")),
                 hours:hours,minutes:minutes,signedIn:signedIn})
         }
     }
@@ -951,83 +1034,83 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
 })
 
 
-router.put('/missingHours',authenticateToken,async(req,res)=>{
+// router.put('/missingHours',authenticateToken,async(req,res)=>{
     
-    const month=new moment().format('M')
-    const user=await StaffMemberModel.findById(req.user.id)
-    var day_off
-    if(user.staff_type=="HR")
-    day_off=(await HRModel.findOne({member:req.user.id})).day_off
-    else
-    day_off=(await AcademicStaffModel.findOne({member:req.user.id})).day_off
-    const time_attended=user.time_attended
-    var monArr=[]
-    var check=false;
-    console.log("length= "+time_attended.length)
-    for(var i=0;i<time_attended.length;i++){
-        console.log("time_attened[i].num= "+time_attended[i].num)
-        console.log("month "+month)
-        if(time_attended[i].num==parseInt(month)){
-            console.log("found it")
-            if(!time_attended[i].mustAttendHours && !time_attended[i].mustAttendMinutes){
-            const {hrs,min}= calculateHrs(time_attended[i].num,day_off)
-            console.log("hrs= "+hrs)
-            console.log("min= "+min)
-                const newMonthly=new monthlyHoursSchema({
-                    num:time_attended[i].num,
-                    hours:time_attended[i].hours,
-                    minutes:time_attended[i].minutes,
-                    mustAttendHours:hrs,
-                    mustAttendMinutes:min,
-                    missingHours:hrs-time_attended[i].hours,
-                    missingMinutes:min-time_attended[i].minutes
-                })
-                monArr[i]=newMonthly
-                check=true
-            }
-            else{
-            monArr[i]=time_attended[i]
-            check=true
-            }
-        }
-        else
-            monArr[i]=time_attended[i]
-    }
-    const user2=user
+//     const month=new moment().format('M')
+//     const user=await StaffMemberModel.findById(req.user.id)
+//     var day_off
+//     if(user.staff_type=="HR")
+//     day_off=(await HRModel.findOne({member:req.user.id})).day_off
+//     else
+//     day_off=(await AcademicStaffModel.findOne({member:req.user.id})).day_off
+//     const time_attended=user.time_attended
+//     var monArr=[]
+//     var check=false;
+//     console.log("length= "+time_attended.length)
+//     for(var i=0;i<time_attended.length;i++){
+//         console.log("time_attened[i].num= "+time_attended[i].num)
+//         console.log("month "+month)
+//         if(time_attended[i].num==parseInt(month)){
+//             console.log("found it")
+//             if(!time_attended[i].mustAttendHours && !time_attended[i].mustAttendMinutes){
+//             const {hrs,min}= calculateHrs(time_attended[i].num,day_off)
+//             console.log("hrs= "+hrs)
+//             console.log("min= "+min)
+//                 const newMonthly=new monthlyHoursSchema({
+//                     num:time_attended[i].num,
+//                     hours:time_attended[i].hours,
+//                     minutes:time_attended[i].minutes,
+//                     mustAttendHours:hrs,
+//                     mustAttendMinutes:min,
+//                     missingHours:hrs-time_attended[i].hours,
+//                     missingMinutes:min-time_attended[i].minutes
+//                 })
+//                 monArr[i]=newMonthly
+//                 check=true
+//             }
+//             else{
+//             monArr[i]=time_attended[i]
+//             check=true
+//             }
+//         }
+//         else
+//             monArr[i]=time_attended[i]
+//     }
+//     const user2=user
     
-    if(check===true){
-       // console.log("user2= "+user)
-        const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,monArr)
-        const newMonth=(await StaffMemberModel.findById(req.user.id)).time_attended
-        console.log("newMonth= "+newMonth)
-        const h=newMonth.missingHours
-        const m=newMonth.missingMinutes
-        console.log("newMonthly.missingHours found= "+newMonth.missingHours)
-        console.log("newMonthly.missingMin found= "+newMonth.missingMinutes)
-        return res.json({missing_hours:h,missing_minutes:m})
-    }
-    if(check==false){
-        const {hrs,min}= calculateHrs(time_attended[i].num,day_off)
-        const newMonthly=new monthlyHoursSchema({
-            num:time_attended[i].num,
-            hours:time_attended[i].hours,
-            minutes:time_attended[i].minutes,
-            mustAttendHours:hrs,
-            mustAttendMinutes:min,
-            missingHours:hrs-time_attended[i].hours,
-            missingMinutes:min-time_attended[i].minutes
-        })
-        var newAtt=time_attended
-        newAtt[newAtt.length-1]=newMonthly
-        const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,newAtt)
-        console.log("newMonthly.missingHours not fond= "+newMonthly.missingHours)
-        console.log("newMonthly.missingMin not found= "+newMonthly.missingMinutes)
-        return res.json({missing_hours:newMonthly.missingHours,missing_minutes:newMonthly.missingMinutes})
-    }
+//     if(check===true){
+//        // console.log("user2= "+user)
+//         const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,monArr)
+//         const newMonth=(await StaffMemberModel.findById(req.user.id)).time_attended
+//         console.log("newMonth= "+newMonth)
+//         const h=newMonth.missingHours
+//         const m=newMonth.missingMinutes
+//         console.log("newMonthly.missingHours found= "+newMonth.missingHours)
+//         console.log("newMonthly.missingMin found= "+newMonth.missingMinutes)
+//         return res.json({missing_hours:h,missing_minutes:m})
+//     }
+//     if(check==false){
+//         const {hrs,min}= calculateHrs(time_attended[i].num,day_off)
+//         const newMonthly=new monthlyHoursSchema({
+//             num:time_attended[i].num,
+//             hours:time_attended[i].hours,
+//             minutes:time_attended[i].minutes,
+//             mustAttendHours:hrs,
+//             mustAttendMinutes:min,
+//             missingHours:hrs-time_attended[i].hours,
+//             missingMinutes:min-time_attended[i].minutes
+//         })
+//         var newAtt=time_attended
+//         newAtt[newAtt.length-1]=newMonthly
+//         const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,newAtt)
+//         console.log("newMonthly.missingHours not fond= "+newMonthly.missingHours)
+//         console.log("newMonthly.missingMin not found= "+newMonthly.missingMinutes)
+//         return res.json({missing_hours:newMonthly.missingHours,missing_minutes:newMonthly.missingMinutes})
+//     }
 
 
 
-})
+// })
 
 function calculateHrs(dateMonth,day_off){
     console.log("inside cal= "+dateMonth)

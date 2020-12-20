@@ -31,10 +31,10 @@ const slotSchema = mongoose.Schema({
 
 const monthlyHoursSchema = mongoose.Schema({
    num:{type:Number}
-   ,hours:{type:Number ,default:0}
-   ,minutes:{type:Number ,default:0}
-    ,mustAttendHours:{type:Number}
-    ,mustAttendMinutes:{type:Number}
+   ,extraHours:{type:Number ,default:0}
+   ,extraMinutes:{type:Number ,default:0}
+    // ,mustAttendHours:{type:Number}
+    // ,mustAttendMinutes:{type:Number}
     ,missingHours:{type:Number ,default:0},
     missingMinutes:{type:Number ,default:0},
 });
