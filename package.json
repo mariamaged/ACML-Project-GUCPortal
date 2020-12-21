@@ -21,6 +21,7 @@
     "mongodb": "^3.6.3",
     "mongoose": "^5.11.8",
     "nodemon": "^2.0.6",
+    "redis": "^3.0.2",
     "supertest": "^6.0.1"
   }
 }
