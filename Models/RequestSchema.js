@@ -8,6 +8,7 @@ const requestSchema=mongoose.Schema({
     slotDate:{type:Date},
     slotNum:{type:Number},
     slotLoc:{type:String},
+    sentBy:{type: ObjectID, ref: 'StaffMemberModel'},
      sentTo:{type: ObjectID, ref: 'StaffMemberModel'},
     state:{type:String},
     reason:{type:String},

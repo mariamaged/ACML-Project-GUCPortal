@@ -237,7 +237,7 @@ catch(err){
 async function  cr(){
     const loc=(await StaffMemberModel.findById("5fdf6be566837b398064cf53"))
     const loc3=loc.notifications
-console.log(loc3)
+//console.log(loc3)
 // const newCourse=new CourseModel({
 //         id: "csen22",
 //         name: "cs7", // Not sure if it should be required.

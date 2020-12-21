@@ -30,12 +30,13 @@ function authenticateToken(req,res,next){
     next();
 }
 router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
-        console.log("req.user= "+req.user)
+        console.log("req.user= "+req.user.id)
         const user=await StaffMemberModel.findById(req.user.id)
         const slotNum=req.body.slotNum
         const slotDate=req.body.slotDate
         const slotLoc=req.body.slotLoc
         var checkFin=false;
+        const id=req.user.id
         // if(moment(slotDate).isBefore(new moment())){
         //     return res.json("Cannot replace a slot that has already passed")
         // }
@@ -105,15 +106,19 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                     console.log("check2"+check2)
             }
             }
+           // var id=req.user.id
+            console.log("teest ="+id)
             //if no such slot is found create a request for this member
             if(check2==false){
                 //create new request
                 console.log("checkk2 "+check2)
+                console.log("req="+id)
                 var req=new request({
                     reqType:"Replacement",
                     slotDate:slotDate,
                     slotNum:slotNum,
                     slotLoc:slotLoc,
+                    sentBy:id,
                     sentTo:replacement.member,
                     state:"Pending",
                     submission_date:new moment()
@@ -128,10 +133,8 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                 //post request in requests table with sent to added
                 try{
                     console.log("saved")
-                  //  res.send(req)
-                  checkFin=true
-                 
-                 const requ= await req.save()
+                    checkFin=true
+                    const requ= await req.save()
                 }
                 catch(err){
                     res.json(err)
@@ -145,5 +148,68 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
       return res.json({error:"Could not find any eligible candidate to replace with"})
         
 })
+router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+        const sent=await request.find({sentBy:req.user.id})
+        for(var i=0;i<sent.length;i++){
+            //get name of request receiver to print
+                reqType=sent[i].reqType
+                const sentTo=(await StaffMemberModel.findById(sent[i].sentTo))
+                const name=sentTo.name
+                if(reqType=="Replacement"){
+                    res.write("request_type: "+sent[i].reqType+"\n")
+                    res.write( "request_state: "+sent[i].state+"\n")
+                    res.write( "sentTo: "+name+"\n")
+                    res.write( "slot_number: "+sent[i].slotNum+"\n")
+                    res.write( "slot_date: "+ sent[i].slotDate+"\n")
+                    res.write( "slot_location: "+sent[i].slotLoc+"\n")
+                    res.write( "submission_date "+sent[i].submission_date+"\n")
+                    res.write("\n")
+                }
+                if(reqType=="Accidental Leave || Sick Leave|| Maternity Leave"){
+                    res.write("request_type: "+sent[i].reqType+"\n")
+                    res.write( "request_state: "+sent[i].state+"\n")
+                    res.write( "sentTo: "+name+"\n")
+                    res.write( "submission_date "+sent[i].submission_date+"\n")
+                    res.write("\n")
+                }
+                
+        }
+
+        res.end()
+        return 
+})
+
+router.get('/receivedReplacementRequests',authenticateToken,async(req,res)=>{
+    //get requests where sentTo is equal this user
+    const sent=await request.find({sentTo:req.user.id})
+    for(var i=0;i<sent.length;i++){
+            reqType=sent[i].reqType
+            const sentBy=(await StaffMemberModel.findById(sent[i].sentBy))
+            const name=sentBy.name
+            if(reqType=="Replacement"){
+                
+                res.write("request_type: "+sent[i].reqType+"\n")
+                    res.write( "request_state: "+sent[i].state+"\n")
+                    res.write( "sentBy: "+name+"\n")
+                    res.write( "slot_number: "+sent[i].slotNum+"\n")
+                    res.write( "slot_date: "+ sent[i].slotDate+"\n")
+                    res.write( "slot_location: "+sent[i].slotLoc+"\n")
+                    res.write( "submission_date "+sent[i].submission_date+"\n")
+                    res.write("\n")
+            }
+            if(reqType=="Accidental Leave || Sick Leave|| Maternity Leave"){
+                res.write("request_type: "+sent[i].reqType+"\n")
+                res.write( "request_state: "+sent[i].state+"\n")
+                res.write( "sentBy: "+name+"\n")
+                res.write( "submission_date "+sent[i].submission_date+"\n")
+                res.write("\n")
+            }
+           
+    }
+    res.end()
+    return 
+})
+
 
 module.exports=router;
