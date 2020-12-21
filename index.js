@@ -513,19 +513,29 @@ app.post('/updateAcademicMemberstoCourses', async (req, res) => {
             }
         }    
             if(Object.keys(errorMessage).length == 1) {
+                    var isAssignedNew = newAcademic.courses.some(function (assignedCourse) {
+                        return assignedCourse.equals(course._id.toString());
+                    });
+                    if(isAssignedNew) {
+                        errorMessage.newMemberAlreadyAssigned = true;
+                        errorMessages.push(errorMessage);
+                    }
+
+                    else {
                         course.academic_staff.pull(oldAcademic._id);
                         if(course.academic_staff.length == 0)
                             course.academic_staff = [];
                         course.academic_staff.push(newAcademic._id);
-                        course.save();
+                        await course.save();
 
                         oldAcademic.courses.pull(course._id);
-                        oldAcademic.save();
+                        await oldAcademic.save();
 
                         if(newAcademic.courses.length == 0)
                             newAcademic.courses = [];
                         newAcademic.courses.push(course._id);
-                        newAcademic.save();
+                        await newAcademic.save();
+                    }
            }
            else 
                 errorMessages.push(errorMessage);
