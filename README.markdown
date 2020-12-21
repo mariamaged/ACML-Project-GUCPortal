@@ -63,7 +63,7 @@ Operation done successfully!
 	
 	"unfoundCourse": true,
 	"unfoundAcademicMember": true,
-	"memberNotCourseInstructor": true,
+    "memberNotCourseInstructor": true,
     "courseNotunderHODDepartment": true,
     "memberNotBelongingtoCourseDep": true,
     "courseInstructorAlreadyAssigned": true
@@ -75,9 +75,9 @@ Operation done successfully!
 		"member": "ac-13"
 	},
 	
-	"unfoundCourse": true,
-	"unfoundAcademicMember": true,
-	"memberNotCourseInstructor": true,
+    "unfoundCourse": true,
+    "unfoundAcademicMember": true,
+    "memberNotCourseInstructor": true,
     "courseNotunderHODDepartment": true,
 }
 ]
@@ -145,7 +145,7 @@ Operation done successfully!
 		"newMember": "ac-13"
 	},
 	
-	"unfoundCourse": true,
+"unfoundCourse": true,
     "unfoundAcademicOldMember": true,
     "unfoundAcademicNewMember": true,
     "newMemberNotBelongingtoCourseDep": true,
@@ -161,7 +161,7 @@ Operation done successfully!
 		"newMember": "ac-11"
 	},
 	
-	"unfoundCourse": true,
+"unfoundCourse": true,
     "unfoundAcademicOldMember": true,
     "unfoundAcademicNewMember": true,
     "newMemberNotBelongingtoCourseDep": true,
