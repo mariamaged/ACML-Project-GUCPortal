@@ -5,7 +5,7 @@ const mongoose =require('mongoose');
 //for testing-----------------------------------------
 const StaffMemberRoutes=require('./Routes/StaffMemberRoutes')
 const department=require('./Models/DepartmentModel')
-const AcademicStaffModel=require('./Models/AcademicStaffModel')
+const AcademicStaff=require('./Models/AcademicStaffModel')
 const faculty=require('./Models/FacultyModel')
 const location=require('./Models/LocationModel');
 const StaffMember = require('./Models/StaffMemberModel');
@@ -16,7 +16,8 @@ const HRrouter=('./Routes/HRroute');
 require('dotenv').config()
 
 //app.use(express.json())
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+const router = require('./Routes/HRroute');
 app.use(bodyParser.json())
 //app.use(bodyParser.urlencoded({ extended: false}));
 //app.use(express.urlencoded({extended: false}));
@@ -34,7 +35,7 @@ mongoose.connect(process.env.db_URL, connectionParams).then(()=>{
 
 
 app.listen(3000);
-app.use(StaffMemberRoutes);
+//app.use(authenticateToken);
 
 
 //for testin only------------------------------------REMOVE AFTERRRRRRRRRRR TESTINGGGGGGGGGGGGGGGGGGGGG--

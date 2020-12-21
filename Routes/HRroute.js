@@ -9,7 +9,6 @@ const faculty=require('../Models/FacultyModel');
 const department=require('../Models/DepartmentModel');
 const course=require('../Models/CourseModel');
 const jwt=require('jsonwebtoken');
-const { off } = require('../Models/AcademicStaffModel.js');
 
 
 //Locations Adding,deleting, and updating
@@ -17,8 +16,9 @@ const { off } = require('../Models/AcademicStaffModel.js');
 //adding
 router.route('/Location').post(async(req,res)=>{
     //to authorize
-    //if(req.user.role!='HR')
-      // res.status(401).send('Access Denied');
+    if(req.user.role!='HR')
+      res.status(401).send('Access Denied');
+    else{  
     try{
         //yedakhaly max_capacity wla ahotaha ana based 3la el type?
         const{id,type,maximum_capacity}=req.body;
@@ -37,6 +37,7 @@ router.route('/Location').post(async(req,res)=>{
     catch(err){
         res.status(500).json({error:err.message});
     }
+}
 })
 
 //deleting
@@ -197,7 +198,7 @@ router.route('/department').post(async(req,res)=>{
 })
 //courses addition,deletion, and updating
 //adding
-app.route('/course').post(async(req,res)=>{
+router.route('/course').post(async(req,res)=>{
     try{
         const{id,name,departmentname}=req.body;
         if(!id||!name||!departmentname) res.status(400).json({msg:"please fill all the fields"});
@@ -263,7 +264,7 @@ app.route('/course').post(async(req,res)=>{
                     }
                       //to test
                       if(academicStaff){
-                        var acStaff=new [academicStaff.length];
+                        var acStaff=String [academicStaff.length];
                         for(var i=0;i<academicStaff.length;i++){
                             var sm= (await StaffMember.findOne({"id":academicStaff[i]}))._id
                             var ac=await AcademicStaff.findOne({"member":sm});
@@ -293,6 +294,8 @@ app.route('/course').post(async(req,res)=>{
 })
 //staffmember
 //elmafrood a bcrypt el password hatta lw default?
+//when academic staff add lel table/delete/update
+const bcrypt=require('bcrypt');
 router.route('/staffmember').post(async(req,res)=>{
     try{
        const{name,email,salary,officelocation,type,dayoff,gender}=req.body;
@@ -329,7 +332,10 @@ router.route('/staffmember').post(async(req,res)=>{
                             if(tuple!=null) {sid="ac-"+(i+1); break;} 
                         }
                      }
-                     const toAdd=await new StaffMember({"id":sid,"email":email,"salary":salary,"name":name,"office":office._id,"staff_type":type,"dayoff":doff,"gender":gender});
+                     const salt=await bcrypt.genSalt(10);
+                     const hashedPassword=await bcrypt.hash("123456",salt);
+                     const toAdd=await new StaffMember({"password":hashedPassword,"newStaffMember":true,"id":sid,"email":email,"salary":salary,"name":name,"office":office._id,"staff_type":type,"dayoff":doff,"gender":gender});
+                     office.current_capacity+=1;
                      await toAdd.save();
                      res.send(message);
                  }
@@ -354,11 +360,51 @@ router.route('/staffmember').post(async(req,res)=>{
         res.status(500).json({error:err.message});
     }
 })
-.put((req,res)=>{
-
+//bcrypt hena kaman
+.put(async(req,res)=>{
+try{
+   const{oldemail,email,name,password,office,newStaffMember,annualdays,lastupdatedannual,accidentaldaysleft,attendcompensationday}=req.body;
+   if(!oldemail) res.status(400).json({msg:"please insert the email of the staff member you want to update"});
+   else{
+       const ob=await StaffMember.findOne({"email":oldemail});
+       if(ob==null) res.status(400).json({msg:"there is no staff member with that email"});
+       else{
+            if(office){
+                const o=await location.findOne({"id":office});
+                if(o==null) res.status(400).json({msg:"there is no office in this location"});
+                else{
+                    if(o.current_capacity<o.maximum_capacity){
+                        const oldoffice=await location.findOne({"_id":ob.office});
+                        oldoffice.current_capacity-=1;
+                        ob.office=(await o)._id;
+                        o.current_capacity+=1;}
+                    else res.status(400).json({msg:"the office you provided is already at full capacity"});    
+                }
+            }
+            if(email){
+                const newob=await StaffMember.findOne({"email":email});
+                if(newob==null || email==oldemail){
+                   (await ob).email=email;}
+                else res.status(400).json({msg:"a user with this email already exists"});
+            }
+            //fadel hettet bcrypt dy  
+            if(password)ob.password=password
+            if(name) ob.name=name;
+            if(newStaffMember) ob.newStaffMember=newStaffMember;
+            if(annualdays) ob.annualdays=annualdays;
+            if(lastupdatedannual) ob.lastupdatedannual=lastupdatedannual;
+            if(accidentaldaysleft) ob.accidentaldaysleft=accidentaldaysleft;
+            if(attendcompensationday) ob.attendcompensationday=attendcompensationday;
+            await ob.save();
+            res.send("done");
+       }
+   }
+}catch(err){
+    res.status(500).json({error:err.message});
+}
 })
 
-router.route('/updatesalary').put((req,res)=>{
+router.route('/updatesalary').put(async(req,res)=>{
     try{
        const{email,salary}=req.body;
        if(!email||!salary) res.status(400).json({msg:"please fill all the fields"});
@@ -371,6 +417,17 @@ router.route('/updatesalary').put((req,res)=>{
        }
     }catch(err){
         res.status(500).json({error:err.message});
+    }
+})
+//attendance record
+router.route('/attendance').get(async(req,res)=>{
+    const email=req.body.email;
+    if(!email) res.status(400).json({msg:"please insert the email of the member you need the attendance records of"});
+    else{
+        const mem= await StaffMember.findOne({"email":email});
+        if(mem==null) res.status(400).json({msg:"there is no user with this email"});
+        else
+            res.send(mem.attendance);
     }
 })
 module.exports=router;
