@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const AttendanceSchema = mongoose.Schema({
+const attendanceSchema = mongoose.Schema({
     date: {type: Date}
    ,hours: {type:Number}
-   ,last_signIn: {type:Timestamp}
-   ,last_signOut: {type:Timestamp}
+   ,last_signIn: {type:Date ,default:Date.now}
+   ,last_signOut: {type:Date ,default:Date.now}
    ,day: {type: String}
 });
 
-modules.exports = AttendanceSchema;
+module.exports = attendanceSchema;

@@ -16,6 +16,7 @@ const mongoose = require('mongoose');
 
 // For app singleton instance.
 const {app} = require('./app.js');
+const slotSchema = require('./Models/SlotSchema.js');
 
 // Database connection parameters.
 const databaseParameters = { useNewUrlParser: true, useUnifiedTopology: true };
@@ -207,6 +208,337 @@ app.post('/viewDepartmentStaffMemberDayOff', async (req, res) => {
   }*/
 });
 
+app.post('/addCourseSlot', async (req, res) => {
+    //  if(req.user.isCourseCoordinator) {
+    const {courseID, details} = req.body;
+    const course = await CourseModel.findOne({id: courseID});
+    if(!course) return res.status(400).send("Course not found!");
+
+    const CCStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
+    const CCAcademicModel = await AcademicStaffModel.findOne({member: CCStaffModel._id}); // member: req.user.id or member: req.user._id.
+    if(!course.course_coordinator.equals(CCAcademicModel._id)) {
+        return res.status(401).send("You are not a course coordinator for this course!");
+    }
+    const errorMessage = {locationsNotFound: [], unprocessedSlots: []};
+
+    for(let index = 0; index < details.length; index++) {
+        const {number, day, locationID} = details[index];
+        const location = await LocationModel.findOne({id: locationID});
+        if(!location) {
+            errorMessage.locationsNotFound.push(locationID);
+            errorMessage.unprocessedSlots.push(details[index]);
+        }
+        else {
+            const newCourseSlot = {
+                day: day,
+                number: number,
+                location: location._id
+            };
+            course.schedule.push(newCourseSlot);
+            course.slots_needed++;
+            await course.save();
+    }
+}
+      return res.status(400).json(errorMessage);
+
+      // }
+    /*else {
+      res.status(401).send('Access Denied!');
+  }*/
+});
+
+app.get('/teachingAssignmentPerCourse', async (req, res) => {
+    //  if(req.user.isHOD) {
+    const {courseID} = req.body;
+    const course = await CourseModel.findOne({id: courseID});
+    if(!course) return res.status(400).send("Course not found!");
+
+    const HODStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
+    const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+    if(!HODAcademicModel.department.equals(course.department)) {
+        return res.status(401).send("This course is not under your department!");  
+    }
+
+    const schedule = course.schedule;
+    const academicStaff = course.academic_staff;
+    const returnArray = [];
+
+    for(let index = 0; index < academicStaff.length; index++) {
+        const oneMemberAcademicModel = await AcademicStaffModel.findById(academicStaff[index]);
+        const oneMemberStaffModel = await StaffMemberModel.findById(oneMemberAcademicModel.member);
+        const oneObject = {academicStaffID: oneMemberStaffModel.id, academicStaffName: oneMemberStaffModel.name, slots: []};
+
+        const slotsArray = schedule.filter(function(elem) {
+            return elem.academic_member_id.equals(academicStaff[index]);
+        });
+
+        for(let i = 0; i < slotsArray.length; i++) {
+            const loc = await LocationModel.findById(slotsArray[i].location);
+            const slotObject = {
+                day: slotsArray[i].day,
+                number: slotsArray[i].number,
+                location: loc.id
+            }
+            oneObject.slots.push(slotObject);
+        }
+        returnArray.push(oneObject);
+    }
+
+    return res.json(returnArray);
+        // }
+    /*else {
+      res.status(401).send('Access Denied!');
+  }*/
+});
+
+app.get('/teachingAssignmentAllCourses', async (req, res) => {
+    //  if(req.user.isHOD) {
+    const HODStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
+    const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+
+    const courses = await CourseModel.find({department: HODAcademicModel.department});
+    const finalArray = [];
+
+    for(let j = 0; j < courses.length; j++) {
+    const course = courses[j];
+    const finalObject = {
+        courseID: course.id,
+    };
+
+    const schedule = course.schedule;
+    const academicStaff = course.academic_staff;
+    const returnArray = [];
+
+    for(let index = 0; index < academicStaff.length; index++) {
+        const oneMemberAcademicModel = await AcademicStaffModel.findById(academicStaff[index]);
+        const oneMemberStaffModel = await StaffMemberModel.findById(oneMemberAcademicModel.member);
+        const oneObject = {academicStaffID: oneMemberStaffModel.id, academicStaffName: oneMemberStaffModel.name, slots: []};
+
+        const slotsArray = schedule.filter(function(elem) {
+            return elem.academic_member_id.equals(academicStaff[index]);
+        });
+
+        for(let i = 0; i < slotsArray.length; i++) {
+            const loc = await LocationModel.findById(slotsArray[i].location);
+            const slotObject = {
+                day: slotsArray[i].day,
+                number: slotsArray[i].number,
+                location: loc.id
+            }
+            oneObject.slots.push(slotObject);
+        }
+        returnArray.push(oneObject);
+    }
+    finalObject.scheduleForEachTA = returnArray
+    finalArray.push(finalObject)
+}
+
+    return res.json(finalArray);
+        // }
+    /*else {
+      res.status(401).send('Access Denied!');
+  }*/
+});
+// Route 1.
+app.post('/assignCourseInstructorforCourses', async (req, res) => {
+//    if(req.user.isHOD) {
+        const body = req.body;
+        const errorMessages = [];
+
+        const HODStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later
+        const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+
+        for(let index = 0; index < body.length; index++) {
+            const errorMessage = {};
+            errorMessage.request = body[index];
+
+            const {courseID, member} = body[index];
+            const course = await CourseModel.findOne({id: courseID});
+            const courseInstructorStaffModel = await StaffMemberModel.findOne({id: member});
+            var courseInstructorAcademicModel = null;
+            if(courseInstructorStaffModel)
+                  courseInstructorAcademicModel = await AcademicStaffModel.findOne({member: courseInstructorStaffModel._id});
+
+            if(!course) 
+                errorMessage.unfoundCourse = true;
+            if(!courseInstructorAcademicModel) 
+                errorMessage.unfoundAcademicMember = true;
+            
+            if(courseInstructorAcademicModel) {
+                if(courseInstructorAcademicModel.type != 'Course Instructor')
+                    errorMessage.memberNotCourseInstructor = true;
+                
+                    if(course) {
+                        if(!course.department.equals(HODAcademicModel.department))
+                            errorMessage.courseNotunderHODDepartment = true;
+                        if(!course.department.equals(courseInstructorAcademicModel.department))
+                            errorMessage.memberNotBelongingtoCourseDep = true;
+                    }
+                    else {
+                        errorMessage.courseNotunderHODDepartment = true;
+                        errorMessage.memberNotBelongingtoCourseDep = true;
+                    }
+            }
+            else {
+                errorMessage.memberNotCourseInstructor = true;
+
+                if(course) {
+                    if(!course.department.equals(HODAcademicModel.department))
+                        errorMessage.courseNotunderHODDepartment = true;
+                    errorMessage.memberNotBelongingtoCourseDep = true;
+                }
+                else {
+                    errorMessage.courseNotunderHODDepartment = true;
+                    errorMessage.memberNotBelongingtoCourseDep = true;
+                }
+            }
+
+
+            if(Object.keys(errorMessage).length == 1) {
+                var isAssigned = courseInstructorAcademicModel.courses.some(function (assignedCourse) {
+                    return assignedCourse.equals(course._id.toString());
+                });
+                if(isAssigned) {
+                    errorMessage.courseInstructorAlreadyAssigned = true;
+                    errorMessages.push(errorMessage);
+                }
+                else {
+                    if(course.academic_staff.length == 0) {
+                        course.academic_staf = [];
+                    }
+                    course.academic_staff.push(courseInstructorAcademicModel._id);
+                    await course.save();
+
+                    if(courseInstructorAcademicModel.courses.length == 0) {
+                        courseInstructorAcademicModel.courses = [];
+                    }
+                    courseInstructorAcademicModel.courses.push(course._id);
+                    await courseInstructorAcademicModel.save();
+                }
+            }
+            else
+                errorMessages.push(errorMessage);
+    }
+
+    if(errorMessages.length != 0)   
+        return res.status(400).json(errorMessages);
+    else
+        return res.status(200).send("Operation done successfully!");
+ //   }
+  /*  else {
+        res.status(401).send('Access Denied!');
+    } */
+})
+
+app.post('/updateAcademicMemberstoCourses', async (req, res) => {
+    //  if(req.user.academicRole == "Course Instructor") {
+        const body = req.body;
+        const errorMessages = [];
+
+        const InstructorStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later
+        const InstructorModel = await AcademicStaffModel.findOne({member: InstructorStaffModel._id}); // member: req.user.id or member: req.user._id.
+
+        for(let index = 0; index < body.length; index++) {
+            const errorMessage = {};
+            errorMessage.request = body[index];
+
+            const {courseID, oldMember, newMember} = body[index];
+            const course = await CourseModel.findOne({id: courseID});
+            const oldStaff = await StaffMemberModel.findOne({id: oldMember});
+            var oldAcademic = null;
+            if(oldStaff)
+                oldAcademic = await AcademicStaffModel.findOne({member: oldStaff._id});
+            const newStaff = await StaffMemberModel.findOne({id: newMember});
+            var newAcademic = null;
+            if(newStaff)
+                newAcademic = await AcademicStaffModel.findOne({member: newStaff._id});
+
+            if(!course) 
+                errorMessage.unfoundCourse = true;
+            if(!oldAcademic) 
+                errorMessage.unfoundAcademicOldMember = true;
+            if(!newAcademic) 
+                errorMessage.unfoundAcademicNewMember = true;
+
+            if(newAcademic) {
+                    if(course) {
+                        if(!newAcademic.department.equals(course.department))
+                            errorMessage.newMemberNotBelongingtoCourseDep = true;
+
+                        var isAssigned = InstructorModel.courses.some(function (assignedCourse) {
+                            return assignedCourse.equals(course._id.toString());
+                        });
+                        if(!isAssigned) 
+                            errorMessage.notAssignedToCourse = true;
+
+                        if(oldAcademic) {
+                            var isAssignedOld = oldAcademic.courses.some(function (assignedCourse) {
+                                return assignedCourse.equals(course._id.toString());
+                            });
+                            if(!isAssignedOld)
+                                errorMessage.oldNotAssignedToCourse = true;  
+                        }
+                        else 
+                            errorMessage.oldNotAssignedToCourse = true;  
+                    }
+                    else {
+                        errorMessage.newMemberNotBelongingtoCourseDep = true;
+                        errorMessage.notAssignedToCourse = true;
+                        errorMessage.oldNotAssignedToCourse = true;
+                    }
+            }
+            else  {
+            errorMessage.newMemberNotBelongingtoCourseDep = true;
+
+            if(course) {
+                var isAssigned = InstructorModel.courses.some(function (assignedCourse) {
+                    return assignedCourse.equals(course._id.toString());
+                });
+                if(!isAssigned) 
+                    errorMessage.notAssignedToCourse = true;
+
+                if(oldAcademic) {
+                    var isAssignedOld = oldAcademic.courses.some(function (assignedCourse) {
+                        return assignedCourse.equals(course._id.toString());
+                    });
+                    if(!isAssignedOld)
+                        errorMessage.oldNotAssignedToCourse = true;  
+                }
+                else 
+                    errorMessage.oldNotAssignedToCourse = true;  
+            }
+            else {
+                errorMessage.notAssignedToCourse = true;
+                errorMessage.oldNotAssignedToCourse = true;
+            }
+        }    
+            if(Object.keys(errorMessage).length == 1) {
+                        course.academic_staff.pull(oldAcademic._id);
+                        if(course.academic_staff.length == 0)
+                            course.academic_staff = [];
+                        course.academic_staff.push(newAcademic._id);
+                        course.save();
+
+                        oldAcademic.courses.pull(course._id);
+                        oldAcademic.save();
+
+                        if(newAcademic.courses.length == 0)
+                            newAcademic.courses = [];
+                        newAcademic.courses.push(course._id);
+                        newAcademic.save();
+           }
+           else 
+                errorMessages.push(errorMessage);
+    }
+    if(errorMessages.length != 0)   
+        return res.status(400).json(errorMessages);
+    else
+        return res.status(200).send("Operation done successfully!");
+    /*else {
+      res.status(401).send('Access Denied!');
+  }*/
+});
+
 app.post('/addCourse', async (req, res) => {
     const departmentName = req.body.departmentName;
     const department = await DepartmentModel.findOne({name: departmentName});
@@ -214,8 +546,8 @@ app.post('/addCourse', async (req, res) => {
     const course = new CourseModel({
         id: "DMET502",
         name: "Computer Graphics",
-        department: department._id,
-        slots_needed: 4
+        course_coordinator: "5fde354af9102b1b1467f1a9",
+        department: department._id
     });
     await course.save();
 });
@@ -257,24 +589,24 @@ app.post('/addAcademicStaffMember', async (req, res) => {
     
     // Add to StaffMemberModelFirst.
     const staffMemberTemp = new StaffMemberModel({
-        name: "Sarah Maged",
-        email: "sarah@gmail.com",
-        salary: 5000,
+        name: "Maya Ahmed",
+        email: "maya@gmail.com",
+        salary: 6000,
         office: location._id,
         staff_type: "Academic Member",
-        day_off: "Wednesday"
     });
     await staffMemberTemp.save();
 
     // Then add to AcademicStaffModel.
-    const staffMember = await StaffMemberModel.findOne({email: "sarah@gmail.com"}); // Find the id JavaScript added to the tuple we inserted.
+    const staffMember = await StaffMemberModel.findOne({email: "maya@gmail.com"}); // Find the id JavaScript added to the tuple we inserted.
     const faculty = await FacultyModel.findOne({name: "Engineering"}); // Find the id JavaScript added to the tuple we inserted.
     const department = await DepartmentModel.findOne({name: "DMET"}); // Find the id JavaScript added to the tuple we inserted.
     const academicMember = new AcademicStaffModel({
         member: staffMember._id,
         faculty: faculty._id,
         department: department._id,
-        type: "Course Instructor"
+        type: "Course Instructor",
+        day_off: "Friday"
     });
     await academicMember.save();
     

@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 
-const SlotSchema = mongoose.Schema({
-    day: {type: String, required: true},
-    number: {type: Number, required: true}, 
+const slotSchema = mongoose.Schema({
+    day: {type: String, required: true, enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]},
+    number: {type: Number, required: true, enum: [1, 2, 3, 4, 5]}, 
     location: {type: ObjectID, ref: 'Location', required: true},
     academic_member_id: {type: ObjectID, ref: 'AcademicStaff'},
-    course: {type: ObjectID, ref:'Course', required: true}
+    course: {type: ObjectID, ref:'Course'}
 });
 
-modules.exports = SlotSchema;
+module.exports = slotSchema;

@@ -1,25 +1,6 @@
 const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
-//const slotSchema = require('SlotSchema.js');
-//const attendanceSchema = require('AttendanceSchema.js');
-
-
-const attendanceSchema = mongoose.Schema({
-    date: {type: Date}
-   ,hours: {type:Number}
-   ,last_signIn: {type:Date ,default:Date.now}
-   ,last_signOut: {type:Date ,default:Date.now}
-   ,day: {type: String}
-});
-
-const slotSchema = mongoose.Schema({
-    day: {type: String, required: true},
-    number: {type: Number, required: true}, 
-    location: {type: ObjectID, ref: 'Location', required: true},
-    academic_member_id: {type: ObjectID, ref: 'AcademicStaff', required: true},
-    course: {type: ObjectID, ref:'Course'}
-});
-
+const slotSchema = require('./SlotSchema.js');
 
 const AcademicStaffSchema = mongoose.Schema({
     // Personal Information.
