@@ -1093,84 +1093,48 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         return res.json(missedDays)
 })
 
-
-// router.put('/missingHours',authenticateToken,async(req,res)=>{
+router.get('/missingHours',authenticateToken,async(req,res)=>{
+        const user=await StaffMemberModel.findById(req.user.id)
+        const monthly=user.time_attended
+        const month=new moment().format('M')
+        var check=false;
+        if(user.time_attended.length>0){
+            for(var i=0;i<monthly.length;i++){
+                if(monthly[i].num==month){
+                    check=true;
+                    return res.json({missingHours:monthly[i].missingHours,
+                        missingMinutes:monthly[i].missingMinutes,
+                    extraHours:monthly[i].extraHours,extraMinutes:monthly[i].extraMinutes})
+                }
+            }
+        }  
+      else {
+            
+            const newMonthly=new monthlyHoursSchema({
+                num:month,
+                extraHours:0
+                ,extraMinutes:0
+                 ,missingHours:0,
+                 missingMinutes:0
+            })
+            if(check==false && monthly.length==0){
+            const arr=new Array()
+            arr[0]=newMonthly
+           
+        }
+            else {
+                const arr=monthly
+                arr[arr.length-1]=newMonthly
+                
+            }
+            const userUp=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:arr})
+            res.json({missingHours:0,
+                missingMinutes:0,
+            extraHours:0,extraMinutes:0})
+        }  
+})
     
-//     const month=new moment().format('M')
-//     const user=await StaffMemberModel.findById(req.user.id)
-//     var day_off
-//     if(user.staff_type=="HR")
-//     day_off=(await HRModel.findOne({member:req.user.id})).day_off
-//     else
-//     day_off=(await AcademicStaffModel.findOne({member:req.user.id})).day_off
-//     const time_attended=user.time_attended
-//     var monArr=[]
-//     var check=false;
-//     console.log("length= "+time_attended.length)
-//     for(var i=0;i<time_attended.length;i++){
-//         console.log("time_attened[i].num= "+time_attended[i].num)
-//         console.log("month "+month)
-//         if(time_attended[i].num==parseInt(month)){
-//             console.log("found it")
-//             if(!time_attended[i].mustAttendHours && !time_attended[i].mustAttendMinutes){
-//             const {hrs,min}= calculateHrs(time_attended[i].num,day_off)
-//             console.log("hrs= "+hrs)
-//             console.log("min= "+min)
-//                 const newMonthly=new monthlyHoursSchema({
-//                     num:time_attended[i].num,
-//                     hours:time_attended[i].hours,
-//                     minutes:time_attended[i].minutes,
-//                     mustAttendHours:hrs,
-//                     mustAttendMinutes:min,
-//                     missingHours:hrs-time_attended[i].hours,
-//                     missingMinutes:min-time_attended[i].minutes
-//                 })
-//                 monArr[i]=newMonthly
-//                 check=true
-//             }
-//             else{
-//             monArr[i]=time_attended[i]
-//             check=true
-//             }
-//         }
-//         else
-//             monArr[i]=time_attended[i]
-//     }
-//     const user2=user
-    
-//     if(check===true){
-//        // console.log("user2= "+user)
-//         const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,monArr)
-//         const newMonth=(await StaffMemberModel.findById(req.user.id)).time_attended
-//         console.log("newMonth= "+newMonth)
-//         const h=newMonth.missingHours
-//         const m=newMonth.missingMinutes
-//         console.log("newMonthly.missingHours found= "+newMonth.missingHours)
-//         console.log("newMonthly.missingMin found= "+newMonth.missingMinutes)
-//         return res.json({missing_hours:h,missing_minutes:m})
-//     }
-//     if(check==false){
-//         const {hrs,min}= calculateHrs(time_attended[i].num,day_off)
-//         const newMonthly=new monthlyHoursSchema({
-//             num:time_attended[i].num,
-//             hours:time_attended[i].hours,
-//             minutes:time_attended[i].minutes,
-//             mustAttendHours:hrs,
-//             mustAttendMinutes:min,
-//             missingHours:hrs-time_attended[i].hours,
-//             missingMinutes:min-time_attended[i].minutes
-//         })
-//         var newAtt=time_attended
-//         newAtt[newAtt.length-1]=newMonthly
-//         const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,newAtt)
-//         console.log("newMonthly.missingHours not fond= "+newMonthly.missingHours)
-//         console.log("newMonthly.missingMin not found= "+newMonthly.missingMinutes)
-//         return res.json({missing_hours:newMonthly.missingHours,missing_minutes:newMonthly.missingMinutes})
-//     }
 
-
-
-// })
 
 function calculateHrs(dateMonth,day_off){
     console.log("inside cal= "+dateMonth)
