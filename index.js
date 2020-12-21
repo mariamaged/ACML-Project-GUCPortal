@@ -1,122 +1,12 @@
-// // For environmental variables.
-// require('dotenv').config();
-
-// // For database instance.
-// const mongoose = require('mongoose');
-
-// // For app singleton instance.
-// const {app} = require('./app.js')
-
-
-// //for testing 
-// const location=require('./Models/LocationModel');
-// const faculty=require('./Models/FacultyModel')
-// const department=require('./Models/FacultyModel')
-// const StaffMember=require('./Models/StaffMemberModel')
-// const AcademicMember=require('./Models/AcademicStaffModel')
-// const HR=require('./Models/HRModel')
-
-
-// // Database connection parameters.
-// const databaseParameters = { useNewUrlParser: true, useUnifiedTopology: true };
-// mongoose.connect(process.env.DB_URL_Monica, databaseParameters)
-// .then(console.log('Successfully Connected to The Database'));
-
-// app.listen(process.env.PORT);
-
-// Models.
-
-
-// Listen on port.
-// app.post('/addLocation', async (req, res) => {
-//     const location = new LocationModel({
-//         id: "C7.203",
-//         type: "Office",
-//         maximum_capacity: 4
-//     });
-//     await location.save();
-// });
-
-// app.post('/addFaculty', async (req, res) => {
-//     const faculty = new FacultyModel({
-//         name: "Engineering"
-//     });
-//     await faculty.save();
-// });
-
-// app.post('/addDepartment', async (req, res) => {
-//     const department = new DepartmentModel({
-//         name: "Computer Science"
-//     });
-//     await department.save();
-// });
-
-// // Data hardcoded now but will put as endpoint params.
-// app.post('/addAcademicStaffMember', async (req, res) => {
-//     // Search for location id.
-//     const location = await LocationModel.findOne({id: "C7.203"});
-    
-//     // Add to StaffMemberModelFirst.
-//     const staffMember = new StaffMemberModel({
-//         name: "Maria Maged",
-//         id: "ac-1",
-//         email: "maria@gmail.com",
-//         salary: 1000,
-//         office: location._id,
-//         staff_type: "Academic Member"
-//     });
-//     await staffMember.save();
-
-//     // Then add to AcademicStaffModel.
-//     staffMember = await StaffMemberModel.findOne({email: "maria@gmail.com"}); // Find the id JavaScript added to the tuple we inserted.
-//     const faculty = await FacultyModel.findOne({name: "Engineering"}); // Find the id JavaScript added to the tuple we inserted.
-//     const department = await DepartmentModel.findOne({name: "Computer Science"}); // Find the id JavaScript added to the tuple we inserted.
-//     const academicMember = new AcademicStaffModel({
-//         member: staffMember._id,
-//         faculty: faculty._id,
-//         department: department._id,
-//         type: "Course Instructor"
-//     });
-//     await academicMember.save();
-    
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const express = require('express');
 const app =express();
 const mongoose =require('mongoose');
 
 //for testing-----------------------------------------
+const ObjectID = mongoose.Schema.Types.ObjectId;
 const StaffMemberRoutes=require('./Routes/StaffMemberRoutes')
+const AcademicMemberRoutes=require('./Routes/AcademicMemberRoutes')
 const department=require('./Models/DepartmentModel')
 const AcademicStaffModel=require('./Models/AcademicStaffModel')
 const faculty=require('./Models/FacultyModel')
@@ -126,6 +16,9 @@ const HRModel = require('./Models/HRModel');
 const CourseModel = require('./Models/CourseModel');
 const attendanceSchema=StaffMemberModel.attendanceSchema
 const moment=require('moment')
+const slot=require('./Models/SlotSchema.js')
+
+
 //----------------------------------------------
 require('dotenv').config()
 
@@ -150,6 +43,7 @@ mongoose.connect(process.env.DB_URL_Monica2, connectionParams).then(()=>{
 
 app.listen(3000);
 app.use(StaffMemberRoutes);
+// app.use(AcademicMemberRoutes);
 
 
 
@@ -212,7 +106,7 @@ app.post('/addStaffMember',async(req,res)=>{
             attArr[i]=a
         }
     }
-
+    
     const name2=req.body.name
     const id2=req.body.id
     const email2=req.body.email
@@ -271,12 +165,21 @@ app.post('/addAcademicMember',async(req,res)=>{
     console.log(type)
     
     
-    
+    const newSlot={
+        date:moment("2020-12-21"),
+        day:'Monday',
+        number:1, 
+        location:"5fdc1b8ea806330ca8156792",
+        academic_member_id:"5fdef2f6e82dbf4a0075426f",
+        course:"5fe0e84209a15235b0383352"
+    }
+    const arr=new Array()
+    arr[0]=newSlot
     
    
     
     try{
-        const user=new AcademicStaffModel({member:memb,department:dep,faculty:fac,type:req.body.type,day_off:req.body.day_off});
+        const user=new AcademicStaffModel({schedule:arr,member:memb,department:dep,faculty:fac,type:req.body.type,day_off:req.body.day_off});
         await user.save();
       return  res.json(user)
     }
@@ -320,3 +223,31 @@ catch(err){
     res.json(err)
 }
 })
+
+
+// const newSlot=new slot({
+//     date:("2020-12-21").toDate(),
+//     day:'Monday',
+//     number:1, 
+//     location:"5fdc1b8ea806330ca8156792",
+//     academic_member_id:"5fdef2f6e82dbf4a0075426f",
+//     course:"5fe0e84209a15235b0383352"
+// })
+
+
+async function  cr(){
+// const newCourse=new CourseModel({
+//         id: "csen808",
+//         name: "cs7", // Not sure if it should be required.
+//         academic_staff:["5fdef2fbe82dbf4a00754273","5fdf6c7166837b398064cf55","5fe0edcc61e23946fca5748c"],
+    
+// })
+const user= await AcademicStaffModel.findByIdAndUpdate("5fdef2fbe82dbf4a00754273",{courses:"5fe0f49ed54fd425f49281b6"})
+// console.log(user)
+//5fdf6c7166837b398064cf55
+//5fdef2fbe82dbf4a00754273
+// await newCourse.save()
+}
+// cr()
+
+// console.log(moment("2020-12-27").format("YYYY-MM-DD")==moment("2020-01-27").format("YYYY-MM-DD"))

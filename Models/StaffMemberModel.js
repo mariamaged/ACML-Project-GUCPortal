@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const moment=require('moment')
+const request=require('../Models/RequestSchema.js')
 //const slotSchema = require('SlotSchema.js');
 //const attendanceSchema = require('AttendanceSchema.js');
 
@@ -30,7 +31,8 @@ const slotSchema = mongoose.Schema({
 });
 
 const monthlyHoursSchema = mongoose.Schema({
-   num:{type:Number}
+   num:{type:Number},
+   yearNum:{type:Number}
    ,extraHours:{type:Number ,default:0}
    ,extraMinutes:{type:Number ,default:0}
     // ,mustAttendHours:{type:Number}
@@ -38,6 +40,15 @@ const monthlyHoursSchema = mongoose.Schema({
     ,missingHours:{type:Number ,default:0},
     missingMinutes:{type:Number ,default:0},
 });
+// const requestSchema=mongoose.Schema({
+//     reqType:{type:String},
+//     state:{type:String},
+//     reason:{type:String},
+//     submission_date:{type:Date},
+//     replacementStaff:{type: ObjectID, ref: 'Location'
+// })
+
+
 
 const StaffMemberSchema = mongoose.Schema({
     // Personal Information.
@@ -60,7 +71,12 @@ const StaffMemberSchema = mongoose.Schema({
     accidentalDaysLeft: {type:Number},
     attendCompensationDay:{type:Boolean},
     missingDays:{type:[String],default:[]},
-    time_attended:{type:[monthlyHoursSchema],default:[]}
+    time_attended:{type:[monthlyHoursSchema],default:[]},
+    // requestsReceived:[{type: ObjectID, ref: 'request'}],
+    // requestsSent:[{type: ObjectID, ref: 'request'}],
+    lastUpdatedAnnual:{type: Date},
+    accidentalDaysLeft: {type:Number},
+    attendCompensationDay:{type:Boolean}
 },
 
 {
@@ -68,6 +84,46 @@ const StaffMemberSchema = mongoose.Schema({
     timestamps: true
 });
 StaffMemberSchema.index({ user: 1, name: 1 }, { unique: true });
+
+
+// StaffMemberSchema.pre('save', function(next) {
+//     var doc = this;
+//     if (!doc.isNew) {
+//         next();
+//         return;
+//       }
+    
+//       if(doc.staff_type == 'Academic Member') {
+//         CounterModel.findByIdAndUpdate(         // ** Method call begins **
+//             'ac-',                              // The ID to find for in counters model
+//             { $inc: { seq: 1 } },               // The update
+//             { new: true, upsert: true },        // The options
+//             function(error, counter) {          // The callback
+//               if(error) return next(error);
+        
+//               doc.id = counter._id + counter.seq ;
+//               next();
+//             }
+//           );  
+//     }
+//     else {
+//         CounterModel.findByIdAndUpdate(          // ** Method call begins **
+//             'hr-',                               // The ID to find for in counters model
+//             { $inc: { seq: 1 } },                // The update
+//             { new: true, upsert: true },         // The options
+//             function(error, counter) {           // The callback
+//               if(error) return next(error);
+        
+//               doc.id = counter._id + counter.seq;
+//               next();
+//             }
+//           ); 
+//     }  
+
+// })
+
+
+
 
 module.exports = mongoose.model('Staff', StaffMemberSchema);
 

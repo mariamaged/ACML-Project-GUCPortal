@@ -14,6 +14,7 @@ const faculty=require('../Models/FacultyModel.js')
 const AttendanceSchema=StaffMemberModel.attendanceSchema
 const monthlyHoursSchema=StaffMemberModel.monthlyHoursSchema
 var moment = require('moment');
+const request=require('../Models/RequestSchema.js')
 
 function authenticateToken(req,res,next){
     const token=req.header('x-auth-token');
@@ -26,7 +27,7 @@ function authenticateToken(req,res,next){
    
     next();
 }
-
+module.exports=authenticateToken
 //login
 router.post('/login',async(req,res,next)=>{
     console.log("here in login")
@@ -617,6 +618,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             /////////////////////////////////////////////////////////////////////////////
            //we can signout so get extra and missing hours and minutes and add them
             const currMonth=new moment().format("M")
+            const currYear=new moment().format("Y")
             var c=false;
             var newMonthlyArr=new Array()
            // console.log("user= "+user)
@@ -628,12 +630,8 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             if(user.time_attended.length>0){
                 console.log("inside first if")
                 for(var l=0;l<user.time_attended.length;l++){
-                    if(user.time_attended[l].num==currMonth){
+                    if(user.time_attended[l].num==currMonth && user.time_attended[l].yearNum==currYear){
                         console.log("inside if")
-                        var currExtraH=user.time_attended[l].extraHours
-                        var currExtraM=user.time_attended[l].extraMinutes
-                        var currMissH=user.time_attended[l].missingHours
-                        var currMissM=user.time_attended[l].missingMinutes
                         
                         
                         console.log("before ifs "+"missingHrs= "+missingHrs+" missingMin= "+missingMin)
@@ -717,6 +715,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                         //new monthlyTime with updated hours and minutes
                         const newMonthly=new monthlyHoursSchema({
                             num:user.time_attended[l].num
+                           ,yearNum:currYear
                             ,extraHours:finEH
                             ,extraMinutes:finEM
                              ,missingHours:finMH
@@ -740,6 +739,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             if(c==false || user.time_attended.length==0){
                 const newMonthly=new monthlyHoursSchema({
                     num:parseInt(currMonth)
+                    ,yearNum:parseInt(currYear)
                     ,extraHours:extraHrs
                     ,extraMinutes:extraMin
                      ,missingHours:missingHrs
@@ -1097,10 +1097,11 @@ router.get('/missingHours',authenticateToken,async(req,res)=>{
         const user=await StaffMemberModel.findById(req.user.id)
         const monthly=user.time_attended
         const month=new moment().format('M')
+        const year=new moment().format('Y')
         var check=false;
         if(user.time_attended.length>0){
             for(var i=0;i<monthly.length;i++){
-                if(monthly[i].num==month){
+                if(monthly[i].num==month && monthly[i].yearNum==year){
                     check=true;
                     return res.json({missingHours:monthly[i].missingHours,
                         missingMinutes:monthly[i].missingMinutes,
@@ -1112,7 +1113,8 @@ router.get('/missingHours',authenticateToken,async(req,res)=>{
             
             const newMonthly=new monthlyHoursSchema({
                 num:month,
-                extraHours:0
+                yearNum:year
+               , extraHours:0
                 ,extraMinutes:0
                  ,missingHours:0,
                  missingMinutes:0
@@ -1178,7 +1180,80 @@ function calculateHrs(dateMonth,day_off){
      console.log("inside "+hours+' m='+minutes)
      return {hours,minutes}
 }
+router.post('sendReplacementRequest',authenticateToken,async(req,res)=>{
+    console.log("in replacment")
+    const user=await StaffMemberModel.findById(req.user.id)
+    const slotNum=req.body.slotNum
+    const slotDate=req.body.slotDate
+    const slotLoc=req.body.slotLoc
+    //const repID=req.body.id
+    if(moment(slotDate).isBefore(new moment())){
 
+    }
+    if(user.staff_type=="HR"){
+        return (res.json({error:"HR cannot make replacement requests"}))
+    }
+    const academicUser=await AcademicStaffModel.findOne({member:req.user.id})
+    var check=false
+    const slots=cademicUser.schedule
+    var course=''
+    var courseID=""
+    if(moment(slotDate).isBefore(new moment())){
+        return res.json("Cannot replace a slot that has already passed")
+    }
+
+
+    //check if slot user is wanting to replace is available in his schedule
+    for(var i=0;i<slots.length;i++){
+        const locID=slots[i].location
+        const loc=await location.findById(locID).id
+        const date=slots[i].date
+        const number=slots[i].number
+        if(loc==slotLoc && slotNum==number &&moment(date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
+            check=true
+            course=(await Course.findById(slots[i].course))
+             courseID=course.id
+        }
+
+    }
+    if(check==false)
+    return res.send("This slot is not present in your schedule")
+
+    //will loop on all slots of each member that teaches this course 
+    //to make sure that they are free during this replacement slot
+    const courseAcademic=course.academic_staff
+    //looping on staff giving the course of replacement slot
+    for(var j=0;j<courseAcademic.length;j++){
+        const replacement=await AcademicStaffModel.findById(courseAcademic[j])
+        const replacementSchedule=replacement.schedule
+        var check2=false;
+        //looping on schedule of each member
+        for(var k=0;k<replacementSchedule.length;k++){
+        const currLocID=replacementSchedule[i].location
+        const currLoc=await location.findById(currLocID).id
+        const currDate=replacementSchedule[i].date
+        const currNumber=replacementSchedule[i].number
+        //if finding same slot
+        if(currLoc==slotLoc && currNumber==number &&moment(currDate).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
+                check2=true
+        }
+        }
+        //if no such slot is found create a request for this member
+        if(check2==false){
+            var req=new request({
+                reqType:"Replacement",
+                slotDate:slotDate,
+                slotNum:slotNum,
+                slotLoc:slotLoc,
+                sentTo:replacement.member,
+                state:"Pending",
+                submission_date:new moment()
+            })
+          await req.save()
+        }
+    }
+    
+})
 
 module.exports=router;
 
@@ -1193,3 +1268,4 @@ module.exports=router;
 // }z()
 
 //console.log(calculateHrs(9,"Monday"))
+
