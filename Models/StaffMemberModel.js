@@ -76,7 +76,8 @@ const StaffMemberSchema = mongoose.Schema({
     // requestsSent:[{type: ObjectID, ref: 'request'}],
     lastUpdatedAnnual:{type: Date},
     accidentalDaysLeft: {type:Number},
-    attendCompensationDay:{type:Boolean}
+    attendCompensationDay:{type:Boolean},
+    notifications:[{type:String,default:[]}]
 },
 
 {

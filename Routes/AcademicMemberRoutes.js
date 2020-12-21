@@ -35,7 +35,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
         const slotNum=req.body.slotNum
         const slotDate=req.body.slotDate
         const slotLoc=req.body.slotLoc
-        
+        var checkFin=false;
         // if(moment(slotDate).isBefore(new moment())){
         //     return res.json("Cannot replace a slot that has already passed")
         // }
@@ -88,11 +88,11 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
             for(var k=0;k<replacementSchedule.length;k++){
             console.log("sched= "+replacementSchedule[k])
             const currLocID=replacementSchedule[k].location
-            const currLoc=await location.findById(currLocID).id
+            const currLoc=(await location.findById(currLocID)).id
             const currDate=replacementSchedule[k].date
             const currNumber=replacementSchedule[k].number
 
-            // console.log("loc "+currLocID)
+             console.log("loc "+currLocID)
             console.log("currLoc "+currLoc)
             console.log("slotLoc "+slotLoc)
             console.log("currdate "+currDate)
@@ -107,6 +107,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
             }
             //if no such slot is found create a request for this member
             if(check2==false){
+                //create new request
                 console.log("checkk2 "+check2)
                 var req=new request({
                     reqType:"Replacement",
@@ -117,9 +118,19 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                     state:"Pending",
                     submission_date:new moment()
                 })
+                //update notifications of person receiving request
+                const notification=(await StaffMemberModel.findById(replacement.member)).notifications
+                const notNew=notification
+                notNew[notNew.length]="You received a new replacement request"
+                const staffReplacement= await StaffMemberModel.findByIdAndUpdate(replacement.member,{notifications:notNew})
+                
+
+                //post request in requests table with sent to added
                 try{
                     console.log("saved")
                   //  res.send(req)
+                  checkFin=true
+                 
                  const requ= await req.save()
                 }
                 catch(err){
@@ -128,7 +139,10 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
             }
 
         }
-        return res.json({success:"requests added"})
+        if(checkFin)
+        return  res.json({success:"Requests successfully sent"})
+        else
+      return res.json({error:"Could not find any eligible candidate to replace with"})
         
 })
 
