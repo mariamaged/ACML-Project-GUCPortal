@@ -546,10 +546,6 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                    
 
 
-
-                     
-
-
                     var fin=minute+attendance[i].minutes
                     var finH=hrs+attendance[i].hours
                     console.log("attendance[i].signedIn= "+attendance[i].signedIn)
@@ -577,7 +573,19 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     missingMin=-Min
                     else
                    extraMin=Min
-
+                   if(extraMin>0 && missingHrs>0){
+                    missingHrs--
+                    missingMin=60-extraMin
+                    extraMin=0
+                    console.log("her paleeeeease")
+                    console.log("missingHrs= "+missingHrs+" missingMin= "+missingMin)
+                }
+                if(extraHrs>0 && missingMin>0){
+                   extraHrs--
+                    extraMin=60-missingMin
+                    missingMin=0
+                    console.log("extraHrs= "+extraHrs+" extraMin= "+extraMin+" missingMin= "+missingMin)
+                }
 
 
 
@@ -626,61 +634,68 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                         var currExtraM=user.time_attended[l].extraMinutes
                         var currMissH=user.time_attended[l].missingHours
                         var currMissM=user.time_attended[l].missingMinutes
-                        if(extraMin>0 && missingHrs>0){
-                            missingHrs--
-                            missingMin=60-extraMin
-                            console.log("her paleeeeease")
-                        }
-                        if(extraHrs>0 && missingMin>0){
-                           extraHrs--
-                            extraMin=60-missingMin
-                            missingMin=0
-                        }
+                        
+                        
+                        console.log("before ifs "+"missingHrs= "+missingHrs+" missingMin= "+missingMin)
+                        console.log("before ifs "+"extraHrs= "+extraHrs+" extraMin= "+extraMin+" missingMin= "+missingMin)
+                        // if(extraMin>0 && missingHrs>0){
+                        //     missingHrs--
+                        //     missingMin=60-extraMin
+                        //     extraMin=0
+                        //     console.log("her paleeeeease")
+                        //     console.log("missingHrs= "+missingHrs+" missingMin= "+missingMin)
+                        // }
+                        // if(extraHrs>0 && missingMin>0){
+                        //    extraHrs--
+                        //     extraMin=60-missingMin
+                        //     missingMin=0
+                        //     console.log("extraHrs= "+extraHrs+" extraMin= "+extraMin+" missingMin= "+missingMin)
+                        // }
 
 
-                        if(extraMin>0){
-                            if(extraMin<currMissM){
-                                currMissM=currMissM-extraMin
-                                extraMin=0
-                            }
-                            else{
-                                extraMin=extraMin-currMissM
-                                currMissM=0
-                            }
-                        }
+                        // if(extraMin>0){
+                        //     if(extraMin<currMissM){
+                        //         currMissM=currMissM-extraMin
+                        //         extraMin=0
+                        //     }
+                        //     else{
+                        //         extraMin=extraMin-currMissM
+                        //         currMissM=0
+                        //     }
+                        // }
 
-                        if(extraHrs>0){
-                            if(extraHrs>currMissH){
-                                extraHrs=extraHrs-currMissH
-                                currMissH=0
-                            }
-                            else{
-                                currMissH=currMissH-extraHrs
-                                extraHrs=0
-                            }
-                        }
+                        // if(extraHrs>0){
+                        //     if(extraHrs>currMissH){
+                        //         extraHrs=extraHrs-currMissH
+                        //         currMissH=0
+                        //     }
+                        //     else{
+                        //         currMissH=currMissH-extraHrs
+                        //         extraHrs=0
+                        //     }
+                        // }
 
-                        if(missingMin>0){
-                            if(missingMin>currExtraM){
-                                missingMin=missingMin-currExtraM
-                                currExtraM=0
-                            }
-                            else{
-                                currExtraM=currExtraM-missingMin
-                                missingMin=0 
-                            }
-                        }
+                        // if(missingMin>0){
+                        //     if(missingMin>currExtraM){
+                        //         missingMin=missingMin-currExtraM
+                        //         currExtraM=0
+                        //     }
+                        //     else{
+                        //         currExtraM=currExtraM-missingMin
+                        //         missingMin=0 
+                        //     }
+                        // }
 
-                        if(missingHrs>0){
-                            if(missingHrs>currExtraH){
-                                missingHrs=missingHrs-currExtraH
-                                currExtraH=0
-                            }
-                            else{
-                                currExtraH=currExtraH-missingHrs
-                                missingHrs=0 
-                            }
-                        }
+                        // if(missingHrs>0){
+                        //     if(missingHrs>currExtraH){
+                        //         missingHrs=missingHrs-currExtraH
+                        //         currExtraH=0
+                        //     }
+                        //     else{
+                        //         currExtraH=currExtraH-missingHrs
+                        //         missingHrs=0 
+                        //     }
+                        // }
 
                         
                         var finEM=extraMin
@@ -882,8 +897,10 @@ function compare( a, b ) {
 
 //---------------------------SHOULD ADD CONDITION LEAVE REQUEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 router.get('/missingDays',authenticateToken,async(req,res)=>{
-    const dateMonth=moment().format("M")
+    var dateMonth=moment().format("M")
     const dateYear=moment().format("Y")
+  //  const dateDay=moment().format("D")
+  const dateDay=2
         const user=await StaffMemberModel.findById(req.user.id)
         var day=""
         if(user.staff_type=="HR")
@@ -901,6 +918,10 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         console.log("dayoff= "+day_off)
         var nextMonth=0;
         var nextYear=0;
+        if( dateDay<=10){
+            dateMonth=dateMonth-1
+        }
+
         if(dateMonth==12){
             nextMonth=1
             nextYear=(parseInt(dateYear)+1) 
@@ -956,13 +977,22 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
 
         }
         }
-   
+    if(j>0){
     var lastD= moment(sortedUserDays[j-1].date).format('D')
     var lastDName= moment(sortedUserDays[j-1].date).format('dddd')           
     const lastMonth=moment(sortedUserDays[j-1].date).format('M')
     const lastYear=moment(sortedUserDays[j-1].date).format('Y')
     console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
     var lastDay=parseInt(lastD)+1
+    }
+    else{
+        var lastD= new moment(dateYear+"-"+dateMonth+"-"+currDay).format('D')
+    var lastDName=new moment(dateYear+"-"+dateMonth+"-"+currDay).format('dddd')          
+    const lastMonth=new moment(dateYear+"-"+dateMonth+"-"+currDay).format('M')
+    var lastYear=new moment(dateYear+"-"+dateMonth+"-"+currDay).format('Y')
+    console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
+    var lastDay=parseInt(lastD)
+    }
  //console.log("missed till now= "+missedDays)
         //get last day present from 1st month then fill the rest according to each month's number of days
     if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
