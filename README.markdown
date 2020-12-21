@@ -46,11 +46,10 @@
         - courseInstructorAlreadyAssigned.
 - **Example response body:**
 ```json
-Operation done successfully!
-```
-
-```json
 Access denied!
+```
+```json
+Operation done successfully!
 ```
 
 ```json
@@ -61,6 +60,7 @@ Access denied!
 		"courseID": "CSEN704",
 		"member": "ac-11"
 	},
+	
 	"unfoundCourse": true,
 	"unfoundAcademicMember": true,
 	"memberNotCourseInstructor": true,
@@ -74,6 +74,7 @@ Access denied!
 		"courseID": "CSEN703",
 		"member": "ac-13"
 	},
+	
 	"unfoundCourse": true,
 	"unfoundAcademicMember": true,
 	"memberNotCourseInstructor": true,
@@ -129,6 +130,12 @@ Access denied!
         - newMemberAlreadyAssigned.
 - **Example response body:**
 ```json
+Access denied!
+```
+```json
+Operation done successfully!
+```
+```json
 [
 {
 	"request": 
@@ -137,6 +144,7 @@ Access denied!
 		"oldMember": "ac-12",
 		"newMember": "ac-13"
 	},
+	
 	"unfoundCourse": true,
     "unfoundAcademicOldMember": true,
     "unfoundAcademicNewMember": true,
@@ -152,6 +160,7 @@ Access denied!
 		"oldMember": "ac-13",
 		"newMember": "ac-11"
 	},
+	
 	"unfoundCourse": true,
     "unfoundAcademicOldMember": true,
     "unfoundAcademicNewMember": true,
