@@ -10,7 +10,7 @@ const AcademicMemberRoutes=require('./Routes/AcademicMemberRoutes')
 const department=require('./Models/DepartmentModel')
 const AcademicStaffModel=require('./Models/AcademicStaffModel')
 const faculty=require('./Models/FacultyModel')
-const location=require('./Models/LocationModel');
+const location=require('./Models/LocationModel.js')
 const StaffMemberModel = require('./Models/StaffMemberModel');
 const HRModel = require('./Models/HRModel');
 const CourseModel = require('./Models/CourseModel');
@@ -43,7 +43,7 @@ mongoose.connect(process.env.DB_URL_Monica2, connectionParams).then(()=>{
 
 app.listen(3000);
 app.use(StaffMemberRoutes);
-// app.use(AcademicMemberRoutes);
+app.use(AcademicMemberRoutes);
 
 
 
@@ -170,8 +170,8 @@ app.post('/addAcademicMember',async(req,res)=>{
         day:'Monday',
         number:1, 
         location:"5fdc1b8ea806330ca8156792",
-        academic_member_id:"5fdef2f6e82dbf4a0075426f",
-        course:"5fe0e84209a15235b0383352"
+        academic_member_id:"5fdef2fbe82dbf4a00754273",
+        course:"5fe1048475f81f0470b078b5"
     }
     const arr=new Array()
     arr[0]=newSlot
@@ -234,20 +234,35 @@ catch(err){
 //     course:"5fe0e84209a15235b0383352"
 // })
 
-
 async function  cr(){
+    const loc=(await StaffMemberModel.findById("5fdc24861418851510805d28"))
+    const loc3=loc.name
+console.log(loc3)
 // const newCourse=new CourseModel({
-//         id: "csen808",
+//         id: "csen22",
 //         name: "cs7", // Not sure if it should be required.
-//         academic_staff:["5fdef2fbe82dbf4a00754273","5fdf6c7166837b398064cf55","5fe0edcc61e23946fca5748c"],
+//         academic_staff:["5fdf6c0a66837b398064cf54","5fdf6c7166837b398064cf55","5fdef2fbe82dbf4a00754273"],
     
 // })
-const user= await AcademicStaffModel.findByIdAndUpdate("5fdef2fbe82dbf4a00754273",{courses:"5fe0f49ed54fd425f49281b6"})
-// console.log(user)
-//5fdf6c7166837b398064cf55
-//5fdef2fbe82dbf4a00754273
-// await newCourse.save()
-}
-// cr()
+// const user= await AcademicStaffModel.findByIdAndUpdate("5fdf6c0a66837b398064cf54",{courses:["5fe1048475f81f0470b078b5"]})
+//  console.log(user)
+// //5fdf6c7166837b398064cf55
+// //5fdef2fbe82dbf4a00754273
+//  await newCourse.save()
 
-// console.log(moment("2020-12-27").format("YYYY-MM-DD")==moment("2020-01-27").format("YYYY-MM-DD"))
+// const newSlot={
+//     date:moment("2020-12-21"),
+//     day:'Monday',
+//     number:1, 
+//     location:"5fdc1b8ea806330ca8156792",
+//     academic_member_id:"5fdef2fbe82dbf4a00754273",
+//     course:"5fe1048475f81f0470b078b5"
+// }
+// const arr=new Array()
+// arr[0]=newSlot
+// const user= await AcademicStaffModel.findByIdAndUpdate("5fdf6c7166837b398064cf55",{schedule:arr})
+//  console.log(user)
+
+}//
+cr()
+
