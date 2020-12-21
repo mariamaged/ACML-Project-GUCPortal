@@ -12,6 +12,7 @@ const CounterModel = require('./Models/CounterModel.js');
 require('dotenv').config();
 
 // For database instance.
+const moment = require('moment');
 const mongoose = require('mongoose');
 
 // For app singleton instance.
@@ -216,34 +217,53 @@ app.post('/addCourseSlot', async (req, res) => {
 
     const CCStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
     const CCAcademicModel = await AcademicStaffModel.findOne({member: CCStaffModel._id}); // member: req.user.id or member: req.user._id.
-    if(!course.course_coordinator.equals(CCAcademicModel._id)) {
+    if(!course.course_coordinator.equals(CCAcademicModel._id)) 
         return res.status(401).send("You are not a course coordinator for this course!");
-    }
-    const errorMessage = {locationsNotFound: [], unprocessedSlots: []};
+    
+    const errorMessages = [];
 
     for(let index = 0; index < details.length; index++) {
-        const {number, day, locationID} = details[index];
+        const {number, locationID, date} = details[index];
+        const errorMessage = {};
+        errorMessage.locationID = locationID;
         const location = await LocationModel.findOne({id: locationID});
+
         if(!location) {
-            errorMessage.locationsNotFound.push(locationID);
-            errorMessage.unprocessedSlots.push(details[index]);
+            errorMessage.locationNotFound = true;
+            errorMessages.push(errorMessage);
         }
         else {
+            var slotFound = course.schedule.some(function (assignedSlot) {
+                return assignedSlot.date.equals(moment(date, 'YYYY-MM-DD').toDate()) && assignedSlot.number == number && assignedSlot.location.equals(location._id);
+            });
+            if(!slotFound) {
             const newCourseSlot = {
-                day: day,
+                day: moment(date, 'YYYY-MM-DD').format('dddd').toDate(),
                 number: number,
-                location: location._id
+                location: location._id,
+                date: moment(date, 'YYYY-MM-DD').toDate()
             };
+
+            if(course.schedule.length == 0) course.schedule = [];
             course.schedule.push(newCourseSlot);
             course.slots_needed++;
             await course.save();
+            }
+
+            else {
+                errorMessage.slotAlreadyExistsforCourse = true;
+                errorMessages.push(errorMessage);
+            }
     }
 }
-      return res.status(400).json(errorMessage);
+    if(errorMessages.length != 0)   
+        return res.status(400).json(errorMessages);
+    else
+        return res.status(200).send("Operation done successfully!");
 
       // }
     /*else {
-      res.status(401).send('Access Denied!');
+      return res.status(401).send('Access Denied!');
   }*/
 });
 
@@ -339,6 +359,7 @@ app.get('/teachingAssignmentAllCourses', async (req, res) => {
       res.status(401).send('Access Denied!');
   }*/
 });
+
 // Route 1.
 app.post('/assignCourseInstructorforCourses', async (req, res) => {
 //    if(req.user.isHOD) {
@@ -426,7 +447,7 @@ app.post('/assignCourseInstructorforCourses', async (req, res) => {
         return res.status(200).send("Operation done successfully!");
  //   }
   /*  else {
-        res.status(401).send('Access Denied!');
+        return res.status(401).send('Access Denied!');
     } */
 })
 
@@ -545,7 +566,120 @@ app.post('/updateAcademicMemberstoCourses', async (req, res) => {
     else
         return res.status(200).send("Operation done successfully!");
     /*else {
-      res.status(401).send('Access Denied!');
+      return res.status(401).send('Access Denied!');
+  }*/
+});
+
+app.delete('/deleteAcademicMemberstoCourses', async (req, res) => {
+    //  if(req.user.academicRole == "Course Instructor") {
+        const body = req.body;
+        const errorMessages = [];
+
+        const InstructorStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later
+        const InstructorModel = await AcademicStaffModel.findOne({member: InstructorStaffModel._id}); // member: req.user.id or member: req.user._id.
+
+        for(let index = 0; index < body.length; index++) {
+            const errorMessage = {};
+            errorMessage.request = body[index];
+
+            const {courseID, member} = body[index];
+            const course = await CourseModel.findOne({id: courseID});
+            const staffMember = await StaffMemberModel.findOne({id: member});
+            var academicMember = null;
+            if(staffMember)
+                academicMember = await AcademicStaffModel.findOne({member: staffMember._id});
+
+            if(!course) 
+                errorMessage.unfoundCourse = true;
+            if(!academicMember) 
+                errorMessage.unfoundAcademicMember = true;
+
+            if(newAcademic) {
+                    if(course) {
+                        if(!newAcademic.department.equals(course.department))
+                            errorMessage.newMemberNotBelongingtoCourseDep = true;
+
+                        var isAssigned = InstructorModel.courses.some(function (assignedCourse) {
+                            return assignedCourse.equals(course._id.toString());
+                        });
+                        if(!isAssigned) 
+                            errorMessage.notAssignedToCourse = true;
+
+                        if(oldAcademic) {
+                            var isAssignedOld = oldAcademic.courses.some(function (assignedCourse) {
+                                return assignedCourse.equals(course._id.toString());
+                            });
+                            if(!isAssignedOld)
+                                errorMessage.oldNotAssignedToCourse = true;  
+                        }
+                        else 
+                            errorMessage.oldNotAssignedToCourse = true;  
+                    }
+                    else {
+                        errorMessage.newMemberNotBelongingtoCourseDep = true;
+                        errorMessage.notAssignedToCourse = true;
+                        errorMessage.oldNotAssignedToCourse = true;
+                    }
+            }
+            else  {
+            errorMessage.newMemberNotBelongingtoCourseDep = true;
+
+            if(course) {
+                var isAssigned = InstructorModel.courses.some(function (assignedCourse) {
+                    return assignedCourse.equals(course._id.toString());
+                });
+                if(!isAssigned) 
+                    errorMessage.notAssignedToCourse = true;
+
+                if(oldAcademic) {
+                    var isAssignedOld = oldAcademic.courses.some(function (assignedCourse) {
+                        return assignedCourse.equals(course._id.toString());
+                    });
+                    if(!isAssignedOld)
+                        errorMessage.oldNotAssignedToCourse = true;  
+                }
+                else 
+                    errorMessage.oldNotAssignedToCourse = true;  
+            }
+            else {
+                errorMessage.notAssignedToCourse = true;
+                errorMessage.oldNotAssignedToCourse = true;
+            }
+        }    
+            if(Object.keys(errorMessage).length == 1) {
+                    var isAssignedNew = newAcademic.courses.some(function (assignedCourse) {
+                        return assignedCourse.equals(course._id.toString());
+                    });
+                    if(isAssignedNew) {
+                        errorMessage.newMemberAlreadyAssigned = true;
+                        errorMessages.push(errorMessage);
+                    }
+
+                    else {
+                        course.academic_staff.pull(oldAcademic._id);
+                        if(course.academic_staff.length == 0)
+                            course.academic_staff = [];
+                        course.academic_staff.push(newAcademic._id);
+                        await course.save();
+
+                        oldAcademic.courses.pull(course._id);
+                        await oldAcademic.save();
+
+                        if(newAcademic.courses.length == 0)
+                            newAcademic.courses = [];
+                        newAcademic.courses.push(course._id);
+                        await newAcademic.save();
+                    }
+           }
+           else 
+                errorMessages.push(errorMessage);
+    }
+    if(errorMessages.length != 0)   
+        return res.status(400).json(errorMessages);
+    else
+        return res.status(200).send("Operation done successfully!");
+    /*else {
+      return res.status(401).send('Access Denied!');
   }*/
 });
 

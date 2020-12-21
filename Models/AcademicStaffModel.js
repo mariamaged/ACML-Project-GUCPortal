@@ -18,7 +18,7 @@ const AcademicStaffSchema = mongoose.Schema({
     isCourseCoordinator: {type: Boolean, default: false},
 
     // Attendance Information.
-    day_off: {type: String, enum: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']},
+    day_off: {type: String, enum: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday']},
 
 },
 
