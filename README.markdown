@@ -59,10 +59,9 @@ Operation done successfully!
 	{
 		"courseID": "CSEN704",
 		"member": "ac-11"
-	},
-	
-	"unfoundCourse": true,
-	"unfoundAcademicMember": true,
+    },
+    "unfoundCourse": true,
+    "unfoundAcademicMember": true,
     "memberNotCourseInstructor": true,
     "courseNotunderHODDepartment": true,
     "memberNotBelongingtoCourseDep": true,
