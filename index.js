@@ -209,7 +209,7 @@ app.post('/viewDepartmentStaffMemberDayOff', async (req, res) => {
   }*/
 });
 
-app.post('/addCourseSlot', async (req, res) => {
+app.post('/addCourseSlots', async (req, res) => {
     //  if(req.user.isCourseCoordinator) {
     const {courseID, details} = req.body;
     const course = await CourseModel.findOne({id: courseID});
@@ -225,23 +225,31 @@ app.post('/addCourseSlot', async (req, res) => {
     for(let index = 0; index < details.length; index++) {
         const {number, locationID, date} = details[index];
         const errorMessage = {};
-        errorMessage.locationID = locationID;
         const location = await LocationModel.findOne({id: locationID});
 
         if(!location) {
+            errorMessage.locationID = locationID;
             errorMessage.locationNotFound = true;
             errorMessages.push(errorMessage);
         }
         else {
-            var slotFound = course.schedule.some(function (assignedSlot) {
-                return assignedSlot.date.equals(moment(date, 'YYYY-MM-DD').toDate()) && assignedSlot.number == number && assignedSlot.location.equals(location._id);
+            const allCourses = await CourseModel.find();
+            const conflictingCourses = [];
+
+            for(let i = 0; i < allCourses.length; i++) {
+            var slotFound = allCourses[i].schedule.some(function (assignedSlot) {
+                return assignedSlot.date.getTime() == new Date(date).getTime() && assignedSlot.number == number && assignedSlot.location.equals(location._id);
             });
-            if(!slotFound) {
+            if(slotFound) conflictingCourses.push(allCourses[i].id);
+            }
+
+
+            if(conflictingCourses.length == 0) {
             const newCourseSlot = {
-                day: moment(date, 'YYYY-MM-DD').format('dddd').toDate(),
+                day: moment(date, 'YYYY-MM-DD').format('dddd').toString(),
                 number: number,
                 location: location._id,
-                date: moment(date, 'YYYY-MM-DD').toDate()
+                date: new Date(date)
             };
 
             if(course.schedule.length == 0) course.schedule = [];
@@ -251,7 +259,8 @@ app.post('/addCourseSlot', async (req, res) => {
             }
 
             else {
-                errorMessage.slotAlreadyExistsforCourse = true;
+                errorMessage.slotAlreadyExistsforOtherCourses = true;
+                errorMessage.conflictingCourses = conflictingCourses;
                 errorMessages.push(errorMessage);
             }
     }
@@ -265,6 +274,126 @@ app.post('/addCourseSlot', async (req, res) => {
     /*else {
       return res.status(401).send('Access Denied!');
   }*/
+});
+
+app.post('/updateCourseSlots', async (req, res) => {
+    //  if(req.user.isCourseCoordinator) {
+        const {courseID, details} = req.body;
+        const course = await CourseModel.findOne({id: courseID});
+        if(!course) return res.status(400).send("Course not found!");
+    
+        const CCStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
+        const CCAcademicModel = await AcademicStaffModel.findOne({member: CCStaffModel._id}); // member: req.user.id or member: req.user._id.
+        if(!course.course_coordinator.equals(CCAcademicModel._id)) 
+            return res.status(401).send("You are not a course coordinator for this course!");
+        
+        const errorMessages = [];
+    
+        for(let index = 0; index < details.length; index++) {
+            const {numberOld, locationIDOld, dateOld} = details[index].oldSlot;
+            const newSlot = details[index].newSlot;
+            
+            const errorMessage = {};
+            const locationOld = await LocationModel.findOne({id: locationIDOld});
+            const locationNew = await LocationModel.findOne({id: newSlot.locationIDNew});
+
+            const updatedSlot = {};
+            if(newSlot.hasOwnProperty('numberNew'))
+                updatedSlot.number = newSlot.numberNew;
+            else
+                updatedSlot.number = numberOld;
+                    
+            if(newSlot.hasOwnProperty('dateNew')) {
+                updatedSlot.date = new Date(newSlot.dateNew);
+                updatedSlot.day = moment(newSlot.dateNew, 'YYYY-MM-DD').format('dddd').toString()
+            }
+            else {
+                updatedSlot.date = new Date(dateOld);
+                updatedSlot.day = moment(dateOld, 'YYYY-MM-DD').format('dddd').toString()
+            }
+            console.log(updatedSlot);
+            if(!locationOld) {
+                errorMessage.locationIDOld = locationIDOld;
+                errorMessage.locationNotFound = true;
+
+                if(newSlot.hasOwnProperty('locationIDNew') && !locationNew) {
+                    errorMessage.locationIDNew = newSlot.locationIDNew;
+                }
+
+                errorMessages.push(errorMessage);
+            }
+            else {
+                if(newSlot.hasOwnProperty('locationIDNew') && !locationNew) {
+                    errorMessage.locationIDNew = newSlot.locationIDNew;
+                    errorMessage.locationNotFound = true;
+                    errorMessages.push(errorMessage);
+                }
+                else {
+                    if(!newSlot.hasOwnProperty('locationIDNew')) {
+                        updatedSlot.location = locationOld._id;
+                    }
+                    if(newSlot.hasOwnProperty('locationIDNew') && locationNew) {
+                        updatedSlot.location = locationNew._id;
+                    }
+                    
+                    const allCourses = await CourseModel.find();
+                    const conflictingCourses = [];
+    
+                    for(let i = 0; i < allCourses.length; i++) {
+                        var slotFound = allCourses[i].schedule.some(function (assignedSlot) {
+                            return assignedSlot.date.getTime() == updatedSlot.date.getTime() 
+                            && assignedSlot.number == updatedSlot.number 
+                            && assignedSlot.location.equals(updatedSlot.location);
+                        });
+
+                        if(slotFound) conflictingCourses.push(allCourses[i].id);
+                    }
+    
+                    var position = -1;
+                    const OldSlotExists = course.schedule.some(function (assignedSlot, ind) {
+                            var flag = assignedSlot.date.getTime() == new Date(dateOld).getTime() 
+                            && assignedSlot.number == numberOld
+                            && assignedSlot.location.equals(locationOld._id);
+                            if(flag) {
+                                position = ind;
+                                return flag;
+                            }
+                        });
+
+                    if(conflictingCourses.length == 0) {
+                        if(OldSlotExists) {
+                            course.schedule[position].day = updatedSlot.day;
+                            course.schedule[position].date = updatedSlot.date;
+                            course.schedule[position].number = updatedSlot.number;
+                            course.schedule[position].location = updatedSlot.location;
+                            await course.save();
+                        }
+                        else {
+                            errorMessage.oldSlotDoesNotExistinCourseScedule = true;
+                            errorMessages.push(errorMessage);
+                        }
+                    }
+                    else {
+                        if(!OldSlotExists) {
+                            errorMessage.oldSlotDoesNotExistinCourseScedule = true;
+                        }
+                        errorMessage.updatedSlotAlreadyExistsforOtherCourses = true;
+                        errorMessage.conflictingCourses = conflictingCourses;
+                        errorMessages.push(errorMessage);
+                }
+            }
+        }   
+    }
+
+        if(errorMessages.length != 0)   
+            return res.status(400).json(errorMessages);
+        else
+            return res.status(200).send("Operation done successfully!");
+    
+          // }
+        /*else {
+          return res.status(401).send('Access Denied!');
+      }*/
 });
 
 app.get('/teachingAssignmentPerCourse', async (req, res) => {
