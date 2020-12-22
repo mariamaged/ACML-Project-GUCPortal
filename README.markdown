@@ -358,8 +358,8 @@ Operation done successfully!
              - The error message contains the first message and a **mix** of the two other messages depending on whether both locations do not exist or only one of them does not exist.
          2. `updatedSlotAlreadyExistsforOtherCourses: true, conflictingCourse: ["courseID1", "courseID2"]`.
             - This error message indicates that the slot ***after being modified*** already exists in the schedule of other courses, and therefore cannot be assigned to the course in the request body.
-           3. `oldSlotDoesNotExistinCourseScedule: true`.
-                - This error message that the old slot ***to be modified*** does ***not exist*** in the schedule of the course.
+       3. `oldSlotDoesNotExistinCourseScedule: true`.
+             - This error message that the old slot ***to be modified*** does ***not exist*** in the schedule of the course.
 
 > Note: the second and third messages may appear together in the same error message object.
 - **Example response body:**
