@@ -276,6 +276,73 @@ app.post('/addCourseSlots', async (req, res) => {
   }*/
 });
 
+app.post('/deleteCourseSlots', async (req, res) => {
+        //  if(req.user.isCourseCoordinator) {
+            const {courseID, details} = req.body;
+            const course = await CourseModel.findOne({id: courseID});
+            if(!course) return res.status(400).send("Course not found!");
+        
+            const CCStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
+            const CCAcademicModel = await AcademicStaffModel.findOne({member: CCStaffModel._id}); // member: req.user.id or member: req.user._id.
+            if(!course.course_coordinator.equals(CCAcademicModel._id)) 
+                return res.status(401).send("You are not a course coordinator for this course!");
+            
+            const errorMessages = [];
+        
+            for(let index = 0; index < details.length; index++) {
+                const {number, locationID, date} = details[index];
+                const errorMessage = {};
+                const location = await LocationModel.findOne({id: locationID});
+        
+                if(!location) {
+                    errorMessage.locationID = locationID;
+                    errorMessage.locationNotFound = true;
+                    errorMessages.push(errorMessage);
+                }
+                else {
+                    const allCourses = await CourseModel.find();
+                    const conflictingCourses = [];
+        
+                    for(let i = 0; i < allCourses.length; i++) {
+                    var slotFound = allCourses[i].schedule.some(function (assignedSlot) {
+                        return assignedSlot.date.getTime() == new Date(date).getTime() && assignedSlot.number == number && assignedSlot.location.equals(location._id);
+                    });
+                    if(slotFound) conflictingCourses.push(allCourses[i].id);
+                    }
+        
+        
+                    if(conflictingCourses.length == 0) {
+                    const newCourseSlot = {
+                        day: moment(date, 'YYYY-MM-DD').format('dddd').toString(),
+                        number: number,
+                        location: location._id,
+                        date: new Date(date)
+                    };
+        
+                    if(course.schedule.length == 0) course.schedule = [];
+                    course.schedule.push(newCourseSlot);
+                    course.slots_needed++;
+                    await course.save();
+                    }
+        
+                    else {
+                        errorMessage.slotAlreadyExistsforOtherCourses = true;
+                        errorMessage.conflictingCourses = conflictingCourses;
+                        errorMessages.push(errorMessage);
+                    }
+            }
+        }
+            if(errorMessages.length != 0)   
+                return res.status(400).json(errorMessages);
+            else
+                return res.status(200).send("Operation done successfully!");
+        
+              // }
+            /*else {
+              return res.status(401).send('Access Denied!');
+          }*/
+});
+
 app.post('/updateCourseSlots', async (req, res) => {
     //  if(req.user.isCourseCoordinator) {
         const {courseID, details} = req.body;
@@ -489,7 +556,6 @@ app.get('/teachingAssignmentAllCourses', async (req, res) => {
   }*/
 });
 
-// Route 1.
 app.post('/assignCourseInstructorforCourses', async (req, res) => {
 //    if(req.user.isHOD) {
         const body = req.body;

@@ -294,13 +294,13 @@ Operation done successfully!
 "details": [
 	{
 	
-		"oldSlot": {
-			"dateOld": "2020-12-12",
-			"locationIDOld": "C7.203",
-			"numberOld": 3
+	"oldSlot": {
+		"dateOld": "2020-12-12",
+		"locationIDOld": "C7.203",
+		"numberOld": 3
 		},
-		"newSlot": {
-			"dateNew": "2020-12-15"
+	"newSlot": {
+		"dateNew": "2020-12-15"
 		}
 	
 	},
@@ -310,7 +310,7 @@ Operation done successfully!
 			"locationIDOld": "C7.203",
 			"numberOld": 3
 		},
-		"newSlot": {
+	"newSlot": {
 			"numberNew": 4
 		}
 	},
@@ -320,7 +320,7 @@ Operation done successfully!
 			"locationIDOld": "C7.203",
 			"numberOld": 3
 		},
-		"newSlot": {
+	"newSlot": {
 			"numberNew": 4,
 			"dateNew": "2020-12-15"
 		}
@@ -331,7 +331,7 @@ Operation done successfully!
 			"locationIDOld": "C7.203",
 			"numberOld": 3
 		},
-		"newSlot": {
+	"newSlot": {
 			"numberNew": 4,
 			"dateNew": "2020-12-15",
 			"locationIDNew": "C3.201"
@@ -356,7 +356,7 @@ Operation done successfully!
              - `locationIDOld: <id-of-old-location-not-in-database>`. [Optional].
              -  `locationIDNew: <id-of-new-location-not-in-database>`. [Optional].
              - The error message contains the first message and a **mix** of the two other messages depending on whether both locations do not exist or only one of them does not exist.
-         3. `updatedSlotAlreadyExistsforOtherCourses: true, conflictingCourse: ["courseID1", "courseID2"]`.
+         2. `updatedSlotAlreadyExistsforOtherCourses: true, conflictingCourse: ["courseID1", "courseID2"]`.
             - This error message indicates that the slot ***after being modified*** already exists in the schedule of other courses, and therefore cannot be assigned to the course in the request body.
            3. `oldSlotDoesNotExistinCourseScedule: true`.
                 - This error message that the old slot ***to be modified*** does ***not exist*** in the schedule of the course.
