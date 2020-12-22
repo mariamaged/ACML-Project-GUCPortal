@@ -209,7 +209,7 @@ app.post('/viewDepartmentStaffMemberDayOff', async (req, res) => {
   }*/
 });
 
-app.post('/addCourseSlots', async (req, res) => {
+app.post('/courseSlots', async (req, res) => {
     //  if(req.user.isCourseCoordinator) {
     const {courseID, details} = req.body;
     const course = await CourseModel.findOne({id: courseID});
@@ -225,6 +225,7 @@ app.post('/addCourseSlots', async (req, res) => {
     for(let index = 0; index < details.length; index++) {
         const {number, locationID, date} = details[index];
         const errorMessage = {};
+        errorMessage.slot = details[index];
         const location = await LocationModel.findOne({id: locationID});
 
         if(!location) {
@@ -276,7 +277,7 @@ app.post('/addCourseSlots', async (req, res) => {
   }*/
 });
 
-app.post('/deleteCourseSlots', async (req, res) => {
+app.delete('/courseSlots', async (req, res) => {
         //  if(req.user.isCourseCoordinator) {
             const {courseID, details} = req.body;
             const course = await CourseModel.findOne({id: courseID});
@@ -292,6 +293,7 @@ app.post('/deleteCourseSlots', async (req, res) => {
             for(let index = 0; index < details.length; index++) {
                 const {number, locationID, date} = details[index];
                 const errorMessage = {};
+                errorMessage.slot = details[index];
                 const location = await LocationModel.findOne({id: locationID});
         
                 if(!location) {
@@ -300,34 +302,24 @@ app.post('/deleteCourseSlots', async (req, res) => {
                     errorMessages.push(errorMessage);
                 }
                 else {
-                    const allCourses = await CourseModel.find();
-                    const conflictingCourses = [];
-        
-                    for(let i = 0; i < allCourses.length; i++) {
-                    var slotFound = allCourses[i].schedule.some(function (assignedSlot) {
-                        return assignedSlot.date.getTime() == new Date(date).getTime() && assignedSlot.number == number && assignedSlot.location.equals(location._id);
-                    });
-                    if(slotFound) conflictingCourses.push(allCourses[i].id);
+                    var position = -1;
+                    const SlotExists = course.schedule.some(function (assignedSlot, ind) {
+                            var flag = assignedSlot.date.getTime() == new Date(date).getTime() 
+                            && assignedSlot.number == number
+                            && assignedSlot.location.equals(location._id);
+                            if(flag) {
+                                position = ind;
+                                return flag;
+                            }
+                        });
+                    
+                    if(SlotExists) {
+                        course.schedule.splice(position, 1);
+                        course.slots_needed--;
+                        await course.save();
                     }
-        
-        
-                    if(conflictingCourses.length == 0) {
-                    const newCourseSlot = {
-                        day: moment(date, 'YYYY-MM-DD').format('dddd').toString(),
-                        number: number,
-                        location: location._id,
-                        date: new Date(date)
-                    };
-        
-                    if(course.schedule.length == 0) course.schedule = [];
-                    course.schedule.push(newCourseSlot);
-                    course.slots_needed++;
-                    await course.save();
-                    }
-        
                     else {
-                        errorMessage.slotAlreadyExistsforOtherCourses = true;
-                        errorMessage.conflictingCourses = conflictingCourses;
+                        errorMessage.slotDoesNotExistinCourseSchedule = true;
                         errorMessages.push(errorMessage);
                     }
             }
@@ -361,6 +353,8 @@ app.post('/updateCourseSlots', async (req, res) => {
             const newSlot = details[index].newSlot;
             
             const errorMessage = {};
+            errorMessage.oldSlot = details[index].oldSlot;
+            errorMessage.newSlot = details[index].newSlot;
             const locationOld = await LocationModel.findOne({id: locationIDOld});
             const locationNew = await LocationModel.findOne({id: newSlot.locationIDNew});
 
@@ -378,7 +372,7 @@ app.post('/updateCourseSlots', async (req, res) => {
                 updatedSlot.date = new Date(dateOld);
                 updatedSlot.day = moment(dateOld, 'YYYY-MM-DD').format('dddd').toString()
             }
-            console.log(updatedSlot);
+
             if(!locationOld) {
                 errorMessage.locationIDOld = locationIDOld;
                 errorMessage.locationNotFound = true;

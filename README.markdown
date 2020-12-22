@@ -181,7 +181,7 @@ Operation done successfully!
         - Slot Number [1, 2, 3, 4, 5].
         - Location.\
         related to the slot.
-- **Route:** /addCourseSlots
+- **Route:** /courseSlots
 - **Request:** POST.
 - **Request body:** 
    - Should be an object with two properties:
@@ -248,10 +248,20 @@ Operation done successfully!
 ```json
 [
 {
+	"slot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
 	"locationNotFound": true,
 	"locationID": "C7.203"
 },
 {
+	"slot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
 	"slotAlreadyExistsforOtherCourses": true,
 	"conflictingCourses": [
 		"CSEN703",
@@ -266,7 +276,7 @@ Operation done successfully!
       - It also contains the day of week calculated from the date by using the **moment library**.
   - The `slots_needed` attribute of the `course` in the course table gets incremented by 1.
 ***
-	(b) Update course slot(s) in his/her course.
+	3(b) Update course slot(s) in his/her course.
 - **Functionality:** 
    - The user who is a Course Coordinator should be capable of updating several slots (or one slot) found in the schedule of a course he is a course coordinator of.
    - These changes include from 1 up to 3 of the following attributes in the slot definition:
@@ -382,22 +392,54 @@ Operation done successfully!
 ```json
 [
 {
+	"oldSlot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
+	"newSlot": {
+		"locationID": "C7.205"
+	},
 	"locationNotFound": true,
 	"locationIDOld": "C7.203"
 },
 
 {
+	"oldSlot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
+	"newSlot": {
+		"locationID": "C7.205"
+	},
 	"locationNotFound": true,
 	"locationIDOld": "C7.203",
 	"locationIDNew": "C7.205"
 },
 
 {
+	"oldSlot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
+	"newSlot": {
+		"locationID": "C7.201"
+	}
 	"locationNotFound": true,
 	"locationIDNew": "C3.201"
 },
 
 {
+	"oldSlot": {
+		"date": "2020-15-12",
+		"number": 4,
+		"locationID": "C7.203"
+	},
+	"newSlot": {
+		"number": 5
+	},
 	"updatedSlotAlreadyExistsforOtherCourses": true,
 	"conflictingCourses": [
 		"CSEN703",
@@ -406,18 +448,125 @@ Operation done successfully!
 },
 
 {
+	"oldSlot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
+	"newSlot": {
+		"number": 4
+	},
 	"updatedSlotAlreadyExistsforOtherCourses": true,
 	"conflictingCourses": [
 		"CSEN703",
 		"CSEN704"
 	],
-	"oldSlotDoesNotExistinCourseScedule": true
+	"oldSlotDoesNotExistinCourseSchedule": true
 },
 
 {
-	"oldSlotDoesNotExistinCourseScedule": true
+	"oldSlot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
+	"newSlot": {
+		"date": "2020-15-12"
+	},
+	"oldSlotDoesNotExistinCourseSchedule": true
 }
 ]
 ```
 - **Changes in database:**  
    - The `schedule` array attribute of the `course` in the course table has the `oldSlot element` attributes specified in the `newSlot` changed to the new values.
+***
+	3(c) Delete course slot(s) in his/her course.
+- **Functionality:** the user who is a Course Coordinator should be capable of deleting several slots (or one slot) from the schedule of a certain course he is a course coordinator of.  
+- **Route:** /courseSlots
+- **Request:** DELETE.
+- **Request body:** 
+   - Should be an object with two properties:
+      - courseID [where courseID is a `string` like `CSEN704`].
+      -  details: An Array of objects with three properties: -->
+         1. date [Where date is a `string` in the form of `YYYY-MM-DD`].
+         2. number [where number is the number of one of the five slots].
+         3. locationID [where locationID is a `string` like `C7.203`].
+    - This implies that the Course Coordinator is trying to delete from this particular course in the request body several slots where each slot is identified by the day it happens, the number of the slot and the location it resides in.
+- **Example request body:**
+```json
+{
+"courseID": "CSEN704",
+"details": [
+	{
+	"date": "2020-12-12",
+	"locationID": "C7.203",
+	"number": 3
+	},
+	{
+	"date": "2020-12-12",
+	"locationID": "C7.204",
+	"number": 3
+	},
+	{
+	"date": "2020-12-14",
+	"locationID": "C7.203",
+	"number": 4
+	}
+]
+}
+```
+- **Response body:**
+   - `Case 1:` If the user is not a Course Coordinator and therefore not authorized to issue this action, the response sends back the message: **`Access Denied!`** with status **`401`**.\
+   &nbsp;
+   -  `Case 2:` If there is no course in the database with that courseID, the response sends back the message **`Course not found!`** with status **`400`**.\
+   &nbsp;
+    - `Case 3:` If the user is not a course coordinator of the course specified in the body, the response sends back the message **`You are not a course coordinator for this course!`** with status **`401`**.\
+     &nbsp;
+    - `Case 4:` If the operation is successful, and the course gets added all of the slots in the request body, the response sends back the message **`Operation done successfully!`** with status **`200`**.\
+  &nbsp;
+  - `Case 5:` If any of the constraints do not apply to one of the input slots objects in the details property, an array of **`request defects`** is sent back with a detailed analysis with what was wrong with the input with status **`400`**.
+     - There are two possible error messages per slot object -->
+         1. `locationNotFound: true, locationID: <id-of-location-not-in-database>`.
+         2. `slotDoesNotExistinCourseSchedule: true`.
+            - This error message indicates that the slot to be deleted does not exist in the schedule of the course specified (and therefore cannot be deleted).
+- **Example response body:**
+```json
+Access Denied!
+```
+
+```json
+Course not found!
+```
+
+```json
+You are not a course coordinator for this course!
+```
+
+```json
+Operation done successfully!
+```
+
+```json
+[
+{
+	"slot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
+	"locationNotFound": true,
+	"locationID": "C7.203"
+},
+{
+	"slot": {
+		"date": "2020-15-12",
+		"number": 5,
+		"locationID": "C7.203"
+	},
+	"slotDoesNotExistinCourseSchedule": true
+}
+]
+```
+- **Changes in database:**  
+   - The `schedule` attribute of the `course` in the course table has the slots objects specified deleted.
+   - The `slots_needed` attribute of the `course` in the course table gets decremented by 1.
