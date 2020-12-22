@@ -58,7 +58,7 @@ const StaffMemberSchema = mongoose.Schema({
     password: {type: String, default: "123456"},
    salary: {type: Number, required: true}, // No academic member can change that.
     office: {type: ObjectID, ref: 'Location', required: true},
-    gender: {type: String},
+    gender: {type: String, required:true,enum:["Female","Male"]},
 
     // Login Information.
     newStaffMember: {type: Boolean, default: true},

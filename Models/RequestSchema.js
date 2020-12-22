@@ -12,7 +12,10 @@ const requestSchema=mongoose.Schema({
     
    //change day off
    newDayOff:{type:String , enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday']},
-    
+
+    //compensation leave
+    missedDay:{type:Date},
+
     //for replacement request
     slotDate:{type:Date},
     slotNum:{type:Number},

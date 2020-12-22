@@ -919,6 +919,9 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         console.log("dayoff= "+day_off)
         var nextMonth=0;
         var nextYear=0;
+
+        //to get curr month and next month and year according to today's date
+        //if less than 10 then curr month=month-1 
         if( dateDay<=10){
             dateMonth=dateMonth-1
         }
@@ -994,8 +997,8 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
     var lastDay=parseInt(lastD)
     }
- //console.log("missed till now= "+missedDays)
-        //get last day present from 1st month then fill the rest according to each month's number of days
+    //console.log("missed till now= "+missedDays)
+    //get last day present from 1st month then fill the rest according to each month's number of days
     if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
         while(lastDay<32){
             if(lastDName!='Friday' && lastDName!=day_off){
