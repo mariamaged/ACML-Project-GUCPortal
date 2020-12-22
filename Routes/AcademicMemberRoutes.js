@@ -175,6 +175,8 @@ router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
                 }
                 
         }
+        if(sent.length==0)
+        res.write("There are no sent requests")
 
         res.end()
         return 
@@ -207,9 +209,40 @@ router.get('/receivedReplacementRequests',authenticateToken,async(req,res)=>{
             }
            
     }
+    if(sent.length==0)
+    res.write("There are noe received requests")
     res.end()
     return 
 })
 
+
+router.post('/SlotLinkingRequest',authenticateToken,async(req,res)=>{
+    //input course name slot number and slot day
+    const courseName=await Course.findOne({id:req.body.courseID})
+    const courseCoordinatorID=courseName.course_coordinator
+    const courseCoordinator= await AcademicStaffModel.findById(courseCoordinatorID)
+    const coordinatorName=courseCoordinator.name
+    const slotNum=req.body.slotNum
+    const slotDay=req.body.slotDay
+    const academicUser=await AcademicStaffModel.findOne({member:req.user.id})
+    const schedule=academicUser.schedule
+    var check=false;
+    for(var i=0;i<schedule.length;i++){
+            if(schedule[i].day==slotDay && schedule[i].number==slotNum){
+                return res.send("User already has teaching activities during this slot. Cannot send this request")
+            }
+    }
+    var req=new request({
+        reqType:"Slot Linking",
+        slotDate:slotDate,
+        slotNum:slotNum,
+        slotLoc:slotLoc,
+        sentBy:id,
+        sentTo:replacement.member,
+        state:"Pending",
+        submission_date:new moment()
+    })
+
+})
 
 module.exports=router;
