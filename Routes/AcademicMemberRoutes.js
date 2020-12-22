@@ -143,7 +143,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
 
         }
         if(checkFin)
-        return  res.json({success:"Requests successfully sent"})
+        return  res.json({success:"Requests successfully submitted"})
         else
       return res.json({error:"Could not find any eligible candidate to replace with"})
         
@@ -219,29 +219,206 @@ router.get('/receivedReplacementRequests',authenticateToken,async(req,res)=>{
 router.post('/SlotLinkingRequest',authenticateToken,async(req,res)=>{
     //input course name slot number and slot day
     const courseName=await Course.findOne({id:req.body.courseID})
-    const courseCoordinatorID=courseName.course_coordinator
-    const courseCoordinator= await AcademicStaffModel.findById(courseCoordinatorID)
-    const coordinatorName=courseCoordinator.name
+    const courseID=courseName.id
+    const courseCoordinatorID=courseName.course_coordinator.member
+    // const courseCoordinator= await AcademicStaffModel.findById(courseCoordinatorID)
+    // const coordinatorName=courseCoordinator.
+    
+    //will compare slot timings with user schedule to make sure that he is free during this slot
     const slotNum=req.body.slotNum
     const slotDay=req.body.slotDay
     const academicUser=await AcademicStaffModel.findOne({member:req.user.id})
     const schedule=academicUser.schedule
     var check=false;
+
+    //check if user already has a slot during the time he is requesting a slot linking for
     for(var i=0;i<schedule.length;i++){
             if(schedule[i].day==slotDay && schedule[i].number==slotNum){
-                return res.send("User already has teaching activities during this slot. Cannot send this request")
+                return res.json("User already has teaching activities during this slot. Cannot send this request")
             }
     }
+
+    //check if user teaches this course
+    const academic=await AcademicStaffModel.find({member:req.user.id})
+    const courses=academic.courses
+    var teaches=false
+    for(var i=0;i<courses.length;i++){
+        if(courses[i].id==courseID)
+            teaches=true
+    }
+    if(teaches==false)
+    return res.json("Not permitted to send this request because user does not teach this course.")
+
+    //creating new slot linking request
     var req=new request({
         reqType:"Slot Linking",
-        slotDate:slotDate,
+        slotDay:slotDay,
         slotNum:slotNum,
-        slotLoc:slotLoc,
-        sentBy:id,
-        sentTo:replacement.member,
+        courseID:courseID,
+        sentBy:req.user.id,
+        sentTo:courseCoordinatorID,
         state:"Pending",
         submission_date:new moment()
     })
+    try{
+    res.json("Request successfully submitted")    
+    await req.save()
+    }
+    catch(err){
+        res.json(err)
+    }
+
+    //sending notification to course coordinator
+    const notification=(await StaffMemberModel.findById(courseCoordinatorID)).notifications
+                const notNew=notification
+                notNew[notNew.length]="You received a new slot linking request"
+                const staffReplacement= await StaffMemberModel.findByIdAndUpdate(courseCoordinatorID,{notifications:notNew})
+
+})
+
+router.post('/changeDayOff',authenticateToken,async(req,res)=>{
+    //input will be new day off
+    const academic=await AcademicStaffModel.findOne({member:req.user.id})
+    const schedule=academic.schedule
+    for(var i=0;i<schedule.length;i++){
+        const slotDay=schedule[i].day
+        if(slotDay==req.body.newDayOff){
+            return res.json("Cannot request for a day off on a day with teaching activities")
+        }
+    }
+     //getting department of this user to get head of department to send request to
+     const departmentID=academic.department
+     const department=await department.findById(departmentID)
+     const hodID=department.HOD
+     const hodAcademic=await AcademicStaffModel.findById(hodID)
+    
+
+    //make a request
+    const reason=""
+    if(req.user.request)
+    reason=req.user.request
+
+    var req=new request({
+        reqType:"Change Day off",
+        newDayOff:req.body.newDayOff,
+        sentBy:req.user.id,
+        sentTo:hodAcademic.member,
+        state:"Pending",
+        reason:reason,
+        submission_date:new moment()
+    })
+    try{
+     res.json("Request successfully submitted")
+    await req.save()
+    }
+    catch(err){
+        res.json(err)
+    }
+
+    //sending notification to hod
+    const notification=(await StaffMemberModel.findById(hodAcademic.member)).notifications
+    const notNew=notification
+    notNew[notNew.length]="You received a new slot linking request"
+    const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
+
+
+})
+
+router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
+
+    //get annual and accidental leave balance
+    const academic=await AcademicStaffModel.findOne({member:req.user.id})
+    const staff=await StaffMemberModel.findById(req.user.id)
+    const accidentalDaysLeft=staff.accidentalDaysLeft
+    const annual_days=staff.annual_days
+
+    //check of number of accidental days left or annual days is equal to 0
+    if(accidentalDaysLeft==0){
+        return res.json("Cannot submit request.Maximum number of accidental day leaves have been reached.")
+    }
+    if(annual_days==0){
+        return res.json("Cannot submit request. Annual leave balance is currently empty")
+    }
+
+    //make request
+    const accidentDate=req.body.accidentDate
+    //get hod
+    const departmentID=academic.department
+     const department=await department.findById(departmentID)
+     const hodID=department.HOD
+     const hodAcademic=await AcademicStaffModel.findById(hodID)
+    var req=new request({
+        reqType:"Accidental Leave",
+        accidentDate:accidentDate,
+        sentBy:req.user.id,
+        sentTo:hodAcademic.member,
+        state:"Pending",
+        submission_date:new moment()
+    })
+    try{
+    await req.save()
+    res.json("Request successfully submitted")
+    }
+    catch(err){
+        res.json(err)
+    }
+    
+    //update annual and accidental leave balance of user
+    const userUpdated=await StaffMemberModel.findByIdAndUpdate(req.user.id,{accidentalDaysLeft:(accidentalDaysLeft-1),annual_days:(annual_days-1)})
+
+    //send notification to hod
+    const notification=(await StaffMemberModel.findById(hodAcademic.member)).notifications
+    const notNew=notification
+    notNew[notNew.length]="You received a new accidental leave request"
+    const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
+})
+
+router.post('/sickLeave',authenticateToken,async(req,res)=>{
+    //input is sick day date
+    const sickDay=req.user.sickDay
+    //getting all days allowed to send request which is 3 days from today
+    var diff3=moment().subtract(3, "days").format("YYYY-MM-DD");
+   var diff2=moment().subtract(2, "days").format("YYYY-MM-DD");
+   var diff1=moment().subtract(1, "days").format("YYYY-MM-DD");
+   var diff0=moment.format("YYYY-MM-DD");
+   if(sickDay==diff0 ||sickDay==diff1 || sickDay==diff2 ||sickDay==diff3 ){
+        
+    //getting hod
+    const academic=await AcademicStaffModel.findOne({member:req.user.id})
+    const departmentID=academic.department
+    const department=await department.findById(departmentID)
+    const hodID=department.HOD
+    const hodAcademic=await AcademicStaffModel.findById(hodID)
+    //create request
+        var req=new request({
+            reqType:"Sick Leave",
+            sickDay:moment(sickDay),
+            sentBy:req.user.id,
+            sentTo:hodAcademic.member,
+            state:"Pending",
+            submission_date:new moment()
+        })
+        try{
+        await req.save()
+        res.json("Request successfully submitted")
+        }
+        catch(err){
+            res.json(err)
+        }
+
+
+         //send notification to hod
+    const notification=(await StaffMemberModel.findById(hodAcademic.member)).notifications
+    const notNew=notification
+    notNew[notNew.length]="You received a new accidental leave request"
+    const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
+
+
+   }
+   //request sent after 3 days deadline has passed
+   else{
+       return res.json("Deadline for sending sick leave request has been exceeded.\n Cannot send request")
+   }
 
 })
 

@@ -68,7 +68,7 @@ const StaffMemberSchema = mongoose.Schema({
     attendance:{type:[attendanceSchema],default:[]},
     annual_days: {type:Number},
     lastUpdatedAnnual:{type: Date},
-    accidentalDaysLeft: {type:Number},
+    accidentalDaysLeft: {type:Number,default:6},
     attendCompensationDay:{type:Boolean},
     missingDays:{type:[String],default:[]},
     time_attended:{type:[monthlyHoursSchema],default:[]},
