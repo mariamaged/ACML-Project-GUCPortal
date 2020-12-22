@@ -492,7 +492,7 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
 
 })
 
-router.post('maternityLeave',authenticateToken,async(req,res)=>{
+router.post('/maternityLeave',authenticateToken,async(req,res)=>{
     //(req.body.maternityDoc, OPTIONAL req.body.reason)
     const user=await StaffMemberModel.findById(req.user.id)
     const type=user.staff_type
@@ -542,7 +542,7 @@ router.post('maternityLeave',authenticateToken,async(req,res)=>{
 
 })
 
-router.post('compensationLeave',authenticateToken,async(req,res)=>{
+router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     //enter absent day he wants to compensate for (req.body.missedDay,OPTIONAL req.body.reason)
 
     //check if user is HR
@@ -613,4 +613,10 @@ router.post('compensationLeave',authenticateToken,async(req,res)=>{
 
 })
 
+router.get('/requestStatus',authenticateToken,async(req,res)=>{
+    const sent=await request.find({sentBy:req.user.id})
+    for(var i=0;i<sent.length;i++){
+        
+    }
+})
 module.exports=router;
