@@ -174,35 +174,36 @@ app.get('/viewDepartmentStaffDayOff', async (req, res) => {
 
           returnArray.push(returnObject);
       }
-        return res.send(returnArray);         
+        return res.status(200).json(returnArray);       
  // }
   /*else {
       res.status(401).send('Access Denied!');
   }*/
 });
 
-app.post('/viewDepartmentStaffMemberDayOff', async (req, res) => {
+app.get('/viewDepartmentStaffMemberDayOff/:memberID', async (req, res) => {
     //  if(req.user.isHod) {
-        const {memberID} = req.body;
+        const memberID = req.params.memberID;
         const HODStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later.
         const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
         const HODDepartment = HODAcademicModel.department;
 
         const staffMemberModel = await StaffMemberModel.findOne({id: memberID});
-        const academicMemberModel = await AcademicStaffModel.findOne({member: staffMemberModel._id});
+        var academicMemberModel = null;
+        if(staffMemberModel)
+            academicMemberModel = await AcademicStaffModel.findOne({member: staffMemberModel._id});
 
+        if(!academicMemberModel) return res.status(400).send('Academic member not found!');
         if(academicMemberModel.department.equals(HODDepartment)) {
             const returnObject = {
             academicStaffMemberName: staffMemberModel.name,
             dayOff: academicMemberModel.day_off
           };
-          return res.send(returnObject);
+          return res.status(200).send(returnObject);
         }
         else {
-            res.status(401).send("Staff member not in your department!");
-        }
-
-                
+            return res.status(401).send("Staff member not in your department!");
+        }       
  // }
   /*else {
       res.status(401).send('Access Denied!');
@@ -455,6 +456,27 @@ app.post('/updateCourseSlots', async (req, res) => {
         /*else {
           return res.status(401).send('Access Denied!');
       }*/
+});
+
+app.get('/courseCoverage/:courseID', async (req, res) => {
+    //    if(req.user.isHOD) {
+        const courseID = req.params.courseID;
+
+        const HODStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later
+        const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+
+        const course = await CourseModel.findOne({id: courseID});
+        if(!course) return res.status(400).send('Course does not exist!');
+        if(!HODAcademicModel.department.equals(course.department)) return res.status(401).send('Course not under your department!');
+        if(course.slots_needed == 0) res.status(400).send('Course does not have any slots for now!');
+
+        const coverage = course.slots_covered/course.slots_needed * 100;
+        return res.status(200).send('Course coverage is equal to: ' + coverage + "%");
+  /*  else {
+        return res.status(401).send('Access Denied!');
+    } */
+ //}
+
 });
 
 app.get('/teachingAssignmentPerCourse', async (req, res) => {

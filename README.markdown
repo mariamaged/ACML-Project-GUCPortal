@@ -86,7 +86,120 @@ Operation done successfully!
    - The `courses` attribute of each `course instructor` in the `AcademicStaffModel` gets updated with the reference to the new course the course instructor will be teaching.
    - The `academic_staff` attribute of each `course` in the `CourseModel` gets updated with the reference to the course instructor who will be teaching this course.
 ***
+	(7) View the coverage of each course in his/her department.
+- **Functionality:** 
+   - The user who is a HOD should be capable of viewing the course coverage (the percentage of slots with academic members assigned to them compared to the total number of slots inserted for a particular course under his department).
+- **Route:** /courseCoverage/:courseID.
+   - Where courseID is a the id of the course as a `string` like `CSEN704`.
+- **Request:** GET.
+- **Request body:** empty.
+- **Example request endpoint:** GET /courseCoverage/CSEN704.
+- **Response body:**
+   - `Case 1:` If the user is not a HOD and therefore not authorized to issue this action, the response sends back the message: **`Access Denied!`** with status **`401`**.\
+   &nbsp;
+   - `Case 2:` If the course does not exist in the database, the response sends back the message **`Course does not exist!`** with status **`400`**.\
+  &nbsp;
+    - `Case 3:` If the course is not under the HOD department, the response sends the message **`Course not under your department!`** with status **`401`**.\
+    &nbsp;
+    - `Case 4:` If there were no slots inserted for the course, the response sends back the message **`Course does not have any slots for now!`** with status **`400`**.\
+    &nbsp;
+    - `Case 5:` If the course coverage was retrieved, the response sends back the message **`Course coverage is equal to: <number-calculated-as slots_covered/slots_need * 100>%`**.
+- **Example response body:**
+```json
+Access Denied!
+```
 
+```json
+Course does not exist!
+```
+
+```json
+Course not under your department!
+```
+
+```json
+Course does not have any slots for now!
+```
+
+```json
+Course coverage is equal to: 50%
+```
+***
+	3(a) View the day off of all the staff in his department.
+- **Functionality:**
+   - The user who is a HOD should be capable of viewing the day off of all the academic members under his department.
+- **Route:** /viewDepartmentStaffDayOff
+- **Request:** GET.
+- **Request body:** empty.
+- **Response body:** 
+   - `Case 1 (Normal case with status 200):` Should be an array of objects with ***three properties***:
+      1. academicStaffMemberID, where academicStaffMemberID is the `ID` of the academic member as a `string`, like `ac-11`.
+      2. academicStaffMemberName, where academicStaffMemberName is the `name` of the academic member as a `string`, like `Maria`.
+      3. dayOff, where dayOff is one of the week days ***except*** `Friday`.\
+      &nbsp;
+   - `Case 2:` If the user is not a HOD, and is therefore not authorized not issue this action, the response sends back the message **`Access Denied!`** with status **`401`**.
+- **Example response body:**
+```json
+Access Denied!
+```
+```json
+[
+{
+	"academicStaffMemberID": "ac-11",
+	"academicStaffMemberName": "Maria",
+	"dayOff": "Monday"
+},
+{
+	"academicStaffMemberID": "ac-12",
+	"academicStaffMemberName": "Monica",
+	"dayOff": "Tuesday"
+},
+{
+	"academicStaffMemberID": "ac-13",
+	"academicStaffMemberName": "Maya",
+	"dayOff": "Wednesday"
+}
+]
+```
+***
+	3 (b) View the day off of a single staff in his/her department.
+- **Functionality:**
+   - The user who is HOD should be capable of viewing the day off of a specific academic member under his department.
+- **Route:** /viewDepartmentStaffMemberDayOff/:memberID
+   - Where memberID is the id of the academic member as a `string`, like `ac-1`.
+- **Request:** GET.
+- **Request body:** empty.
+- **Response body:**
+   - `Case 1 (Normal case with status 200): `Should be a single object with ***two properties***:
+       1. academicStaffMemberName, where academicStaffMemberName is the `name` of the academic member as a `string`, like `Maria`.
+       2. dayOff, where dayOff is one of the day weeks ***except*** `Friday`.\
+       &nbsp;
+    - `Case 2:` If the user is not a HOD, and is therefore not authorized to issue this action, the response sends back the message **`Access Denied!`** with the status **`401`**.\
+    &nbsp;
+    - `Case 3:` If the id inserted does not belong to an academic member in the database, the response sends back the message **`Academic member not found!`** with status **`400`**.\
+    &nbsp;
+     - `Case 4:` If the academic member belongs to a different department than the HOD's department, the response sends back the message **`Staff member not in your department!`** with status **`401`**.
+- **Response body example:**
+```json
+Access Denied!
+```
+
+```json
+Academic member not found!
+```
+
+```json
+Staff member not in your department!
+```
+
+```json
+{
+"academicStaffMemberName": "Maria",
+"dayOff": "Tuesday"
+}
+```
+     
+  
 ## 4.2 Course Instructor
 ### Any course instructor can do the following:
 	5(a) Update assignment of academic member in course(s) he/she is assigned to.
@@ -569,4 +682,6 @@ Operation done successfully!
 ```
 - **Changes in database:**  
    - The `schedule` attribute of the `course` in the course table has the slots objects specified deleted.
-   - The `slots_needed` attribute of the `course` in the course table gets decremented by 1.
+  - The `slots_needed` attribute of the `course` in the course table gets decremented by 1.
+
+	
