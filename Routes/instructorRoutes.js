@@ -138,7 +138,67 @@ router.get('/staffpercourse',async(req,res)=>{
 })
 
 //assigntounassignedSlot
-router.route('Assignment')
+router.route('Assignment').put(async(req,res)=>{
+   try{
+    if(req.user.role=="Course Instructor"){
+        const inst=await AcademicStaff.findOne({"_id":req.user.id});
+        if(inst==null) res.status(400).json({msg:"Something went wrong"});
+        else{
+         const{courseid,day,number,slocation,memid}=req.body;
+         if(!courseid||!day||!number||!slocation||!memid) res.status(400).json({msg:"please fill all the required fields"});
+         else{
+             var assigned=false;
+             const thecourse=await course.findOne({"id":courseid});
+             if(thecourse==null) res.status(400).json({msg:"this course id does not exist"});
+             else{
+             for(var i=0;i<inst.courses.length;i++){
+                 if(inst.courses[i]==thecourse._id){assigned=true; break;}
+             }
+             if(!assigned) res.status(400).json({msg:"you are not assigned to this course"});
+             else{
+                const mem=await AcademicStaff.findOne({"id":memid});
+                if(mem==null) res.status(400).json({msg:"the Academic member with the id you entered does not exist"});
+                else{
+                 var free=true;
+                 for(var i=0;i<mem.schedule.length;i++){
+                    if(mem.schedule[i].day==day && mem.schedule[i].number==number){free=false; break;}
+                 }
+                 if(free){
+                     var duplicate=false;
+                    for(var i=0;i<mem.courses.length;i++){
+                        if(mem.courses[i]==thecourse._id){duplicate=true; break;}
+                    }
+                    //keda sah wla ahoto fe object??
+                    if(!duplicate) mem.courses.push(thecourse._id);
+                    mem.schedule.push({"day":day,"number":number,"location":slocation,"academic_member_id":mem._id,"course":thecourse._id});
+        
+                  for(var i=0;i<thecourse.schedule.length;i++){
+                    if(thecourse.schedule[i].day==day && thecourse.schedule[i].number==number && thecourse.schedule[i].location==slocation){
+                        if(thecourse.schedule[i].academic_member_id==null) thecourse.schedule[i].academic_member_id=mem._id;
+                        else res.status(400).json({msg:"the slot is already assigned"});
+                        break;
+                     }
+                    }
+                    duplicate=false;
+                  for(var i=0;i<thecourse.academic_staff.length;i++){
+                    if(thecourse.academic_staff[i]==mem._id){duplicate=true; break;}
+                   }
+                  if(!duplicate) thecourse.academic_staff.push(mem._id);
+                  res.send("done");  
+                    }
+                       else res.status(400).json({msg:"the member you want to assign this slot to is already busy at this time."});
+                   
+                 }
+             }
+
+      }
+    }
+}
+}
+   }catch(err){
+         res.status(500).json({error:err.message});
+   }
+})
 
 
 
