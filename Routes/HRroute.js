@@ -25,7 +25,8 @@ router.route('/Location').post(async(req,res)=>{
         if(!id || !type || !maximum_capacity)
            return res.status(400).json({msg:"Please enter a correct location"});
         else{
-            if(location.findOne({"id":id})) res.status(400).json({msg:"a location with this id already exists"});
+            const loc=await location.findOne({"id":id});
+            if(loc!=null) res.status(400).json({msg:"a location with this id already exists"});
             else{
               toAdd= new location({id,type,maximum_capacity,current_capacity:0});
               await toAdd.save();
@@ -37,7 +38,7 @@ router.route('/Location').post(async(req,res)=>{
     catch(err){
         res.status(500).json({error:err.message});
     }
-}
+    }
 })
 
 //deleting
@@ -46,8 +47,26 @@ router.route('/Location').post(async(req,res)=>{
     const{id}=req.body;
    if(!id) res.status(400).json({msg:"please enter the id of the location to be deleted"});
    else{ 
-    await location.deleteOne({"id":id});
-    res.send("done");
+    const loc=await location.findOne({"id":id});
+    if(loc== null) res.send("this location does not exist");
+    else{
+    if(loc.type=="Office")       
+        await StaffMember.deleteMany({"office":loc._id})  
+    else {
+       const staff= await AcademicStaff.find();
+       for(var i=0;i<staff.length;i++){
+           for(var j=0;j<staff[i].schedule.length;j++){
+               if(staff[i].schedule[j].location==loc._id){
+                   delete staff[i].schedule[j];
+                   j--;
+               }
+           }
+       }
+    }
+       await location.deleteOne({"id":id});
+       res.send("done");
+        
+    }
     }
 }catch(err){
     res.status(500).json({error:err.message});
@@ -64,7 +83,7 @@ router.route('/Location').post(async(req,res)=>{
             if(obid==null) res.status(400).json({msg: "There is no Location with this id to update"});
            else{
             if(Obid.current_capacity>maximum_capacity)
-             res.status(400).json({msg:"Cannot update the current capacity of this location is already exceeding the new maximum capacity."})
+             res.status(400).json({msg:"Cannot update the current capacity of this location is already exceeding the new maximum capacity."});
             else{
              Obid.type=type;
              if(!location.find(id)){
@@ -102,8 +121,20 @@ router.route('/Faculty').post(async(req,res)=>{
         const{name}=req.body;
         if(!name) res.status(400).json({msg:"Please insert the name of the faculty you want to delete."});
         else{
+            const fac=await faculty.findOne({"name":name});
+            if(fac==null) res.send("this faculty does not exist");
+            else{
+            await AcademicStaff.deleteMany({"faculty":fac._id});    
+            const departmentstodelete=await department.find({"faculty":fac._id});
+            //const coursestodelete= [];
+            for(var i=0;i<departmentstodelete.length;i++){
+                //coursestodelete.push(await course.find({"department":departmentstodelete[i]._id}));
+                await course.deleteMany({"department":departmentstodelete[i]._id});
+            }    
+            await department.deleteMany({"faculty":fac._id});
             await faculty.deleteOne({"name":name});
             res.send("Done");
+            }
         }
     }catch(err){
         res.status(500).json({msg:{error:err.message}})
@@ -158,8 +189,14 @@ router.route('/department').post(async(req,res)=>{
         const{name}=req.body;
         if(!name) res.status(400).json({msg:"Please insert the name of the department you want to delete."});
         else{
+            const dep= await department.findOne({"name":name});
+            if(dep==null) res.send("this department already does not exist");
+            else{
+            await course.deleteMany({"department":dep._id});
+            await AcademicStaff.deleteMany({"department":dep._id});
             await department.deleteOne({"name":name});
             res.send("done");
+            }
         }
     }catch(err){
         res.status(500).json({error:err.message});
@@ -168,23 +205,28 @@ router.route('/department').post(async(req,res)=>{
 //updating
 .put(async(req,res)=>{
     try{
-       const{oldname,name,facultyname,hod}=req.body;
+       const{oldname,name,facultyname,hodid}=req.body;
        if(!oldname||!name||!facultyname) res.status(400).json({msg:"Please fill all the fields."});
        else{
            const ob= await department.findOne({"name":oldname});
            if(ob==null) res.status(400).json("there is no department with that name.");
            else{
-               var hod1=null;
-             if(!hod) hod1=null;
-             else hod1=hod;
+               var hod1=ob.hod;
+               var messge="";
+             if(hodid) {
+                const h= await AcademicStaff.findOne({"id":hodid});
+                if(h==null)  messge="there is no Academic member with the id you entered.";
+                else
+                hod1=h._id;
+             }
              const obnew=await department.findOne({"name":name});
              if( obnew==null || name==oldname){
                 const fid=await faculty.findOne({"name":facultyname});
-                if(fid==null) res.status(400).json({msg:"No faculty with that name exists."})
+                if(fid==null) res.status(400).json({msg:(messge+"No faculty with that name exists.")})
                 else{
                 ob.name=name;
                 ob.faculty=fid._id;
-                ob.HOD=hod;
+                ob.HOD=hod1;
                 await ob.save();
                 res.send("done");
                 }
@@ -228,8 +270,19 @@ router.route('/course').post(async(req,res)=>{
        const{id}=req.body;
        if(!id)res.status(400).json({msg:"please enter the id of the course you want to delete"});
        else{
+           //assuming academic members only teach courses in their department
+           const c=await course.findOne({"id":id});
+           if(c==null) res.send("a course with this id already does not exist");
+           else{
+           const staff= await AcademicStaff.find({"department":c.department});
+           for(var i=0;i<staff.length;i++){
+               for(var j=0;j<staff[i].courses.length;j++){
+                   if(staff[i].courses[j]==c._id){ delete staff[i].courses[j]; j--; break;}
+               }
+           }
            await course.deleteOne({"id":id});
            res.send("done");
+           }
        }
     }catch(err){
         res.status(500).json({error:err.message});
@@ -298,9 +351,10 @@ router.route('/course').post(async(req,res)=>{
 const bcrypt=require('bcrypt');
 router.route('/staffmember').post(async(req,res)=>{
     try{
-       const{name,email,salary,officelocation,type,dayoff,gender}=req.body;
+       const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname}=req.body;
        if(!email||!salary||!officelocation|| !gender) res.status(400).json({msg:"please fill all the fields"});
        else{
+           var flag=false;
            const isemail=await StaffMember.findOne({"email":email});
            if(isemail==null){
             const office=await location.findOne({"id":officelocation,"type":"Office"});
@@ -323,20 +377,35 @@ router.route('/staffmember').post(async(req,res)=>{
                          var tuple=await StaffMember.findOne({"id":"hr-"+i});
                          if(tuple!=null) {sid="hr-"+(i+1); break;}
                      }}else{
-                        for(var i=num;i>=0;i--){
-                            if(i==0){
+                         if(!actype||!departmentname||!facultyname)res.status(400).json({msg:"please fill the required data fields"});
+                         else{
+                             var fac;
+                             var dep;
+                          for(var i=num;i>=0;i--){
+                             if(i==0){
                                 sid="ac-1";
                                 break;
                             }
                             var tuple=await StaffMember.findOne({"id":"ac-"+i});
                             if(tuple!=null) {sid="ac-"+(i+1); break;} 
-                        }
+                            }
+                            }
+                             dep=await department.findOne({"name":departmentname});
+                             fac=await faculty.findOne({"name":facultyname});
+                            if(dep==null||fac==null) res.status(400).json({msg:"the data you entered is incorrect"});
+                            else flag=true;
                      }
                      const salt=await bcrypt.genSalt(10);
                      const hashedPassword=await bcrypt.hash("123456",salt);
                      const toAdd=await new StaffMember({"password":hashedPassword,"newStaffMember":true,"id":sid,"email":email,"salary":salary,"name":name,"office":office._id,"staff_type":type,"dayoff":doff,"gender":gender});
-                     office.current_capacity+=1;
                      await toAdd.save();
+                     office.current_capacity+=1;
+                     await office.save();
+                     if(flag==true){
+                     const ac= await new AcademicStaff({"member":toAdd._id,"day_off":dayoff,"faculty":fac._id,"department":dep._id,"type":actype});
+                     await ac.save();
+                    }
+                    
                      res.send(message);
                  }
              }
@@ -353,8 +422,31 @@ router.route('/staffmember').post(async(req,res)=>{
         const{email}=req.body;
         if(!email) res.status(400).json({msg:"please insert the email of the staff member you want to delete"});
         else{
-          await StaffMember.deleteOne({"email":email});
-          res.send("done");
+          const person= await StaffMember.findOne({"email":email});
+          if(person==null) res.send("a person with this email already does not exist");
+          else{
+           const office=await location.findOne({"_id":person.office});
+           office.current_capacity-=1;
+           await office.save();
+           if(person. staff_type=="Academic Member"){
+            const ac=await AcademicStaff.findOne({"member":person._id});   
+            const courses=ac.courses;
+            const schedule=ac.schedule;
+            for(var i=0;i<schedule.length;i++){
+                for(var j=0;j<courses.length;j++){
+                   if(schedule[i].course==courses[j]){
+                       var c=await course.findOne({"_id":courses[j]});
+                       c.slots_covered-=1;
+                       await c.save();
+                       break;
+                   }
+                }
+            }   
+            await AcademicStaff.deleteOne({"member":ac.member});
+          }
+           await StaffMember.deleteOne({"email":email});
+           res.send("done");
+          }
         }
     }catch(err){
         res.status(500).json({error:err.message});
@@ -388,7 +480,10 @@ try{
                 else res.status(400).json({msg:"a user with this email already exists"});
             }
             //fadel hettet bcrypt dy  
-            if(password)ob.password=password
+            if(password){
+                const salt=await bcrypt.genSalt(10);
+                const hashedPassword=await bcrypt.hash(password,salt);
+                ob.password=hashedPassword;}
             if(name) ob.name=name;
             if(newStaffMember) ob.newStaffMember=newStaffMember;
             if(annualdays) ob.annualdays=annualdays;
@@ -419,7 +514,7 @@ router.route('/updatesalary').put(async(req,res)=>{
         res.status(500).json({error:err.message});
     }
 })
-//attendance record
+
 router.route('/attendance').get(async(req,res)=>{
     const email=req.body.email;
     if(!email) res.status(400).json({msg:"please insert the email of the member you need the attendance records of"});

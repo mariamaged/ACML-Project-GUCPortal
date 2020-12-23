@@ -153,3 +153,188 @@ app.listen(3000);
 // //    ,"faculty":"met"
 // //    ,"type":"Academic Member"
 // })
+
+const bcrypt=require('bcrypt');
+app.route('/staffmember').post(async(req,res)=>{
+    try{
+       const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname}=req.body;
+       if(!email||!salary||!officelocation|| !gender) res.status(400).json({msg:"please fill all the fields"});
+       else{
+           var flag=false;
+           const isemail=await StaffMember.findOne({"email":email});
+           if(isemail==null){
+            const office=await location.findOne({"id":officelocation,"type":"Office"});
+             if(office==null) res.status(400).json({msg:"there is no office in this location"});
+             else{
+                 if(office.current_capacity==office.maximum_capacity) res.status(400).json({msg:"the office in the location provided is already at maximum capacity"}); 
+                 else{
+                     var message="done";
+                     var doff=dayoff;
+                     var sid=null;
+                     if(type=="HR" && dayoff!="Saturday") {message="Saturday is automatically assigned to HR members as dayoff"; doff="Saturday";}
+                     const num=await StaffMember.countDocuments();
+                     console.log(num);
+                     if(type=='HR'){
+                     for(var i=num;i>=0;i--){
+                        if(i==0){
+                            sid="hr-1";
+                            break;
+                        }
+                         var tuple=await StaffMember.findOne({"id":"hr-"+i});
+                         if(tuple!=null) {sid="hr-"+(i+1); break;}
+                     }}else{
+                         if(!actype||!departmentname||!facultyname)res.status(400).json({msg:"please fill the required data fields"});
+                         else{
+                             var fac;
+                             var dep;
+                          for(var i=num;i>=0;i--){
+                             if(i==0){
+                                sid="ac-1";
+                                break;
+                            }
+                            var tuple=await StaffMember.findOne({"id":"ac-"+i});
+                            if(tuple!=null) {sid="ac-"+(i+1); break;} 
+                            }
+                            }
+                             dep=await department.findOne({"name":departmentname});
+                             fac=await faculty.findOne({"name":facultyname});
+                            if(dep==null||fac==null) res.status(400).json({msg:"the data you entered is incorrect"});
+                            else flag=true;
+                     }
+                     const salt=await bcrypt.genSalt(10);
+                     const hashedPassword=await bcrypt.hash("123456",salt);
+                     const toAdd=await new StaffMember({"password":hashedPassword,"newStaffMember":true,"id":sid,"email":email,"salary":salary,"name":name,"office":office._id,"staff_type":type,"dayoff":doff,"gender":gender});
+                     await toAdd.save();
+                     office.current_capacity+=1;
+                     await office.save();
+                     if(flag==true){
+                     const ac= await new AcademicStaff({"member":toAdd._id,"day_off":dayoff,"faculty":fac._id,"department":dep._id,"type":actype});
+                     await ac.save();
+                    }
+                    
+                     res.send(message);
+                 }
+             }
+           }
+           else res.status(400).json({msg:"this email is already registered"})
+       }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+.delete(async (req,res)=>{
+    try{
+        //ydeeny email wla id?
+        const{email}=req.body;
+        if(!email) res.status(400).json({msg:"please insert the email of the staff member you want to delete"});
+        else{
+          const person= await StaffMember.findOne({"email":email});
+          if(person==null) res.send("a person with this email already does not exist");
+          else{
+           const office=await location.findOne({"_id":person.office});
+           office.current_capacity-=1;
+           await office.save();
+           if(person. staff_type=="Academic Member"){
+            const ac=await AcademicStaff.findOne({"member":person._id});   
+            const courses=ac.courses;
+            const schedule=ac.schedule;
+            for(var i=0;i<schedule.length;i++){
+                for(var j=0;j<courses.length;j++){
+                   if(schedule[i].course==courses[j]){
+                       var c=await course.findOne({"_id":courses[j]});
+                       c.slots_covered-=1;
+                       await c.save();
+                       break;
+                   }
+                }
+            }   
+            await AcademicStaff.deleteOne({"member":ac.member});
+          }
+           await StaffMember.deleteOne({"email":email});
+           res.send("done");
+          }
+        }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+//bcrypt hena kaman
+.put(async(req,res)=>{
+try{
+   const{oldemail,email,name,password,office,newStaffMember,annualdays,lastupdatedannual,accidentaldaysleft,attendcompensationday}=req.body;
+   if(!oldemail) res.status(400).json({msg:"please insert the email of the staff member you want to update"});
+   else{
+       const ob=await StaffMember.findOne({"email":oldemail});
+       if(ob==null) res.status(400).json({msg:"there is no staff member with that email"});
+       else{
+            if(office){
+                const o=await location.findOne({"id":office});
+                if(o==null) res.status(400).json({msg:"there is no office in this location"});
+                else{
+                    if(o.current_capacity<o.maximum_capacity){
+                        const oldoffice=await location.findOne({"_id":ob.office});
+                        oldoffice.current_capacity-=1;
+                        ob.office=(await o)._id;
+                        o.current_capacity+=1;}
+                    else res.status(400).json({msg:"the office you provided is already at full capacity"});    
+                }
+            }
+            if(email){
+                const newob=await StaffMember.findOne({"email":email});
+                if(newob==null || email==oldemail){
+                   (await ob).email=email;}
+                else res.status(400).json({msg:"a user with this email already exists"});
+            }
+            //fadel hettet bcrypt dy  
+            if(password){
+                const salt=await bcrypt.genSalt(10);
+                const hashedPassword=await bcrypt.hash(password,salt);
+                ob.password=hashedPassword;}
+            if(name) ob.name=name;
+            if(newStaffMember) ob.newStaffMember=newStaffMember;
+            if(annualdays) ob.annualdays=annualdays;
+            if(lastupdatedannual) ob.lastupdatedannual=lastupdatedannual;
+            if(accidentaldaysleft) ob.accidentaldaysleft=accidentaldaysleft;
+            if(attendcompensationday) ob.attendcompensationday=attendcompensationday;
+            await ob.save();
+            res.send("done");
+       }
+   }
+}catch(err){
+    res.status(500).json({error:err.message});
+}
+})
+
+app.route('/updatesalary').put(async(req,res)=>{
+    try{
+       const{email,salary}=req.body;
+       if(!email||!salary) res.status(400).json({msg:"please fill all the fields"});
+       else{
+           const ob=await StaffMember.findOne({"email":email});
+           if(ob==null) res.status(400).json({msg:"a staff member with this email is not found"});
+           else (await ob).salary=salary;
+           await ob.save();
+           res.send("done");
+       }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+
+
+
+
+
+
+app.route('/attendance').get(async(req,res)=>{
+    const email=req.body.email;
+    if(!email) res.status(400).json({msg:"please insert the email of the member you need the attendance records of"});
+    else{
+        const mem= await StaffMember.findOne({"email":email});
+        if(mem==null) res.status(400).json({msg:"there is no user with this email"});
+        else
+            res.send(mem.attendance);
+    }
+})
+
+

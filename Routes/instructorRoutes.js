@@ -15,21 +15,26 @@ const SlotSchema = require('../Models/SlotSchema.js');
 //cannot test because of the login problem
 router.get('/coursecoverage',async (req,res)=>{
     try{
-       //specific courses wla kolo
+       //specific courses wla kolo??????????????????????!!!!!!!!!!!!!!!!!!!!!
        //assuming kolo
-       if(req.user.role=="Course Instructor"){
-          const inst=await AcademicStaff.findOne({"_id":req.user.id});
-          if(inst==null) res.status(400).json({msg:"Something went wrong"});
-          else{
+
+
+    //    if(req.user.role=="Course Instructor"){
+    //       const inst=await AcademicStaff.findOne({"_id":req.user.id});
+    //      if(inst==null) res.status(400).json({msg:"Something went wrong"});
+    //      else{
+        //for testing
+        const inst=AcademicStaff.findOne({"id":req.body.id});
+        //shely el fo2 da
             const courses=inst.courses;
-            var coverage= Number [courses.length];
+            var coverage= [courses.length];
             for(var i=0;i<courses.length;i++){
                var c=await course.findOne({"_id":courses[i]}); 
                coverage[i]=c.slots_covered/c.slots_needed;
             }
             res.send(coverage);
-          }
-       }else res.status(400).json({msg:"Access denied"});
+        //  }
+      // }else res.status(400).json({msg:"Access denied"});
     }catch(err){
         res.status(500).json({error:err.message});
     }
