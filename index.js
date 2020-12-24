@@ -292,6 +292,11 @@ arr[1]=newSlot2
 // const course2=await CourseModel.findById("5fe1048475f81f0470b078b5")
 // console.log(course2.name)
 
+// const user=await StaffMemberModel.findById("5fdc1c399d5e1e0b58bd1e4f")
+// const not=user.notifications
+// console.log("not= "+user)
+// const m=moment("2020-12-08T22:00:00.000+00:00").format("YYYY-MM-DD")
+// console.log(m)
 
 }//
 cr()
