@@ -64,12 +64,16 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
             const loc=(await location.findById(locID)).id
             const date=slots[i].date
             const number=slots[i].number
+            console.log("num= "+number)
+            console.log("date= "+date)
+            console.log("loc"+loc)
             console.log(moment(date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD"))
             if(loc==slotLoc && slotNum==number &&moment(date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
                 check=true
                 course=(await Course.findById(slots[i].course))
                  courseID=course.id
-                 console.log(course.name)
+                 console.log("COURSE NAME===="+course.name)
+                 console.log("check="+check)
             }
 
         }
@@ -81,11 +85,19 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
         const courseAcademic=course.academic_staff
         console.log(course.id)
 
+        if(courseAcademic.length==1){
+            return res.json("No other academic staff member who teach this course are available to send a replacement request to.")
+        }
+
         //looping on staff giving the course of replacement slot
         for(var j=0;j<courseAcademic.length;j++){
             console.log("in c1 "+courseAcademic[j])
+            console.log("courseid= "+course._id)
             const replacement=await AcademicStaffModel.findById(courseAcademic[j])
+           
             const staff= await StaffMemberModel.findById(replacement.member)
+           
+            const staffID=staff._id
             console.log("l= "+staff.name)
             
             const replacementSchedule=replacement.schedule
@@ -116,7 +128,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
            // var id=req.user.id
             console.log("teest ="+id)
             //if no such slot is found create a request for this member
-            if(check2==false){
+            if(check2==false && staffID!=id){
                 //create new request
                 console.log("checkk2 "+check2)
                 console.log("req="+id)
@@ -162,7 +174,7 @@ router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
     if(type=="HR"){
         return res.json("HR do not have replacement requests")
     }
-    if(staff_type=="HR"){
+    if(type=="HR"){
         return res.json("HR cannot submit this request.Only academic staff are permitted.")
     }
         const sent=await request.find({sentBy:req.user.id})
@@ -239,18 +251,23 @@ router.get('/receivedReplacementRequests',authenticateToken,async(req,res)=>{
 })
 
 
-router.post('/SlotLinkingRequest',authenticateToken,async(req,res)=>{
-    //input course name slot number and slot day (req.body.slotDay , req.body.slotNum,OPTIONAL req.body.reason)
+router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
+    //input course name slot number and slot day (req.body.courseID,req.body.slotDay , req.body.slotNum,OPTIONAL req.body.reason)
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
     if(type=="HR"){
         return res.json("HR are not permitted to send slot slinking requests.Only academic members are allowed.")
     }
     const courseName=await Course.findOne({id:req.body.courseID})
+    if(!courseName)
+    return res.json("No such course exists. Please enter correct course ID.")
     const courseID=courseName.id
-    const courseCoordinatorID=courseName.course_coordinator.member
-    // const courseCoordinator= await AcademicStaffModel.findById(courseCoordinatorID)
-    // const coordinatorName=courseCoordinator.
+    const courseCoordinatorID=courseName.course_coordinator
+     const courseCoordinator= await AcademicStaffModel.findById(courseCoordinatorID)
+     if(!courseCoordinator){
+         return res.json("Currently there is not an assigned course coorinator to this course send this request to.")
+     }
+    const coordinatorID=courseCoordinator.member
     
     //will compare slot timings with user schedule to make sure that he is free during this slot
     const slotNum=req.body.slotNum
@@ -270,10 +287,15 @@ router.post('/SlotLinkingRequest',authenticateToken,async(req,res)=>{
 
     //check if user teaches this course
     //const academic=await AcademicStaffModel.find({member:req.user.id})
-    const courses=academic.courses
+    const coursesIDs=academic.courses
     var teaches=false
-    for(var i=0;i<courses.length;i++){
-        if(courses[i].id==courseID)
+    console.log(coursesIDs)
+    for(var i=0;i< coursesIDs.length;i++){
+       // console.log(coursesIDs[i])
+        var courses=await Course.findById(coursesIDs[i])
+        // console.log(courses)
+        // console.log(courses.id)
+        if(courses.id==courseID)
             teaches=true
     }
     if(teaches==false)
@@ -289,7 +311,7 @@ router.post('/SlotLinkingRequest',authenticateToken,async(req,res)=>{
         slotNum:slotNum,
         courseID:courseID,
         sentBy:req.user.id,
-        sentTo:courseCoordinatorID,
+        sentTo:coordinatorID,
         state:"Pending",
         reason:reason,
         submission_date:new moment()
@@ -306,7 +328,7 @@ router.post('/SlotLinkingRequest',authenticateToken,async(req,res)=>{
     const notification=(await StaffMemberModel.findById(courseCoordinatorID)).notifications
                 const notNew=notification
                 notNew[notNew.length]="You received a new slot linking request"
-                const staffReplacement= await StaffMemberModel.findByIdAndUpdate(courseCoordinatorID,{notifications:notNew})
+                const staffReplacement= await StaffMemberModel.findByIdAndUpdate(coordinatorID,{notifications:notNew})
 
 })
 
@@ -373,7 +395,7 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
     if(type=="HR"){
-        return res.json("HR are not permitted to send slot slinking requests.Only academic members are allowed.")
+        return res.json("HR are not permitted to send this request.Only academic members are allowed.")
     }
     //get annual and accidental leave balance
     const academic=await AcademicStaffModel.findOne({member:req.user.id})
@@ -1003,11 +1025,19 @@ router.put('/acceptReplacementRequest',authenticateToken,async(req,res)=>{
     number: slotNum, 
     location: currRequest.slotLoc,
     academic_member_id:academicRep._id,
-    course: ,
+   // course: ,
     isReplaced: true
 }
 
-
+// router.get('/schedule',authenticateToken,async(req,res)=>{
+//     const academic=await AcademicStaffModel.findOne({member:req.user.id})
+//     const schedule=academic.schedule
+//     const days=new Array()
+//     const today=new moment().format("YYYY-MM-DD")
+//     for(var i=0;i<schedule.length;i++){
+//         if(moment(schedule[i].date))
+//     }
+// })
 
 
 

@@ -114,7 +114,8 @@ app.post('/addStaffMember',async(req,res)=>{
     const office2=(await location.find({id:req.body.office}))[0]._id
     const staff_type2=req.body.staff_type
     const attendance=attArr
-
+    const annual_days=req.body.annual_days
+    const gender=req.body.gender
     console.log(attArr)
     console.log(name2)
     console.log(id2)
@@ -122,7 +123,9 @@ app.post('/addStaffMember',async(req,res)=>{
     console.log(salary2)
     console.log(office2)
     console.log(staff_type2)
-    const mem=new StaffMemberModel({name:name2,id:id2,email:email2,salary:salary2,office:office2,staff_type:req.body.staff_type,attendance:attArr});
+    const mem=new StaffMemberModel({name:name2,id:id2,email:email2,salary:salary2,
+        office:office2,staff_type:req.body.staff_type,attendance:attArr,
+        annual_days:annual_days,gender:gender});
   //  res.json(mem)
        try{
     await mem.save();
@@ -166,12 +169,12 @@ app.post('/addAcademicMember',async(req,res)=>{
     
     
     const newSlot={
-        date:moment("2020-12-21"),
-        day:'Monday',
+        date:moment("2020-12-29"),
+        day:'Tuesday',
         number:1, 
         location:"5fdc1b8ea806330ca8156792",
         academic_member_id:"5fdef2fbe82dbf4a00754273",
-        course:"5fe1048475f81f0470b078b5"
+        course:"5fe0f36b1dcec73df0171cd2"
     }
     const arr=new Array()
     arr[0]=newSlot
@@ -238,30 +241,57 @@ async function  cr(){
     const loc=(await StaffMemberModel.findById("5fdf6be566837b398064cf53"))
     const loc3=loc.notifications
 //console.log(loc3)
-// const newCourse=new CourseModel({
-//         id: "csen22",
-//         name: "cs7", // Not sure if it should be required.
-//         academic_staff:["5fdf6c0a66837b398064cf54","5fdf6c7166837b398064cf55","5fdef2fbe82dbf4a00754273"],
+const newCourse=new CourseModel({
+        id: "csen33",
+        name: "cs3", // Not sure if it should be required.
+        academic_staff:["5fe4320666d23941b83c45b5"],
     
-// })
-// const user= await AcademicStaffModel.findByIdAndUpdate("5fdf6c0a66837b398064cf54",{courses:["5fe1048475f81f0470b078b5"]})
+})
+// try{
+// newCourse.save()}
+// catch(err){
+
+// }
+// const userNew=await AcademicStaffModel.findByIdAndUpdate("5fe4320666d23941b83c45b5",{courses:["5fe1048475f81f0470b078b5","5fe43f5252560d16f0580e1c"]})
+//  const user= await CourseModel.findByIdAndUpdate("5fe1048475f81f0470b078b5",{academic_staff:["5fe43858b0287c03e4f2c105",
+// "5fe4320666d23941b83c45b5","5fe432954b947a3954a1886e","5fe43342a3107c39f80fd389"]})
 //  console.log(user)
 // //5fdf6c7166837b398064cf55
 // //5fdef2fbe82dbf4a00754273
 //  await newCourse.save()
 
-// const newSlot={
-//     date:moment("2020-12-21"),
-//     day:'Monday',
-//     number:1, 
-//     location:"5fdc1b8ea806330ca8156792",
-//     academic_member_id:"5fdef2fbe82dbf4a00754273",
-//     course:"5fe1048475f81f0470b078b5"
-// }
-// const arr=new Array()
-// arr[0]=newSlot
-// const user= await AcademicStaffModel.findByIdAndUpdate("5fdf6c7166837b398064cf55",{schedule:arr})
+const newSlot1={
+    date:moment("2020-12-29"),
+    day:'Monday',
+    number:1, 
+    location:"5fdc1b8ea806330ca8156792",
+    academic_member_id:"5fe4320666d23941b83c45b5",
+    course:"5fe43f5252560d16f0580e1c"
+}
+const newSlot2={
+    date:moment("2020-12-29"),
+    day:'Tuesday',
+    number:1, 
+    location:"5fdc1b8ea806330ca8156792",
+    academic_member_id:"5fe4320666d23941b83c45b5",
+    course:"5fe1048475f81f0470b078b5"
+}
+const arr=new Array()
+arr[0]=newSlot1
+arr[1]=newSlot2
+//const user2= await AcademicStaffModel.findByIdAndUpdate("5fe4320666d23941b83c45b5",{schedule:arr})
 //  console.log(user)
+
+// const u=await AcademicStaffModel.findById("5fe4320666d23941b83c45b5")
+// const c=u.schedule
+// for(var i=0;i<c;i++)
+// console.log(c[i].day+" "+c[i].number)
+
+// const course=await CourseModel.findById("5fe43f5252560d16f0580e1c")
+// console.log(course.name)
+// const course2=await CourseModel.findById("5fe1048475f81f0470b078b5")
+// console.log(course2.name)
+
 
 }//
 cr()

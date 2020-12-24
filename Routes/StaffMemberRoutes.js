@@ -175,64 +175,71 @@ router.get('/profile',authenticateToken,async(req,res)=>{
 /////////left updating schedule,,,,,CAN WE UPDATE ISHOD AND ISCOORINDATOR AND TYPE AND DAY OFF?????-----------------------
 router.put('/updateProfile',authenticateToken,async(req,res)=>{
     
-    //.log("req.user= "+req.user)
-    const role=req.user.role
-    
     const user=await StaffMemberModel.findById(req.user.id)
+    const role=user.staff_type
     console.log("user= "+user)
     if(req.body.id)
-       return res.json("Cannot change id")
+       return res.json("Cannot change id.")
      if(req.body.name)   
-       return res.json("Cannot change name")
+       return res.json("Cannot change name.")
        if(req.body.day_off)
-       return res.json("Must make a request to change day-off")
+       return res.json("Must make a request to change day-off.")
     
     var email=''
-    var password=''
+   // var password=''
     var office=''
-    var courses=''
-    var staff_type=''
+   // var courses=''
+    //var staff_type=''
 
      //update email
-     if(req.body.email)
+     if(req.body.email){
+         const mailPresent=await StaffMemberModel.findOne({email:req.body.email})
+         if(mailPresent){
+             return res.json("This email is already registered. Please enter a new one.")
+         }
         email=req.body.email
+
+     }
       else
       email= user.email
 
       console.log("email= "+email)
     //update password
       if(req.body.password){
-      const salt=await bcrypt.genSalt();     
-      const hashedPassword=await bcrypt.hash(req.body.password,salt);
-      password=hashedPassword
+          return res.json("Cannot change password.Please make a reset pasword request.")
       }
-    else{
-        console.log("pass= "+user.password)
-        password= user.password
+    //   const salt=await bcrypt.genSalt();     
+    //   const hashedPassword=await bcrypt.hash(req.body.password,salt);
+    //   password=hashedPassword
+    //   }
+    // else{
+    //     console.log("pass= "+user.password)
+    //     password= user.password
 
-    }
+    // }
 
     //update staff typee don't know if possible
-    if(req.body.staff_type)
-        staff_type=req.body.staff_type
-    else
-        staff_type = user.staff_type
+    // if(req.body.staff_type)
+    //     staff_type=req.body.staff_type
+    // else
+    //     staff_type = user.staff_type
+    
 
-    if(req.user.role=="HR")
+    if(role=="HR")
         return  res.json(await StaffMemberModel.findByIdAndUpdate(req.user.id,{email:email,password:password,staff_type:staff_type}))
 
     else{
         if(req.body.salary) 
-            return res.json("Cannot change salary")
+            return res.json("Cannot change salary.")
         if(req.body.department) 
-           return res.json("Cannot change department")
+           return res.json("Cannot change department.")
         if(req.body.faculty) 
-            return res.json("Cannot change faculty")
+            return res.json("Cannot change faculty.")
 
-            const academicUser=AcademicStaffModel.findOne({member:req.user.id})
+        const academicUser=AcademicStaffModel.findOne({member:req.user.id})
         const academicUserID=academicUser.id
         var courses=''
-        var day_off=''
+       // var day_off=''
     //if replacing old courses
     if(req.body.courses){
          courses=new Array(req.body.courses.length)
@@ -263,7 +270,7 @@ router.put('/updateProfile',authenticateToken,async(req,res)=>{
         res.json({name:staff.name,
             id:staff.id,
             email:staff.email,
-            salay:staff.salary,
+            salary:staff.salary,
             office:(await location.findById(staff.office)).id,
             staff_type:staff.staff_type,
             day_off:academic.day_off,
@@ -967,8 +974,8 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
              m= moment(sortedUserDays[j].date).format('M')
                 while(d>currDay && m==dateMonth ){
                    const currYear=new moment().format("Y")
-                   const currDate=new moment(currYear+"-"+dateMonth+"-"+currDay).format('dddd')
-                   if(currDate!=day_off && currDate!='Friday'){
+                   var currDate=new moment(currYear+"-"+dateMonth+"-"+currDay).format('dddd')
+                   if(currDate!=day_off && currDate!='Friday' && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
                        missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+currDay).format("YYYY-MM-DD");
                         console.log("adding "+missedDays[k-1])
                     }
@@ -1001,7 +1008,9 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     //get last day present from 1st month then fill the rest according to each month's number of days
     if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
         while(lastDay<32){
-            if(lastDName!='Friday' && lastDName!=day_off){
+            //added recently
+            var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+            if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             console.log("added= "+missedDays[k-1])
             }
@@ -1012,7 +1021,9 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     }
     if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 ){
         while(lastDay<31 ){
-            if(lastDName!='Friday' && lastDName!=day_off){
+            //added recently
+            var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+            if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             }
             lastDay++;
@@ -1023,7 +1034,9 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
        if(moment(dateYear).isLeapYear() )
         {
             while(lastDay<30){
-             if(lastDName!='Friday'&& lastDName!=day_off){
+                 //added recently
+            var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+             if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
               missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             }
             lastDay++;
@@ -1032,7 +1045,9 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         }
         else {
             while(lastDay<29){
-                if(lastDName!='Friday'&& lastDName!=day_off){
+                 //added recently
+            var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
                 }
             lastDay++;
@@ -1045,7 +1060,9 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         var currDay2=1
         lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
         for(var g=1;g<=10;g++){
-            if(lastDName!='Friday'&& lastDName!=day_off){
+            //added recently
+            var currDate=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
+            if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD") ){
             missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
             }
             currDay2++
@@ -1062,11 +1079,11 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
          var d2= moment(sortedUserDays[j].date).format('D')
          var m2= moment(sortedUserDays[j].date).format('M')
              while(d2>currDay2 ){
-               
+               //RECENTLY
                 const currDate2=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
                 console.log("inside 2nd= "+currDay2+" "+currDate2)
-
-                if(currDate2!=day_off && currDate2!='Friday'){
+                //RECENTLY
+                if(currDate2!=day_off && currDate2!='Friday'&& moment(currDate2).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD") ){
                     console.log("accepted 2nd= "+currDay2+" "+currDate2)
                     missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
                 }
@@ -1085,7 +1102,9 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     
      for(last2day;last2day<=10;last2day++){
         lastDName=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("dddd");
-         if(lastDName!='Friday' && lastDName!=day_off){
+        //RECENTLY
+        const currDate2=new moment(nextYear+"-"+nextMonth+"-"+last2day).format('dddd')
+         if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
         missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("YYYY-MM-DD");
          }
         

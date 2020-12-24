@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const moment=require('moment')
 const request=require('../Models/RequestSchema.js')
-//const slotSchema = require('SlotSchema.js');
+const slotSchema = require('../Models/SlotSchema.js');
 //const attendanceSchema = require('AttendanceSchema.js');
 
 const attendanceSchema = mongoose.Schema({
@@ -22,13 +22,13 @@ const attendanceSchema = mongoose.Schema({
    accepted_leave:{type:Boolean,default:false}
 });
 
-const slotSchema = mongoose.Schema({
-    day: {type: String, required: true},
-    number: {type: Number, required: true}, 
-    location: {type: ObjectID, ref: 'Location', required: true},
-    academic_member_id: {type: ObjectID, ref: 'AcademicStaff', required: true},
-    course: {type: ObjectID, ref:'Course'}
-});
+// const slotSchema = mongoose.Schema({
+//     day: {type: String, required: true},
+//     number: {type: Number, required: true}, 
+//     location: {type: ObjectID, ref: 'Location', required: true},
+//     academic_member_id: {type: ObjectID, ref: 'AcademicStaff', required: true},
+//     course: {type: ObjectID, ref:'Course'}
+// });
 
 const monthlyHoursSchema = mongoose.Schema({
    num:{type:Number},
