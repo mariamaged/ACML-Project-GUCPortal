@@ -202,9 +202,10 @@ app.post('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
          slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc,
          sentBy: req.user.id});
 
+
     if(acceptedRequest) {
         const newAnnualRequest = new RequestModel({
-            requestType: 'Annual Leave',
+            reqType: 'Annual Leave',
             sentTo: HODStaffModel._id,
             sentBy: req.user.id,
             state: 'Pending',
@@ -228,7 +229,7 @@ app.post('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
         }
         else {
             const newAnnualRequest = new RequestModel({
-                requestType: 'Annual Leave',
+                reqType: 'Annual Leave',
                 sentTo: HODStaffModel._id,
                 sentBy: req.user.id,
                 state: 'Pending',
