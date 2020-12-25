@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const StaffMemberModel = require('../Models/StaffMemberModel.js');
 
-const RequestSchema=mongoose.Schema({
+const requestSchema=mongoose.Schema({
     requestID: {type: Number, unique: true},
    //for all requests
    reqType:{type:String},
@@ -36,7 +36,7 @@ const RequestSchema=mongoose.Schema({
 })
 
 
-RequestSchema.pre('save', function(next) {
+requestSchema.pre('save', function(next) {
     var doc = this;
     if (!doc.isNew) {
         next();
@@ -148,4 +148,4 @@ RequestSchema.pre('save', function(next) {
           );         
       }
 });
-module.exports = mongoose.model('request',RequestSchema)
+module.exports = mongoose.model('request',requestSchema)

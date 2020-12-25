@@ -17,7 +17,7 @@ var moment = require('moment');
 const request=require('../Models/RequestSchema.js')
 const slotSchema=require('../Models/SlotSchema')
 //const authenticateToken=require('../Routes/StaffMemberRoutes')
-
+const CounterModel=require('../Models/CounterModel')
 function authenticateToken(req,res,next){
     
     const token=req.header('x-auth-token');
@@ -145,7 +145,12 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                 const counterAcademic = new CounterModel({
                 _id: 'Replacement-'
                 });
+                try{
                 await counterAcademic.save();
+                }
+                catch(err){
+
+                }
                 }
                 //create new request
                 console.log("checkk2 "+check2)
@@ -174,6 +179,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                     const requ= await req.save()
                 }
                 catch(err){
+                    console.log("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
                     res.json(err)
                 }
             }
