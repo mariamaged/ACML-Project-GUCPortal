@@ -122,7 +122,7 @@ RequestSchema.pre('save', function(next) {
             }
           );
       }
-      else {
+      else if(doc.reqType == 'Accidental Leave') {
         CounterModel.findByIdAndUpdate(         // ** Method call begins **
             'AccidentalLeave-',                 // The ID to find for in counters model
             { $inc: { seq: 1 } },               // The update
@@ -135,6 +135,19 @@ RequestSchema.pre('save', function(next) {
             }
           );
       }
+      else {
+        CounterModel.findByIdAndUpdate(         // ** Method call begins **
+            'Replacement-',                 // The ID to find for in counters model
+            { $inc: { seq: 1 } },               // The update
+            { new: true, upsert: true },        // The options
+            function(error, counter) {          // The callback
+              if(error) return next(error);
+        
+              doc.id = counter._id + counter.seq ;
+              next();
+            }
+          );         
+      }
 });
 
-module.exports = mongoose.model('request', RequestSchema)
+module.exports = mongoose.model('request', RequestSchema);

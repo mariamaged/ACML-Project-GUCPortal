@@ -39,40 +39,4 @@ const StaffMemberSchema = mongoose.Schema({
     timestamps: true
 });
 
-// StaffMemberSchema.pre('save', function(next) {
-//     var doc = this;
-//     if (!doc.isNew) {
-//         next();
-//         return;
-//       }
-    
-//       if(doc.staff_type == 'Academic Member') {
-//         CounterModel.findByIdAndUpdate(         // ** Method call begins **
-//             'ac-',                              // The ID to find for in counters model
-//             { $inc: { seq: 1 } },               // The update
-//             { new: true, upsert: true },        // The options
-//             function(error, counter) {          // The callback
-//               if(error) return next(error);
-        
-//               doc.id = counter._id + counter.seq ;
-//               next();
-//             }
-//           );  
-//     }
-//     else {
-//         CounterModel.findByIdAndUpdate(          // ** Method call begins **
-//             'hr-',                               // The ID to find for in counters model
-//             { $inc: { seq: 1 } },                // The update
-//             { new: true, upsert: true },         // The options
-//             function(error, counter) {           // The callback
-//               if(error) return next(error);
-        
-//               doc.id = counter._id + counter.seq;
-//               next();
-//             }
-//           ); 
-//     }  
-
-// });
-
 module.exports = mongoose.model('Staff', StaffMemberSchema);

@@ -4,7 +4,7 @@ const slotSchema = require('./SlotSchema.js');
 
 const AcademicStaffSchema = mongoose.Schema({
     // Personal Information.
-   member: {type:ObjectID, ref:'Staff', required: true},
+    member: {type: ObjectID, ref: 'Staff', required: true},
 
     // Academic Information.
     department: {type: ObjectID, ref: 'Department', required: true}, // No academic member can change that.

@@ -550,7 +550,7 @@ app.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
             const offObject = {
                 requestType: request.reqType,
                 state: request.state,
-                submission_date: request.submission_date
+                submission_date: moment(request.submission_date).format('YYYY-MM-DD')
             };
 
             const sentByStaff = await StaffMemberModel.findById(request.sentBy);
@@ -573,7 +573,7 @@ app.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
             const leaveObject = {
                 requestType: request.reqType,
                 state: request.state,
-                submission_date: request.submission_date
+                submission_date: moment(request.submission_date).format('YYYY-MM-DD')
             };
 
             const sentByStaff = await StaffMemberModel.findById(request.sentBy);
@@ -588,19 +588,19 @@ app.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
             }
             else if(request.reqType == 'Sick Leave') {
                 leaveObject.medicalDoc = request.medicalDoc;
-                leaveObject.sickDay = request.sickDay;
+                leaveObject.sickDay = moment(request.sickDay).format('YYYY-MM-DD')
                 if(request.reason) leaveObject.reason = request.reason;
             }
             else if(request.reqType == 'Accidental Leave') {
-                leaveObject.accidentDate = request.accidentDate;
+                leaveObject.accidentDate = moment(request.accidentDate).format('YYYY-MM-DD');
                 if(request.reason) leaveObject.reason = request.reason;
             }
             else if(request.reqType == 'Compensation Leave'){
-                leaveObject.missedDate = request.missedDate;
+                leaveObject.missedDate = moment(request.missedDate).format('YYYY-MM-DD');
                 leaveObject.reason = request.reason;
             }
             else {
-                leaveObject.slotDate = request.slotDate;
+                leaveObject.slotDate = moment(request.slotDate).format('YYYY-MM-DD');
                 leaveObject.slotNum = request.slotNum;
                 leaveObject.slotLoc = request.slotLoc;
 
@@ -704,7 +704,7 @@ app.post('/acceptRequest', async (req, res) => {
             const replacementAcademic = await AcademicStaffModel.findOne({member: request.replacementStaff});
             const slotLocation = await Location.findOne({id: request.slotLoc});
 
-            request.state = accepted;
+            request.state = 'Accepted';
 
             var position = -1.
             sentByAcademic.schedule.some(function(assignedSlot, ind) {
