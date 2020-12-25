@@ -8,7 +8,7 @@ const HRSchema = mongoose.Schema({
     // Login Information.
     
     // Attendance Information.
-    day_off: {type: String, enum: ['Saturday']}, // No HR member can change that.
+    day_off: {type: String, default:"Saturday",enum: ['Saturday']}, // No HR member can change that.
 },
 
 {

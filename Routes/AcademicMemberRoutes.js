@@ -100,18 +100,18 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
 
         //looping on staff giving the course of replacement slot
         for(var j=0;j<courseAcademic.length;j++){
-            console.log("in c1 "+courseAcademic[j])
-            console.log("courseid= "+course._id)
-            console.log("ca= "+courseAcademic[j])
+            // console.log("in c1 "+courseAcademic[j])
+            // console.log("courseid= "+course._id)
+            // console.log("ca= "+courseAcademic[j])
             const replacement=await AcademicStaffModel.findById(courseAcademic[j])
-           console.log('bslsbizo= '+replacement)
+          // console.log('bslsbizo= '+replacement)
             const staff= await StaffMemberModel.findById(replacement.member)
            
             const staffID=staff._id
             console.log("l= "+staff.name)
             
             const replacementSchedule=replacement.schedule
-            console.log("rep "+replacement.schedule)
+            //console.log("rep "+replacement.schedule)
             var check2=false;
 
             //looping on schedule of each member
@@ -140,22 +140,24 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
             //if no such slot is found create a request for this member
             if(check2==false && staffID!=id){
 
-                const doc = await CounterModel.findById('Replacement-');
-                if(!doc) {
-                const counterAcademic = new CounterModel({
-                _id: 'Replacement-'
-                });
-                try{
-                await counterAcademic.save();
-                }
-                catch(err){
-
-                }
-                }
+                // const doc = await CounterModel.findById('Replacement-');
+                // if(!doc) {
+                //     console.log("NOTTTTTTTTTTTTTTTTTT DOCCCCCCCCCC")
+                // const counterAcademic = new CounterModel({
+                // _id: 'Replacement-'
+                // });
+                // try{
+                // await counterAcademic.save();
+                // console.log("successsssssssssssssssssss")
+                // }
+                // catch(err){
+                //         console.log("errooooooooooooooooooooooooooooooooor")
+                // }
+                //}
                 //create new request
                 console.log("checkk2 "+check2)
                 console.log("req="+id)
-                var req=new request({
+                var newRequest=new request({
                     reqType:"Replacement",
                     slotDate:slotDate,
                     slotNum:slotNum,
@@ -170,17 +172,17 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                 const notNew=notification
                 notNew[notNew.length]="You received a new replacement request"
                 const staffReplacement= await StaffMemberModel.findByIdAndUpdate(replacement.member,{notifications:notNew})
-                
+                console.log("new req=========="+newRequest)
 
                 //post request in requests table with sent to added
                 try{
                     console.log("saved")
                     checkFin=true
-                    const requ= await req.save()
+                    const requ= await newRequest.save()
                 }
                 catch(err){
                     console.log("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-                    res.json(err)
+                   return res.json("Cannot save new request")
                 }
             }
 
@@ -334,7 +336,7 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     var reason=''
     if(req.body.reason)
     reason=req.body.reason
-    var req=new request({
+    var newRequest=new request({
         reqType:"Slot Linking",
         slotDay:slotDay,
         slotNum:slotNum,
@@ -347,7 +349,7 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     })
     try{
     res.json("Request successfully submitted.")    
-    await req.save()
+    await newRequest.save()
     }
     catch(err){
         res.json(err)
@@ -410,7 +412,7 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
     if(req.body.reason)
     reason=req.body.reason
 
-    var req=new request({
+    var newRequest=new request({
         reqType:"Change Day off",
         newDayOff:req.body.newDayOff,
         sentBy:req.user.id,
@@ -421,7 +423,7 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
     })
     try{
      res.json("Request successfully submitted.")
-    await req.save()
+    await newRequest.save()
     }
     catch(err){
         res.json(err)
@@ -480,7 +482,7 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
   
 
     //create request
-    var req=new request({
+    var newRequest=new request({
         reqType:"Accidental Leave",
         accidentDate:accidentDate,
         sentBy:req.user.id,
@@ -490,7 +492,7 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
         submission_date:new moment().format("YYYY-MM-DD").toString()
     })
     try{
-    await req.save()
+    await newRequest.save()
     res.json("Request successfully submitted.")
     }
     catch(err){
@@ -550,7 +552,7 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
     var reason=''
     if(req.body.reason)
     reason=req.body.reason
-        var req=new request({
+        var newRequest=new request({
             reqType:"Sick Leave",
             sickDay:moment(sickDay),
             sentBy:req.user.id,
@@ -561,7 +563,7 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
             submission_date:new moment().format("YYYY-MM-DD").toString()
         })
         try{
-        await req.save()
+        await newRequest.save()
         res.json("Request successfully submitted.")
         }
         catch(err){
@@ -619,7 +621,7 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
          var reason=''
          if(req.body.reason)
          reason=req.body.reason
-         var req=new request({
+         var newRequest=new request({
             reqType:"Maternity Leave",
             sentBy:req.user.id,
             sentTo:hodAcademic.member,
@@ -629,7 +631,7 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
             submission_date:new moment().format("YYYY-MM-DD").toString()
         })
         try{
-        await req.save()
+        await newRequest.save()
         res.json("Request successfully submitted.")
         }
         catch(err){
@@ -695,7 +697,7 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     //  if(req.body.reason)
     //  reason=req.body.reason
 
-     var req=new request({
+     var newRequest=new request({
         reqType:"Compensation Leave",
         sentBy:req.user.id,
         sentTo:hodAcademic.member,
@@ -705,7 +707,7 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
         submission_date:new moment().format("YYYY-MM-DD").toString()
     })
     try{
-    await req.save()
+    await newRequest.save()
     res.json("Request successfully submitted.")
     }
     catch(err){

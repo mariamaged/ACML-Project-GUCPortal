@@ -18,7 +18,8 @@ const attendanceSchema=StaffMemberModel.attendanceSchema
 const moment=require('moment')
 const slot=require('./Models/SlotSchema.js')
 const request=require('./Models/RequestSchema.js')
-
+const jwt = require('jsonwebtoken');
+const bcrypt=require('bcrypt');
 //----------------------------------------------
 require('dotenv').config()
 
@@ -312,6 +313,11 @@ const t=moment("2020-12-29").format("YYYY-MM-DD hh:mm:ss A")
 const currRequest=await request.find({reqType:"Replacement",submission_date:"2020-12-25",slotDate:t
    , slotNum:1,slotLoc:"c7.101",sentBy:"5fe5a6b1e6bee81f985e560f",sentTo:"5fe5a7a929927c4a44f65004"})
    console.log("curr= "+currRequest)
+
+
+   const salt=await bcrypt.genSalt();     
+        const hashedPassword=await bcrypt.hash("123456",salt);
+        console.log("hashed pass= "+hashedPassword)
 }//
 cr()
 

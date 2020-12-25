@@ -20,13 +20,23 @@ function authenticateToken(req,res,next){
     
     const token=req.header('x-auth-token');
     if(!token){
-    return res.sendStatus(401).status('Access deined please log in first')
-    
+    return res.sendStatus(401).status('Access deined please log in first.')
     }
-    const verified= jwt.verify(token, process.env.TOKEN_SECRET)
-    req.user=verified
-    console.log("in auth "+req.user)
-    next();
+    // const verified= jwt.verify(token, process.env.TOKEN_SECRET)
+    // if(!verified){
+    //     return res.json("Token is unauthorized.")
+    // }
+    // req.user=verified
+    // console.log("in auth "+req.user)
+    // next();
+    try{
+        const verified= jwt.verify(token, process.env.TOKEN_SECRET)
+        req.user= verified
+        next()
+    }
+    catch(err){
+        res.status(400).send('Invalid Request.')
+    }
 }
 module.exports=authenticateToken
 //login
@@ -35,14 +45,14 @@ router.post('/login',async(req,res,next)=>{
     try{
         const{email,password}=req.body;
         if(!email ){
-            return res.status(400).json("Please enter valid email ");
+            return res.status(400).json("Please enter a valid email. ");
         }
         if(!password)
-        return res.status(400).json("Please enter valid  password");
+        return res.status(400).json("Please enter a valid  password.");
 
         const existingUser=await StaffMemberModel.findOne({email:email})
         if(!existingUser){
-            return res.status(400).json({msg:"This user is not registered"});
+            return res.status(400).json({msg:"This user is not registered."});
         }
         else{
             //user first login original pass='123456'
@@ -52,17 +62,17 @@ router.post('/login',async(req,res,next)=>{
             
             
             const isMatched=await bcrypt.compare(password,existingUser.password);       //comparing password entered text with password of the user we got from the database            
-            if(existingUser.newStaffMember===false && isMatched===false){
-                 return res.status(400).json({msg:"Please enter correct password"});
+            if( isMatched===false){
+                 return res.status(400).json({error:"Please enter correct password."});
              }
              
              else if(existingUser.staff_type=="HR"){
                 const token=await jwt.sign({id:existingUser._id,role:existingUser.staff_type,academic_role:'',isHead:false,isCoordinator:false},process.env.TOKEN_SECRET);
                // res.header('auth-token', token).send(token);
                if(existingUser.newStaffMember===true){
-                return res.status(500).json({error:"Please enter new password ",token:token})
+                return res.status(500).json({message:"Please enter new password.",token:token})
                 }
-             return  res.json({token,existingUser});
+             return  res.json({token,msg:"User logged in successfully"});
             }
             else{
                 
@@ -71,9 +81,9 @@ router.post('/login',async(req,res,next)=>{
                 const token=await jwt.sign({id:existingUser._id,role:existingUser.staff_type,academic_role:user.type,isHead:user.isHOD,isCoordinator:user.isCoordinator},process.env.TOKEN_SECRET);
                // res.header('auth-token', token).send(token);
                if(existingUser.newStaffMember===true){
-                return  res.status(500).json({err:"Please enter new password ",token:token})
+                return  res.status(500).json({message:"Please enter new password.",token:token})
             }
-            return  (res.json({token}));
+            return  (res.json({token,msg:"User logged in successfully"}));
 
          }
         
@@ -92,8 +102,13 @@ router.put('/enterNewPass',authenticateToken,async(req,res)=>{
     const passNew=req.body.newPassword;
     const passCheck=req.body.passCheck;
     const user=await StaffMemberModel.findById(req.user.id)
+    if(!passNew)
+    return res.json("Please enter a valid password.")
+    if(!passCheck){
+        return res.json("Please enter the password check.")
+    }
     if(passNew!=passCheck){
-        return res.status(400).json({msg:"Passwords should match"});
+        return res.status(400).json({msg:"Passwords should match."});
     }
     else{
         console.log("in else")
@@ -103,10 +118,10 @@ router.put('/enterNewPass',authenticateToken,async(req,res)=>{
         console.log("hashed pass= "+hashedPassword)
         try{
       await  StaffMemberModel.findByIdAndUpdate(req.user.id,{password:hashedPassword,newStaffMember:false})
-      return  res.json( await StaffMemberModel.findById(req.user.id))
+      return  res.json("Password changed successfully.")
         }
         catch(err){
-           return res.json(err)
+           return res.json("Error. Please try again")
         }
       
     }
@@ -128,15 +143,22 @@ router.put('/enterNewPass',authenticateToken,async(req,res)=>{
 
 router.get('/profile',authenticateToken,async(req,res)=>{
     console.log("in profile")
-    const role=req.user.role
+    const staff=await StaffMemberModel.findById(req.user.id)
+    const role=staff.staff_type
     if(role=='HR'){
         const staff=await StaffMemberModel.findById(req.user.id);
         const HR=await HRModel.findOne({member:req.user.id})
+        const office=(await location.findById(staff.office))
+        var off=""
+        if(!office)
+        off=""
+        else
+        off=office.id
         res.json({name:staff.name,
             id:staff.id,
             email:staff.email,
-            salay:staff.salary,
-            office:(await location.findById(staff.office)).id,
+           // salay:staff.salary,
+            office:off,
             staff_type:staff.staff_type,
             day_off:HR.day_off
         })
@@ -144,28 +166,50 @@ router.get('/profile',authenticateToken,async(req,res)=>{
     else{
         const staff=await StaffMemberModel.findById(req.user.id);
         const academic=await AcademicStaffModel.findOne({member:req.user.id})
-      const courses= (await Course.findById(academic.courses))
-      var arr=new Array()
-      if(courses){
-      for(var i=0;i<courses.length;i++)
-            arr[i]=courses[i].name
-      }
+    //   const courses= (await Course.findById(academic.courses))
+    //   var arr=new Array()
+    //   if(courses){
+    //   for(var i=0;i<courses.length;i++)
+    //         arr[i]=courses[i].name
+    //   }
+        const dep=(await department.findById(academic.department))
+        var depName=""
+        if(!dep)
+        depName=""
+        else
+        depName=dep.name
+     
+        const fac=(await faculty.findById(academic.faculty))
+        var facName=""
+        if(!fac)
+        facName=""
+        else
+        facName=fac.name
+
+        const loc=(await location.findById(staff.office))
+        var locName=""
+        if(!loc)
+        locName=""
+        else
+        locName=loc.id
+        
+
         res.json({name:staff.name,
             id:staff.id,
             email:staff.email,
-            salay:staff.salary,
+            // salary:staff.salary,
             office:(await location.findById(staff.office)).id,
             staff_type:staff.staff_type,
             day_off:academic.day_off,
-            department:(await department.findById(academic.department)).name, 
-            faculty:(await faculty.findById(academic.faculty)).name, 
-            courses:arr,
+            department:depName, 
+            faculty:facName, 
+            //courses:arr,
 
           /////SCHEDULEEEEEEEE
     
-            type:academic.type,
-            isHeadOfDepartment:academic.isHOD,
-            isCourseCoordinator:academic.isCourseCoordinator,
+            type:academic.type
+            //, isHeadOfDepartment:academic.isHOD,
+            // isCourseCoordinator:academic.isCourseCoordinator,
         })
         
     }
@@ -186,10 +230,7 @@ router.put('/updateProfile',authenticateToken,async(req,res)=>{
        return res.json("Must make a request to change day-off.")
     
     var email=''
-   // var password=''
     var office=''
-   // var courses=''
-    //var staff_type=''
 
      //update email
      if(req.body.email){
@@ -208,26 +249,14 @@ router.put('/updateProfile',authenticateToken,async(req,res)=>{
       if(req.body.password){
           return res.json("Cannot change password.Please make a reset pasword request.")
       }
-    //   const salt=await bcrypt.genSalt();     
-    //   const hashedPassword=await bcrypt.hash(req.body.password,salt);
-    //   password=hashedPassword
-    //   }
-    // else{
-    //     console.log("pass= "+user.password)
-    //     password= user.password
-
-    // }
-
-    //update staff typee don't know if possible
-    // if(req.body.staff_type)
-    //     staff_type=req.body.staff_type
-    // else
-    //     staff_type = user.staff_type
     
 
-    if(role=="HR")
-        return  res.json(await StaffMemberModel.findByIdAndUpdate(req.user.id,{email:email,password:password,staff_type:staff_type}))
+    
 
+    if(role=="HR"){
+         (await StaffMemberModel.findByIdAndUpdate(req.user.id,{email:email}))
+         return res.json("Profile updated successfully.")
+    }
     else{
         if(req.body.salary) 
             return res.json("Cannot change salary.")
@@ -236,54 +265,26 @@ router.put('/updateProfile',authenticateToken,async(req,res)=>{
         if(req.body.faculty) 
             return res.json("Cannot change faculty.")
 
-        const academicUser=AcademicStaffModel.findOne({member:req.user.id})
-        const academicUserID=academicUser.id
-        var courses=''
-       // var day_off=''
-    //if replacing old courses
-    if(req.body.courses){
-         courses=new Array(req.body.courses.length)
-        for(var i=0;i<req.body.courses.length;i++){
-            courses[i]=Course.findOne({id:req.body.courses[i]})
+        // const academicUser=AcademicStaffModel.findOne({member:req.user.id})
+        // const academicUserID=academicUser.id
+       
+   // var off=""
+    var offID=""
+        if(req.body.office){
+           const off=await location.findOne({id:req.body.office})
+            console.log("offfffffffffff="+off)
+            if(!off)
+            return res.json("This office does not exist.Please enter a valid office ID.")
+            offID=off._id
         }
-    }
-    else
-        courses=academicUser.courses
-
-    //update day-off
-    // if(req.body.day_off)
-    //     day_off=req.body.day_off
-    // else
-    //     day_off=academicUser.day_off         
+        else{
+            offID=user.office
+        }
+        
     
-   const staff1= (await StaffMemberModel.findByIdAndUpdate(req.user.id,{email:email,password:password,staff_type:staff_type}))
-    const academic1=(await AcademicStaffModel.findOneAndUpdate({id:academicUserID},{courses:courses}))
-    //I had to do it on 2 steps otherwise old results were produced
-     const staff=await StaffMemberModel.findById(req.user.id);
-    const academic=await AcademicStaffModel.findOne({member:req.user.id})
-      const coursesNew= (await Course.findById(academic.courses))
-      var arr=new Array()
-      if(coursesNew){
-      for(var i=0;i<coursesNew.length;i++)
-            arr[i]=coursesNew[i].name
-      }
-        res.json({name:staff.name,
-            id:staff.id,
-            email:staff.email,
-            salary:staff.salary,
-            office:(await location.findById(staff.office)).id,
-            staff_type:staff.staff_type,
-            day_off:academic.day_off,
-            department:(await department.findById(academic.department)).name, 
-            faculty:(await faculty.findById(academic.faculty)).name, 
-            courses:arr,
-
-          /////SCHEDULEEEEEEEE
-    
-            type:academic.type,
-            isHeadOfDepartment:academic.isHOD,
-            isCourseCoordinator:academic.isCourseCoordinator,
-        })
+   const staff1= (await StaffMemberModel.findByIdAndUpdate(req.user.id,{email:email,office:offID}))
+  
+        res.json("Profile updated successfully")
         
 }
 })
