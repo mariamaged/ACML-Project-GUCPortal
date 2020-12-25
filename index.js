@@ -17,7 +17,7 @@ const CourseModel = require('./Models/CourseModel');
 const attendanceSchema=StaffMemberModel.attendanceSchema
 const moment=require('moment')
 const slot=require('./Models/SlotSchema.js')
-
+const request=require('./Models/RequestSchema.js')
 
 //----------------------------------------------
 require('dotenv').config()
@@ -297,6 +297,12 @@ arr[1]=newSlot2
 // console.log("not= "+user)
 // const m=moment("2020-12-08T22:00:00.000+00:00").format("YYYY-MM-DD")
 // console.log(m)
+  
+// const sent=await request.find({sentBy:"5fdc1c399d5e1e0b58bd1e4f"})
+// if(sent.length==0){
+//     return console.log("There are no submitted requests to display.")
+// }
+// console.log()
 
 }//
 cr()
