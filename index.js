@@ -170,11 +170,11 @@ app.post('/addAcademicMember',async(req,res)=>{
     
     const newSlot={
         date:moment("2020-12-29"),
-        day:'Tuesday',
+        day:'Monday',
         number:1, 
         location:"5fdc1b8ea806330ca8156792",
         academic_member_id:"5fdef2fbe82dbf4a00754273",
-        course:"5fe0f36b1dcec73df0171cd2"
+        course:"5fe5a6df1a5d472ebc798dae"
     }
     const arr=new Array()
     arr[0]=newSlot
@@ -242,9 +242,9 @@ async function  cr(){
     const loc3=loc.notifications
 //console.log(loc3)
 const newCourse=new CourseModel({
-        id: "csen33",
-        name: "cs3", // Not sure if it should be required.
-        academic_staff:["5fe4320666d23941b83c45b5"],
+        id: "csen44",
+        name: "cs4", // Not sure if it should be required.
+       // academic_staff:["5fe4320666d23941b83c45b5"],
     
 })
 // try{
@@ -252,8 +252,8 @@ const newCourse=new CourseModel({
 // catch(err){
 
 // }
-// const userNew=await AcademicStaffModel.findByIdAndUpdate("5fe4320666d23941b83c45b5",{courses:["5fe1048475f81f0470b078b5","5fe43f5252560d16f0580e1c"]})
-//  const user= await CourseModel.findByIdAndUpdate("5fe1048475f81f0470b078b5",{academic_staff:["5fe43858b0287c03e4f2c105",
+ //const userNew=await CourseModel.findByIdAndUpdate("5fe5a6df1a5d472ebc798dae",{academic_staff:["5fe5a729b0c2c8365c564dea","5fe5a7643f109c481cbecdde","5fe5a79029927c4a44f64ffd","5fe5a7ba85423b3948f23b97"]})
+//  const user= await CourseModel.findByIdAndUpdate("5fe5a6df1a5d472ebc798dae",{academic_staff:["5fe43858b0287c03e4f2c105",
 // "5fe4320666d23941b83c45b5","5fe432954b947a3954a1886e","5fe43342a3107c39f80fd389"]})
 //  console.log(user)
 // //5fdf6c7166837b398064cf55
@@ -304,10 +304,14 @@ arr[1]=newSlot2
 // }
 // console.log()
 //console.log(moment("2020-12-24T18:56:07.808+00:00").format("YYYY-MM-DD"))
-const check=("2020-12-25T00:00:00.000+00:00"==moment("2020-12-25"))
-// console.log(new moment().format().toString())
-// console.log(moment("2020-12-25").format.toString())
+// const check=("2020-12-25T00:00:00.000+00:00"==moment("2020-12-25"))
+// // console.log(new moment().format().toString())
+//  console.log(moment("2020-12-28T22:00:00.000+00:00").format("YYYY-MM-DD"))
 // console.log(check)
+const t=moment("2020-12-29").format("YYYY-MM-DD hh:mm:ss A")
+const currRequest=await request.find({reqType:"Replacement",submission_date:"2020-12-25",slotDate:t
+   , slotNum:1,slotLoc:"c7.101",sentBy:"5fe5a6b1e6bee81f985e560f",sentTo:"5fe5a7a929927c4a44f65004"})
+   console.log("curr= "+currRequest)
 }//
 cr()
 
