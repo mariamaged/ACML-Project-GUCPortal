@@ -11,6 +11,41 @@ const course=require('../Models/CourseModel');
 const jwt=require('jsonwebtoken');
 const SlotSchema = require('../Models/SlotSchema.js');
 
+
+
+function authenticateToken(req,res,next){
+    
+    const token=req.header('x-auth-token');
+    if(!token){
+    return res.sendStatus(401).status('Access deined please log in first.')
+    }
+    // const verified= jwt.verify(token, process.env.TOKEN_SECRET)
+    // if(!verified){
+    //     return res.json("Token is unauthorized.")
+    // }
+    // req.user=verified
+    // console.log("in auth "+req.user)
+    // next();
+    try{
+        const verified= jwt.verify(token, process.env.TOKEN_SECRET)
+        req.user= verified
+        next()
+    }
+    catch(err){
+        res.status(400).send('Invalid Request.')
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 //course coverage
 //cannot test because of the login problem
 router.get('/coursecoverage',async (req,res)=>{
@@ -47,13 +82,39 @@ router.get('/coursecoverage',async (req,res)=>{
 })
 
 //slots assignment
-router.get('/slotsAssignment',async (req,res)=>{
+router.get('/slotsAssignmentpersemester',async (req,res)=>{
     try{
        if(req.user.role=="Course Instructor"){
         const inst=await AcademicStaff.findOne({"_id":req.user.id});
         if(inst==null) res.status(400).json({msg:"Something went wrong"});
         else{
           const courses=inst.courses;
+          var assignments= [courses.length]; 
+          for(var i=0;i<courses.length;i++){
+            var c= await course.findOne({"_id":courses[i]}); 
+            assignments[i]={"course id":c.id,"schedule": c.schedule};           
+         }
+         res.send(assignments);
+        }
+       }
+       else res.status(400).json({msg:"Access denied"});
+    }catch(err){ 
+        res.status(500).json({error:err.message});}
+})
+
+
+
+//slots assignment
+router.get('/slotsAssignmentperweek',async (req,res)=>{
+    try{
+       if(req.user.role=="Course Instructor"){
+        const instr=await StaffMember.findOne({"id":req.user.id});
+        if(instr==null) res.status(400).json({msg:"Something went wrong"});
+        else{
+            const inst=await AcademicStaff.findOne({"member":instr._id});
+            if(inst==null) res.status(400).json({msg:"Something went wrong"});
+            else{
+           const courses=inst.courses;
           var assignments= [courses.length]; 
           for(var i=0;i<courses.length;i++){
             var c= await course.findOne({"_id":courses[i]}); 
@@ -84,11 +145,12 @@ router.get('/slotsAssignment',async (req,res)=>{
          }
          return res.status(200).json(assignments);
         }
-       }
+       }}
        else res.status(400).json({msg:"Access denied"});
     }catch(err){ 
         res.status(500).json({error:err.message});}
 })
+
 
 
 
@@ -119,7 +181,7 @@ router.get('/staffperdepartment',async (req,res)=>{
             //   const dep= await department.findOne({"name":departmentname});
             const departmentid=inst.department;
             const dep= await department.findOne({"_id":departmentid});
-            if(dep==null) res.status(400).json({msg:"the department name you entered is incorrect"});
+            if(dep==null) res.status(400).json({msg:"the department name is incorrect"});
             else{ 
                const staff= await AcademicStaff.find({"department":dep._id});
                var s=[];
@@ -203,7 +265,7 @@ router.get('/staffpercourse',async(req,res)=>{
 })
 
 //assigntounassignedSlot
-router.route('/Assignment').post(async(req,res)=>{
+router.route('/Assignment').put(async(req,res)=>{
     try{
      if(req.user.role=="Course Instructor"){
          const instr=await StaffMember.findOne({"_id":req.user.id});
@@ -248,9 +310,6 @@ router.route('/Assignment').post(async(req,res)=>{
                      for(var i=0;i<mem.courses.length;i++){
                          if(mem.courses[i]==thecourse._id){duplicate=true; break;}
                      }
-                     //keda sah wla ahoto fe object??
-                     if(!duplicate) mem.courses.push(thecourse._id);
-                     mem.schedule.push({"day":day,"number":number,"location":loc._id,"academic_member_id":mem._id,"course":thecourse._id});
                      var slotbelongs=false;
                    for(var i=0;i<thecourse.schedule.length;i++){
                      if(thecourse.schedule[i].day==day && thecourse.schedule[i].number==number && ((String)(thecourse.schedule[i].location))==((String)(loc._id))){
@@ -261,6 +320,9 @@ router.route('/Assignment').post(async(req,res)=>{
                       }
                      }
                      if(slotbelongs){
+                      //keda sah wla ahoto fe object??
+                     if(!duplicate) mem.courses.push(thecourse._id);
+                     mem.schedule.push({"day":day,"number":number,"location":loc._id,"academic_member_id":mem._id,"course":thecourse._id});
                      duplicate=false;
                    for(var i=0;i<thecourse.academic_staff.length;i++){
                      if(thecourse.academic_staff[i]==mem._id){duplicate=true; break;}
@@ -326,7 +388,7 @@ router.put('/assigncoordinator',async (req,res)=>{
                            for(var i=0;i<courses.length;i++){
                                if(thecourse._id==courses[i]){assigned=true; break;}
                            }
-                           //if(assigned){
+                           if(assigned){
                                //make sure the coordinater is a teaching assistant of this course
                                var coassigned=false;
                                const cocourses= thecoordinator.courses;
@@ -334,13 +396,14 @@ router.put('/assigncoordinator',async (req,res)=>{
                                    if(((String)(thecourse._id))==((String)(cocourses[i]))){coassigned=true; break;}
                                }
                                if(coassigned){
-                                  thecoordinator.isCourseCoordinator=true;
+                                  if(thecourse.course_coordinator!=null) { const oldcoordinater=await AcademicStaff.findOne({"_id":thecourse.course_coordinator}); oldcoordinater.isCourseCoordinator=false; await oldcoordinater.save();}
                                   thecourse. course_coordinator=thecoordinator._id;
+                                  thecoordinator.isCourseCoordinator=true;
                                   await thecoordinator.save();
                                   await thecourse.save();
                                   res.send("done");
                                }else res.status(400).json({msg:"the staffmember you entered is not assigned to this course"});
-                           //}else res.status(400).json({msg:"your not assigned to this course."});
+                           }else res.status(400).json({msg:"your not assigned to this course."});
                        }
                     }
                    }                  

@@ -535,8 +535,9 @@ router.route('/staffmember').post(async(req,res)=>{
           if(person==null) res.send("a person with this email already does not exist");
           else{
            const office=await location.findOne({"_id":person.office});
+           if(Office!=null){
            office.current_capacity-=1;
-           await office.save();
+           await office.save();}
            if(person.staff_type=="Academic Member"){
             const ac=await AcademicStaff.findOne({"member":person._id});   
             const courses=ac.courses;
@@ -560,13 +561,13 @@ router.route('/staffmember').post(async(req,res)=>{
 
                 //remove from each slot assigned to the member
                 for(var j=0;j<thec.schedule.length;j++){
-                    if(((String)(thec.schedule[j].academic_member_id))==((String)(ac._id))){ thec.schedule[j].academic_member_id=null;}
+                    if(((String)(thec.schedule[j].academic_member_id))==((String)(ac._id))){ thec.schedule[j].academic_member_id=null;  thec.slots_covered-=1;}
                 }
-                thec.slots_covered-=1;
+               
                 await thec.save();
             }   
             await AcademicStaff.deleteOne({"member":ac.member});
-          }
+          }else await HR.deleteOne({"member":person._id});
            await StaffMember.deleteOne({"email":email});
            res.send("done");
           }
@@ -1045,14 +1046,14 @@ function compare( a, b ) {
 
 
 
-router.post('/addrecord',async(req,res)=>{
+router.put('/addrecord',async(req,res)=>{
     try{
         //to authorize
     if(req.user.role!='HR')
     res.status(401).send('Access Denied');
     else{
        const{userid,thedate,signintime,signouttime}=req.body;
-       if(!userid) res.status(400).json({msg:"please insert your id"});
+       if(!userid || !thedate) res.status(400).json({msg:"please fill the required fields"});
        else{
            if(userid==req.user.id)
               res.status(400).json({msg:"Cannot add record to this user"});
