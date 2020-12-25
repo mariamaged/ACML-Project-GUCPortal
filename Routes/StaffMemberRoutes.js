@@ -347,7 +347,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
        var last_signOut=0
        var day="Saturday";
        var signedOut=true;
-       var signins=[]
+       var newSignins=[]
        var signinsTemp=[]
         var idx=-1;
         var attArr=new Array()
@@ -385,8 +385,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                newSigninsTemp[attendance[i].signins.length]=SignInTime
             //    console.log("1111111111111111111111111111111111111="+newSignins[0])
             //    console.log("2222222222222222222222222222222222222="+newSignins[1])
-               signins=newSigninsTemp
-            //    console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
+               newSignins=newSigninsTemp
+                console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
                 //const signins=
                 
             }
@@ -397,7 +397,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
         }
         //found today's record will update it then insert it into attendance array
         if(check===true){
-            console.log("SIGNINSSSSSSSSSSS INSIDEEEEE=" +signins)
+            // console.log("SIGNINSSSSSSSSSSS INSIDEEEEE=" +signins)
             const newAtt=new AttendanceSchema({
                 date:date,
                 time:time,
@@ -410,7 +410,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_calculated_signOut:last_signIn,
                 day:day,
                 dayOffBool:dayOffBool,
-                signins:signins
+                signins:newSignins
             })
             console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newAtt)
             attArr[idx]=newAtt
@@ -426,7 +426,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const dayoff=user.attendance[idx].dayOffBool
           //  console.log("signed in true= "+signedInToday)
             return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
-           hours:hour,minutes:minute,signins:signins})
+           hours:hour,minutes:minute,signins:up.attendance})
            //return res.json("Succesfully signed in")
         }
     }
@@ -442,7 +442,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            }
            else
            var dayOffBool=false
-           console.log("at 2nd"+signins)
+        //    console.log("at 2nd"+signins)
            console.log("dayofBool at signin= "+dayOffBool)
             const newAttendance=new AttendanceSchema({
                 date:newSignInDate,
@@ -456,7 +456,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_signOut,
                 day,
                 dayOffBool:dayOffBool,
-                signins:signins
+                signins:[SignInTime]
             })
             console.log("SignIn= "+SignIn)
             console.log("newAttendance "+newAttendance)
@@ -471,7 +471,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const signedInToday=userNow.attendance[attendance.length-1].signedIn
             console.log("att= "+(moment(att).format("HH:mm")))
             return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),
-            last_signIn:(moment(att).format("HH:mm")),signins:signins
+            last_signIn:(moment(att).format("HH:mm")),signins:[SigninTime]
             })
           //  return res.json("Succesfully signed in")
         }

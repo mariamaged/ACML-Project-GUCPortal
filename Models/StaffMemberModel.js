@@ -9,8 +9,8 @@ const attendanceSchema = mongoose.Schema({
     date: {type: Date}
     ,time:{type:Date}
     ,dayOffBool:{type:Boolean ,default:false}
-    ,signins:{type:[String]},
-    signouts:{type:[String]}
+    ,signins:{type:[String],default:[]},
+    signouts:{type:[String],default:[]}
     //var datetime = new Date();
     //console.log(datetime.toISOString().slice(0,10)); ----->2020-12-18,
     ,attended:{type:Boolean, default:true},
