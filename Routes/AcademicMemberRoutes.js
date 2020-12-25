@@ -149,7 +149,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                     sentBy:id,
                     sentTo:replacement.member,
                     state:"Pending",
-                    submission_date:new moment()
+                    submission_date:new moment().format("YYYY-MM-DD").toString()
                 })
                 //update notifications of person receiving request
                 const notification=(await StaffMemberModel.findById(replacement.member)).notifications
@@ -326,7 +326,7 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
         sentTo:coordinatorID,
         state:"Pending",
         reason:reason,
-        submission_date:new moment()
+        submission_date:new moment().format("YYYY-MM-DD").toString()
     })
     try{
     res.json("Request successfully submitted.")    
@@ -400,7 +400,7 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
         sentTo:hodAcademic.member,
         state:"Pending",
         reason:reason,
-        submission_date:new moment()
+        submission_date:new moment().format("YYYY-MM-DD").toString()
     })
     try{
      res.json("Request successfully submitted.")
@@ -470,7 +470,7 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
         sentTo:hodAcademic.member,
         state:"Pending",
         reason:reason,
-        submission_date:new moment()
+        submission_date:new moment().format("YYYY-MM-DD").toString()
     })
     try{
     await req.save()
@@ -541,7 +541,7 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
             medicalDoc:req.body.medicalDoc,
             state:"Pending",
             reason:reason,
-            submission_date:new moment()
+            submission_date:new moment().format("YYYY-MM-DD").toString()
         })
         try{
         await req.save()
@@ -609,7 +609,7 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
             maternityDoc:maternityDoc,
             state:"Pending",
             reason:reason,
-            submission_date:new moment()
+            submission_date:new moment().format("YYYY-MM-DD").toString()
         })
         try{
         await req.save()
@@ -685,7 +685,7 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
         missedDay:moment(req.body.missedDay),
         state:"Pending",
         reason:reason,
-        submission_date:new moment()
+        submission_date:new moment().format("YYYY-MM-DD").toString()
     })
     try{
     await req.save()
@@ -1062,10 +1062,14 @@ router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
 
 //---------------------------------------RECHECK ON BELOW CODEEEEEEEEEEEEEEE---------------------------------------------------
 //---------------------------------------DO I NEED TO REMOVE NOTIFICATION AT HOD IF REQUEST IS CANCELLED--------------------
-router.put('/cancelRequest',authenticateToken,async(req,res)=>{
+router.delete('/cancelRequest',authenticateToken,async(req,res)=>{
     //input req type, sentTo(if replacement) , submissionDate
     //for replacement(req.body.reqType, slotNum,slotLoc,slotDate,replacementID)
-
+    const staff=await StaffMemberModel.findById(req.user.id)
+    const type=staff.staff_type
+    if(type=="HR"){
+        return res.json("HR do not have any leave requests.")
+    }
     //all other requests except replacement 
     const reqType=req.body.reqType
     const submission_date=req.body.submission_date
@@ -1073,15 +1077,23 @@ router.put('/cancelRequest',authenticateToken,async(req,res)=>{
        ||reqType=="Change Day off" || reqType=="Compensation Leave"){
     
     //get request
-    const currReq=request.findOne({reqType:reqType,submission_date:submission_date,sentBy:req.user.id})
+    console.log("here")
+    const date=moment(submission_date)
+    console.log("ss "+moment(submission_date).format())
+    const currReq=await request.findOne({reqType:reqType,submission_date:submission_date,sentBy:req.user.id})
+    if(!currReq){
+        return res.json("This request does not exist. Please enter correct request type and date.")
+    }
+    console.log(currReq)
     const requestState=currReq.state
     //if it is not pending
     if(requestState!="Pending"){
+        console.log("state= "+requestState)
         return res.json("This request has already been responded to. It cannot be cancelled.")
     }
 
-    const reqRemoved=request.findOneAndDelete({reqType:reqType,submission_date:submission_date,sentBy:req.user.id})
-
+    const reqRemoved=await request.findOneAndDelete({reqType:reqType,submission_date:submission_date,sentBy:req.user.id})
+    return res.json("Request cancelled successfully.")
     //get hod 
     // const academic=await AcademicStaffModel.findOne({member:req.user.id})
     // const department=await DepartmentModel.findById(academic.department)
@@ -1095,13 +1107,13 @@ router.put('/cancelRequest',authenticateToken,async(req,res)=>{
     }
     else if(reqType=="Replacement"){
         const replace=await StaffMemberModel.findOne({id:req.body.replacementID})
-        const currRequest=request.findOne({reqType:reqType,submission_date:submission_date,slotDate:req.body.slotDate,
+        const currRequest=await request.findOne({reqType:reqType,submission_date:submission_date,slotDate:req.body.slotDate,
             slotNum:req.body.slotNum,slotLoc:req.body.slotLoc,sentBy:req.user.id,sentTo:replace._id})
         const requestState=currRequest.state
         const reqDate=currRequest.slotDate
 
         if( requestState=="Pending"){
-            const reqRemoved=request.findOneAndDelete({reqType:reqType,submission_date:submission_date,slotDate:req.body.slotDate,
+            const reqRemoved=await request.findOneAndDelete({reqType:reqType,submission_date:submission_date,slotDate:req.body.slotDate,
                 slotNum:req.body.slotNum,slotLoc:req.body.slotLoc,sentBy:req.user.id,sentTo:req.body.replacementID})
             res.json("Request successfully removed")
         }
@@ -1109,7 +1121,7 @@ router.put('/cancelRequest',authenticateToken,async(req,res)=>{
         //if day is yet to come and it is accepted then we 
         //must go remove this slot from other member's schedule
         if(moment().format('YYYY-MM-DD')<(moment(reqDate).format("YYYY-MM-DD"))){
-            const reqRemoved=request.findOneAndDelete({reqType:reqType,submission_date:submission_date,slotDate:req.body.slotDate,
+            const reqRemoved=await request.findOneAndDelete({reqType:reqType,submission_date:submission_date,slotDate:req.body.slotDate,
             slotNum:req.body.slotNum,slotLoc:req.body.slotLoc,sentBy:req.user.id,sentTo:req.body.replacementID})
             
             if(requestState=="Accepted"){

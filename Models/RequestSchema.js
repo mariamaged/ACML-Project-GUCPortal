@@ -8,7 +8,7 @@ const requestSchema=mongoose.Schema({
    sentBy:{type: ObjectID, ref: 'StaffMemberModel'},
    sentTo:{type: ObjectID, ref: 'StaffMemberModel'},
    state:{type:String},
-   submission_date:{type:Date},
+   submission_date:{type:String},
     
    //change day off
    newDayOff:{type:String , enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday']},

@@ -303,7 +303,11 @@ arr[1]=newSlot2
 //     return console.log("There are no submitted requests to display.")
 // }
 // console.log()
-
+//console.log(moment("2020-12-24T18:56:07.808+00:00").format("YYYY-MM-DD"))
+const check=("2020-12-25T00:00:00.000+00:00"==moment("2020-12-25"))
+// console.log(new moment().format().toString())
+// console.log(moment("2020-12-25").format.toString())
+// console.log(check)
 }//
 cr()
 
