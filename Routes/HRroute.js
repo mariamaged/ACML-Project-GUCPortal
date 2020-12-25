@@ -11,12 +11,49 @@ const course=require('../Models/CourseModel');
 const jwt=require('jsonwebtoken');
 
 
+
+function authenticateToken(req,res,next){
+    
+    const token=req.header('x-auth-token');
+    if(!token){
+    return res.sendStatus(401).status('Access deined please log in first.')
+    }
+    // const verified= jwt.verify(token, process.env.TOKEN_SECRET)
+    // if(!verified){
+    //     return res.json("Token is unauthorized.")
+    // }
+    // req.user=verified
+    // console.log("in auth "+req.user)
+    // next();
+    try{
+        const verified= jwt.verify(token, process.env.TOKEN_SECRET)
+        req.user= verified
+        next()
+    }
+    catch(err){
+        res.status(400).send('Invalid Request.')
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 //Locations Adding,deleting, and updating
 //fadel autherization
 //adding
-router.route('Location').post(async(req,res)=>{
+router.route('Location').post(authenticateToken,async(req,res)=>{
     //to authorize
-    if(req.user.role!='HR')
+     const st=await StaffMember.findOne({"id":req.user.id});
+     if(st.staff_type=="HR")
       res.status(401).send('Access Denied');
     else{  
     try{
@@ -42,9 +79,10 @@ router.route('Location').post(async(req,res)=>{
 })
 
 //deleting
-.delete(async (req,res)=>{
+.delete(authenticateToken,async (req,res)=>{
     try{
-        if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
       res.status(401).send('Access Denied');
     else{ 
      const{id}=req.body;
@@ -82,8 +120,12 @@ router.route('Location').post(async(req,res)=>{
  })
 
 //updating 
-.put(async(req,res)=>{
+.put(authenticateToken,async(req,res)=>{
     try{
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
+        res.status(401).send('Access Denied');
+        else{ 
         const{oldid,id,type,maximum_capacity}=req.body;
         if(!oldid||!id||!type||!maximum_capacity) res.status(400).json({msg:"please fill all the fields for the location to be updated successfully"});
         else{
@@ -123,7 +165,7 @@ router.route('Location').post(async(req,res)=>{
              res.send("done");  
               }
               }  
-            }
+            }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -131,10 +173,11 @@ router.route('Location').post(async(req,res)=>{
 
 //faculty addition,deletion,and updating
 //adding
-router.route('/Faculty').post(async(req,res)=>{
+router.route('/Faculty').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
     const{name}=req.body;
@@ -153,10 +196,11 @@ router.route('/Faculty').post(async(req,res)=>{
 })
 
 //deleting
-.delete(async (req,res)=>{
+.delete(authenticateToken,async (req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
         const{name}=req.body;
@@ -188,10 +232,11 @@ router.route('/Faculty').post(async(req,res)=>{
 })
 
 //updating
-.put(async (req,res)=>{
+.put(authenticateToken, async (req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
         const{oldname,name}=req.body;
@@ -209,10 +254,11 @@ router.route('/Faculty').post(async(req,res)=>{
 
 //department addition,deletion,and updating
 //adding
-router.route('/department').post(async(req,res)=>{
+router.route('/department').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
      const{name,facultyname,hod}=req.body;
@@ -238,10 +284,11 @@ router.route('/department').post(async(req,res)=>{
     }
 })
 //deleting
-.delete(async(req,res)=>{
+.delete(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
         const{name}=req.body;
@@ -265,10 +312,11 @@ router.route('/department').post(async(req,res)=>{
     }
 })
 //updating
-.put(async(req,res)=>{
+.put(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
        const{oldname,name,facultyname,hodid}=req.body;
@@ -310,10 +358,11 @@ router.route('/department').post(async(req,res)=>{
 })
 //courses addition,deletion, and updating
 //adding
-router.route('/course').post(async(req,res)=>{
+router.route('/course').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
         const{id,name,departmentname}=req.body;
@@ -339,10 +388,11 @@ router.route('/course').post(async(req,res)=>{
     }
 })
 //deleting
-.delete(async(req,res)=>{
+.delete(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
        const{id}=req.body;
@@ -383,7 +433,7 @@ router.route('/course').post(async(req,res)=>{
     }
 })
 //updating
-.put(async (req,res)=>{
+.put(authenticateToken,async (req,res)=>{
     try{
         //to authorize
     if(req.user.role!='HR')
@@ -447,10 +497,11 @@ router.route('/course').post(async(req,res)=>{
 //elmafrood a bcrypt el password hatta lw default?
 //when academic staff add lel table/delete/update
 const bcrypt=require('bcrypt');
-router.route('/staffmember').post(async(req,res)=>{
+router.route('/staffmember').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
        const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname}=req.body;
@@ -521,10 +572,11 @@ router.route('/staffmember').post(async(req,res)=>{
         res.status(500).json({error:err.message});
     }
 })
-.delete(async (req,res)=>{
+.delete(authenticateToken,async (req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
         //ydeeny email wla id?
@@ -577,10 +629,11 @@ router.route('/staffmember').post(async(req,res)=>{
     }
 })
 //bcrypt hena kaman
-.put(async(req,res)=>{
+.put(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
        const{oldemail,email,password,office,newStaffMember,annualdays,lastupdatedannual,accidentaldaysleft,attendcompensationday}=req.body;
@@ -628,10 +681,11 @@ router.route('/staffmember').post(async(req,res)=>{
     }
     })
 
-router.route('/updatesalary').put(async(req,res)=>{
+router.route('/updatesalary').put(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
        const{email,salary}=req.body;
@@ -648,10 +702,11 @@ router.route('/updatesalary').put(async(req,res)=>{
     }
 })
 
-router.route('/attendance').get(async(req,res)=>{
+router.route('/attendance').get(authenticateToken,async(req,res)=>{
     try{
     //to authorize
-    if(req.user.role!='HR')
+    const st=await StaffMember.findOne({"id":req.user.id});
+    if(st.staff_type=="HR")
       res.status(401).send('Access Denied');
       else{
     const email=req.body.email;
@@ -666,10 +721,11 @@ router.route('/attendance').get(async(req,res)=>{
 })
 
 
-router.get('/viewMissinghours',async(req,res)=>{
+router.get('/viewMissinghours',authenticateToken,async(req,res)=>{
    try{
    //to authorize
-   if(req.user.role!='HR')
+   const st=await StaffMember.findOne({"id":req.user.id});
+   if(st.staff_type=="HR")
    res.status(401).send('Access Denied');
    else{  
     var members=[];
@@ -794,102 +850,117 @@ for(var j=1;j<=10;j++){
 
 
 const moment=require('moment');
-router.get('/viewMissingdays',async(req,res)=>{
+router.get('/viewMissingdays',authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
         var dateMonth=moment().format("M")
         const dateYear=moment().format("Y")
-      //  const dateDay=moment().format("D")
-      const dateDay=2
+      const dateDay=moment().format("D")
+     // const dateDay=2
          const staff=await StaffMember.find();
          var members=[];
          for(var a=0;a<staff.length;a++){
             const user=staff[a];
-            var day=""
-            if(user.staff_type=="HR")
-            day="Saturday";
-           else
-          day=(await AcademicStaffModel.findOne({member:user._id})).day_off;
-          const userAttendance=user.attendance
-          var userDays=new Array()
-          var missedDays=new Array()
-          var idx=0;
-          var k=0;
-          var check=false;
-          const day_off=day
-          console.log("dayoff= "+day_off)
-          var nextMonth=0;
-          var nextYear=0;
-           //to get curr month and next month and year according to today's date
-            //if less than 10 then curr month=month-1 
-            if( dateDay<=10){
-                dateMonth=dateMonth-1
-            }
-            if(dateMonth==12){
-                nextMonth=1
-                nextYear=(parseInt(dateYear)+1) 
-            }
-            else{
-                nextMonth=(parseInt(dateMonth)+1)  
-                nextYear=dateYear
-               }
-
-            //first get list of present days in both months
-            for(var i=0;i<userAttendance.length;i++){
-                const currDay=userAttendance[i]
-                const year=moment(currDay.date).format("Y")
-                const month=moment(currDay.date).format("M")
-                
-                const dayNum=moment(currDay.date).format("D")
-                const day=moment(currDay.date).format("dddd")
-    
-                //if 1st month will get starting from 11th day
-                if(year==dateYear && month==dateMonth && dayNum>=11){
-                        userDays[idx++]=userAttendance[i]
-                }
-                 //if 1st month will get till the 10th day
-                if(year==nextYear && month==nextMonth  && dayNum<=10){
-                    userDays[idx++]=userAttendance[i]
-                }
-            }
-            //sort this array to be able to fill missing days in between present days
-            const sortedUserDays=userDays.sort(compareAsc);
-            //console.log(" sortedUserDays"+sortedUserDays)
-            var j=0
-            var currDay=11
-            var m= moment(sortedUserDays[j].date).format('M')
-             //start looping on days of first month to get missing days in between present days
-             while(j<sortedUserDays.length && m==dateMonth){
-                var d= moment(sortedUserDays[j].date).format('D')
-                 m= moment(sortedUserDays[j].date).format('M')
-                    while(d>currDay && m==dateMonth ){
-                       const currYear=new moment().format("Y")
-                       var currDate=new moment(currYear+"-"+dateMonth+"-"+currDay).format('dddd')
-                       if(currDate!=day_off && currDate!='Friday' && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
-                           missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+currDay).format("YYYY-MM-DD");
-                            console.log("adding "+missedDays[k-1])
-                        }
-                       currDay++
+                    var day=""
+                    if(user.staff_type=="HR")
+                     day=(await HRModel.findOne({member:user.id})).day_off
+                    else
+                   day=(await AcademicStaffModel.findOne({member:user.id})).day_off
+            
+                    const userAttendance=user.attendance
+                    var userDays=new Array()
+                    var missedDays=new Array()
+                    var idx=0;
+                    var k=0;
+                    var check=false;
+                    const day_off=day
+                    console.log("dayoff= "+day_off)
+                    var nextMonth=0;
+                    var nextYear=0;
+            
+                    //to get curr month and next month and year according to today's date
+                    //if less than 10 then curr month=month-1 
+                    if( dateDay<=10){
+                        dateMonth=dateMonth-1
                     }
-                    currDay++
-                    j++
-                    if(j<sortedUserDays.length){
-                     m= moment(sortedUserDays[j].date).format('M')
-    
-            }
-            }
-
-
-            if(j>0){
+            
+                    if(dateMonth==12){
+                        nextMonth=1
+                        nextYear=(parseInt(dateYear)+1) 
+                    }
+                     else{
+                     nextMonth=(parseInt(dateMonth)+1)  
+                     nextYear=dateYear
+                    }
+                    console.log("dateMonth= "+dateMonth+" dateYear= "+dateYear+" nextYear= "+nextYear+" nextMonth= "+nextMonth)
+                    //first get list of present days in both months
+                    for(var i=0;i<userAttendance.length;i++){
+                        const currDay=userAttendance[i]
+                        const year=moment(currDay.date).format("Y")
+                        const month=moment(currDay.date).format("M")
+                        
+                        const dayNum=moment(currDay.date).format("D")
+                        const day=moment(currDay.date).format("dddd")
+                      //  console.log("in first")
+                        //if 1st month will get starting from 11th day
+                        if(year==dateYear && month==dateMonth && dayNum>=11){
+                                userDays[idx++]=userAttendance[i]
+                        }
+                         //if 1st month will get till the 10th day
+                        if(year==nextYear && month==nextMonth  && dayNum<=10){
+                            userDays[idx++]=userAttendance[i]
+                        }
+                    }
+            
+                    //sort this array to be able to fill missing days in between present days
+                    const sortedUserDays=userDays.sort(compareAsc)
+                    for(var l=0;l<sortedUserDays.length;l++){
+                  console.log(" sortedUserDays"+moment(sortedUserDays[l].date).format("YYYY-MM-DD"))
+                    }
+                    var j=0
+                    var currDay=11
+                    if(sortedUserDays.length>0)
+                    var m= moment(sortedUserDays[j].date).format('M')
+            
+                    //start looping on days of first month to get missing days in between present days
+                    while(j<sortedUserDays.length && m==dateMonth){
+                        var d= moment(sortedUserDays[j].date).format('D')
+                        console.log("d=================="+d)
+                         m= moment(sortedUserDays[j].date).format('M')
+                            while(d>currDay && m==dateMonth ){
+                               const currYear=new moment().format("Y")
+                               var currDate=new moment(currYear+"-"+dateMonth+"-"+currDay).format('dddd')
+                               console.log("currDay= "+currDay+" currDate= "+currDate+" d="+d)
+                               if(currDate!=day_off && currDate!='Friday' ){
+                                   missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+currDay).format("YYYY-MM-DD");
+                                    console.log("adding "+missedDays[k-1])
+                                }
+                               currDay++
+                            }
+                            currDay++
+                            console.log("currDyyyyyyyyyyyyyyyyyyyyyyyyy= "+currDay)
+                            ++j
+                            if(j<sortedUserDays.length){
+                             m= moment(sortedUserDays[j].date).format('M')
+            
+                    }
+                    }
+                if(j>0){
                 var lastD= moment(sortedUserDays[j-1].date).format('D')
                 var lastDName= moment(sortedUserDays[j-1].date).format('dddd')           
-                const lastMonth=moment(sortedUserDays[j-1].date).format('M')
-                const lastYear=moment(sortedUserDays[j-1].date).format('Y')
+                var lastMonth=moment(sortedUserDays[j-1].date).format('M')
+                var lastYear=moment(sortedUserDays[j-1].date).format('Y')
                 console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
                 var lastDay=parseInt(lastD)+1
+                const y=moment(sortedUserDays[j-1].date).format("YYYY")
+                const m=moment(sortedUserDays[j-1].date).format("MM")
+                const d=moment(sortedUserDays[j-1].date).format("DD")
+                 lastDName=new moment(y+"-"+m+"-"+lastDay).format('dddd')
+                 console.log("lastdNAMEEEEEEEEEEEEEEE=" +lastDName)
                 }
                 else{
                     var lastD= new moment(dateYear+"-"+dateMonth+"-"+currDay).format('D')
@@ -899,119 +970,128 @@ router.get('/viewMissingdays',async(req,res)=>{
                 console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
                 var lastDay=parseInt(lastD)
                 }
-
-
-                 //console.log("missed till now= "+missedDays)
-        //get last day present from 1st month then fill the rest according to each month's number of days
-        if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
-            while(lastDay<32){
-                //added recently
-                var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
-                if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
-                missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
-                console.log("added= "+missedDays[k-1])
-                }
-               lastDay++
-               lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
-               console.log("now= "+lastDay)
-            }
-        }
-        if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 ){
-            while(lastDay<31 ){
-                //added recently
-                var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
-                if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
-                missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
-                }
-                lastDay++;
-                lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
-            }
-        }
-        if(dateMonth==2 ){
-            if(moment(dateYear).isLeapYear() )
-             {
-                 while(lastDay<30){
-                      //added recently
-                 var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
-                  if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
-                   missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
-                 }
-                 lastDay++;
-                 lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
-             }
-             }
-             else {
-                 while(lastDay<29){
-                      //added recently
-                 var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
-                     if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
-                 missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
-                     }
-                 lastDay++;
-                 lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
-             }
-         }
-         }
-          //if only present in first month then fill 2nd month manually
-        if(moment(sortedUserDays[sortedUserDays.length-1].date).format("M")==dateMonth){
-            var currDay2=1
-            lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
-            for(var g=1;g<=10;g++){
-                //added recently
-                var currDate=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
-                if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD") ){
-                missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
-                }
-                currDay2++
-                lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
-            }
-        }
-
-      //else will need to check and only insert absent days
-      else{    
-        //first fill days missed in the middle
-        while(j<sortedUserDays.length && m==nextMonth){
-            var currDay2=1
-            var last2day=currDay2
-             var d2= moment(sortedUserDays[j].date).format('D')
-             var m2= moment(sortedUserDays[j].date).format('M')
-                 while(d2>currDay2 ){
-                   //RECENTLY
-                    const currDate2=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
-                    console.log("inside 2nd= "+currDay2+" "+currDate2)
-                    //RECENTLY
-                    if(currDate2!=day_off && currDate2!='Friday'&& moment(currDate2).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD") ){
-                        console.log("accepted 2nd= "+currDay2+" "+currDate2)
-                        missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
+                //console.log("missed till now= "+missedDays)
+                //get last day present from 1st month then fill the rest according to each month's number of days
+                if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
+                    while(lastDay<32){
+                        //added recently
+                        var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                        console.log("lastYear= "+lastYear+" dateMonth"+dateMonth)
+                        console.log("here at "+lastDay+" lastDName= "+lastDName)
+                        if(lastDName!='Friday' && lastDName!=day_off ){
+                            
+                        missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                        console.log("added= "+missedDays[k-1])
+                        }
+                       lastDay++
+                       lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+                       console.log("now= "+lastDay)
                     }
-                    currDay2++
-                    last2day=currDay2
-                 }
-                 
-                 currDay2++
-                 j++
-                
-         }
-
-          //  console.log("missed till now= "+missedDays)
-         //then start looping from last present day till the 10th of 2nd month
-         var last2D=moment(sortedUserDays[sortedUserDays.length-1].date).format("D")
-         var last2day=parseInt(last2D)+1
-        
-         for(last2day;last2day<=10;last2day++){
-            lastDName=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("dddd");
-            //RECENTLY
-            const currDate2=new moment(nextYear+"-"+nextMonth+"-"+last2day).format('dddd')
-             if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
-            missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("YYYY-MM-DD");
-             }
+                }
+                if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 ){
+                    while(lastDay<31 ){
+                        //added recently
+                        var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                        if(lastDName!='Friday' && lastDName!=day_off ){
+                        missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                        }
+                        lastDay++;
+                        lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+                    }
+                }
+                if(dateMonth==2 ){
+                   if(moment(dateYear).isLeapYear() )
+                    {
+                        while(lastDay<30){
+                             //added recently
+                        var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                         if(lastDName!='Friday'&& lastDName!=day_off ){
+                          missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                        }
+                        lastDay++;
+                        lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+                    }
+                    }
+                    else {
+                        while(lastDay<29){
+                             //added recently
+                        var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                            if(lastDName!='Friday'&& lastDName!=day_off ){
+                        missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                            }
+                        lastDay++;
+                        lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+                    }
+                }
+                }
+                //if only present in first month then fill 2nd month manually
+                if( sortedUserDays.length==0||moment(sortedUserDays[sortedUserDays.length-1].date).format("M")==dateMonth ){
+                    var currDay2=1
+                    console.log("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+                    lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
+                    for(var g=1;g<=10;g++){
+                        //added recently
+                        var currDate=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
+                        if(lastDName!='Friday'&& lastDName!=day_off ){
+                        missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
+                        }
+                        currDay2++
+                        lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
+                    }
+                }
             
-         }
-        }
-        //my code b2a
-        if(missedDays.length>0){
-            members.push({"name":user.name,"id":user.id,"email":user.email,"missing days":missedDays.length});
-        }
+                //else will need to check and only insert absent days
+                else{    
+                //first fill days missed in the middle
+                while(j<sortedUserDays.length && m==nextMonth){
+                    var currDay2=1
+                    var last2day=currDay2
+                     var d2= moment(sortedUserDays[j].date).format('D')
+                     var m2= moment(sortedUserDays[j].date).format('M')
+                         while(d2>currDay2 ){
+                           //RECENTLY
+                            const currDate2=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
+                            console.log("inside 2nd= "+currDay2+" "+currDate2)
+                            //RECENTLY
+                            if(currDate2!=day_off && currDate2!='Friday' ){
+                                console.log("accepted 2nd= "+currDay2+" "+currDate2)
+                                missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
+                            }
+                            currDay2++
+                            last2day=currDay2
+                            console.log("currDay2== "+currDay2+" d2="+d2)
+                         }
+                         
+                         currDay2++
+                         j++
+                        
+                 }
+                //  console.log("missed till now= "+missedDays)
+                 //then start looping from last present day till the 10th of 2nd month
+                //  var last2D=moment(sortedUserDays[sortedUserDays.length-1].date).format("D")
+                //  var last2day=parseInt(last2D)+1
+                var last2D=moment(sortedUserDays[sortedUserDays.length-1].date).format("D")
+                 var last2day=parseInt(last2D)+1
+                 console.log("LASTTTTTTTTTTTTTTTTTT= "+last2day)
+                
+                 for(last2day;last2day<=10;last2day++){
+                    lastDName=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("dddd");
+                    //RECENTLY
+                    const currDate2=new moment(nextYear+"-"+nextMonth+"-"+last2day).format('dddd')
+                     if(lastDName!='Friday' && lastDName!=day_off ){
+                         console.log("ADDDDDDDDDDDDDDDING= "+last2day)
+                    missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("YYYY-MM-DD");
+                     }
+                    
+                 }
+                }
+                var returnArr=new Array()
+                var s=0
+                for(var d=0;d<missedDays.length;d++){
+                    if(moment(missedDays[d]).format("YYYY-MM-DD")< new moment().format("YYYY-MM-DD"))
+                    returnArr[s++]=missedDays[d]
+                }
+                    if(returnArr.length>0)  members.push({"name":user.name,"id":user.id,"email":user.email,"missing days":returnArr.length});
          }
             
             return res.json(members);  
@@ -1019,6 +1099,21 @@ router.get('/viewMissingdays',async(req,res)=>{
     }catch(err){
         res.status(500).json({error:err.message});
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 })
 
 function compare( a, b ) {
@@ -1046,10 +1141,11 @@ function compare( a, b ) {
 
 
 
-router.put('/addrecord',async(req,res)=>{
+router.put('/addrecord',authenticateToken,async(req,res)=>{
     try{
         //to authorize
-    if(req.user.role!='HR')
+        const st=await StaffMember.findOne({"id":req.user.id});
+        if(st.staff_type=="HR")
     res.status(401).send('Access Denied');
     else{
        const{userid,thedate,signintime,signouttime}=req.body;

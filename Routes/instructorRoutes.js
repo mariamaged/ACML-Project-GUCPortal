@@ -48,17 +48,16 @@ function authenticateToken(req,res,next){
 
 //course coverage
 //cannot test because of the login problem
-router.get('/coursecoverage',async (req,res)=>{
+router.get('/coursecoverage',authenticateToken,async (req,res)=>{
     try{
        //specific courses wla kolo??????????????????????!!!!!!!!!!!!!!!!!!!!!
        //assuming kolo
-       if(req.user.role=="Course Instructor"){
+       
         const instr=await StaffMember.findOne({"_id":req.user.id});
       //make sure instr is not null elawl
       if(instr==null) res.status(400).json({msg:"something went wrong"});
       else{
-        const inst=await AcademicStaff.findOne({"member":instr._id});
-       
+        const inst=await AcademicStaff.findOne({"member":instr._id});       
       //for testing 
     //    const instr=await StaffMember.findOne({"id":"ac-1"});
     //    const inst=await AcademicStaff.findOne({"member":instr._id});
@@ -66,6 +65,7 @@ router.get('/coursecoverage',async (req,res)=>{
 
          if(inst==null) res.status(400).json({msg:"Something went wrong"});
          else{
+             if(inst.type=="Course Instructor"){
             const courses=inst.courses;
             var coverage= [];
             for(var i=0;i<courses.length;i++){
@@ -73,21 +73,23 @@ router.get('/coursecoverage',async (req,res)=>{
                coverage.push({"course id":c.id,"coverage":(100*c.slots_covered/c.slots_needed)+"%"});
             }
             res.send(coverage);
-          }
+          }else res.status(400).json({msg:"Access denied"});
         }
-       }else res.status(400).json({msg:"Access denied"});
+       }
     }catch(err){
         res.status(500).json({error:err.message});
     }
 })
 
 //slots assignment
-router.get('/slotsAssignmentpersemester',async (req,res)=>{
+router.get('/slotsAssignmentpersemester',authenticateToken, async (req,res)=>{
     try{
-       if(req.user.role=="Course Instructor"){
-        const inst=await AcademicStaff.findOne({"_id":req.user.id});
-        if(inst==null) res.status(400).json({msg:"Something went wrong"});
+        const instr=await StaffMember.findOne({"_id":req.user.id});
+        if(instr==null) res.status(400).json({msg:"Something went wrong"});
         else{
+           const inst=await AcademicStaff.findOne({"member":instr._id});
+           if(inst==null)  res.status(400).json({msg:"Something went wrong"});
+           else{ if(inst.type=="Course Instructor"){
           const courses=inst.courses;
           var assignments= [courses.length]; 
           for(var i=0;i<courses.length;i++){
@@ -95,9 +97,8 @@ router.get('/slotsAssignmentpersemester',async (req,res)=>{
             assignments[i]={"course id":c.id,"schedule": c.schedule};           
          }
          res.send(assignments);
-        }
-       }
-       else res.status(400).json({msg:"Access denied"});
+        }   else res.status(400).json({msg:"Access denied"});
+       }}
     }catch(err){ 
         res.status(500).json({error:err.message});}
 })
@@ -105,15 +106,14 @@ router.get('/slotsAssignmentpersemester',async (req,res)=>{
 
 
 //slots assignment
-router.get('/slotsAssignmentperweek',async (req,res)=>{
+router.get('/slotsAssignmentperweek',authenticateToken,async (req,res)=>{
     try{
-       if(req.user.role=="Course Instructor"){
         const instr=await StaffMember.findOne({"id":req.user.id});
         if(instr==null) res.status(400).json({msg:"Something went wrong"});
         else{
             const inst=await AcademicStaff.findOne({"member":instr._id});
             if(inst==null) res.status(400).json({msg:"Something went wrong"});
-            else{
+            else{ if(inst.type=="Course Instructor"){
            const courses=inst.courses;
           var assignments= [courses.length]; 
           for(var i=0;i<courses.length;i++){
@@ -144,9 +144,9 @@ router.get('/slotsAssignmentperweek',async (req,res)=>{
             assignments[i]=  {"course id":c.id,"slots assignment":week};           
          }
          return res.status(200).json(assignments);
-        }
+        } else res.status(400).json({msg:"Access denied"});
        }}
-       else res.status(400).json({msg:"Access denied"});
+      
     }catch(err){ 
         res.status(500).json({error:err.message});}
 })
@@ -160,9 +160,9 @@ router.get('/slotsAssignmentperweek',async (req,res)=>{
 
 
 //staff per department
-router.get('/staffperdepartment',async (req,res)=>{
+router.get('/staffperdepartment',authenticateToken,async (req,res)=>{
     try{
-         if(req.user.role=="Course Instructor"){
+
           const instr=await StaffMember.findOne({"_id":req.user.id});
         //make sure instr is not null elawl
         if(instr==null) res.status(400).json({msg:"something went wrong"});
@@ -174,7 +174,7 @@ router.get('/staffperdepartment',async (req,res)=>{
         // const inst=await AcademicStaff.findOne({"member":instr._id});
          //end
          if(inst==null) res.status(400).json({msg:"Something went wrong"});
-         else{
+         else{ if(inst.type=="Course Instructor"){
             //for testing only
             // const departmentname=req.body.departmentname;
             // if(!departmentname) res.status(400).json({msg:"please enter the department name"});
@@ -194,19 +194,18 @@ router.get('/staffperdepartment',async (req,res)=>{
                }
                res.send(s);
             }
-        }
+        }    else res.status(400).json({msg:"Access denied"});
          }
         }
-        else res.status(400).json({msg:"Access denied"});
+    
      }catch(err){ 
          res.status(500).json({error:err.message});}
 })
 
 //staffpercourse
 //they have to enter a course,no?
-router.get('/staffpercourse',async(req,res)=>{
+router.get('/staffpercourse',authenticateToken,async(req,res)=>{
     try{
-        if(req.user.role=="Course Instructor"){
             const instr=await StaffMember.findOne({"_id":req.user.id});
           //make sure instr is not null elawl
           if(instr==null) res.status(400).json({msg:"something went wrong"});
@@ -218,7 +217,7 @@ router.get('/staffpercourse',async(req,res)=>{
         //    const inst=await AcademicStaff.findOne({"member":instr._id});
           // end
          if(inst==null) res.status(400).json({msg:"Something went wrong"});
-         else{
+         else{ if(inst.type=="Course Instructor"){
              const courseid=req.body.Scourse;
              if(!courseid){
                 const courses=inst.courses;
@@ -256,30 +255,29 @@ router.get('/staffpercourse',async(req,res)=>{
                     else res.status(400).json({msg:"you are not assigned to this course"});
                  }  
              }      
-        }
+        }     else res.status(400).json({msg:"Access denied"});
          }
         }
-        else res.status(400).json({msg:"Access denied"});
+   
      }catch(err){ 
          res.status(500).json({error:err.message});}
 })
 
 //assigntounassignedSlot
-router.route('/Assignment').put(async(req,res)=>{
+router.route('/Assignment').put(authenticateToken,async(req,res)=>{
     try{
-     if(req.user.role=="Course Instructor"){
          const instr=await StaffMember.findOne({"_id":req.user.id});
        //make sure instr is not null elawl
        if(instr==null) res.status(400).json({msg:"something went wrong"});
        else{
          const inst=await AcademicStaff.findOne({"member":instr._id});
-        
+
        //for testing 
         // const instr=await StaffMember.findOne({"id":"ac-1"});
         // const inst=await AcademicStaff.findOne({"member":instr._id});
        // end
          if(inst==null) res.status(400).json({msg:"Something went wrong"});
-         else{
+         else{ if(inst.type=="Course Instructor"){
           const{courseid,day,number,slocation,memid}=req.body;
           if(!courseid||!day||!number||!slocation||!memid) res.status(400).json({msg:"please fill all the required fields"});
           else{
@@ -343,10 +341,10 @@ router.route('/Assignment').put(async(req,res)=>{
        }
      } 
  }
-          }}
+          }} else res.status(400).json({msg:"Access denied"});
  }
 }
- else res.status(400).json({msg:"Access denied"});
+
     }catch(err){
           res.status(500).json({error:err.message});
     }
@@ -355,9 +353,8 @@ router.route('/Assignment').put(async(req,res)=>{
 
 
 //assign course coordinator
-router.put('/assigncoordinator',async (req,res)=>{
+router.put('/assigncoordinator',authenticateToken,async (req,res)=>{
     try{
-        if(req.user.role=="Course Instructor"){
             const instr=await StaffMember.findOne({"_id":req.user.id});
           //make sure instr is not null elawl
           if(instr==null) res.status(400).json({msg:"something went wrong"});
@@ -369,7 +366,7 @@ router.put('/assigncoordinator',async (req,res)=>{
         //    const inst=await AcademicStaff.findOne({"member":instr._id});
           // end
             if(inst==null) res.status(400).json({msg:"Something went wrong"});
-            else{
+            else{ if(inst.type=="Course Instructor"){
                 const{courseid,coordinatorid}=req.body;
                 if(!courseid||!coordinatorid) res.status(400).json({msg:"please fill all the fields"});
                 else{
@@ -408,10 +405,11 @@ router.put('/assigncoordinator',async (req,res)=>{
                     }
                    }                  
                 }
-            }
+            }else res.status(400).json({msg:"Access denied"});
         }
-    }else res.status(400).json({msg:"Access denied"});
+    }
         }catch(err){
         res.status(500).json({error:err.message});
     }
 })
+module.exports=router;
