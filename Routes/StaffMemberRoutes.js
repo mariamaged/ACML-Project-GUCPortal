@@ -899,7 +899,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     var dateMonth=moment().format("M")
     const dateYear=moment().format("Y")
   const dateDay=moment().format("D")
-//  const dateDay=2
+ // const dateDay=2
         const user=await StaffMemberModel.findById(req.user.id)
         var day=""
         if(user.staff_type=="HR")
@@ -1121,10 +1121,13 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         
      }
     }
-
-
- 
-        return res.json(missedDays)
+    var returnArr=new Array()
+    var s=0
+    for(var d=0;d<missedDays.length;d++){
+        if(moment(missedDays[d]).format("YYYY-MM-DD")< new moment().format("YYYY-MM-DD"))
+        returnArr[s++]=missedDays[d]
+    }
+        return res.json(returnArr)
 })
 
 router.get('/missingHours',authenticateToken,async(req,res)=>{
