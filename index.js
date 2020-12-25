@@ -30,7 +30,7 @@ mongoose.connect(process.env.DB_URL, databaseParameters)
 function authenticateToken(req,res,next){
     
     const token=req.header('x-auth-token');
-    if(!token){
+    if(!token) {
     return res.sendStatus(401).status('Access deined please log in first')
     
     }
@@ -824,6 +824,34 @@ app.post('/acceptRequest', async (req, res) => {
     } */
  //}  
 });
+
+app.post('/cancelRequest', async (req, res) => {
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+
+    if(!userAcademic) return res.status(401).send('You are not an academic member!');
+    const {requestID} = req.body;
+
+    const request = await RequestModel.findOne({requestID: requestID});
+    if(!request.sentBy.equals(req.user.id)) return res.status(401).send('You are not the one who sent this request!');
+    if(request.reqType != 'Replacement' && request.reqType != 'Annual Leave') {
+        if(request.state != 'Pending') return res.status(400).send('Cannot cancel a pending request!');
+        else {
+            await RequestModel.findOneAndDelete({requestID: requestID});
+        }
+    }
+    else {
+        if(request.slotDate.getTime() <= moment().getTime()) return res.status(400).send('Cannot cancel a replacement/annual request whose target day has passed!');
+        else {
+            if(request.reqType == 'Annual Leave' && request.state == 'Accepted') {
+                const sentToAcademic = await AcademicStaffModel.findOne({member: request.sentTo});
+                var position = -1;
+                sentToAcademic.schedule.some(function())
+            }
+            await RequestModel.findOneAndDelete({requestID: requestID});
+        }
+    }
+});
+
 
 app.get('/teachingAssignmentPerCourse', async (req, res) => {
     //  if(req.user.isHOD) {

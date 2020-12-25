@@ -254,6 +254,7 @@ router.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
     for(let index = 0; index < off.length; index++) {
         const request = off[index];
         const offObject = {
+            requestID: request.requestID,
             requestType: request.reqType,
             state: request.state,
             submission_date: moment(request.submission_date).format('YYYY-MM-DD')
@@ -277,6 +278,7 @@ router.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
         const request = leave[index];
 
         const leaveObject = {
+            requestID: request.requestID,
             requestType: request.reqType,
             state: request.state,
             submission_date: moment(request.submission_date).format('YYYY-MM-DD')
@@ -352,6 +354,7 @@ router.get('/courseCoverage/:courseID', authenticateToken, async (req, res) => {
         return res.status(401).send('Access Denied!');
     }
 });
+
 // 7 (b)
 router.get('/coursesCoverage', authenticateToken, async (req, res) => {
     const HODAcademicModel = await AcademicStaffModel.findOne({member: req.user.id}); 
@@ -378,6 +381,79 @@ router.get('/coursesCoverage', authenticateToken, async (req, res) => {
     }
 });
 
+// 8
+router.get('/teachingAssignmentAllCourses', authenticateToken, async (req, res) => {
+    const HODAcademicModel = await AcademicStaffModel.findOne({member: req.user.id}); 
+
+    if(HODAcademicModel.isHOD) {
+    const HODDepartment = HODAcademicModel.department;
+    const courses = await CourseModel.find({department: HODDepartment});
+
+    // Has objectID of academic staff and his respective slots.
+    const returnArray = [];
+    Array.prototype.forEach.call(courses, (course) => {
+        const academic_staff = course.academic_staff;
+        const oneCourseTeachingAssignment = [];
+
+        academic_staff.forEach((oneStaff) => {
+            const slotsTaughtbyStaff = course.schedule.filter((slot) => {
+                if(slot.academic_member_id) return oneStaff.equals(slot.academic_member_id)
+            });
+
+            for(let j = 0; j < slotsTaughtbyStaff.length; j++) {
+                const oldSlot = slotsTaughtbyStaff[j];
+                const newSlot = {
+                    date: moment(oldSlot.date).format('YYYY-MM-DD'),
+                    day: oldSlot.day,
+                    number: oldSlot.number,
+                    location: oldSlot.location,
+                    isReplaced: oldSlot.isReplaced
+                };
+
+                slotsTaughtbyStaff[j] = newSlot;
+            }
+            const teachingAssignment = {
+                staffID: oneStaff,
+                staffName: oneStaff,
+                slotsTaughtbyStaff: slotsTaughtbyStaff
+            }
+            oneCourseTeachingAssignment.push(teachingAssignment);
+        });
+
+        const oneCourse = {
+            courseID: course.id,
+            courseName: course.name,
+            oneCourseTeachingAssignment: oneCourseTeachingAssignment
+        }
+
+        returnArray.push(oneCourse);
+    }
+    );
+
+    // Change ObjectIDs with real ids.
+    for(let index = 0; index < returnArray.length; index++) {
+        for(let i = 0; i < returnArray[index].oneCourseTeachingAssignment.length; i++) {
+            const staffID = returnArray[index].oneCourseTeachingAssignment[i].staffID;
+            const academicStaff = await AcademicStaffModel.findById(staffID);
+            const staff = await StaffMemberModel.findById(academicStaff.member);
+            returnArray[index].oneCourseTeachingAssignment[i].staffID = staff.id;
+            returnArray[index].oneCourseTeachingAssignment[i].staffName = staff.name;
+
+            for(let j = 0; j < returnArray[index].oneCourseTeachingAssignment[i].slotsTaughtbyStaff.length; j++) {
+                const oldSlot = returnArray[index].oneCourseTeachingAssignment[i].slotsTaughtbyStaff[j];
+                const location = await LocationModel.findById(oldSlot.location);
+                oldSlot.location = location.id;
+                returnArray[index].oneCourseTeachingAssignment[i].slotsTaughtbyStaff[j] = oldSlot;
+            }
+        }
+    }
+
+    return res.status(200).json(returnArray);
+    }
+    else {
+        return res.status(401).send('Access Denied!');
+    }
+});
 
 // // Route 1.
 // router.route('/CourseInstructorforSingleCourse')
