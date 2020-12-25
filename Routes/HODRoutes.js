@@ -133,13 +133,38 @@ router.get('/viewDepartmentStaffAllCourses', authenticateToken, async (req, res)
 });
 
 // 2 (c)
-router.get('/viewDepartmentStaff', async (req, res) => {
+router.get('/viewDepartmentStaff', authenticateToken, async (req, res) => {
     const HODAcademicModel = await AcademicStaffModel.findOne({member: req.user.id}); 
 
     if(HODAcademicModel.isHOD) {
         const HODDepartment = HODAcademicModel.department;
 
         const staff = await AcademicStaffModel.find({department: HODDepartment});
+        const returnArray = [];
+
+        for(let index = 0; index < staff.length; index++) {
+            const academicTemp = await AcademicStaffModel.findById(staff[index]);
+            const staffTemp = await StaffMemberModel.findById(academicTemp.member);
+            const officeTemp = await LocationModel.findById(staffTemp.office);
+            const departmentTemp = await DepartmentModel.findById(academicTemp.department);
+            const facultyTemp = await FacultyModel.findById(academicTemp.faculty);
+            
+            const returnObject = {
+              name: staffTemp.name,
+              email: staffTemp.email,
+              id: staffTemp.id,
+              salary: staffTemp.salary,
+              office: officeTemp.id,
+              gender: staffTemp.gender,
+  
+              department: departmentTemp.name,
+              faculty: facultyTemp.name,
+              academicType: academicTemp.type
+            };
+  
+            returnArray.push(returnObject);
+        }
+        return res.status(200).json(returnArray);
     }
     else {
         return res.status(401).send('Access Denied!');

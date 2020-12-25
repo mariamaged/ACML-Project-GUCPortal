@@ -41,6 +41,74 @@ function authenticateToken(req,res,next){
 }
 
 // Listen on port.
+app.get('/viewScheduleAllSemester', authenticateToken, async (req, res) => {
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+
+    if(!userAcademic) return res.status(401).send('You are not an academic member!');
+    const schedule = userAcademic.schedule;
+    const normalSlots = [];
+    const replacementSlots = [];
+
+    for(let index = 0; index < schedule.length; index++) {
+        const slot = schedule[index];
+        const courseTemp = await CourseModel.findById(slot.course);
+        const locationTemp = await LocationModel.findById(slot.location);
+        const returnedSlot = {
+            day: slot.day,
+            locationID: locationTemp.id,
+            courseID: courseTemp.id,
+            date: moment(slot.date).format('YYYY-MM-DD'),
+            number: slot.number
+        }
+        if(slot.isReplaced) replacementSlots.push(returnedSlot);
+        else normalSlots.push(returnedSlot);
+    }
+    const returnObject = {
+        replacementSlots: replacementSlots,
+        normalSlots: normalSlots
+    }
+    return res.status(200).json(returnObject);
+});
+
+app.get('/viewScheduleThisWeek', authenticateToken, async (req, res) => {
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+
+    if(!userAcademic) return res.status(401).send('You are not an academic member!');
+    const schedule = userAcademic.schedule;
+    const normalSlots = [];
+    const replacementSlots = [];
+
+    for(let index = 0; index < schedule.length; index++) {
+        const slot = schedule[index];
+        var flag = false;
+        for(let i = 1; i < 8; i++) {
+            const diff = moment().add(i, "days").format('YYYY-MM-DD');
+            if(moment(slot.date).format('YYYY-MM-DD').toString() == diff.toString()) {
+                flag = true;
+                break;
+            }
+        }
+        if(flag) {
+        const courseTemp = await CourseModel.findById(slot.course);
+        const locationTemp = await LocationModel.findById(slot.location);
+        const returnedSlot = {
+            day: slot.day,
+            locationID: locationTemp.id,
+            courseID: courseTemp.id,
+            date: moment(slot.date).format('YYYY-MM-DD'),
+            number: slot.number
+        }
+        if(slot.isReplaced) replacementSlots.push(returnedSlot);
+        else normalSlots.push(returnedSlot);
+    }
+}
+    const returnObject = {
+        replacementSlots: replacementSlots,
+        normalSlots: normalSlots
+    }
+    return res.status(200).json(returnObject);
+});
+
 app.post('/CourseInstructorforCourse', async (req, res) => {
  //   if(req.user.isHOD) {
         const {courseID, courseInstructorID} = req.body;
@@ -1208,6 +1276,8 @@ app.post('/addDepartment', async (req, res) => {
     await department.save();
 });
 
+
+
 // Data hardcoded now but will put as endpoint params.
 app.post('/addAcademicStaffMember', async (req, res) => {
     const doc = await CounterModel.findById('ac-');
@@ -1530,13 +1600,14 @@ app.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
 app.post('/addtoSchedule', async (req, res) => {
     const {date, number, location, courseID} = req.body;
     const locationTemp = await LocationModel.findOne({id: location});
-    const course = await CourseModel.findOne({id: courseID});
+    const courseTemp = await CourseModel.findOne({id: courseID});
     const slot = {
         date: moment(date, 'YYYY-MM-DD'),
         number: number,
         day: moment(date, 'YYYY-MM-DD').format('dddd').toString(),
-        course: course._id,
-        location: locationTemp._id
+        course: courseTemp._id,
+        location: locationTemp._id,
+        isReplaced: true
     }
     const user = await StaffMemberModel.findOne({id: 'ac-12'});
     const userAcademic = await AcademicStaffModel.findOne({member: user._id});
