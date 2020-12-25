@@ -565,4 +565,456 @@ router.route('/attendance').get(async(req,res)=>{
             res.send(mem.attendance);
     }
 })
+
+
+router.get('/viewMissinghours',async(req,res)=>{
+   var members=[];
+   const staff=await StaffMember.find();
+   for(var a=0;a<staff.length;a++){
+    var h=0;   
+    const user=staff[a];
+    const monthly=user.time_attended
+    const month=new moment().format('M')
+    const year=new moment().format('Y')
+    var check=false;
+    if(user.time_attended.length>0){
+        for(var i=0;i<monthly.length;i++){
+            if(monthly[i].num==month && monthly[i].yearNum==year){
+                check=true;
+                if(monthly[i].missingHours>0||monthly[i].missingMinutes>0) members.push({"name":user.name,"id":user.id,"email":user.email,"missing hours":monthly[i].missingHours,"missing minutes":monthly[i].missingMinutes});
+            }
+        }
+    }
+    // else {
+        
+    //     const newMonthly=new monthlyHoursSchema({
+    //         num:month,
+    //         yearNum:year
+    //        , extraHours:0
+    //         ,extraMinutes:0
+    //          ,missingHours:0,
+    //          missingMinutes:0
+    //     })
+    //     if(check==false && monthly.length==0){
+    //     const arr=new Array()
+    //     arr[0]=newMonthly
+       
+    // }
+    //     else {
+    //         const arr=monthly
+    //         arr[arr.length-1]=newMonthly
+            
+    //     }
+    //     //const userUp=await StaffMemberModel.findByIdAndUpdate(staff[a].id,{time_attended:arr})
+    //     // res.json({missingHours:0,
+    //     //     missingMinutes:0,
+    //     // extraHours:0,extraMinutes:0})
+    // }
+   }
+ return res.json(members);
+ 
+})
+
+
+
+function calculateHrs(dateMonth,day_off){
+console.log("inside cal= "+dateMonth)
+console.log("inside "+day_off)
+var start=11
+var end=0;
+var hours=0;
+var minutes=0;
+if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12)
+    end=31
+if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 )
+end=30
+if(dateMonth==2 ){
+    if(moment(dateYear).isLeapYear())
+    end=29
+    else
+    end=28
+}
+const currYear=new moment().format("Y")
+for(var i=11;i<=end;i++){
+   var currDay= new moment(currYear+"-"+dateMonth+"-"+i).format("dddd");
+   if(currDay!= day_off && currDay!="Friday"){
+        hours+=8
+        if(minutes+24>60){
+            hours++
+            minutes=(minutes+24)-60
+        }
+   }
+}
+
+for(var j=1;j<=10;j++){
+    var currDay= new moment(currYear+"-"+dateMonth+"-"+j).format("dddd");
+    if(currDay!= day_off && currDay!="Friday"){
+         hours+=8
+         if(minutes+24>60){
+             hours++
+             minutes=(minutes+24)-60
+         }
+    }
+ }
+ console.log("inside "+hours+' m='+minutes)
+ return {hours,minutes}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const moment=require('moment');
+router.get('/viewMissingdays',async(req,res)=>{
+    try{
+        var dateMonth=moment().format("M")
+        const dateYear=moment().format("Y")
+      //  const dateDay=moment().format("D")
+      const dateDay=2
+         const staff=await StaffMember.find();
+         var members=[];
+         for(var a=0;a<staff.length;a++){
+            const user=staff[a];
+            var day=""
+            if(user.staff_type=="HR")
+            day="Saturday";
+           else
+          day=(await AcademicStaffModel.findOne({member:user._id})).day_off;
+          const userAttendance=user.attendance
+          var userDays=new Array()
+          var missedDays=new Array()
+          var idx=0;
+          var k=0;
+          var check=false;
+          const day_off=day
+          console.log("dayoff= "+day_off)
+          var nextMonth=0;
+          var nextYear=0;
+           //to get curr month and next month and year according to today's date
+            //if less than 10 then curr month=month-1 
+            if( dateDay<=10){
+                dateMonth=dateMonth-1
+            }
+            if(dateMonth==12){
+                nextMonth=1
+                nextYear=(parseInt(dateYear)+1) 
+            }
+            else{
+                nextMonth=(parseInt(dateMonth)+1)  
+                nextYear=dateYear
+               }
+
+            //first get list of present days in both months
+            for(var i=0;i<userAttendance.length;i++){
+                const currDay=userAttendance[i]
+                const year=moment(currDay.date).format("Y")
+                const month=moment(currDay.date).format("M")
+                
+                const dayNum=moment(currDay.date).format("D")
+                const day=moment(currDay.date).format("dddd")
+    
+                //if 1st month will get starting from 11th day
+                if(year==dateYear && month==dateMonth && dayNum>=11){
+                        userDays[idx++]=userAttendance[i]
+                }
+                 //if 1st month will get till the 10th day
+                if(year==nextYear && month==nextMonth  && dayNum<=10){
+                    userDays[idx++]=userAttendance[i]
+                }
+            }
+            //sort this array to be able to fill missing days in between present days
+            const sortedUserDays=userDays.sort(compareAsc);
+            //console.log(" sortedUserDays"+sortedUserDays)
+            var j=0
+            var currDay=11
+            var m= moment(sortedUserDays[j].date).format('M')
+             //start looping on days of first month to get missing days in between present days
+             while(j<sortedUserDays.length && m==dateMonth){
+                var d= moment(sortedUserDays[j].date).format('D')
+                 m= moment(sortedUserDays[j].date).format('M')
+                    while(d>currDay && m==dateMonth ){
+                       const currYear=new moment().format("Y")
+                       var currDate=new moment(currYear+"-"+dateMonth+"-"+currDay).format('dddd')
+                       if(currDate!=day_off && currDate!='Friday' && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+                           missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+currDay).format("YYYY-MM-DD");
+                            console.log("adding "+missedDays[k-1])
+                        }
+                       currDay++
+                    }
+                    currDay++
+                    j++
+                    if(j<sortedUserDays.length){
+                     m= moment(sortedUserDays[j].date).format('M')
+    
+            }
+            }
+
+
+            if(j>0){
+                var lastD= moment(sortedUserDays[j-1].date).format('D')
+                var lastDName= moment(sortedUserDays[j-1].date).format('dddd')           
+                const lastMonth=moment(sortedUserDays[j-1].date).format('M')
+                const lastYear=moment(sortedUserDays[j-1].date).format('Y')
+                console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
+                var lastDay=parseInt(lastD)+1
+                }
+                else{
+                    var lastD= new moment(dateYear+"-"+dateMonth+"-"+currDay).format('D')
+                var lastDName=new moment(dateYear+"-"+dateMonth+"-"+currDay).format('dddd')          
+                const lastMonth=new moment(dateYear+"-"+dateMonth+"-"+currDay).format('M')
+                var lastYear=new moment(dateYear+"-"+dateMonth+"-"+currDay).format('Y')
+                console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
+                var lastDay=parseInt(lastD)
+                }
+
+
+                 //console.log("missed till now= "+missedDays)
+        //get last day present from 1st month then fill the rest according to each month's number of days
+        if(dateMonth==1 ||dateMonth==3 ||dateMonth==5 ||dateMonth==7 ||dateMonth==8 ||dateMonth==10||dateMonth==12){
+            while(lastDay<32){
+                //added recently
+                var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+                missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                console.log("added= "+missedDays[k-1])
+                }
+               lastDay++
+               lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+               console.log("now= "+lastDay)
+            }
+        }
+        if(dateMonth==4 ||dateMonth==6 ||dateMonth==9 ||dateMonth==11 ){
+            while(lastDay<31 ){
+                //added recently
+                var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+                missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                }
+                lastDay++;
+                lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+            }
+        }
+        if(dateMonth==2 ){
+            if(moment(dateYear).isLeapYear() )
+             {
+                 while(lastDay<30){
+                      //added recently
+                 var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                  if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+                   missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                 }
+                 lastDay++;
+                 lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+             }
+             }
+             else {
+                 while(lastDay<29){
+                      //added recently
+                 var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
+                     if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+                 missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
+                     }
+                 lastDay++;
+                 lastDName=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("dddd");
+             }
+         }
+         }
+          //if only present in first month then fill 2nd month manually
+        if(moment(sortedUserDays[sortedUserDays.length-1].date).format("M")==dateMonth){
+            var currDay2=1
+            lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
+            for(var g=1;g<=10;g++){
+                //added recently
+                var currDate=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
+                if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD") ){
+                missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
+                }
+                currDay2++
+                lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
+            }
+        }
+
+      //else will need to check and only insert absent days
+      else{    
+        //first fill days missed in the middle
+        while(j<sortedUserDays.length && m==nextMonth){
+            var currDay2=1
+            var last2day=currDay2
+             var d2= moment(sortedUserDays[j].date).format('D')
+             var m2= moment(sortedUserDays[j].date).format('M')
+                 while(d2>currDay2 ){
+                   //RECENTLY
+                    const currDate2=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
+                    console.log("inside 2nd= "+currDay2+" "+currDate2)
+                    //RECENTLY
+                    if(currDate2!=day_off && currDate2!='Friday'&& moment(currDate2).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD") ){
+                        console.log("accepted 2nd= "+currDay2+" "+currDate2)
+                        missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
+                    }
+                    currDay2++
+                    last2day=currDay2
+                 }
+                 
+                 currDay2++
+                 j++
+                
+         }
+
+          //  console.log("missed till now= "+missedDays)
+         //then start looping from last present day till the 10th of 2nd month
+         var last2D=moment(sortedUserDays[sortedUserDays.length-1].date).format("D")
+         var last2day=parseInt(last2D)+1
+        
+         for(last2day;last2day<=10;last2day++){
+            lastDName=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("dddd");
+            //RECENTLY
+            const currDate2=new moment(nextYear+"-"+nextMonth+"-"+last2day).format('dddd')
+             if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+            missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("YYYY-MM-DD");
+             }
+            
+         }
+        }
+        //my code b2a
+        if(missedDays.length>0){
+            members.push({"name":user.name,"id":user.id,"email":user.email,"missing days":missedDays.length});
+        }
+         }
+            
+            return res.json(members);  
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
+
+function compare( a, b ) {
+   
+    // if (parseInt( a.date) < parseInt(b.date) ){
+    //     console.log("inside compare")
+    //   return -1;
+    // }
+    // if ( parseInt(a.date )>parseInt( b.date) ){
+    //   return 1;
+    // }
+    // return 0;
+    // if(moment(a.date).isBefore(moment(b.date)))
+    // return -1;
+    // if(moment(b.date).isBefore(moment(a.date)))
+    // return 1;
+    // return 0;
+
+    if((moment(a.date).format("YYYY-MM-DD"))<((moment(b.date).format("YYYY-MM-DD")))){
+        
+    return 1;
+
+    }
+}
+
+
+
+router.post('/addrecord',async(req,res)=>{
+    try{
+       const{userid,thedate,signintime,signouttime}=req.body;
+       if(!userid) res.status(400).json({msg:"please insert your id"});
+       else{
+           if(userid==req.user.id)
+              res.status(400).json({msg:"Cannot add record th this user"});
+           else{
+               const person=await StaffMember.findOne({"id":userid});
+               if(signintime){
+                   var index=0;
+                   for(var i=0;i<person.attendance.length;i++){
+                        //to add sorted   
+                        if(person.attendance[i].date==thedate){
+                            if(person.attendance[i].signins.length==0)signins.push(signintime);
+                           for(var j=0;j<person.attendance[i].signins.length;j++){
+                               if(person.attendance[i].signins[j]>signintime){ 
+                                var temp2=signintime;
+                                for(var k=j;k<person.attendance[i].signins.length;k++){
+                                    var temp=person.attendance[i].signins[k];
+                                    person.attendance[i].signins[k]=temp2;
+                                    temp2=temp;
+                                 }
+                                break;
+                               }
+                               else{
+                                   if(j==person.attendance[i].signins.length-1){person.attendance[i].signins.push(signintime);break;}
+                               }
+                           }
+                            break;
+                        }
+                   }
+               }
+
+               if(signouttime){
+                var index=0;
+                for(var i=0;i<person.attendance.length;i++){
+                     //to add sorted   
+                     if(person.attendance[i].date==thedate){
+                        if(person.attendance[i].signouts.length==0)signouts.push(signouttime);
+                        for(var j=0;j<person.attendance[i].signouts.length;j++){
+                            if(person.attendance[i].signouts[j]>signouttime){ 
+                             var temp2=signouttime;
+                             for(var k=j;k<person.attendance[i].signouts.length;k++){
+                                 var temp=person.attendance[i].signouts[k];
+                                 person.attendance[i].signouts[k]=temp2;
+                                 temp2=temp;
+                              }
+                             break;
+                            }
+                            else{
+                                if(j==person.attendance[i].signouts.length-1){person.attendance[i].signouts.push(signouttime);break;}
+                            }
+                        }
+                         break;
+                     }
+                }
+            }
+
+
+            //hours should be calculated again here
+
+
+            await person.save();
+            if(!signintime&& !signouttime) res.status(400).json({msg:"please insert the record to add"});
+            res.send("done");
+
+
+
+
+
+
+
+               
+           
+           }   
+       }
+    }catch(err){
+        res.status(500).json({error:err.message});
+    }
+})
 module.exports=router;
