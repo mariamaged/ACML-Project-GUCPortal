@@ -7,6 +7,9 @@ const FacultyModel = require('./Models/FacultyModel.js');
 const DepartmentModel = require('./Models/DepartmentModel.js');
 const CourseModel = require('./Models/CourseModel.js');
 const CounterModel = require('./Models/CounterModel.js');
+const RequestModel = require('./Models/RequestModel.js');
+const jwt = require('jsonwebtoken');
+const bcrypt=require('bcrypt');
 
 // For environmental variables.
 require('dotenv').config();
@@ -23,6 +26,19 @@ const slotSchema = require('./Models/SlotSchema.js');
 const databaseParameters = { useNewUrlParser: true, useUnifiedTopology: true };
 mongoose.connect(process.env.DB_URL, databaseParameters)
 .then(console.log('Successfully Connected to The Database'));
+
+function authenticateToken(req,res,next){
+    
+    const token=req.header('x-auth-token');
+    if(!token){
+    return res.sendStatus(401).status('Access deined please log in first')
+    
+    }
+    const verified= jwt.verify(token, process.env.TOKEN_SECRET)
+    req.user=verified
+    console.log("in auth "+req.user)
+    next();
+}
 
 // Listen on port.
 app.post('/CourseInstructorforCourse', async (req, res) => {
@@ -458,25 +474,287 @@ app.post('/updateCourseSlots', async (req, res) => {
       }*/
 });
 
-app.get('/courseCoverage/:courseID', async (req, res) => {
-    //    if(req.user.isHOD) {
+// 7 (a)
+app.get('/courseCoverage/:courseID', authenticateToken, async (req, res) => {
         const courseID = req.params.courseID;
 
-        const HODStaffModel = await StaffMemberModel.findOne({id: "ac-11"}); // Delete later
-        const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
+        const HODAcademicModel = await AcademicStaffModel.findOne({member: req.user.id}); 
 
+        if(HODAcademicModel.isHOD) {
         const course = await CourseModel.findOne({id: courseID});
         if(!course) return res.status(400).send('Course does not exist!');
         if(!HODAcademicModel.department.equals(course.department)) return res.status(401).send('Course not under your department!');
-        if(course.slots_needed == 0) res.status(400).send('Course does not have any slots for now!');
+        if(course.slots_needed == 0) return res.status(400).send('Course does not have any slots for now!');
 
         const coverage = course.slots_covered/course.slots_needed * 100;
         return res.status(200).send('Course coverage is equal to: ' + coverage + "%");
-  /*  else {
+        }
+
+        else {
+            return res.status(401).send('Access Denied!');
+        }
+
+});
+
+// 7 (b)
+app.get('/coursesCoverage', authenticateToken, async (req, res) => {
+        const HODAcademicModel = await AcademicStaffModel.findOne({member: req.user.id}); 
+
+        if(HODAcademicModel.isHOD) {
+        const courses = await CourseModel.find({department: HODAcademicModel.department});
+
+        const errorMessages = [];
+        for(let index = 0; index < courses.length; index++) {
+            const errorMessage = {courseID: courses[index].id};
+            if(courses[index].slots_needed == 0) errorMessage.courseDoesNotHaveSlotsAssigned = true;
+            else {
+                const coverage = courses[index].slots_covered/courses[index].slots_needed * 100;
+                errorMessage.courseCoverage = coverage;
+            }
+            errorMessages.push(errorMessage);
+        }
+
+        return res.status(200).json(errorMessages);
+    }
+
+        else {
+            return res.status(401).send('Access Denied!');
+        }
+
+});
+
+// 4
+app.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
+        const HODAcademicModel = await AcademicStaffModel.findOne({member: req.user.id});
+        
+        if(HODAcademicModel.isHOD) {
+        const off = await RequestModel.find({sentTo: HODAcademicModel.member, reqType: 'Change Day off'});
+        const leave = await RequestModel.find({$and: [
+            { // First and condition starts.
+          $or: [
+            {reqType: 'Maternity Leave'},
+            {reqType: 'Sick Leave'},
+            {reqType: 'Compensation Leave'},
+            {reqType: 'Accidental Leave'},
+            {reqType: 'Annual Leave'}
+          ],  
+            }, // First and condition ends.
+
+            {sentTo: HODAcademicModel.member} // Second and condition.
+          ], 
+        });
+
+        const updatedOff = [];
+        for(let index = 0; index < off.length; index++) {
+            const request = off[index];
+            const offObject = {
+                requestType: request.reqType,
+                state: request.state,
+                submission_date: request.submission_date
+            };
+
+            const sentByStaff = await StaffMemberModel.findById(request.sentBy);
+
+            offObject.sentByID = sentByStaff.id;
+            offObject.sentByName = sentByStaff.name;
+            if(request.HODRejectionReason) offObject.HODRejectionReason = request.HODRejectionReason;
+
+            offObject.newDayOff = request.newDayOff;
+
+            if(request.reason) offObject.reason = request.reason;
+
+            updatedOff.push(offObject);
+        }
+
+        const updatedLeave = [];
+        for(let index = 0; index < leave.length; index++) {
+            const request = leave[index];
+ 
+            const leaveObject = {
+                requestType: request.reqType,
+                state: request.state,
+                submission_date: request.submission_date
+            };
+
+            const sentByStaff = await StaffMemberModel.findById(request.sentBy);
+
+            leaveObject.sentByID = sentByStaff.id;
+            leaveObject.sentByName = sentByStaff.name;
+            if(request.HODRejectionReason) leaveObject.HODRejectionReason = request.HODRejectionReason;
+
+            if(request.reqType == 'Maternity Leave') {
+                leaveObject.maternityDoc = request.maternityDoc;
+                if(request.reason) leaveObject.reason = request.reason;
+            }
+            else if(request.reqType == 'Sick Leave') {
+                leaveObject.medicalDoc = request.medicalDoc;
+                leaveObject.sickDay = request.sickDay;
+                if(request.reason) leaveObject.reason = request.reason;
+            }
+            else if(request.reqType == 'Accidental Leave') {
+                leaveObject.accidentDate = request.accidentDate;
+                if(request.reason) leaveObject.reason = request.reason;
+            }
+            else if(request.reqType == 'Compensation Leave'){
+                leaveObject.missedDate = request.missedDate;
+                leaveObject.reason = request.reason;
+            }
+            else {
+                leaveObject.slotDate = request.slotDate;
+                leaveObject.slotNum = request.slotNum;
+                leaveObject.slotLoc = request.slotLoc;
+
+                const replacementStaff = await StaffMemberModel.findById(request.replacementStaff);
+
+                leaveObject.replacementStaffID = replacementStaff.id;
+                leaveObject.replacementStaffName = replacementStaff.name;
+                if(!request.reason) leaveObject.reason = request.reason;
+            }
+            updatedLeave.push(leaveObject);
+        }
+
+        const returnObject = {
+            dayOffRequests: updatedOff,
+            leaveRequests: updatedLeave,
+        };
+
+        return res.status(200).json(returnObject);
+    }
+
+    else {
+        return res.status(401).send('Access Denied!');
+    } 
+});
+
+app.post('/sendAnnualLeavetoHOD', async (req, res) => {
+  //  const user = await StaffMemberModel.findById(req.user.id); // const user = await StaffMemberModel.findById(req.user._id);
+    const user = await StaffMemberModel.findOne({id: "ac-11"});
+    const userAcademic = await AcademicStaffModel.findOne({member: user._id});
+
+    const department = await DepartmentModel.findById(userAcademic.department);
+
+    const HODAcademicModel = await AcademicStaffModel.findById(department.HOD);
+    const HODStaffModel = await StaffMemberModel.findById(HODAcademicModel.member);
+    
+    const {slotNum, slotDate, slotLoc} = req.body;
+    const acceptedRequest = await RequestModel.findOne({
+          slotNum: slotNum, slotDate: moment(slotDate, 'YYYY-MM-DD'), slotLoc: slotLoc, 
+          state: 'Accepted',
+          sentBy: user._id}); // req.user.id/ req.user._id.
+    
+    const requestsSameSlot = await RequestModel.find({
+         slotNum: slotNum, slotDate: moment(slotDate, 'YYYY-MM-DD'), slotLoc: slotLoc,
+         sentBy: user._id}); // req.user.id/ req.user._id.
+
+    if(acceptedRequest) {
+        const newAnnualRequest = new RequestModel({
+            requestType: 'Annual Leave',
+            sentTo: HODStaffModel._id,
+            sentBy: user._id, // req.user.id/ req.user._id
+            state: 'Pending',
+            submission_date: moment(),
+
+            slotNum: slotNum,
+            slotDate: moment(slotDate, 'YYYY-MM-DD'),
+            slotLoc: slotLoc,
+            replacementStaff: acceptedRequest.sentTo
+        });
+        if(req.body.reason) newAnnualRequest.reason = req.body.reason;
+        await newAnnualRequest.save();
+
+        const acceptedStaff = await StaffMemberModel.findById(acceptedRequest.sentTo);
+        return res.status(200).send('Annual Leave request sent to HOD with the details about the academic member who accepted your request: ' 
+        + acceptedStaff.name + ", with id: " + acceptedStaff.id + '.');
+    }
+    else {
+        if(requestsSameSlot.length == 0) {
+            return res.status(400).send('You do not have a replacement request with such details!');
+        }
+        else {
+            const newAnnualRequest = new RequestModel({
+                requestType: 'Annual Leave',
+                sentTo: HODStaffModel._id,
+                sentBy: user._id, // req.user.id/ req.user._id.
+                state: 'Pending',
+                submission_date: moment(),
+    
+                slotNum: slotNum,
+                slotDate: moment(slotDate, 'YYYY-MM-DD'),
+                slotLoc: slotLoc,
+            });
+            if(req.body.reason) newAnnualRequest.reason = req.body.reason;
+            await newAnnualRequest.save();
+
+            return res.status(200).send('Annual Leave request sent to HOD with request that has no accept responses.');
+        }
+    }
+
+});
+
+app.post('/acceptRequest', async (req, res) => {
+    //    if(req.user.isHOD) {
+        const HODStaffModel = await StaffMemberModel.findOne({id: "ac-12"}); // Delete later
+
+        const {requestID} = req.body;
+        const request = await RequestModel.findOne({requestID: requestID});
+        if(!request.sentTo.equals(HODStaffModel._id)) return res.status(400).send('This request is not sent for you!');
+
+        if(request.reqType == 'Annual Leave') {
+            const sentByAcademic = await AcademicStaffModel.findOne({member: request.sentBy});
+            const replacementAcademic = await AcademicStaffModel.findOne({member: request.replacementStaff});
+            const slotLocation = await Location.findOne({id: request.slotLoc});
+
+            request.state = accepted;
+
+            var position = -1.
+            sentByAcademic.schedule.some(function(assignedSlot, ind) {
+                var flag = assignedSlot.date.getTime() == request.slotDate.getTime()
+                    && assignedSlot.number == request.slotNum
+                    && assignedSlot.location.equals(slotLocation._id);
+                if(flag) {
+                    position = ind;
+                    return flag;
+                }
+            });
+
+            const slot = sentByAcademic.schedule[position];
+            sentByAcademic.schedule.splice(position, 1);
+            await sentByAcademic.save();
+
+            slot.isReplaced = true;
+
+            replacementAcademic.schedule.push(slot);
+            await replacementAcademic.save();
+
+            const courses = await CourseModel.find({});
+            for(let i = 0; i < courses.length; i++) {
+                const course = courses[i];
+                
+                var pos = - 1;
+                var SlotExists = course.schedule.some(function(courseSlot, ind) {
+                    var flag = courseSlot.date.getTime() == slot.date.getTime()
+                    && courseSlot.number == slot.number
+                    && courseSlot.location.equals(slot.location);
+
+                    if(flag) {
+                        pos = ind;
+                        return flag;
+                    }
+                });
+
+                if(SlotExists) {
+                    course.schedule[pos].isReplaced = true;
+                    course.academic_member_id = replacementAcademic._id;
+                    await course.save();
+                }
+            }
+
+            return res.status(200).send('Operation done successfully!');
+        }
+          /*  else {
         return res.status(401).send('Access Denied!');
     } */
- //}
-
+ //}  
 });
 
 app.get('/teachingAssignmentPerCourse', async (req, res) => {
@@ -966,6 +1244,268 @@ app.post('/addAcademicStaffMember', async (req, res) => {
     await academicMember.save();
     
 });
+
+app.post('/changeDayOff', async(req,res)=>{
+    //input will be new day off (req.body.newDayOff , (OPTIONAL) req.user.reason)
+    const staff = await StaffMemberModel.findOne({id: 'ac-11'});
+    const type=staff.staff_type
+    if(type=="HR"){
+        return res.json("HR are not permitted to send this request.Only academic members are allowed.")
+    }
+
+    const academic=await AcademicStaffModel.findOne({member:staff._id})
+    const schedule=academic.schedule
+
+    if(req.body.newDayOff=="Friday"){
+        return res.json("Friday is already a day off.Please submit a new day")
+    }
+    for(var i=0;i<schedule.length;i++){
+        const slotDay=schedule[i].day
+        if(slotDay==req.body.newDayOff){
+            return res.json("Cannot request for a day off on a day with teaching activities")
+        }
+    }
+     //getting department of this user to get head of department to send request to
+     const departmentID=academic.department
+     const department=await DepartmentModel.findById(departmentID)
+     const hodID=department.HOD
+     const hodAcademic=await AcademicStaffModel.findById(hodID)
+    
+
+    //make a request
+    const reason=""
+    if(req.body.request)
+    reason=req.body.reason
+
+    var req=new RequestModel({
+        reqType:"Change Day off",
+        newDayOff:req.body.newDayOff,
+        sentBy:staff._id,
+        sentTo:hodAcademic.member,
+        state:"Pending",
+        reason:reason,
+        submission_date:new moment()
+    })
+    try{
+     res.json("Request successfully submitted")
+    await req.save()
+    }
+    catch(err){
+        res.json(err)
+    }
+
+    //sending notification to hod
+    const notification=(await StaffMemberModel.findById(hodAcademic.member)).notifications
+    const notNew=notification
+    notNew[notNew.length]="You received a new slot linking request"
+    const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
+});
+
+app.post('/sickLeave', async(req,res)=>{
+    //input is sick day date and medical documents (req.body.sickDay , req.body.medicalDoc, OPTIONAL req.body.reason)
+    const staff=await StaffMemberModel.findOne({id: "ac-13"});
+    const type=staff.staff_type
+    if(type=="HR"){
+        return res.json("HR are not permitted to send slot slinking requests.Only academic members are allowed.")
+    }
+    const sickDay=req.body.sickDay
+    //getting all days allowed to send request which is 3 days from today
+    var diff3=moment().subtract(3, "days").format("YYYY-MM-DD");
+   var diff2=moment().subtract(2, "days").format("YYYY-MM-DD");
+   var diff1=moment().subtract(1, "days").format("YYYY-MM-DD");
+   var diff0=moment().format("YYYY-MM-DD");
+
+   if(sickDay==diff0 ||sickDay==diff1 || sickDay==diff2 ||sickDay==diff3 ){
+       //no medical documents submitted
+        if(!req.body.medicalDoc){
+            return res.json("Medical documents to prove medical condition must be submitted with the request.")
+        }
+
+        //medical documents submitted
+        else{
+    //getting hod
+    const academic=await AcademicStaffModel.findOne({member:staff._id})
+    const departmentID=academic.department
+    const department=await DepartmentModel.findById(departmentID)
+    const hodID=department.HOD
+    const hodAcademic=await AcademicStaffModel.findById(hodID)
+    
+    //create request
+    var reason=''
+    if(req.body.reason)
+    reason=req.body.reason
+        var req=new RequestModel({
+            reqType:"Sick Leave",
+            sickDay:new Date(sickDay),
+            sentBy:staff._id,
+            sentTo:hodAcademic.member,
+            medicalDoc:req.body.medicalDoc,
+            state:"Pending",
+            reason:reason,
+            submission_date:new moment()
+        })
+        try{
+        await req.save()
+        res.json("Request successfully submitted")
+        }
+        catch(err){
+            res.json(err)
+        }
+
+
+         //send notification to hod
+    const notification=(await StaffMemberModel.findById(hodAcademic.member)).notifications
+    const notNew=notification
+    notNew[notNew.length]="You received a new accidental leave request"
+    const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
+    }
+
+   }
+
+
+   //request sent after 3 days deadline has passed
+   else {
+       return res.json("Deadline for sending sick leave request has been exceeded.\n Cannot send request")
+   }
+
+
+})
+
+app.post('/maternityLeave',async(req,res)=>{
+    //(req.body.maternityDoc, OPTIONAL req.body.reason)
+    const user=await StaffMemberModel.findOne({id: "ac-13"});
+    const type=user.staff_type
+    if(type=="HR"){
+        return res.json("HR are not permitted to send slot slinking requests.Only academic members are allowed.")
+    }
+       // const user=await StaffMemberModel.findById(req.user.id)
+        const gender= "Female"
+        if(gender!="Female"){
+            return res.json("Only female staff members are eligible to send this request.")
+        }
+        if(!req.body.maternityDoc){
+            return res.json("Documents to prove the maternity condition must be submitted.")
+        }
+        const academic=await AcademicStaffModel.findOne({member:user._id})
+        const departmentID=academic.department
+        const department=await DepartmentModel.findById(departmentID)
+        const hodID=department.HOD
+        const hodAcademic=await AcademicStaffModel.findById(hodID)
+
+         //create request
+         var reason=''
+         if(req.body.reason)
+         reason=req.body.reason
+         var req=new RequestModel({
+            reqType:"Maternity Leave",
+            sentBy:user._id,
+            sentTo:hodAcademic.member,
+            maternityDoc: req.body.maternityDoc,
+            state:"Pending",
+            reason:reason,
+            submission_date:new moment()
+        })
+        try{
+        await req.save()
+        res.json("Request successfully submitted")
+        }
+        catch(err){
+            res.json(err)
+        }
+
+        //send notification to hod
+    const notification=(await StaffMemberModel.findById(hodAcademic.member)).notifications
+    const notNew=notification
+    notNew[notNew.length]="You received a new accidental leave request"
+    const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
+
+})
+
+app.post('/login',async(req,res,next)=>{
+    console.log("here in login")
+    try{
+        const{email,password}=req.body;
+        if(!email ){
+            return res.status(400).json("Please enter valid email ");
+        }
+        if(!password)
+        return res.status(400).json("Please enter valid  password");
+
+        const existingUser=await StaffMemberModel.findOne({email:email})
+        if(!existingUser){
+            return res.status(400).json({msg:"This user is not registered"});
+        }
+        else{
+            //user first login original pass='123456'
+            // if(existingUser.newStaffMember===true){
+            //     res.status(500).json("Please enter new password")
+            // }
+            
+            
+            const isMatched= await bcrypt.compare(password,existingUser.password);       //comparing password entered text with password of the user we got from the database            
+            if(!existingUser.newStaffMember && !isMatched){
+                 return res.status(400).json({msg:"Please enter correct password"});
+             }
+             
+             else if(existingUser.staff_type=="HR"){
+                const token=await jwt.sign({id:existingUser._id,role:existingUser.staff_type,academic_role:'',isHead:false,isCoordinator:false},process.env.TOKEN_SECRET);
+               // res.header('auth-token', token).send(token);
+               if(existingUser.newStaffMember===true){
+                return res.status(500).json({error:"Please enter new password ",token:token})
+                }
+             return  res.json({token,existingUser});
+            }
+            else{
+                
+                const user=await AcademicStaffModel.findOne({member:existingUser._id});
+                console.log("user= "+user)
+                const token=await jwt.sign({id:existingUser._id,role:existingUser.staff_type,academic_role:user.type,isHead:user.isHOD,isCoordinator:user.isCoordinator},process.env.TOKEN_SECRET);
+               // res.header('auth-token', token).send(token);
+               if(existingUser.newStaffMember===true){
+                return  res.status(500).json({err:"Please enter new password ",token:token})
+            }
+            return  (res.json({token}));
+
+         }
+        
+    }
+}
+        catch(err){
+          return  res.status(500).json({error:err.message});
+        }
+    
+})
+
+//user first login should change password hash it and update his account
+app.put('/enterNewPass', authenticateToken, async(req,res)=>{
+
+    
+    const passNew=req.body.newPassword;
+    const passCheck=req.body.passCheck;
+    const user=await StaffMemberModel.findById(req.user.id)
+    if(passNew!=passCheck){
+        return res.status(400).json({msg:"Passwords should match"});
+    }
+    else{
+        console.log("in else")
+        console.log(req.user.id)
+        const salt=await bcrypt.genSalt();     
+        const hashedPassword=await bcrypt.hash(passNew,salt);
+        console.log("hashed pass= "+hashedPassword)
+        try{
+      await  StaffMemberModel.findByIdAndUpdate(req.user.id,{password:hashedPassword,newStaffMember:false})
+      return  res.json( await StaffMemberModel.findById(req.user.id))
+        }
+        catch(err){
+           return res.json(err)
+        }
+      
+    }
+
+   
+        
+})
+
 app.listen(process.env.PORT);
 
 
@@ -994,155 +1534,3 @@ app.listen(process.env.PORT);
 
 
 
-/*const express = require('express');
-const app =express();
-const mongoose =require('mongoose');
-
-//for testing-----------------------------------------
-const StaffMemberRoutes=require('./Routes/StaffMemberRoutes')
-const department=require('./Models/DepartmentModel')
-const AcademicStaffModel=require('./Models/AcademicStaffModel')
-const faculty=require('./Models/FacultyModel')
-const location=require('./Models/LocationModel');
-const StaffMemberModel = require('./Models/StaffMemberModel');
-//----------------------------------------------
-require('dotenv').config()
-
-//app.use(express.json())
-var bodyParser = require('body-parser')
-app.use(bodyParser.json())
-//app.use(bodyParser.urlencoded({ extended: false}));
-//app.use(express.urlencoded({extended: false}));
-const connectionParams={
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true 
-}
-//process.env.db_test_URL
-mongoose.connect(process.env.db_URL, connectionParams).then(()=>{
-    console.log("db successfully connected");
-}).catch(()=>{
-    console.log("db is not connected");
-});
-
-
-app.listen(3000);
-app.use(StaffMemberRoutes);
-
-
-//for testin only------------------------------------REMOVE AFTERRRRRRRRRRR TESTINGGGGGGGGGGGGGGGGGGGGG--
-//---------------------------------------------------INSERTING IN TABLES DEPARTMENT ,FACULTY ,STAFF MEMBER ,ACADEMIC MEMBER
-app.post('/addFaculty',async(req,res)=>{
-    const fac=new faculty({name:req.body.name})
-   await fac.save();
-   res.json(fac)
-
-   //"name":"met"
-})
-
-app.post('/addDepart',async(req,res)=>{
-    // fac=faculty.find({name:"met"})
-    const fac=(await faculty.find({name:req.body.facName}))[0]._id
-    const dep=new department({name:req.body.name,faculty:fac})
-    await dep.save();
-    res.json(dep)
-   // console.log(dep)
-    //"name":"engineering",
-    //"facName":"met"
-
-})
-
-app.post('/addLoc',async(req,res)=>{
-    const loc=new location(req.body)
-    await loc.save()
-    res.json(loc)
-
-    //   "id":"c7.101",
-    // "type":"Tutorial Room",
-    // "maximum_capacity":"15"
-})
-
-
-
-app.post('/Member',async(req,res)=>{
-    // const office3=(await location.find({id:req.body.office}))[0]._id
-    // console.log(office3)
-    // const fac=(await faculty.find({name:"met"}))[0]._id;
-    // console.log(fac)
-//     //res.json(req.body)
-//     // if(!req.body.id){
-//     //     res.json("please enter id")
-//     // }
-//     // else res.json(req.body.id)
-//    // console.log("lala")
-//     //else{
-//     const name2=req.body.name
-//     const id2=req.body.id
-//     const email2=req.body.email
-//     const salary2=req.body.salary
-//     const office2=(await location.find({id:req.body.office}))[0]._id
-//     const staff_type2=req.body.staff_type
-//     console.log(name2)
-//     console.log(id2)
-//     console.log(email2)
-//     console.log(salary2)
-//     console.log(office2)
-//     console.log(staff_type2)
-//     const mem=new StaffMemberModel({name:name2},{id:id2},{email:email2},{salary:salary2},{office:office2},{staff_type:staff_type2});
-//     try{
-//     await mem.save();
-//     res.json(mem)
-//         }
-//     catch(err){
-//         res.json(err)
-//        }
-    // //}
-    
-//    "name":"nada"
-//    ,"id":"ac-2"
-//    ,"email":"nada99@gmail.com"
-//    ,"salary":"2000"
-//    ,"office":"c7.101"
-//    ,"staff_type":"Assistant"
-})
-
-const  memeee=new StaffMemberModel({
-    name:"asdad",
-    id:1,
-    email:"dasdasd",
-    salary:22,
-    office:"5fda77733d34934a248e3e08",
-    staff_type:"HR"
-
-})
-memeee.save();
-console.log(memeee)
-
-
-app.post('/addAc',async(req,res)=>{
-   // res.json(req.body)
-    
-    if(!req.body.faculty || !req.body.type){
-        res.json("need faculty and type")
-    }
-    else{
-     const memb=StaffMemberModel.find({id:req.body.id})._id;
-    const dep=department.find({name:req.body.dep})._id;
-    const fac=faculty.find({name:req.body.faculty})._id;
-    const type=req.body.type;
-    
-    try{
-        const user=new AcademicStaffModel({member:memb},{department:dep},{faculty:fac},{type:req.body.type});
-        await user.save();
-        res.json(user)
-    }
-    catch(err){
-        res.json(err)
-    }
-    }
-//    ,"id":"ac-3"
-//    ,"dep":"engineering"
-//    ,"faculty":"met"
-//    ,"type":"Academic Member"
-})
-*/

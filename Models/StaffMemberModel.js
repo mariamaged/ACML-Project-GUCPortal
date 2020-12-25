@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const CounterModel = require('./CounterModel.js');
 const attendanceSchema = require('./AttendanceSchema.js');
-
+const monthlyHoursSchema = require('./MonthlyHoursSchema.js');
 
 const StaffMemberSchema = mongoose.Schema({
     // Personal Information.
@@ -12,18 +12,26 @@ const StaffMemberSchema = mongoose.Schema({
     password: {type: String, default: "123456"},
     salary: {type: Number, required: true}, // No academic member can change that.
     office: {type: ObjectID, ref: 'Location', required: true},
-    gender: {type: String},
+    gender: {type: String, required: true, enum: ['Male, Female']},
 
     // Login Information.
     newStaffMember: {type: Boolean, default: true},
-    staff_type:{type: String, enum: ['HR', 'Academic Member'], required: true},
+    staff_type: {type: String, enum: ['HR', 'Academic Member'], required: true},
     
     // Attendance Information.
-    attendance:[attendanceSchema],
-    annual_days: {type:Number},
-    lastUpdatedAnnual:{type: Date},
+    attendance: {type: [attendanceSchema], default:[]},
+    annual_days: {type: Number},
+    lastUpdatedAnnual: {type: Date},
+    accidentalDaysLeft: {type:Number, default:6},
+    attendCompensationDay: {type: Boolean},
+    missingDays: {type: [String], default: []},
+    time_attended: {type: [monthlyHoursSchema], default: []},
+    // requestsReceived:[{type: ObjectID, ref: 'request'}],
+    // requestsSent:[{type: ObjectID, ref: 'request'}],
+    lastUpdatedAnnual: {type: Date},
     accidentalDaysLeft: {type:Number},
-    attendCompensationDay:{type:Boolean}
+    attendCompensationDay: {type:Boolean},
+    notifications: [{type: String, default: []}]
 },
 
 {
@@ -31,40 +39,40 @@ const StaffMemberSchema = mongoose.Schema({
     timestamps: true
 });
 
-StaffMemberSchema.pre('save', function(next) {
-    var doc = this;
-    if (!doc.isNew) {
-        next();
-        return;
-      }
+// StaffMemberSchema.pre('save', function(next) {
+//     var doc = this;
+//     if (!doc.isNew) {
+//         next();
+//         return;
+//       }
     
-      if(doc.staff_type == 'Academic Member') {
-        CounterModel.findByIdAndUpdate(         // ** Method call begins **
-            'ac-',                              // The ID to find for in counters model
-            { $inc: { seq: 1 } },               // The update
-            { new: true, upsert: true },        // The options
-            function(error, counter) {          // The callback
-              if(error) return next(error);
+//       if(doc.staff_type == 'Academic Member') {
+//         CounterModel.findByIdAndUpdate(         // ** Method call begins **
+//             'ac-',                              // The ID to find for in counters model
+//             { $inc: { seq: 1 } },               // The update
+//             { new: true, upsert: true },        // The options
+//             function(error, counter) {          // The callback
+//               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
-              next();
-            }
-          );  
-    }
-    else {
-        CounterModel.findByIdAndUpdate(          // ** Method call begins **
-            'hr-',                               // The ID to find for in counters model
-            { $inc: { seq: 1 } },                // The update
-            { new: true, upsert: true },         // The options
-            function(error, counter) {           // The callback
-              if(error) return next(error);
+//               doc.id = counter._id + counter.seq ;
+//               next();
+//             }
+//           );  
+//     }
+//     else {
+//         CounterModel.findByIdAndUpdate(          // ** Method call begins **
+//             'hr-',                               // The ID to find for in counters model
+//             { $inc: { seq: 1 } },                // The update
+//             { new: true, upsert: true },         // The options
+//             function(error, counter) {           // The callback
+//               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq;
-              next();
-            }
-          ); 
-    }  
+//               doc.id = counter._id + counter.seq;
+//               next();
+//             }
+//           ); 
+//     }  
 
-})
+// });
 
 module.exports = mongoose.model('Staff', StaffMemberSchema);

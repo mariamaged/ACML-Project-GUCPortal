@@ -681,7 +681,7 @@ Operation done successfully!
 ]
 ```
 - **Changes in database:**  
-   - The `schedule` attribute of the `course` in the course table has the slots objects specified deleted.
+  - The `schedule` attribute of the `course` in the course table has the slots objects specified deleted.
   - The `slots_needed` attribute of the `course` in the course table gets decremented by 1.
 
 	
