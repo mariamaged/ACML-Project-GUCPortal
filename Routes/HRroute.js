@@ -43,35 +43,43 @@ router.route('Location').post(async(req,res)=>{
 
 //deleting
 .delete(async (req,res)=>{
-   try{
-    const{id}=req.body;
-   if(!id) res.status(400).json({msg:"please enter the id of the location to be deleted"});
-   else{ 
-    const loc=await location.findOne({"id":id});
-    if(loc== null) res.send("this location does not exist");
-    else{
-    if(loc.type=="Office")       
-        await StaffMember.deleteMany({"office":loc._id})  
-    else {
-       const staff= await AcademicStaff.find();
-       for(var i=0;i<staff.length;i++){
-           for(var j=0;j<staff[i].schedule.length;j++){
-               if(staff[i].schedule[j].location==loc._id){
-                   delete staff[i].schedule[j];
-                   j--;
-               }
-           }
-       }
-    }
-       await location.deleteOne({"id":id});
-       res.send("done");
-        
-    }
-    }
-}catch(err){
-    res.status(500).json({error:err.message});
-}
-})
+    try{
+        if(req.user.role!='HR')
+      res.status(401).send('Access Denied');
+    else{ 
+     const{id}=req.body;
+    if(!id) res.status(400).json({msg:"please enter the id of the location to be deleted"});
+    else{ 
+     const loc=await location.findOne({"id":id});
+     if(loc== null) res.send("this location does not exist");
+     else{
+     if(loc.type=="Office"){       
+         const staff=await StaffMember.find({"office":loc._id})
+         for(var i=0;i<staff.length;i++){
+             staff.office=null;
+         }
+         staff.save();
+     }
+     else {
+        const staff= await AcademicStaff.find();
+        for(var i=0;i<staff.length;i++){
+            for(var j=0;j<staff[i].schedule.length;j++){
+                if(staff[i].schedule[j].location==loc._id){
+                    staff[i].schedule[j].location=null;
+                    j--;
+                }
+            }
+        }
+     }
+        await location.deleteOne({"id":id});
+        res.send("done");
+         
+     }
+     }}
+ }catch(err){
+     res.status(500).json({error:err.message});
+ }
+ })
 
 //updating 
 .put(async(req,res)=>{
@@ -80,20 +88,42 @@ router.route('Location').post(async(req,res)=>{
         if(!oldid||!id||!type||!maximum_capacity) res.status(400).json({msg:"please fill all the fields for the location to be updated successfully"});
         else{
             const Obid= await location.findOne({"id":oldid});
-            if(obid==null) res.status(400).json({msg: "There is no Location with this id to update"});
+            if(Obid==null) res.status(400).json({msg: "There is no Location with this id to update"});
            else{
             if(Obid.current_capacity>maximum_capacity)
-             res.status(400).json({msg:"Cannot update the current capacity of this location is already exceeding the new maximum capacity."});
+             res.status(400).json({msg:"Cannot update the current capacity of this location it is already exceeding the new maximum capacity."});
             else{
-             Obid.type=type;
-             if(!location.find(id)){
+             if(Obid.type!=type){   
+               if(Obid.type=="Office"){
+                const staff=await StaffMember.find({"office":Obid._id});
+                for(var i=0;i< staff.length;i++){
+                    staff[i].office=null;
+                    staff[i].save();
+                }
+            
+               }
+               else{
+                   const staff=await AcademicStaff.find();
+                   for(var i=0;i<staff.length;i++){
+                       for(var j=0;j<staff.schedule.length;j++){
+                           if(staff[i].schedule[j].location==Obid._id)
+                              staff[i].schedule[j].location=null;
+                       }
+                       await staff[i].save();
+                   }
+               }
+                Obid.type=type;
+             }
+             const newob=await location.findOne({"id":id});
+             if(newob==null|| id==oldid){
              Obid.id=id;}
              else res.status(400).json({msg:"the new id already exists"})
              Obid.maximum_capacity=maximum_capacity;
              await Obid.save();
              res.send("done");  
+              }
+              }  
             }
-              }      }
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -103,13 +133,20 @@ router.route('Location').post(async(req,res)=>{
 //adding
 router.route('/Faculty').post(async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
     const{name}=req.body;
     if(!name) res.status(400).json({msg:"please enter the faculty name"});
     else{
+    const f=await faculty.findOne({"name":name});
+    if(f!=null) res.status(400).json({msg:"a faculty with this name already exists"});
+    else{   
     toAdd=new faculty({name});
     await toAdd.save();}
     res.json(toAdd);
-    console.log(toAdd);}
+    console.log(toAdd);}}}
     catch(err){
         res.status(500).json({msg:{error:err.message}});
     }
@@ -118,6 +155,10 @@ router.route('/Faculty').post(async(req,res)=>{
 //deleting
 .delete(async (req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
         const{name}=req.body;
         if(!name) res.status(400).json({msg:"Please insert the name of the faculty you want to delete."});
         else{
@@ -140,7 +181,7 @@ router.route('/Faculty').post(async(req,res)=>{
             await faculty.deleteOne({"name":name});
             res.send("Done");
             }
-        }
+        }}
     }catch(err){
         res.status(500).json({msg:{error:err.message}})
     }
@@ -149,14 +190,18 @@ router.route('/Faculty').post(async(req,res)=>{
 //updating
 .put(async (req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
         const{oldname,name}=req.body;
-        if(!name) res.status(400).json({msg:"Please insert the name of the faculty you want to delete."});
+        if(!name||!oldname) res.status(400).json({msg:"Please insert the old and new name of the faculty you want to update."});
         else{
             const ob= await faculty.findOne({"name":oldname});
             const obnew=await faculty.findOne({"name":name});
             if( (obnew==null || name==oldname)&& ob!=null ) {ob.name=name; await ob.save();res.send("done");}
             else res.status(400).json({msg:"please enter correct data"});
-        }
+        }}
     }catch(err){
         res.status(500).json({msg:{error:err.message}})
     }
@@ -166,6 +211,10 @@ router.route('/Faculty').post(async(req,res)=>{
 //adding
 router.route('/department').post(async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
      const{name,facultyname,hod}=req.body;
      //HOD could be null as in not yet assigned
      if(!name || !facultyname) res.status(400).json({msg:"Please fill the fields correctly"});
@@ -183,7 +232,7 @@ router.route('/department').post(async(req,res)=>{
          console.log(toAdd);
         }
        }
-    }
+    }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -191,6 +240,10 @@ router.route('/department').post(async(req,res)=>{
 //deleting
 .delete(async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
         const{name}=req.body;
         if(!name) res.status(400).json({msg:"Please insert the name of the department you want to delete."});
         else{
@@ -206,7 +259,7 @@ router.route('/department').post(async(req,res)=>{
             await department.deleteOne({"name":name});
             res.send("done");
             }
-        }
+        }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -214,6 +267,10 @@ router.route('/department').post(async(req,res)=>{
 //updating
 .put(async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
        const{oldname,name,facultyname,hodid}=req.body;
        if(!oldname||!name||!facultyname) res.status(400).json({msg:"Please fill all the fields."});
        else{
@@ -223,10 +280,13 @@ router.route('/department').post(async(req,res)=>{
                var hod1=ob.hod;
                var messge="";
              if(hodid) {
-                const h= await AcademicStaff.findOne({"id":hodid});
+                const h= await StaffMember.findOne({"id":hodid});
                 if(h==null)  messge="there is no Academic member with the id you entered.";
+                else{
+                const hac= await AcademicStaff.findOne({"member":h._id});    
+                if(hac==null) messge="there is no Academic member with the id you entered.";
                 else
-                hod1=h._id;
+                hod1=h._id;}
              }
              const obnew=await department.findOne({"name":name});
              if( obnew==null || name==oldname){
@@ -237,12 +297,13 @@ router.route('/department').post(async(req,res)=>{
                 ob.faculty=fid._id;
                 ob.HOD=hod1;
                 await ob.save();
-                res.send("done");
+                if(messge="") message="done";
+                res.send(message);
                 }
             }
              else res.status(400).json({msg:"A department with that new name already exists"});
            }
-       }
+       }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -251,6 +312,10 @@ router.route('/department').post(async(req,res)=>{
 //adding
 router.route('/course').post(async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
         const{id,name,departmentname}=req.body;
         if(!id||!name||!departmentname) res.status(400).json({msg:"please fill all the fields"});
         else{
@@ -268,7 +333,7 @@ router.route('/course').post(async(req,res)=>{
                     res.status(400).json({msg:"a course with this id already exists"});
                 }
             }
-        }
+        }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -276,6 +341,10 @@ router.route('/course').post(async(req,res)=>{
 //deleting
 .delete(async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
        const{id}=req.body;
        if(!id)res.status(400).json({msg:"please enter the id of the course you want to delete"});
        else{
@@ -308,7 +377,7 @@ router.route('/course').post(async(req,res)=>{
            await course.deleteOne({"id":id});
            res.send("done");
            }
-       }
+       }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -316,6 +385,10 @@ router.route('/course').post(async(req,res)=>{
 //updating
 .put(async (req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
         //academic staff is a list of staff members ids
        const{oldid,id,name,departmentname,slotsneeded,slotscovered,schedule}=req.body;
        if(!oldid||!id||!name||!departmentname) res.status(400).json({msg:"please fill all the fields"});
@@ -365,7 +438,7 @@ router.route('/course').post(async(req,res)=>{
                    res.status(400).json({msg:"a course with this new id already exists"});
                }
            }
-       }
+       }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -376,7 +449,11 @@ router.route('/course').post(async(req,res)=>{
 const bcrypt=require('bcrypt');
 router.route('/staffmember').post(async(req,res)=>{
     try{
-       const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname,courses}=req.body;
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
+       const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname}=req.body;
        if(!email||!salary||!officelocation|| !gender||!type) res.status(400).json({msg:"please fill all the fields"});
        else{
            var flag=false;
@@ -427,22 +504,29 @@ router.route('/staffmember').post(async(req,res)=>{
                      office.current_capacity+=1;
                      await office.save();
                      if(flag==true){
-                     const ac= await new AcademicStaff({"courses":courses,"member":toAdd._id,"day_off":dayoff,"faculty":fac._id,"department":dep._id,"type":actype});
+                     const ac= await new AcademicStaff({"member":toAdd._id,"day_off":dayoff,"faculty":fac._id,"department":dep._id,"type":actype});
                      await ac.save();
                     }
+                    else {const hr=new HR({"member":toAdd._id,"day_off":"Saturday"}); 
+                     await hr.save();
+                    } 
                     
                      res.send(message);
                  }
              }
            }
            else res.status(400).json({msg:"this email is already registered"})
-       }
+       }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
 })
 .delete(async (req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
         //ydeeny email wla id?
         const{email}=req.body;
         if(!email) res.status(400).json({msg:"please insert the email of the staff member you want to delete"});
@@ -486,7 +570,7 @@ router.route('/staffmember').post(async(req,res)=>{
            await StaffMember.deleteOne({"email":email});
            res.send("done");
           }
-        }
+        }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -494,6 +578,10 @@ router.route('/staffmember').post(async(req,res)=>{
 //bcrypt hena kaman
 .put(async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
        const{oldemail,email,password,office,newStaffMember,annualdays,lastupdatedannual,accidentaldaysleft,attendcompensationday}=req.body;
        if(!oldemail) res.status(400).json({msg:"please insert the email of the staff member you want to update"});
        else{
@@ -533,7 +621,7 @@ router.route('/staffmember').post(async(req,res)=>{
                 if(message=="") message="done";
                 res.send(message);
            }
-       }
+       }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -541,6 +629,10 @@ router.route('/staffmember').post(async(req,res)=>{
 
 router.route('/updatesalary').put(async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
        const{email,salary}=req.body;
        if(!email||!salary) res.status(400).json({msg:"please fill all the fields"});
        else{
@@ -549,13 +641,18 @@ router.route('/updatesalary').put(async(req,res)=>{
            else (await ob).salary=salary;
            await ob.save();
            res.send("done");
-       }
+       }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
 })
 
 router.route('/attendance').get(async(req,res)=>{
+    try{
+    //to authorize
+    if(req.user.role!='HR')
+      res.status(401).send('Access Denied');
+      else{
     const email=req.body.email;
     if(!email) res.status(400).json({msg:"please insert the email of the member you need the attendance records of"});
     else{
@@ -563,12 +660,18 @@ router.route('/attendance').get(async(req,res)=>{
         if(mem==null) res.status(400).json({msg:"there is no user with this email"});
         else
             res.send(mem.attendance);
-    }
+    }}}
+    catch(err){res.status(500).json({error:err.message});}
 })
 
 
 router.get('/viewMissinghours',async(req,res)=>{
-   var members=[];
+   try{
+   //to authorize
+   if(req.user.role!='HR')
+   res.status(401).send('Access Denied');
+   else{  
+    var members=[];
    const staff=await StaffMember.find();
    for(var a=0;a<staff.length;a++){
     var h=0;   
@@ -612,7 +715,8 @@ router.get('/viewMissinghours',async(req,res)=>{
     // }
    }
  return res.json(members);
- 
+}
+}catch(err){res.status(500).json({error:err.message});}
 })
 
 
@@ -691,6 +795,10 @@ for(var j=1;j<=10;j++){
 const moment=require('moment');
 router.get('/viewMissingdays',async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
         var dateMonth=moment().format("M")
         const dateYear=moment().format("Y")
       //  const dateDay=moment().format("D")
@@ -906,6 +1014,7 @@ router.get('/viewMissingdays',async(req,res)=>{
          }
             
             return res.json(members);  
+        }
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -938,18 +1047,24 @@ function compare( a, b ) {
 
 router.post('/addrecord',async(req,res)=>{
     try{
+        //to authorize
+    if(req.user.role!='HR')
+    res.status(401).send('Access Denied');
+    else{
        const{userid,thedate,signintime,signouttime}=req.body;
        if(!userid) res.status(400).json({msg:"please insert your id"});
        else{
            if(userid==req.user.id)
-              res.status(400).json({msg:"Cannot add record th this user"});
+              res.status(400).json({msg:"Cannot add record to this user"});
            else{
+               var index=0;
                const person=await StaffMember.findOne({"id":userid});
                if(signintime){
-                   var index=0;
+                   if(signintime>="07:00") {
                    for(var i=0;i<person.attendance.length;i++){
                         //to add sorted   
-                        if(person.attendance[i].date==thedate){
+                        if(moment(person.attendance[i].date).format("YYYY-MM-DD")==thedate){
+                            index=i;
                             if(person.attendance[i].signins.length==0)signins.push(signintime);
                            for(var j=0;j<person.attendance[i].signins.length;j++){
                                if(person.attendance[i].signins[j]>signintime){ 
@@ -968,9 +1083,10 @@ router.post('/addrecord',async(req,res)=>{
                             break;
                         }
                    }
-               }
+               }}
 
                if(signouttime){
+                   if(signouttime<="19:00"){
                 var index=0;
                 for(var i=0;i<person.attendance.length;i++){
                      //to add sorted   
@@ -994,14 +1110,25 @@ router.post('/addrecord',async(req,res)=>{
                      }
                 }
             }
-
+        }
 
             //hours should be calculated again here
-
-
+            var min=0;
+            if(person.attendance[index].signins.length<person.attendance[index].signouts.length) min=person.attendance[index].signins.length;
+            else min=person.attendance[index].signouts.length;
+            var hours=0;
+            var j=0;
+            for(var i=0;i<min;i++){
+                if(person.attendance[index].signouts[i]>person.attendance[index].signins[j]){
+                     hours+=(Number.parseInt(person.attendance[index].signouts[i].substring(0,2))-Number.parseInt(person.attendance[index].signins[j].substring(2)))+((Number.parseInt(person.attendance[index].signouts[i].substring(3,5))-Number.parseInt(person.attendance[index].signins[j].substring(3,5)))/60);
+                     j++;
+                } 
+            }
+             person.attendance[i].hours=hours;
+             
             await person.save();
             if(!signintime&& !signouttime) res.status(400).json({msg:"please insert the record to add"});
-            res.send("done");
+            else res.send("done");
 
 
 
@@ -1012,7 +1139,7 @@ router.post('/addrecord',async(req,res)=>{
                
            
            }   
-       }
+       }}
     }catch(err){
         res.status(500).json({error:err.message});
     }

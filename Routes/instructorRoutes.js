@@ -57,15 +57,44 @@ router.get('/slotsAssignment',async (req,res)=>{
           var assignments= [courses.length]; 
           for(var i=0;i<courses.length;i++){
             var c= await course.findOne({"_id":courses[i]}); 
-            assignments[i]=await c.schedule;           
+            var week=[];
+            for(var j=0;j<c.schedule.length;j++){
+                var slot=c.schedule[j];
+                var flag=false;
+                for(let i = 1; i < 8; i++) {
+                    const diff = moment().add(i, "days").format('YYYY-MM-DD');
+                    if(moment(slot.date).format('YYYY-MM-DD').toString() == diff.toString()) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if(flag){
+                    var loc=await location.findOne({"_id":slot.location});
+                    const returnedSlot = {
+                        day: slot.day,
+                        locationID: loc.id,
+                        courseID: c.id,
+                        date: moment(slot.date).format('YYYY-MM-DD'),
+                        number: slot.number
+                    }
+                    week.push(returnedSlot);                 
+                }
+            }
+            assignments[i]=  {"course id":c.id,"slots assignment":week};           
          }
-         res.send(assignments);
+         return res.status(200).json(assignments);
         }
        }
        else res.status(400).json({msg:"Access denied"});
     }catch(err){ 
         res.status(500).json({error:err.message});}
 })
+
+
+
+
+
+
 
 
 //staff per department

@@ -7,8 +7,8 @@ const AttendanceSchema = mongoose.Schema({
    ,last_signIn: {type:Timestamp}
    ,last_signOut: {type:Timestamp}
    ,day: {type: String},
-   signins:[{type:Timestamp}],
-   signouts:[{type: Timestamp}]
+   signins:[String],
+   signouts:[String]
 });
 
 modules.exports = AttendanceSchema;
