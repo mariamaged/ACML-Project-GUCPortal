@@ -184,6 +184,68 @@ app.post('/cancelRequest', authenticateToken, async (req, res) => {
     }
 });
 
+app.post('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+
+    const department = await DepartmentModel.findById(userAcademic.department);
+
+    const HODAcademicModel = await AcademicStaffModel.findById(department.HOD);
+    const HODStaffModel = await StaffMemberModel.findById(HODAcademicModel.member);
+    
+    const {slotNum, slotDate, slotLoc} = req.body;
+    const acceptedRequest = await RequestModel.findOne({
+          slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc, 
+          state: 'Accepted',
+          sentBy: req.user.id});
+    
+    const requestsSameSlot = await RequestModel.find({
+         slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc,
+         sentBy: req.user.id});
+
+    if(acceptedRequest) {
+        const newAnnualRequest = new RequestModel({
+            requestType: 'Annual Leave',
+            sentTo: HODStaffModel._id,
+            sentBy: req.user.id,
+            state: 'Pending',
+            submission_date: moment(),
+
+            slotNum: slotNum,
+            slotDate: slotDate,
+            slotLoc: slotLoc,
+            replacementStaff: acceptedRequest.sentTo
+        });
+        if(req.body.reason) newAnnualRequest.reason = req.body.reason;
+        await newAnnualRequest.save();
+
+        const acceptedStaff = await StaffMemberModel.findById(acceptedRequest.sentTo);
+        return res.status(200).send('Annual Leave request sent to HOD with the details about the academic member who accepted your request: ' 
+        + acceptedStaff.name + ", with id: " + acceptedStaff.id + '.');
+    }
+    else {
+        if(requestsSameSlot.length == 0) {
+            return res.status(400).send('You do not have a replacement request with such details!');
+        }
+        else {
+            const newAnnualRequest = new RequestModel({
+                requestType: 'Annual Leave',
+                sentTo: HODStaffModel._id,
+                sentBy: req.user.id,
+                state: 'Pending',
+                submission_date: moment(),
+    
+                slotNum: slotNum,
+                slotDate: slotDate,
+                slotLoc: slotLoc,
+            });
+            if(req.body.reason) newAnnualRequest.reason = req.body.reason;
+            await newAnnualRequest.save();
+
+            return res.status(200).send('Annual Leave request sent to HOD with request that has no accept responses.');
+        }
+    }
+
+});
 
 app.post('/CourseInstructorforCourse', async (req, res) => {
  //   if(req.user.isHOD) {
@@ -770,10 +832,8 @@ app.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
     } 
 });
 
-app.post('/sendAnnualLeavetoHOD', async (req, res) => {
-  //  const user = await StaffMemberModel.findById(req.user.id); // const user = await StaffMemberModel.findById(req.user._id);
-    const user = await StaffMemberModel.findOne({id: "ac-11"});
-    const userAcademic = await AcademicStaffModel.findOne({member: user._id});
+app.post('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
 
     const department = await DepartmentModel.findById(userAcademic.department);
 
@@ -782,24 +842,24 @@ app.post('/sendAnnualLeavetoHOD', async (req, res) => {
     
     const {slotNum, slotDate, slotLoc} = req.body;
     const acceptedRequest = await RequestModel.findOne({
-          slotNum: slotNum, slotDate: moment(slotDate, 'YYYY-MM-DD'), slotLoc: slotLoc, 
+          slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc, 
           state: 'Accepted',
-          sentBy: user._id}); // req.user.id/ req.user._id.
+          sentBy: req.user.id});
     
     const requestsSameSlot = await RequestModel.find({
-         slotNum: slotNum, slotDate: moment(slotDate, 'YYYY-MM-DD'), slotLoc: slotLoc,
-         sentBy: user._id}); // req.user.id/ req.user._id.
+         slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc,
+         sentBy: req.user.id});
 
     if(acceptedRequest) {
         const newAnnualRequest = new RequestModel({
             requestType: 'Annual Leave',
             sentTo: HODStaffModel._id,
-            sentBy: user._id, // req.user.id/ req.user._id
+            sentBy: req.user.id,
             state: 'Pending',
             submission_date: moment(),
 
             slotNum: slotNum,
-            slotDate: moment(slotDate, 'YYYY-MM-DD'),
+            slotDate: slotDate,
             slotLoc: slotLoc,
             replacementStaff: acceptedRequest.sentTo
         });
@@ -818,12 +878,12 @@ app.post('/sendAnnualLeavetoHOD', async (req, res) => {
             const newAnnualRequest = new RequestModel({
                 requestType: 'Annual Leave',
                 sentTo: HODStaffModel._id,
-                sentBy: user._id, // req.user.id/ req.user._id.
+                sentBy: req.user.id,
                 state: 'Pending',
                 submission_date: moment(),
     
                 slotNum: slotNum,
-                slotDate: moment(slotDate, 'YYYY-MM-DD'),
+                slotDate: slotDate,
                 slotLoc: slotLoc,
             });
             if(req.body.reason) newAnnualRequest.reason = req.body.reason;
