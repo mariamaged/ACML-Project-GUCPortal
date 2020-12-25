@@ -759,13 +759,15 @@ app.post('/sendAnnualLeavetoHOD', async (req, res) => {
 
 });
 
-app.post('/acceptRequest', async (req, res) => {
-    //    if(req.user.isHOD) {
-        const HODStaffModel = await StaffMemberModel.findOne({id: "ac-12"}); // Delete later
+app.post('/acceptRequest', authenticateToken, async (req, res) => {
+        const HODAcademicModel = await AcademicMemberModel.findOne({member: req.user.id});
+
+        if(HODAcademicModel.isHOD) {
 
         const {requestID} = req.body;
         const request = await RequestModel.findOne({requestID: requestID});
-        if(!request.sentTo.equals(HODStaffModel._id)) return res.status(400).send('This request is not sent for you!');
+        if(!request) res.status(400).send('Request not found!');
+        if(!request.sentTo.equals(req.user.id)) return res.status(400).send('This request is not sent for you!');
 
         if(request.reqType == 'Annual Leave') {
             const sentByAcademic = await AcademicStaffModel.findOne({member: request.sentBy});
@@ -776,7 +778,7 @@ app.post('/acceptRequest', async (req, res) => {
 
             var position = -1.
             sentByAcademic.schedule.some(function(assignedSlot, ind) {
-                var flag = assignedSlot.date.getTime() == request.slotDate.getTime()
+                var flag = moment(assignedSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString()
                     && assignedSlot.number == request.slotNum
                     && assignedSlot.location.equals(slotLocation._id);
                 if(flag) {
@@ -800,7 +802,7 @@ app.post('/acceptRequest', async (req, res) => {
                 
                 var pos = - 1;
                 var SlotExists = course.schedule.some(function(courseSlot, ind) {
-                    var flag = courseSlot.date.getTime() == slot.date.getTime()
+                    var flag = moment(courseSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString()
                     && courseSlot.number == slot.number
                     && courseSlot.location.equals(slot.location);
 
@@ -819,10 +821,10 @@ app.post('/acceptRequest', async (req, res) => {
 
             return res.status(200).send('Operation done successfully!');
         }
-          /*  else {
-        return res.status(401).send('Access Denied!');
-    } */
- //}  
+     }
+     else {
+         res.status(401).send('Access Denied!')
+     }
 });
 
 app.post('/cancelRequest', async (req, res) => {
@@ -844,8 +846,33 @@ app.post('/cancelRequest', async (req, res) => {
         else {
             if(request.reqType == 'Annual Leave' && request.state == 'Accepted') {
                 const sentToAcademic = await AcademicStaffModel.findOne({member: request.sentTo});
+                const location = await LocationModel.findOne({id: request.slotLoc});
+
                 var position = -1;
-                sentToAcademic.schedule.some(function())
+                var SlotExists = sentToAcademic.schedule.some(function(assignedSlot, ind) {
+                    var flag = assignedSlot.number == request.slotNum 
+                    && assignedSlot.location.equals(location._id)
+                    && moment(assignedSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString();
+
+                    if(flag) {
+                        position = ind;
+                        return flag;
+                    }
+                });
+
+                if(SlotExists) {
+                    const slot = sentToAcademic.schedule[position];
+                    sentToAcademic.schedule.splice(position, 1);
+                    await sentToAcademic.save();
+
+                    slot.isReplaced = false;
+
+                    userAcademic.schedule.push(slot);
+                    await userAcademic.save();
+                }
+                else {
+
+                }
             }
             await RequestModel.findOneAndDelete({requestID: requestID});
         }
