@@ -331,7 +331,7 @@ async function  cr(){
     // const arr=[1,2,3]
     // arr.push(4)
     // console.log(arr)
-    // console.log(hashedPassword)
+    console.log(hashedPassword)
     // console.log(await request.findOne({requestID:"Replacement-2"}))
   //  console.log(moment().format("HH:mm".toString()))
         // console.log(moment("2020-12-18T22:00:00.000+00:00").format("YYYY-MM-DD"))

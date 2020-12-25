@@ -348,7 +348,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
        var day="Saturday";
        var signedOut=true;
        var signins=[]
-       
+       var signinsTemp=[]
         var idx=-1;
         var attArr=new Array()
         for(var i=0;i<attendance.length;i++){
@@ -379,15 +379,15 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 check=true;
                 idx=i;
               
-               var newSignins=attendance[i].signins
+                newSigninsTemp=attendance[i].signins
                console.log("------------------------------------="+attendance[i])
-               console.log("000000000000000000000000000000000000="+newSignins)
-               newSignins[attendance[i].signins.length]=SignInTime
-               console.log("1111111111111111111111111111111111111="+newSignins[0])
-               console.log("2222222222222222222222222222222222222="+newSignins[1])
-               signins=newSignins
-               console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
-
+               //console.log("000000000000000000000000000000000000="+newSignins)
+               newSigninsTemp[attendance[i].signins.length]=SignInTime
+            //    console.log("1111111111111111111111111111111111111="+newSignins[0])
+            //    console.log("2222222222222222222222222222222222222="+newSignins[1])
+               signins=newSigninsTemp
+            //    console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
+                //const signins=
                 
             }
             else if(momentA==momentB &&attendance[i].signedOut==false )
@@ -397,6 +397,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
         }
         //found today's record will update it then insert it into attendance array
         if(check===true){
+            console.log("SIGNINSSSSSSSSSSS INSIDEEEEE=" +signins)
             const newAtt=new AttendanceSchema({
                 date:date,
                 time:time,
@@ -441,7 +442,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            }
            else
            var dayOffBool=false
-
+           console.log("at 2nd"+signins)
            console.log("dayofBool at signin= "+dayOffBool)
             const newAttendance=new AttendanceSchema({
                 date:newSignInDate,

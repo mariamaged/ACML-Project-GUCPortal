@@ -6,11 +6,11 @@ const slotSchema = require('../Models/SlotSchema.js');
 //const attendanceSchema = require('AttendanceSchema.js');
 
 const attendanceSchema = mongoose.Schema({
-    date: {type: Date},
-    signins:{type:[String]},
-    signouts:{type:[String]}
+    date: {type: Date}
     ,time:{type:Date}
     ,dayOffBool:{type:Boolean ,default:false}
+    ,signins:{type:[String]},
+    signouts:{type:[String]}
     //var datetime = new Date();
     //console.log(datetime.toISOString().slice(0,10)); ----->2020-12-18,
     ,attended:{type:Boolean, default:true},
