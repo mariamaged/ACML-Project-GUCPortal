@@ -336,6 +336,20 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     var reason=''
     if(req.body.reason)
     reason=req.body.reason
+    const doc = await CounterModel.findById('SlotLinking-');
+    if(!doc) {
+        console.log("NOTTTTTTTTTTTTTTTTTT DOCCCCCCCCCC")
+    const counterAcademic = new CounterModel({
+    _id: 'SlotLinking-'
+    });
+    try{
+    await counterAcademic.save();
+    console.log("successsssssssssssssssssss")
+    }
+    catch(err){
+            console.log("errooooooooooooooooooooooooooooooooor")
+    }
+}
     var newRequest=new request({
         reqType:"Slot Linking",
         slotDay:slotDay,
@@ -412,6 +426,20 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
     if(req.body.reason)
     reason=req.body.reason
 
+    const doc = await CounterModel.findById('ChangeDayOff-');
+    if(!doc) {
+        console.log("NOTTTTTTTTTTTTTTTTTT DOCCCCCCCCCC")
+    const counterAcademic = new CounterModel({
+    _id: 'ChangeDayOff-'
+    });
+    try{
+    await counterAcademic.save();
+    console.log("successsssssssssssssssssss")
+    }
+    catch(err){
+            console.log("errooooooooooooooooooooooooooooooooor")
+    }
+}
     var newRequest=new request({
         reqType:"Change Day off",
         newDayOff:req.body.newDayOff,
@@ -479,7 +507,20 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     //     return res.json("Must submit accident date with request")
     // }
     const accidentDate=req.body.accidentDate
-  
+    const doc = await CounterModel.findById('AccidentalLeave-');
+    if(!doc) {
+        console.log("NOTTTTTTTTTTTTTTTTTT DOCCCCCCCCCC")
+    const counterAcademic = new CounterModel({
+    _id: 'AccidentalLeave-'
+    });
+    try{
+    await counterAcademic.save();
+    console.log("successsssssssssssssssssss")
+    }
+    catch(err){
+            console.log("errooooooooooooooooooooooooooooooooor")
+    }
+}
 
     //create request
     var newRequest=new request({
@@ -552,6 +593,20 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
     var reason=''
     if(req.body.reason)
     reason=req.body.reason
+    const doc = await CounterModel.findById('SickLeave-');
+    if(!doc) {
+        console.log("NOTTTTTTTTTTTTTTTTTT DOCCCCCCCCCC")
+    const counterAcademic = new CounterModel({
+    _id: 'SickLeave-'
+    });
+    try{
+    await counterAcademic.save();
+    console.log("successsssssssssssssssssss")
+    }
+    catch(err){
+            console.log("errooooooooooooooooooooooooooooooooor")
+    }
+}
         var newRequest=new request({
             reqType:"Sick Leave",
             sickDay:moment(sickDay),
@@ -621,6 +676,20 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
          var reason=''
          if(req.body.reason)
          reason=req.body.reason
+         const doc = await CounterModel.findById('MaternityLeave-');
+         if(!doc) {
+             console.log("NOTTTTTTTTTTTTTTTTTT DOCCCCCCCCCC")
+         const counterAcademic = new CounterModel({
+         _id: 'MaternityLeave-'
+         });
+         try{
+         await counterAcademic.save();
+         console.log("successsssssssssssssssssss")
+         }
+         catch(err){
+                 console.log("errooooooooooooooooooooooooooooooooor")
+         }
+     }
          var newRequest=new request({
             reqType:"Maternity Leave",
             sentBy:req.user.id,
@@ -696,7 +765,20 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     //  var reason=''
     //  if(req.body.reason)
     //  reason=req.body.reason
-
+    const doc = await CounterModel.findById('CompensationLeave-');
+    if(!doc) {
+        console.log("NOTTTTTTTTTTTTTTTTTT DOCCCCCCCCCC")
+    const counterAcademic = new CounterModel({
+    _id: 'CompensationLeave-'
+    });
+    try{
+    await counterAcademic.save();
+    console.log("successsssssssssssssssssss")
+    }
+    catch(err){
+            console.log("errooooooooooooooooooooooooooooooooor")
+    }
+}
      var newRequest=new request({
         reqType:"Compensation Leave",
         sentBy:req.user.id,
@@ -1714,8 +1796,8 @@ router.get('/viewScheduleAllSemester', authenticateToken, async (req, res) => {
 
     for(let index = 0; index < schedule.length; index++) {
         const slot = schedule[index];
-        const courseTemp = await CourseModel.findById(slot.course);
-        const locationTemp = await LocationModel.findById(slot.location);
+        const courseTemp = await Course.findById(slot.course);
+        const locationTemp = await location.findById(slot.location);
         const returnedSlot = {
             day: slot.day,
             locationID: locationTemp.id,
@@ -1752,8 +1834,8 @@ router.get('/viewScheduleThisWeek', authenticateToken, async (req, res) => {
             }
         }
         if(flag) {
-        const courseTemp = await CourseModel.findById(slot.course);
-        const locationTemp = await LocationModel.findById(slot.location);
+        const courseTemp = await Course.findById(slot.course);
+        const locationTemp = await location.findById(slot.location);
         const returnedSlot = {
             day: slot.day,
             locationID: locationTemp.id,
@@ -1778,29 +1860,29 @@ router.post('/cancelRequest', authenticateToken, async (req, res) => {
     if(!userAcademic) return res.status(401).send('You are not an academic member!');
     const {requestID} = req.body;
 
-    const request = await RequestModel.findOne({requestID: requestID});
-    if(!request) res.status(400).send('Request not found!');
-    if(!request.sentBy.equals(req.user.id)) return res.status(401).send('You are not the one who sent this request!');
+    const currRequest = await request.findOne({requestID: requestID});
+    if(!currRequest) res.status(400).send('Request not found!');
+    if(!currRequest.sentBy.equals(req.user.id)) return res.status(401).send('You are not the one who sent this request!');
 
-    if(request.reqType != 'Replacement' && request.reqType != 'Annual Leave') {
-        if(request.state != 'Pending') return res.status(400).send('Cannot cancel a non-pending request!');
+    if(currRequest.reqType != 'Replacement' && currRequest.reqType != 'Annual Leave') {
+        if(currRequest.state != 'Pending') return res.status(400).send('Cannot cancel a non-pending request!');
         else {
-            await RequestModel.findOneAndDelete({requestID: requestID});
+            await request.findOneAndDelete({requestID: requestID});
             return res.status(200).send('Request cancelled successfully!');
         }
     }
     else {
-        if(moment(request.slotDate).format('YYYY-MM-DD').toString() <= moment().format('YYYY-MM-DD').toString()) return res.status(400).send('Cannot cancel a replacement/annual request whose target day has passed!');
+        if(moment(currRequest.slotDate).format('YYYY-MM-DD').toString() <= moment().format('YYYY-MM-DD').toString()) return res.status(400).send('Cannot cancel a replacement/annual request whose target day has passed!');
         else {
-            if(request.reqType == 'Annual Leave' && request.state == 'Accepted') {
-                const sentToAcademic = await AcademicStaffModel.findOne({member: request.replacementStaff});
-                const location = await LocationModel.findOne({id: request.slotLoc});
+            if(currRequest.reqType == 'Annual Leave' && currRequest.state == 'Accepted') {
+                const sentToAcademic = await AcademicStaffModel.findOne({member: currRequest.replacementStaff});
+                const location = await location.findOne({id: currRequest.slotLoc});
 
                 var position = -1;
                 sentToAcademic.schedule.some(function(assignedSlot, ind) {
-                    var flag = assignedSlot.number == request.slotNum 
+                    var flag = assignedSlot.number == currRequest.slotNum 
                     && assignedSlot.location.equals(location._id)
-                    && moment(assignedSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString();
+                    && moment(assignedSlot.date).format('YYYY-MM-DD').toString() == moment(currRequest.slotDate).format('YYYY-MM-DD').toString();
 
                     if(flag) {
                         position = ind;
@@ -1818,13 +1900,13 @@ router.post('/cancelRequest', authenticateToken, async (req, res) => {
                 userAcademic.schedule.push(slot);
                 await userAcademic.save();
 
-                const courses = await CourseModel.find({});
+                const courses = await Course.find({});
                 for(let i = 0; i < courses.length; i++) {
                     const course = courses[i];
                     
                     var pos = - 1;
                     var SlotExists = course.schedule.some(function(courseSlot, ind) {
-                        var flag = moment(courseSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString()
+                        var flag = moment(courseSlot.date).format('YYYY-MM-DD').toString() == moment(currRequest.slotDate).format('YYYY-MM-DD').toString()
                         && courseSlot.number == slot.number
                         && courseSlot.location.equals(slot.location);
     
@@ -1841,7 +1923,7 @@ router.post('/cancelRequest', authenticateToken, async (req, res) => {
                     }
                 }
             }
-            await RequestModel.findOneAndDelete({requestID: requestID});
+            await request.findOneAndDelete({requestID: requestID});
             return res.status(200).send('Request deleted successfully!');
         }
     }
@@ -1850,24 +1932,24 @@ router.post('/cancelRequest', authenticateToken, async (req, res) => {
 router.delete('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
 
-    const department = await DepartmentModel.findById(userAcademic.department);
+    const currDepartment = await department.findById(userAcademic.department);
 
-    const HODAcademicModel = await AcademicStaffModel.findById(department.HOD);
+    const HODAcademicModel = await AcademicStaffModel.findById(currDepartment.HOD);
     const HODStaffModel = await StaffMemberModel.findById(HODAcademicModel.member);
     
     const {slotNum, slotDate, slotLoc} = req.body;
-    const acceptedRequest = await RequestModel.findOne({
+    const acceptedRequest = await request.findOne({
           slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc, 
           state: 'Accepted',
           sentBy: req.user.id});
     
-    const requestsSameSlot = await RequestModel.find({
+    const requestsSameSlot = await request.find({
          slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc,
          sentBy: req.user.id});
 
 
     if(acceptedRequest) {
-        const newAnnualRequest = new RequestModel({
+        const newAnnualRequest = new request({
             reqType: 'Annual Leave',
             sentTo: HODStaffModel._id,
             sentBy: req.user.id,
@@ -1891,7 +1973,7 @@ router.delete('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
             return res.status(400).send('You do not have a replacement request with such details!');
         }
         else {
-            const newAnnualRequest = new RequestModel({
+            const newAnnualRequest = new request({
                 reqType: 'Annual Leave',
                 sentTo: HODStaffModel._id,
                 sentBy: req.user.id,
