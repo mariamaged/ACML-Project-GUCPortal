@@ -317,7 +317,14 @@ const currRequest=await request.find({reqType:"Replacement",submission_date:"202
 
    const salt=await bcrypt.genSalt();     
         const hashedPassword=await bcrypt.hash("123456",salt);
-        console.log("hashed pass= "+hashedPassword)
+        // console.log("hashed pass= "+hashedPassword)
+
+    const s="08:00"
+    const d="12:50"
+    const check=(s>d)
+    console.log(check)
+  //  console.log(moment().format("HH:mm".toString()))
+        // console.log(moment("2020-12-18T22:00:00.000+00:00").format("YYYY-MM-DD"))
 }//
 cr()
 

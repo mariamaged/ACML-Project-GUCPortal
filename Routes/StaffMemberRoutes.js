@@ -223,7 +223,7 @@ router.put('/updateProfile',authenticateToken,async(req,res)=>{
     const role=user.staff_type
     console.log("user= "+user)
     if(req.body.id)
-       return res.json("Cannot change id.")
+       return res.json("Cannot change ID.")
      if(req.body.name)   
        return res.json("Cannot change name.")
        if(req.body.day_off)
@@ -294,20 +294,35 @@ router.put('/resetPassword',authenticateToken,async(req,res)=>{
         const userPass=user.password
         //console.log(user+" userPass= "+userPass)
         const oldPass=req.body.oldPass
+        if(!oldPass){
+            return res.json("Please enter old password.")
+        }
         const isMatched=await bcrypt.compare(oldPass,user.password); 
         console.log(isMatched)
         if(!isMatched)
         return res.json("Please enter correct old password")
         const newPass=req.body.newPass
+        if(!newPass)
+        return res.json("Please enter valid new password.")
         const checkPass=req.body.checkPass
+        if(!checkPass){
+            return res.json("Please enter password check.")
+        }
         if(newPass!=checkPass)
        return res.json("Passwords do not match")
+
         const salt=await bcrypt.genSalt();     
         const hashedPassword=await bcrypt.hash(newPass,salt);
+
+        try{
         const userUpdated=await StaffMemberModel.findByIdAndUpdate(req.user.id,{password:hashedPassword})
-        const userUpdated2=await StaffMemberModel.findById(req.user.id)
+        //const userUpdated2=await StaffMemberModel.findById(req.user.id)
         // console.log(userUpdated.password)
-        res.json(userUpdated2)
+      return  res.json("Password updated successfully.")
+        }
+        catch(err){
+            return res.json("An error occured. Please try again.")
+        }
 })
 //USE MOMENT LIBRARY moment().utc().format('hh:mm:ss') 
 router.put('/signin',authenticateToken,async(req,res)=>{
@@ -320,6 +335,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
     var currentTime = moment();
    //console.log("SignIn= "+SignIn)
     const user=await StaffMemberModel.findById(req.user.id)
+    //if there is objects in attendance array will check if today's date is present to update it
     if(user.attendance){
        var attendance=user.attendance
        var date=new moment()
@@ -340,6 +356,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             console.log("momentA= "+momentA)
             console.log("momentB= "+momentB)
 
+            //checking if today's date and this object's date are the same and if user is signedOut 
+            //
             if(momentA==momentB &&attendance[i].signedOut==true ){
                 if(today=="Friday"){
                     var dayOffBool=true
@@ -361,10 +379,11 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 
             }
             else if(momentA==momentB &&attendance[i].signedOut==false )
-                return res.send("This user is already signed in")
+                return res.send("This user is already signed in.")
             attArr[i]=attendance[i];
 
         }
+        //found today's record will update it then insert it into attendance array
         if(check===true){
             const newAtt=new AttendanceSchema({
                 date:date,
@@ -390,10 +409,14 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const minute=user.attendance[idx].minutes
             const dayoff=user.attendance[idx].dayOffBool
           //  console.log("signed in true= "+signedInToday)
-            return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
-            signedIn:signedInToday,hours:hour,minutes:minute,dayOffBool:dayOffBool})
+        //     return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
+        //    hours:hour,minutes:minute})
+           return res.json("Succesfully signed in")
         }
     }
+    //if didn't find today's date or array empty from the beginnning
+    //will create a new record and insert it
+    //using dayOffBool to check in signout because if signed in and out on friday will not count hours
     if(check===false || user.attendance.length==0){
         const newSignInDate=new moment()
        // moment.utc( //).format('YYYY-MM-DD');
@@ -420,6 +443,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             })
             console.log("SignIn= "+SignIn)
             console.log("newAttendance "+newAttendance)
+            //enter new record to already existing attendance array
         if(check===false){
            const attArr=user.attendance
            attArr[attArr.length]=newAttendance
@@ -429,9 +453,11 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const att=userNow.attendance[attendance.length-1].last_signIn
             const signedInToday=userNow.attendance[attendance.length-1].signedIn
             console.log("att= "+(moment(att).format("HH:mm")))
-            return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
-            signedIn:signedInToday})
+            // return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm"))
+            // })
+            return res.json("Succesfully signed in")
         }
+        //enter new array with new record
         else{
            const attArr=new Array()
            attArr[0]=newAttendance
@@ -441,12 +467,13 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            const att=user.attendance[0].last_signIn
            const dateToday=user.attendance[0].date
            const signedInToday=user.attendance[0].signedIn
-           return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
-                            signedIn:signedInToday})
+           //return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm"))})
+           return res.json("Succesfully signed in.")
         }
         
 
     }
+    return res.json("An error occured. Please try again.")
     
 })
 
@@ -482,6 +509,8 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             var momentA = moment(attendance[i].date).format('YYYY-MM-DD');
             var momentB = currentTime.format('YYYY-MM-DD')
            // console.log("understand "+ attendance[i].last_signIn )
+           //searching for today's date and signedout is false otherwise will say
+           //already signed out
             if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
                 var dayOffBool=attendance[i].dayOffBool
                 console.log(attendance[i])
@@ -536,6 +565,10 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                     // console.log("check1= "+check1)
                     // console.log("check2= "+check2)
 
+                    //checking if today is not friday
+                    //if it is will not add hours to monthly hours
+                    //and checking if we signed in before 7 pm
+                    //because after we will not add any hours
                     if((start.isBefore(end))==true && dayOffBool==false){
                     console.log("new start= "+moment(start).format("HH:mm"))
                     console.log("new end= "+moment(end).format("HH:mm"))
@@ -615,13 +648,15 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 
             }
              else if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==true )
-                 return res.send("This user has already signed out")
+                 return res.send("This user has already signed out.")
 
             attArr[i]=attendance[i];
 
         }
         
-        
+        //found today's date and not signed out yet
+        // will update monthly hrs,min
+        //wil update the record with new missing hrs,min
         if(check==true){
             const user= await StaffMemberModel.findById(req.user.id)
             /////////////////////////////////////////////////////////////////////////////
@@ -630,9 +665,10 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             const currYear=new moment().format("Y")
             var c=false;
             var newMonthlyArr=new Array()
-           // console.log("user= "+user)
-            //search in months hours for this person then add new hours and minutesif there is already a record
-            //const user=await StaffMemberModel.findById(req.user.id)
+
+            //search in months hours for this person then add new hours 
+            //and minutes if there is already a record
+            
             console.log("length= "+user.time_attended.length)
             const check=(user.time_attended.length>0)
             console.log("check= "+check)
@@ -645,78 +681,14 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                         
                         console.log("before ifs "+"missingHrs= "+missingHrs+" missingMin= "+missingMin)
                         console.log("before ifs "+"extraHrs= "+extraHrs+" extraMin= "+extraMin+" missingMin= "+missingMin)
-                        // if(extraMin>0 && missingHrs>0){
-                        //     missingHrs--
-                        //     missingMin=60-extraMin
-                        //     extraMin=0
-                        //     console.log("her paleeeeease")
-                        //     console.log("missingHrs= "+missingHrs+" missingMin= "+missingMin)
-                        // }
-                        // if(extraHrs>0 && missingMin>0){
-                        //    extraHrs--
-                        //     extraMin=60-missingMin
-                        //     missingMin=0
-                        //     console.log("extraHrs= "+extraHrs+" extraMin= "+extraMin+" missingMin= "+missingMin)
-                        // }
-
-
-                        // if(extraMin>0){
-                        //     if(extraMin<currMissM){
-                        //         currMissM=currMissM-extraMin
-                        //         extraMin=0
-                        //     }
-                        //     else{
-                        //         extraMin=extraMin-currMissM
-                        //         currMissM=0
-                        //     }
-                        // }
-
-                        // if(extraHrs>0){
-                        //     if(extraHrs>currMissH){
-                        //         extraHrs=extraHrs-currMissH
-                        //         currMissH=0
-                        //     }
-                        //     else{
-                        //         currMissH=currMissH-extraHrs
-                        //         extraHrs=0
-                        //     }
-                        // }
-
-                        // if(missingMin>0){
-                        //     if(missingMin>currExtraM){
-                        //         missingMin=missingMin-currExtraM
-                        //         currExtraM=0
-                        //     }
-                        //     else{
-                        //         currExtraM=currExtraM-missingMin
-                        //         missingMin=0 
-                        //     }
-                        // }
-
-                        // if(missingHrs>0){
-                        //     if(missingHrs>currExtraH){
-                        //         missingHrs=missingHrs-currExtraH
-                        //         currExtraH=0
-                        //     }
-                        //     else{
-                        //         currExtraH=currExtraH-missingHrs
-                        //         missingHrs=0 
-                        //     }
-                        // }
-
+                       
+                       
                         
                         var finEM=extraMin
                         var finMM=missingMin
                         var finEH=extraHrs
                         var finMH=missingHrs
-                        // if(extraMin+currExtraM>60){
-                        //     extraHrs++
-                        //     finEM=extraMin+currExtraM-60
-                        // }
-                        // if(missingMin+currMissM>60){
-                        //     extraHrs++
-                        //     finMM=missingMin+currMissM-60
-                        // }
+                        
                         console.log("finEM= "+finEM)
                      console.log("inEH= "+finEH)
                        // console.log("extras= "+finEM+" "+finEH)
@@ -772,7 +744,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
 
 
 
-
+            //updating attendance to enter signed out date
             ///////////////////////////////////////////////////////////////////////////////////
             const newAtt=new AttendanceSchema({
                 date:date,
@@ -780,6 +752,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 attended:true,
                 hours:hours,
                 minutes:minutes,
+                attended:true,
                 signedIn:false,
                 signedOut:true,
                 last_signIn:last_signIn,
@@ -788,26 +761,33 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             })
             console.log("signout down= "+moment(SignOut).format("HH:mm"))
             attArr[idx]=newAtt
+            try{
             const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+            
            // const user= await StaffMemberModel.findById(req.user.id)
             const signin=user.attendance[idx].last_signIn
             const signout=user.attendance[idx].last_signOut
             console.log("signing out at"+moment(SignOut).format("HH:mm"))
             const dateToday=user.attendance[idx].date
             const lastCal=user.attendance[idx].last_calculated_signOut
-            return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(OldSignIn).format("HH:mm")),last_signOut:(moment(SignOut).format("HH:mm")),
-                hours:hours,minutes:minutes,signedIn:signedIn})
+            // return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(OldSignIn).format("HH:mm")),last_signOut:(moment(SignOut).format("HH:mm")),
+            //     hours:hours,minutes:minutes,signedIn:signedIn})
+                return res.json("Succesffuly signed out.")}
+                catch{
+                    return res.json("An error occured please try again.")
+                }
         }
     }
 
 
     //no attendance or this day is not found so no prior signin
     if(check===false || user.attendance.length==0){
-        return res.json("Cannot sign out without prior signin")
+        return res.json("Cannot sign out without prior signin.")
     }
 
         
 })
+///////////////////MUST MAKE SURE THAT USER INPUTS NUMBERSSSSSSSSSSSSSSSSS/////////
 router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
     const user=await StaffMemberModel.findById(req.user.id)
    // if(user.attendance){
@@ -816,8 +796,10 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
         var month=false;
         if(req.body.month){
             month=true;
+            if(!((req.body.month>0) && (req.body.month<13) ))
+            return res.send("Please enter correct month.")
             if(req.body.month<=0 || req.body.month>=13)
-                return res.send("Please enter correct month")
+                return res.send("Please enter correct month.")
         }
       
         var arr=new Array()
@@ -843,14 +825,22 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
                     last_signOut:(moment(currDay.last_signOut).format("HH:mm")),
                 hours:currDay.hours,minutes:currDay.minutes})
             }
-            res.json({attendance:arr})
+            if(arr.length==0)
+            return res.json("There are no attendance records to display.")
+            else{
+                // for(var k=0;k<arr.length;k++){
+                //     res.write()
+                // }
+                return res.json({attendance:arr})
+            }
+          
         }
 
 
 
 //}
     else{
-        return res.json(user.attendance)
+        return res.json("There are no attendance records to display.")
     }
     
 })
@@ -908,8 +898,8 @@ function compare( a, b ) {
 router.get('/missingDays',authenticateToken,async(req,res)=>{
     var dateMonth=moment().format("M")
     const dateYear=moment().format("Y")
-  //  const dateDay=moment().format("D")
-  const dateDay=2
+  const dateDay=moment().format("D")
+//  const dateDay=2
         const user=await StaffMemberModel.findById(req.user.id)
         var day=""
         if(user.staff_type=="HR")
@@ -942,7 +932,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
          nextMonth=(parseInt(dateMonth)+1)  
          nextYear=dateYear
         }
-
+        console.log("dateMonth= "+dateMonth+" dateYear= "+dateYear+" nextYear= "+nextYear+" nextMonth= "+nextMonth)
         //first get list of present days in both months
         for(var i=0;i<userAttendance.length;i++){
             const currDay=userAttendance[i]
@@ -951,7 +941,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
             
             const dayNum=moment(currDay.date).format("D")
             const day=moment(currDay.date).format("dddd")
-
+          //  console.log("in first")
             //if 1st month will get starting from 11th day
             if(year==dateYear && month==dateMonth && dayNum>=11){
                     userDays[idx++]=userAttendance[i]
@@ -964,26 +954,32 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
 
         //sort this array to be able to fill missing days in between present days
         const sortedUserDays=userDays.sort(compareAsc)
-      //console.log(" sortedUserDays"+sortedUserDays)
+        for(var l=0;l<sortedUserDays.length;l++){
+      console.log(" sortedUserDays"+moment(sortedUserDays[l].date).format("YYYY-MM-DD"))
+        }
         var j=0
         var currDay=11
+        if(sortedUserDays.length>0)
         var m= moment(sortedUserDays[j].date).format('M')
 
         //start looping on days of first month to get missing days in between present days
         while(j<sortedUserDays.length && m==dateMonth){
             var d= moment(sortedUserDays[j].date).format('D')
+            console.log("d=================="+d)
              m= moment(sortedUserDays[j].date).format('M')
                 while(d>currDay && m==dateMonth ){
                    const currYear=new moment().format("Y")
                    var currDate=new moment(currYear+"-"+dateMonth+"-"+currDay).format('dddd')
-                   if(currDate!=day_off && currDate!='Friday' && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+                   console.log("currDay= "+currDay+" currDate= "+currDate+" d="+d)
+                   if(currDate!=day_off && currDate!='Friday' ){
                        missedDays[k++]=new moment(currYear+"-"+dateMonth+"-"+currDay).format("YYYY-MM-DD");
                         console.log("adding "+missedDays[k-1])
                     }
                    currDay++
                 }
                 currDay++
-                j++
+                console.log("currDyyyyyyyyyyyyyyyyyyyyyyyyy= "+currDay)
+                ++j
                 if(j<sortedUserDays.length){
                  m= moment(sortedUserDays[j].date).format('M')
 
@@ -992,10 +988,15 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     if(j>0){
     var lastD= moment(sortedUserDays[j-1].date).format('D')
     var lastDName= moment(sortedUserDays[j-1].date).format('dddd')           
-    const lastMonth=moment(sortedUserDays[j-1].date).format('M')
-    const lastYear=moment(sortedUserDays[j-1].date).format('Y')
+    var lastMonth=moment(sortedUserDays[j-1].date).format('M')
+    var lastYear=moment(sortedUserDays[j-1].date).format('Y')
     console.log("ld= "+lastD+" lm= "+lastMonth+" ly= "+lastYear)
     var lastDay=parseInt(lastD)+1
+    const y=moment(sortedUserDays[j-1].date).format("YYYY")
+    const m=moment(sortedUserDays[j-1].date).format("MM")
+    const d=moment(sortedUserDays[j-1].date).format("DD")
+     lastDName=new moment(y+"-"+m+"-"+lastDay).format('dddd')
+     console.log("lastdNAMEEEEEEEEEEEEEEE=" +lastDName)
     }
     else{
         var lastD= new moment(dateYear+"-"+dateMonth+"-"+currDay).format('D')
@@ -1011,7 +1012,10 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         while(lastDay<32){
             //added recently
             var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
-            if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+            console.log("lastYear= "+lastYear+" dateMonth"+dateMonth)
+            console.log("here at "+lastDay+" lastDName= "+lastDName)
+            if(lastDName!='Friday' && lastDName!=day_off ){
+                
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             console.log("added= "+missedDays[k-1])
             }
@@ -1024,7 +1028,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
         while(lastDay<31 ){
             //added recently
             var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
-            if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+            if(lastDName!='Friday' && lastDName!=day_off ){
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             }
             lastDay++;
@@ -1037,7 +1041,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
             while(lastDay<30){
                  //added recently
             var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
-             if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+             if(lastDName!='Friday'&& lastDName!=day_off ){
               missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
             }
             lastDay++;
@@ -1048,7 +1052,7 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
             while(lastDay<29){
                  //added recently
             var currDate=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format('dddd')
-                if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+                if(lastDName!='Friday'&& lastDName!=day_off ){
             missedDays[k++]=new moment(lastYear+"-"+dateMonth+"-"+lastDay).format("YYYY-MM-DD");
                 }
             lastDay++;
@@ -1057,13 +1061,14 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
     }
     }
     //if only present in first month then fill 2nd month manually
-    if(moment(sortedUserDays[sortedUserDays.length-1].date).format("M")==dateMonth){
+    if( sortedUserDays.length==0||moment(sortedUserDays[sortedUserDays.length-1].date).format("M")==dateMonth ){
         var currDay2=1
+        console.log("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         lastDName=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("dddd");
         for(var g=1;g<=10;g++){
             //added recently
             var currDate=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
-            if(lastDName!='Friday'&& lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD") ){
+            if(lastDName!='Friday'&& lastDName!=day_off ){
             missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
             }
             currDay2++
@@ -1084,12 +1089,13 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
                 const currDate2=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format('dddd')
                 console.log("inside 2nd= "+currDay2+" "+currDate2)
                 //RECENTLY
-                if(currDate2!=day_off && currDate2!='Friday'&& moment(currDate2).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD") ){
+                if(currDate2!=day_off && currDate2!='Friday' ){
                     console.log("accepted 2nd= "+currDay2+" "+currDate2)
                     missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+currDay2).format("YYYY-MM-DD");
                 }
                 currDay2++
                 last2day=currDay2
+                console.log("currDay2== "+currDay2+" d2="+d2)
              }
              
              currDay2++
@@ -1098,14 +1104,18 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
      }
     //  console.log("missed till now= "+missedDays)
      //then start looping from last present day till the 10th of 2nd month
-     var last2D=moment(sortedUserDays[sortedUserDays.length-1].date).format("D")
+    //  var last2D=moment(sortedUserDays[sortedUserDays.length-1].date).format("D")
+    //  var last2day=parseInt(last2D)+1
+    var last2D=moment(sortedUserDays[sortedUserDays.length-1].date).format("D")
      var last2day=parseInt(last2D)+1
+     console.log("LASTTTTTTTTTTTTTTTTTT= "+last2day)
     
      for(last2day;last2day<=10;last2day++){
         lastDName=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("dddd");
         //RECENTLY
         const currDate2=new moment(nextYear+"-"+nextMonth+"-"+last2day).format('dddd')
-         if(lastDName!='Friday' && lastDName!=day_off && moment(currDate).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
+         if(lastDName!='Friday' && lastDName!=day_off ){
+             console.log("ADDDDDDDDDDDDDDDING= "+last2day)
         missedDays[k++]=new moment(nextYear+"-"+nextMonth+"-"+last2day).format("YYYY-MM-DD");
          }
         
