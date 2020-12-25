@@ -109,6 +109,82 @@ app.get('/viewScheduleThisWeek', authenticateToken, async (req, res) => {
     return res.status(200).json(returnObject);
 });
 
+app.post('/cancelRequest', authenticateToken, async (req, res) => {
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+
+    if(!userAcademic) return res.status(401).send('You are not an academic member!');
+    const {requestID} = req.body;
+
+    const request = await RequestModel.findOne({requestID: requestID});
+    if(!request) res.status(400).send('Request not found!');
+    if(!request.sentBy.equals(req.user.id)) return res.status(401).send('You are not the one who sent this request!');
+
+    if(request.reqType != 'Replacement' && request.reqType != 'Annual Leave') {
+        if(request.state != 'Pending') return res.status(400).send('Cannot cancel a non-pending request!');
+        else {
+            await RequestModel.findOneAndDelete({requestID: requestID});
+            return res.status(200).send('Request cancelled successfully!');
+        }
+    }
+    else {
+        if(moment(request.slotDate).format('YYYY-MM-DD').toString() <= moment().format('YYYY-MM-DD').toString()) return res.status(400).send('Cannot cancel a replacement/annual request whose target day has passed!');
+        else {
+            if(request.reqType == 'Annual Leave' && request.state == 'Accepted') {
+                const sentToAcademic = await AcademicStaffModel.findOne({member: request.replacementStaff});
+                const location = await LocationModel.findOne({id: request.slotLoc});
+
+                var position = -1;
+                sentToAcademic.schedule.some(function(assignedSlot, ind) {
+                    var flag = assignedSlot.number == request.slotNum 
+                    && assignedSlot.location.equals(location._id)
+                    && moment(assignedSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString();
+
+                    if(flag) {
+                        position = ind;
+                        return flag;
+                    }
+                });
+
+                console.log(position);
+                const slot = sentToAcademic.schedule[position];
+                sentToAcademic.schedule.splice(position, 1);
+                await sentToAcademic.save();
+
+                slot.isReplaced = false;
+
+                userAcademic.schedule.push(slot);
+                await userAcademic.save();
+
+                const courses = await CourseModel.find({});
+                for(let i = 0; i < courses.length; i++) {
+                    const course = courses[i];
+                    
+                    var pos = - 1;
+                    var SlotExists = course.schedule.some(function(courseSlot, ind) {
+                        var flag = moment(courseSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString()
+                        && courseSlot.number == slot.number
+                        && courseSlot.location.equals(slot.location);
+    
+                        if(flag) {
+                            pos = ind;
+                            return flag;
+                        }
+                    });
+    
+                    if(SlotExists) {
+                        course.schedule[pos].isReplaced = false;
+                        course.academic_member_id = userAcademic._id;
+                        await course.save();
+                    }
+                }
+            }
+            await RequestModel.findOneAndDelete({requestID: requestID});
+            return res.status(200).send('Request deleted successfully!');
+        }
+    }
+});
+
+
 app.post('/CourseInstructorforCourse', async (req, res) => {
  //   if(req.user.isHOD) {
         const {courseID, courseInstructorID} = req.body;
@@ -827,29 +903,32 @@ app.post('/acceptRequest', authenticateToken, async (req, res) => {
      }
 });
 
-app.post('/cancelRequest', async (req, res) => {
+app.post('/cancelRequest', authenticateToken, async (req, res) => {
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
 
     if(!userAcademic) return res.status(401).send('You are not an academic member!');
     const {requestID} = req.body;
 
     const request = await RequestModel.findOne({requestID: requestID});
+    if(!request) res.status(400).send('Request not found!');
     if(!request.sentBy.equals(req.user.id)) return res.status(401).send('You are not the one who sent this request!');
+
     if(request.reqType != 'Replacement' && request.reqType != 'Annual Leave') {
-        if(request.state != 'Pending') return res.status(400).send('Cannot cancel a pending request!');
+        if(request.state != 'Pending') return res.status(400).send('Cannot cancel a non-pending request!');
         else {
             await RequestModel.findOneAndDelete({requestID: requestID});
+            return res.status(200).send('Request cancelled successfully!');
         }
     }
     else {
-        if(request.slotDate.getTime() <= moment().getTime()) return res.status(400).send('Cannot cancel a replacement/annual request whose target day has passed!');
+        if(moment(request.slotDate).format('YYYY-MM-DD').toString() <= moment().format('YYYY-MM-DD').toString()) return res.status(400).send('Cannot cancel a replacement/annual request whose target day has passed!');
         else {
             if(request.reqType == 'Annual Leave' && request.state == 'Accepted') {
-                const sentToAcademic = await AcademicStaffModel.findOne({member: request.sentTo});
+                const sentToAcademic = await AcademicStaffModel.findOne({member: request.replacementStaff});
                 const location = await LocationModel.findOne({id: request.slotLoc});
 
                 var position = -1;
-                var SlotExists = sentToAcademic.schedule.some(function(assignedSlot, ind) {
+                sentToAcademic.schedule.some(function(assignedSlot, ind) {
                     var flag = assignedSlot.number == request.slotNum 
                     && assignedSlot.location.equals(location._id)
                     && moment(assignedSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString();
@@ -860,21 +939,41 @@ app.post('/cancelRequest', async (req, res) => {
                     }
                 });
 
-                if(SlotExists) {
-                    const slot = sentToAcademic.schedule[position];
-                    sentToAcademic.schedule.splice(position, 1);
-                    await sentToAcademic.save();
+                console.log(position);
+                const slot = sentToAcademic.schedule[position];
+                sentToAcademic.schedule.splice(position, 1);
+                await sentToAcademic.save();
 
-                    slot.isReplaced = false;
+                slot.isReplaced = false;
 
-                    userAcademic.schedule.push(slot);
-                    await userAcademic.save();
-                }
-                else {
+                userAcademic.schedule.push(slot);
+                await userAcademic.save();
 
+                const courses = await CourseModel.find({});
+                for(let i = 0; i < courses.length; i++) {
+                    const course = courses[i];
+                    
+                    var pos = - 1;
+                    var SlotExists = course.schedule.some(function(courseSlot, ind) {
+                        var flag = moment(courseSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString()
+                        && courseSlot.number == slot.number
+                        && courseSlot.location.equals(slot.location);
+    
+                        if(flag) {
+                            pos = ind;
+                            return flag;
+                        }
+                    });
+    
+                    if(SlotExists) {
+                        course.schedule[pos].isReplaced = false;
+                        course.academic_member_id = userAcademic._id;
+                        await course.save();
+                    }
                 }
             }
             await RequestModel.findOneAndDelete({requestID: requestID});
+            return res.status(200).send('Request deleted successfully!');
         }
     }
 });
@@ -1657,14 +1756,14 @@ app.post('/addtoSchedule', async (req, res) => {
     const locationTemp = await LocationModel.findOne({id: location});
     const courseTemp = await CourseModel.findOne({id: courseID});
     const slot = {
-        date: moment(date, 'YYYY-MM-DD'),
+        date: date,
         number: number,
         day: moment(date, 'YYYY-MM-DD').format('dddd').toString(),
         course: courseTemp._id,
         location: locationTemp._id,
         isReplaced: true
     }
-    const user = await StaffMemberModel.findOne({id: 'ac-12'});
+    const user = await StaffMemberModel.findOne({id: 'ac-11'});
     const userAcademic = await AcademicStaffModel.findOne({member: user._id});
     userAcademic.schedule.push(slot);
     await userAcademic.save();
