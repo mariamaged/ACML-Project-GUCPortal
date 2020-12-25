@@ -425,9 +425,9 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const minute=user.attendance[idx].minutes
             const dayoff=user.attendance[idx].dayOffBool
           //  console.log("signed in true= "+signedInToday)
-            return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
-           hours:hour,minutes:minute,signins:up.attendance})
-           //return res.json("Succesfully signed in")
+        //     return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
+        //    hours:hour,minutes:minute,signins:up.attendance})
+           return res.json("Succesfully signed in")
         }
     }
     //if didn't find today's date or array empty from the beginnning
@@ -470,10 +470,10 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const att=userNow.attendance[attendance.length-1].last_signIn
             const signedInToday=userNow.attendance[attendance.length-1].signedIn
             console.log("att= "+(moment(att).format("HH:mm")))
-            return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),
-            last_signIn:(moment(att).format("HH:mm")),signins:[SigninTime]
-            })
-          //  return res.json("Succesfully signed in")
+            // return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),
+            // last_signIn:(moment(att).format("HH:mm")),signins:[SigninTime]
+            // })
+           return res.json("Succesfully signed in")
         }
         //enter new array with new record
         else{
@@ -485,9 +485,9 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            const att=user.attendance[0].last_signIn
            const dateToday=user.attendance[0].date
            const signedInToday=user.attendance[0].signedIn
-           return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),
-           last_signIn:(moment(att).format("HH:mm")),signins:signins})
-           //return res.json("Succesfully signed in.")
+        //    return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),
+        //    last_signIn:(moment(att).format("HH:mm")),signins:signins})
+           return res.json("Succesfully signed in.")
         }
         
 
@@ -780,7 +780,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             })
             console.log("signout down= "+moment(SignOut).format("HH:mm"))
             attArr[idx]=newAtt
-           // try{
+            try{
             const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
             
            // const user= await StaffMemberModel.findById(req.user.id)
@@ -789,12 +789,12 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             console.log("signing out at"+moment(SignOut).format("HH:mm"))
             const dateToday=user.attendance[idx].date
             const lastCal=user.attendance[idx].last_calculated_signOut
-            return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(OldSignIn).format("HH:mm")),last_signOut:(moment(SignOut).format("HH:mm")),
-                hours:hours,minutes:minutes,signedIn:signedIn})
-                // return res.json("Succesffuly signed out.")}
-                // catch{
-                //     return res.json("An error occured please try again.")
-                // }
+            // return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(OldSignIn).format("HH:mm")),last_signOut:(moment(SignOut).format("HH:mm")),
+            //     hours:hours,minutes:minutes,signedIn:signedIn})
+                return res.json("Succesffuly signed out.")}
+                catch{
+                    return res.json("An error occured please try again.")
+                }
         }
     }
 
