@@ -330,23 +330,20 @@ Example of HR response body
  - Response Body example:
  - 
 ```
-[{
-"date": "2021-12-13",
-"attended": true,
-"last_signIn": "16:17",
-"last_signOut": "16:17",
-"hours": 0,
-"minutes": 0
-},
+Date: 2020-12-25
+Attended: true
+Hours: 0
+Minutes: 0
 
-{
-"date": "2021-01-02",
-"attended": true,
-"last_signIn": "16:17",
-"last_signOut": "16:17",
-"hours": 0,
-"minutes": 0
-}]
+Date: 2020-12-24
+Attended: true
+Hours: 1
+Minutes: 35
+
+Date: 2020-12-22
+Attended: false
+Hours: 0
+Minutes: 0
 ``````
 Example for attendance for a certain month
 
@@ -872,7 +869,9 @@ Submission date: Thu Dec 24 2020 22:19:59 GMT+0200 (Eastern European Standard Ti
 
 **7 (b) . View accepted requests.**
  - **Functionality:** any academic member should be able to view  accepted requests.
- - **Route:**/acceptedRequests
+ - **Route:**
+ - /acceptedRequests (for submitted requests)
+ - /acceptedReceivedRequests (for received requests)
  - **Request type:** GET
  - **Request body:** empty
 
@@ -898,9 +897,15 @@ Course ID: csen33
 Reason: 
 Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Time)
 ```
+
+
+
+
 **7 (b) . View pending requests.**
  - **Functionality:** any academic member should be able to view  pending requests.
- - **Route:**/pendingRequests
+ - **Route:**
+ - /pendingRequests (for submitted requests)
+ - /pendingReceivedRequests (for received requests)
  - **Request type:** GET
  - **Request body:** empty
 
@@ -928,7 +933,9 @@ Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Ti
 ```
 **7 (c) . View rejected requests.**
  - **Functionality:** any academic member should be able to view  rejected requests.
- - **Route:**/rejectedRequests
+ - **Route:**
+ - /rejectedRequests (for submitted requests)
+ - /rejectedReceivedRequests (for received requests)
  - **Request type:** GET
  - **Request body:** empty
 
@@ -954,34 +961,56 @@ Course ID: csen33
 Reason: 
 Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Time)
 ```
-**8 . Cancel a still pending request or a request whose day is yet to come.**
- - **Functionality:** any academic member should be able to cancel a still pending request or a request whose day is yet to come.
- - **Route:**/cancelRequest
- - **Request type:** GET
+**8 . Accept a replacement request.**
+ - **Functionality:** any academic member should be able to accept a replacement request sent by another member.
+ - **Route:**/acceptReplacementRequest
+ - **Request type:** PUT
  - **Request body:** user must input
-         - reqType
-         - ,submission_date,
-         - .id
+         - requestID (he can get this ID by viewing his requests)
 
 
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
 
-      ```"HR do not have any leave requests."```
- -  Case 2: if the user do not have any accepted requests yet, the response sends back the message :
+      ```'You are not an academic member!'```
+ -  Case 2: if the user inputs a request ID that does not exist, the response sends back the message :
 
-       ```"There are no rejected requests to display."```
- -  Case 3:else if there are submitted requests:
+       ```"This request does not exist. Please enter correct request ID"```
+ -  Case 3: if the user inputs the ID of a request that was not sent to him , the response sends back the message :
 
-     **Example of response body:**
+       ```This request was not sent to you.Cannot accept or reject.'```
+   -  Case 3: if the user inputs a request ID that he has already accepted before, the response sends back the message :
 
-```json
-Request type: Slot Linking
-Sent to course coordinator: marina
-Request state: Rejected
-Slot Day: Monday
-Slot Number: 2
-Course ID: csen33
-Reason: 
-Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Time)
-```
+       ```"This request has already been accepted before."'```    
+     -  Case 4: else :
+
+           ```"Request successfully accepted."'```      
+
+
+**8 . Reject a replacement request.**
+ - **Functionality:** any academic member should be able to accept a replacement request sent by another member.
+ - **Route:**/rejectReplacementRequest
+ - **Request type:** PUT
+ - **Request body:** user must input
+         - requestID (he can get this ID by viewing his requests)
+
+
+ - **Response body:**  
+ - Case 1: if the user is an HR member and not an academic one the response sends back the message :
+
+      ```'You are not an academic member!'```
+ -  Case 2: if the user inputs a request ID that does not exist, the response sends back the message :
+
+       ```"This request does not exist. Please enter correct request ID"```
+ -  Case 3: if the user inputs the ID of a request that was not sent to him , the response sends back the message :
+
+       ```This request was not sent to you.Cannot accept or reject.'```
+   -  Case 3: if the user inputs a request ID that he has already rejected before, the response sends back the message :
+
+       ```"This request has already been rejected before."'```    
+     -  Case 4: else :
+
+           ```"Request successfully rejected."'```    
+
+
+
