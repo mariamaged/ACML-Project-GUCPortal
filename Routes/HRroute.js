@@ -95,7 +95,7 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
          for(var i=0;i<staff.length;i++){
              staff.office=null;
          }
-         staff.save();
+        await staff[i].save();
      }
      else {
         const staff= await AcademicStaff.find();
@@ -105,7 +105,9 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
                     staff[i].schedule[j].location=null;
                     j--;
                 }
+               
             }
+            await staff[i].save();
         }
      }
         await location.deleteOne({"id":id});
@@ -139,7 +141,7 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
                 const staff=await StaffMember.find({"office":Obid._id});
                 for(var i=0;i< staff.length;i++){
                     staff[i].office=null;
-                    staff[i].save();
+                   await staff[i].save();
                 }
             
                }
@@ -154,6 +156,7 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
                    }
                }
                 Obid.type=type;
+                Obid.current_capacity=0;
              }
              const newob=await location.findOne({"id":id});
              if(newob==null|| id==oldid){
