@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
+const CounterModel = require('./CounterModel.js');
 
 const RequestSchema = mongoose.Schema({
-   requestID: {type: Number, unique: true},
+   requestID: {type: String, unique: true},
 
    // For all requests
-   reqType: {type: String, required: true, enum: ['Change Day off', 'Slot Linking', 'Annual Leave', 'Accidental Leave', 'Sick Leave', 'Maternity Leave', 'Compensation Leave']},
+   reqType: {type: String, required: true, enum: ['Change Day off', 'Slot Linking', 'Annual Leave', 'Accidental Leave', 'Sick Leave', 'Maternity Leave', 'Compensation Leave', 'Replacement']},
    sentBy: {type: ObjectID, ref: 'StaffMemberModel', required: true},
    sentTo: {type: ObjectID, ref: 'StaffMemberModel', required: true},
    state: {type: String, required: true, enum: ['Accepted', 'Rejected', 'Pending']},
@@ -52,7 +53,7 @@ RequestSchema.pre('save', function(next) {
             function(error, counter) {          // The callback
               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
+              doc.requestID = counter._id + counter.seq ;
               next();
             }
           );
@@ -65,7 +66,7 @@ RequestSchema.pre('save', function(next) {
             function(error, counter) {          // The callback
               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
+              doc.requestID = counter._id + counter.seq ;
               next();
             }
           );
@@ -78,7 +79,7 @@ RequestSchema.pre('save', function(next) {
             function(error, counter) {          // The callback
               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
+              doc.requestID = counter._id + counter.seq ;
               next();
             }
           );
@@ -91,7 +92,7 @@ RequestSchema.pre('save', function(next) {
             function(error, counter) {          // The callback
               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
+              doc.requestID = counter._id + counter.seq ;
               next();
             }
           );
@@ -104,7 +105,7 @@ RequestSchema.pre('save', function(next) {
             function(error, counter) {          // The callback
               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
+              doc.requestID = counter._id + counter.seq ;
               next();
             }
           );
@@ -117,7 +118,7 @@ RequestSchema.pre('save', function(next) {
             function(error, counter) {          // The callback
               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
+              doc.requestID = counter._id + counter.seq ;
               next();
             }
           );
@@ -130,20 +131,20 @@ RequestSchema.pre('save', function(next) {
             function(error, counter) {          // The callback
               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
+              doc.requestID = counter._id + counter.seq ;
               next();
             }
           );
       }
       else {
         CounterModel.findByIdAndUpdate(         // ** Method call begins **
-            'Replacement-',                 // The ID to find for in counters model
+            'Replacement-',                     // The ID to find for in counters model
             { $inc: { seq: 1 } },               // The update
             { new: true, upsert: true },        // The options
             function(error, counter) {          // The callback
               if(error) return next(error);
         
-              doc.id = counter._id + counter.seq ;
+              doc.requestID = counter._id + counter.seq ;
               next();
             }
           );         

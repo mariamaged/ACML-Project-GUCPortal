@@ -139,7 +139,7 @@ router.get('/viewDepartmentStaff', async (req, res) => {
     if(HODAcademicModel.isHOD) {
         const HODDepartment = HODAcademicModel.department;
 
-        const AcademicStaffModel.find({department: })
+        const staff = await AcademicStaffModel.find({department: HODDepartment});
     }
     else {
         return res.status(401).send('Access Denied!');

@@ -1371,6 +1371,180 @@ app.post('/sickLeave', async(req,res)=>{
 
 })
 
+app.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
+    //input(req.body.slotNum , req.body.slotDate , req.body.slotLoc)
+
+        console.log("req.user= "+req.user.id)
+        const user=await StaffMemberModel.findById(req.user.id)
+        const staff_type=user.staff_type
+        if(staff_type=="HR"){
+            return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        }
+        const slotNum=req.body.slotNum
+        const slotDate=req.body.slotDate
+        const slotLoc=req.body.slotLoc
+        if(!slotNum){
+            return res.json("Must submit slot number with the request.")
+        }
+        if(!slotDate){
+            return res.json("Must submit slot date with the request.")
+        }
+        if(!slotLoc){
+            return res.json("Must submit slot location with the request.")
+        }
+        var checkFin=false;
+        const id=req.user.id
+        if(moment(slotDate).format('YYYY-MM-DD')<(new moment().format("YYYY-MM-DD"))){
+            return res.json("Cannot replace a slot that has already passed.")
+        }
+        // if(user.staff_type=="HR"){
+        //     return (res.json({error:"HR cannot make replacement requests"}))
+        // }
+        const academicUser=await AcademicStaffModel.findOne({member:req.user.id})
+        var check=false
+        const slots=academicUser.schedule
+        var course=''
+        var courseID=""
+        
+
+
+        //check if slot user is wanting to replace is available in his schedule
+        for(var i=0;i<slots.length;i++){
+            const locID=slots[i].location
+            const loc=(await LocationModel.findById(locID)).id
+            const date=slots[i].date
+            const number=slots[i].number
+            console.log("num= "+number)
+            console.log("date= "+date)
+            console.log("loc"+loc)
+            console.log(moment(date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD"))
+            if(loc==slotLoc && slotNum==number &&moment(date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
+                check=true
+                course=(await CourseModel.findById(slots[i].course))
+                 courseID=course.id
+                 console.log("COURSE NAME===="+course.name)
+                 console.log("check="+check)
+            }
+
+        }
+        if(check==false)
+        return res.send("This slot is not present in your schedule.")
+
+        //will loop on all slots of each member that teaches this course 
+        //to make sure that they are free during this replacement slot
+        const courseAcademic=course.academic_staff
+        console.log(course.id)
+
+        if(courseAcademic.length==1){
+            return res.json("No other academic staff member who teach this course are available to send a replacement request to.")
+        }
+
+        //looping on staff giving the course of replacement slot
+        for(var j=0;j<courseAcademic.length;j++){
+            console.log("in c1 "+courseAcademic[j])
+            console.log("courseid= "+course._id)
+            console.log("ca= "+courseAcademic[j])
+            const replacement=await AcademicStaffModel.findById(courseAcademic[j])
+           console.log('bslsbizo= '+replacement)
+            const staff= await StaffMemberModel.findById(replacement.member)
+           
+            const staffID=staff._id
+            console.log("l= "+staff.name)
+            
+            const replacementSchedule=replacement.schedule
+            console.log("rep "+replacement.schedule)
+            var check2=false;
+
+            //looping on schedule of each member
+            for(var k=0;k<replacementSchedule.length;k++){
+            console.log("sched= "+replacementSchedule[k])
+            const currLocID=replacementSchedule[k].location
+            const currLoc=(await LocationModel.findById(currLocID)).id
+            const currDate=replacementSchedule[k].date
+            const currNumber=replacementSchedule[k].number
+
+             console.log("loc "+currLocID)
+            console.log("currLoc "+currLoc)
+            console.log("slotLoc "+slotLoc)
+            console.log("currdate "+currDate)
+            console.log("slotNum "+currNumber)
+            console.log("number "+slotNum)
+            console.log(moment(currDate).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD"))
+            //if finding same slot
+            if(currLoc==slotLoc && currNumber==slotNum &&moment(currDate).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
+                    check2=true
+                    console.log("check2"+check2)
+            }
+            }
+           // var id=req.user.id
+            console.log("teest ="+id)
+            //if no such slot is found create a request for this member
+            if(check2==false && staffID!=id){
+
+                const doc = await CounterModel.findById('Replacement-');
+                if(!doc) {
+                const counterAcademic = new CounterModel({
+                _id: 'Replacement-'
+                });
+                try{
+                await counterAcademic.save();
+                }
+                catch(err){
+
+                }
+            }
+                //create new request
+                console.log("checkk2 "+check2)
+                console.log("req="+id)
+                var r = new RequestModel({
+                    reqType:"Replacement",
+                    slotDate:slotDate,
+                    slotNum:slotNum,
+                    slotLoc:slotLoc,
+                    sentBy:id,
+                    sentTo:replacement.member,
+                    state:"Pending",
+                    submission_date:new moment().format("YYYY-MM-DD").toString()
+                })
+                //update notifications of person receiving request
+                const notification=(await StaffMemberModel.findById(replacement.member)).notifications
+                const notNew=notification
+                notNew[notNew.length]="You received a new replacement request"
+                const staffReplacement= await StaffMemberModel.findByIdAndUpdate(replacement.member,{notifications:notNew})
+                
+
+                //post request in requests table with sent to added
+                    console.log("saved")
+                    checkFin=true
+                    await r.save()
+            }
+
+        }
+        if(checkFin)
+        return  res.json({success:"Requests successfully submitted"})
+        else
+      return res.json({error:"Could not find any eligible candidate to replace with"})
+        
+});
+
+app.post('/addtoSchedule', async (req, res) => {
+    const {date, number, location, courseID} = req.body;
+    const locationTemp = await LocationModel.findOne({id: location});
+    const course = await CourseModel.findOne({id: courseID});
+    const slot = {
+        date: moment(date, 'YYYY-MM-DD'),
+        number: number,
+        day: moment(date, 'YYYY-MM-DD').format('dddd').toString(),
+        course: course._id,
+        location: locationTemp._id
+    }
+    const user = await StaffMemberModel.findOne({id: 'ac-12'});
+    const userAcademic = await AcademicStaffModel.findOne({member: user._id});
+    userAcademic.schedule.push(slot);
+    await userAcademic.save();
+    return res.status(200).send('Successful');
+});
+
 app.post('/maternityLeave',async(req,res)=>{
     //(req.body.maternityDoc, OPTIONAL req.body.reason)
     const user=await StaffMemberModel.findOne({id: "ac-13"});
@@ -1421,7 +1595,7 @@ app.post('/maternityLeave',async(req,res)=>{
 
 })
 
-app.post('/login',async(req,res,next)=>{
+app.post('/login', async (req,res,next)=>{
     console.log("here in login")
     try{
         const{email,password}=req.body;
