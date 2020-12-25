@@ -6,6 +6,8 @@
 3. Maya Ahmed 43-6655
 
 
+Note: try and catch statments are present in all routes so the responses might be the error message of one of them.
+
 3. HR Functionalities:
  Add location:
 o Functionality: adds a location (lab, office, tutorial, or lecture hall).
