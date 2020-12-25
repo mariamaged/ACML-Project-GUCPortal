@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const moment=require('moment')
-const request=require('../Models/RequestSchema.js')
+const request=require('./RequestModel.js')
 const slotSchema = require('../Models/SlotSchema.js');
 //const attendanceSchema = require('AttendanceSchema.js');
 

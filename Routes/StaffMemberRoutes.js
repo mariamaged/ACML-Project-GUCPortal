@@ -14,7 +14,7 @@ const faculty=require('../Models/FacultyModel.js')
 const AttendanceSchema=StaffMemberModel.attendanceSchema
 const monthlyHoursSchema=StaffMemberModel.monthlyHoursSchema
 var moment = require('moment');
-const request=require('../Models/RequestSchema.js')
+const request=require('../Models/RequestModel.js')
 
 function authenticateToken(req,res,next){
     
@@ -103,7 +103,7 @@ router.put('/enterNewPass',authenticateToken,async(req,res)=>{
     const passCheck=req.body.passCheck;
     const user=await StaffMemberModel.findById(req.user.id)
     if(!passNew)
-    return res.json("Please enter a valid password.")
+    return res.json("Please enter a valid new password.")
     if(!passCheck){
         return res.json("Please enter the password check.")
     }
@@ -828,10 +828,25 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
             if(arr.length==0)
             return res.json("There are no attendance records to display.")
             else{
-                // for(var k=0;k<arr.length;k++){
-                //     res.write()
-                // }
-                return res.json({attendance:arr})
+                var check=false
+                for(var k=0;k<arr.length;k++){
+                    if(moment(arr[k].date).format("YYYY-MM-DD")<=new moment().format("YYYY-MM-DD")){
+                        console.log("aaaaaaaaaaaaaaa= "+moment(arr[k].date).format("YYYY-MM-DD"))
+                    res.write("Date: "+moment(arr[k].date).format("YYYY-MM-DD")+"\n")
+                    res.write("Attended: "+arr[k].attended+"\n")
+                    // res.write("last_signIn: "+moment(arr[k].last_signIn).format("HH:mm")+"\n")
+                    // res.write("last_signOut: "+moment(arr[k].last_signOut).format("HH:mm")+"\n")
+                    res.write("Hours: "+arr[k].hours+"\n")
+                    res.write("Minutes: "+arr[k].minutes+"\n")
+                    res.write("\n")
+                    check=true
+                    }
+                }
+                if(check==false){
+                    return res.json("There are no attendance records to display.")
+                }
+                res.end()
+               // return res.json({attendance:arr})
             }
           
         }

@@ -17,7 +17,7 @@ const CourseModel = require('./Models/CourseModel');
 const attendanceSchema=StaffMemberModel.attendanceSchema
 const moment=require('moment')
 const slot=require('./Models/SlotSchema.js')
-const request=require('./Models/RequestSchema.js')
+const request=require('./Models/RequestModel.js')
 const jwt = require('jsonwebtoken');
 const bcrypt=require('bcrypt');
 //----------------------------------------------
@@ -239,15 +239,15 @@ catch(err){
 // })
 
 async function  cr(){
-    const loc=(await StaffMemberModel.findById("5fdf6be566837b398064cf53"))
-    const loc3=loc.notifications
-//console.log(loc3)
-const newCourse=new CourseModel({
-        id: "csen44",
-        name: "cs4", // Not sure if it should be required.
-       // academic_staff:["5fe4320666d23941b83c45b5"],
-    
-})
+//     const loc=(await StaffMemberModel.findById("5fdf6be566837b398064cf53"))
+//     const loc3=loc.notifications
+// //console.log(loc3)
+// // const newCourse=new CourseModel({
+// //         id: "csen44",
+// //         name: "cs4", // Not sure if it should be required.
+//        // academic_staff:["5fe4320666d23941b83c45b5"],
+     
+// })
 // try{
 // newCourse.save()}
 // catch(err){
@@ -261,25 +261,25 @@ const newCourse=new CourseModel({
 // //5fdef2fbe82dbf4a00754273
 //  await newCourse.save()
 
-const newSlot1={
-    date:moment("2020-12-29"),
-    day:'Monday',
-    number:1, 
-    location:"5fdc1b8ea806330ca8156792",
-    academic_member_id:"5fe4320666d23941b83c45b5",
-    course:"5fe43f5252560d16f0580e1c"
-}
-const newSlot2={
-    date:moment("2020-12-29"),
-    day:'Tuesday',
-    number:1, 
-    location:"5fdc1b8ea806330ca8156792",
-    academic_member_id:"5fe4320666d23941b83c45b5",
-    course:"5fe1048475f81f0470b078b5"
-}
-const arr=new Array()
-arr[0]=newSlot1
-arr[1]=newSlot2
+// const newSlot1={
+//     date:moment("2020-12-29"),
+//     day:'Monday',
+//     number:1, 
+//     location:"5fdc1b8ea806330ca8156792",
+//     academic_member_id:"5fe4320666d23941b83c45b5",
+//     course:"5fe43f5252560d16f0580e1c"
+// }
+// const newSlot2={
+//     date:moment("2020-12-29"),
+//     day:'Tuesday',
+//     number:1, 
+//     location:"5fdc1b8ea806330ca8156792",
+//     academic_member_id:"5fe4320666d23941b83c45b5",
+//     course:"5fe1048475f81f0470b078b5"
+// }
+// const arr=new Array()
+// arr[0]=newSlot1
+// arr[1]=newSlot2
 //const user2= await AcademicStaffModel.findByIdAndUpdate("5fe4320666d23941b83c45b5",{schedule:arr})
 //  console.log(user)
 
@@ -294,35 +294,41 @@ arr[1]=newSlot2
 // console.log(course2.name)
 
 // const user=await StaffMemberModel.findById("5fdc1c399d5e1e0b58bd1e4f")
-// const not=user.notifications
-// console.log("not= "+user)
-// const m=moment("2020-12-08T22:00:00.000+00:00").format("YYYY-MM-DD")
-// console.log(m)
+// // const not=user.notifications
+// // console.log("not= "+user)
+// // const m=moment("2020-12-08T22:00:00.000+00:00").format("YYYY-MM-DD")
+// // console.log(m)
   
-// const sent=await request.find({sentBy:"5fdc1c399d5e1e0b58bd1e4f"})
-// if(sent.length==0){
-//     return console.log("There are no submitted requests to display.")
-// }
-// console.log()
-//console.log(moment("2020-12-24T18:56:07.808+00:00").format("YYYY-MM-DD"))
-// const check=("2020-12-25T00:00:00.000+00:00"==moment("2020-12-25"))
-// // console.log(new moment().format().toString())
-//  console.log(moment("2020-12-28T22:00:00.000+00:00").format("YYYY-MM-DD"))
-// console.log(check)
-const t=moment("2020-12-29").format("YYYY-MM-DD hh:mm:ss A")
-const currRequest=await request.find({reqType:"Replacement",submission_date:"2020-12-25",slotDate:t
-   , slotNum:1,slotLoc:"c7.101",sentBy:"5fe5a6b1e6bee81f985e560f",sentTo:"5fe5a7a929927c4a44f65004"})
-   console.log("curr= "+currRequest)
+// // const sent=await request.find({sentBy:"5fdc1c399d5e1e0b58bd1e4f"})
+// // if(sent.length==0){
+// //     return console.log("There are no submitted requests to display.")
+// // }
+// // console.log()
+// //console.log(moment("2020-12-24T18:56:07.808+00:00").format("YYYY-MM-DD"))
+// // const check=("2020-12-25T00:00:00.000+00:00"==moment("2020-12-25"))
+// // // console.log(new moment().format().toString())
+// //  console.log(moment("2020-12-28T22:00:00.000+00:00").format("YYYY-MM-DD"))
+// // console.log(check)
+// const t=moment("2020-12-29").format("YYYY-MM-DD hh:mm:ss A")
+// const currRequest=await request.find({reqType:"Replacement",submission_date:"2020-12-25",slotDate:t
+//    , slotNum:1,slotLoc:"c7.101",sentBy:"5fe5a6b1e6bee81f985e560f",sentTo:"5fe5a7a929927c4a44f65004"})
+//    console.log("curr= "+currRequest)
 
 
-   const salt=await bcrypt.genSalt();     
-        const hashedPassword=await bcrypt.hash("123456",salt);
-        // console.log("hashed pass= "+hashedPassword)
+//    const salt=await bcrypt.genSalt();     
+//         const hashedPassword=await bcrypt.hash("123456",salt);
+//         // console.log("hashed pass= "+hashedPassword)
 
-    const s="08:00"
-    const d="12:50"
-    const check=(s>d)
-    console.log(check)
+//     const s="08:00"
+//     const d="12:50"
+//     const check=(s>d)
+//     console.log(check)
+
+
+
+    const salt=await bcrypt.genSalt();     
+    const hashedPassword=await bcrypt.hash("123456",salt);
+    console.log(hashedPassword)
   //  console.log(moment().format("HH:mm".toString()))
         // console.log(moment("2020-12-18T22:00:00.000+00:00").format("YYYY-MM-DD"))
 }//
