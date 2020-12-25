@@ -331,6 +331,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
     const today=new moment().format('dddd')
     
     const SignIn=moment()
+    var SignInTime=moment().format("HH:mm").toString()
     //(moment(currentTime).format("HH:mm"))
     var currentTime = moment();
    //console.log("SignIn= "+SignIn)
@@ -346,6 +347,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
        var last_signOut=0
        var day="Saturday";
        var signedOut=true;
+       var signins=[]
        
         var idx=-1;
         var attArr=new Array()
@@ -376,6 +378,16 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                  day=attendance[i].day
                 check=true;
                 idx=i;
+              
+               var newSignins=attendance[i].signins
+               console.log("------------------------------------="+attendance[i])
+               console.log("000000000000000000000000000000000000="+newSignins)
+               newSignins[attendance[i].signins.length]=SignInTime
+               console.log("1111111111111111111111111111111111111="+newSignins[0])
+               console.log("2222222222222222222222222222222222222="+newSignins[1])
+               signins=newSignins
+               console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
+
                 
             }
             else if(momentA==momentB &&attendance[i].signedOut==false )
@@ -396,11 +408,14 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_signOut:last_signOut,
                 last_calculated_signOut:last_signIn,
                 day:day,
-                dayOffBool:dayOffBool
+                dayOffBool:dayOffBool,
+                signins:signins
             })
+            console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newAtt)
             attArr[idx]=newAtt
             
             const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+            console.log("uppppppppppppppppp= "+up)
             const user= await StaffMemberModel.findById(req.user.id)
             const att=user.attendance[idx].last_signIn
             const dateToday=user.attendance[idx].date
@@ -410,7 +425,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const dayoff=user.attendance[idx].dayOffBool
           //  console.log("signed in true= "+signedInToday)
             return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
-           hours:hour,minutes:minute})
+           hours:hour,minutes:minute,signins:signins})
            //return res.json("Succesfully signed in")
         }
     }
@@ -439,7 +454,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_calculated_signOut:SignIn,
                 last_signOut,
                 day,
-                dayOffBool:dayOffBool
+                dayOffBool:dayOffBool,
+                signins:signins
             })
             console.log("SignIn= "+SignIn)
             console.log("newAttendance "+newAttendance)
@@ -453,7 +469,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
             const att=userNow.attendance[attendance.length-1].last_signIn
             const signedInToday=userNow.attendance[attendance.length-1].signedIn
             console.log("att= "+(moment(att).format("HH:mm")))
-            return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm"))
+            return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),
+            last_signIn:(moment(att).format("HH:mm")),signins:signins
             })
           //  return res.json("Succesfully signed in")
         }
@@ -467,7 +484,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            const att=user.attendance[0].last_signIn
            const dateToday=user.attendance[0].date
            const signedInToday=user.attendance[0].signedIn
-           return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm"))})
+           return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),
+           last_signIn:(moment(att).format("HH:mm")),signins:signins})
            //return res.json("Succesfully signed in.")
         }
         

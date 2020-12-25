@@ -1611,29 +1611,33 @@ router.get('/rejectedReceivedRequests',authenticateToken,async(req,res)=>{
 router.put('/acceptReplacementRequest',authenticateToken,async(req,res)=>{
     //input will be sender type,submission date,sentBy (email or can change to normal id ,requestID)
     const requestID=req.body.requestID
+    userAcademic=await AcademicStaffModel.findOne({member:req.user.id})
     if(!userAcademic) return res.status(401).send('You are not an academic member!');
 
     //check if this request actually exists
-    const request = await RequestModel.findOne({requestID: requestID});
-    if(!request){
+    const currRequest = await request.findOne({requestID:req.body.requestID})
+    console.log("currRes= "+currRequest)
+    if(!currRequest){
         return res.json("This request does not exist. Please enter correct request ID")
     }
     //check if this person is the sender of this request
-    if(!request.sentTo.equals(req.user.id)) 
+    if(!currRequest.sentTo.equals(req.user.id)) 
     return res.status(401).send('This request was not sent to you.Cannot accept or reject.');
-    
+    if(currRequest.state=="Accepted"){
+        return res.json("This request has already been accepted before.")
+    }
 
     // const sentBy=(await StaffMemberModel.findOne({email:sentByEmail}))._id
-    const reqType=request.reqType
-    const submission_date=request.submission_date
-    const sentBy=request.sentBy
-    const slotNum=request.slotNum
-    const slotDate=request.slotDate
-    const slotLoc=request.slotLoc
+    const reqType=currRequest.reqType
+    const submission_date=currRequest.submission_date
+    const sentBy=currRequest.sentBy
+    const slotNum=currRequest.slotNum
+    const slotDate=currRequest.slotDate
+    const slotLoc=currRequest.slotLoc
     
     
     // const reqID=currRequest._id
-    const reqUpdated=await request.findByIdAndUpdate(requestID,{state:"Accepted"})
+    const reqUpdated=await request.findOneAndUpdate({requestID:requestID},{state:"Accepted"})
 
     //delete other requests sent to other academic members since one is already accepted
     const otherRepReq=await request.find({reqType:reqType,submission_date:submission_date,sentBy:sentBy,
@@ -1645,48 +1649,155 @@ router.put('/acceptReplacementRequest',authenticateToken,async(req,res)=>{
         }
     }
 
-//     //update academic member's schedule since he accepted replacement request
-//     const academicRep=await AcademicStaffModel.findOne({memeber:req.user.id})
-//     const schedule=academicRep.schedule
+    return res.json("Request successfully accepted.")
+
+
+ })
+
+ router.put('/rejectReplacementRequest',authenticateToken,async(req,res)=>{
+    //input will be sender type,submission date,sentBy (email or can change to normal id ,requestID)
+    const requestID=req.body.requestID
+    userAcademic=await AcademicStaffModel.findOne({member:req.user.id})
+    if(!userAcademic) return res.status(401).send('You are not an academic member!');
+
+    //check if this request actually exists
+    const currRequest = await request.findOne({requestID:req.body.requestID})
+    console.log("currRes= "+currRequest)
+    if(!currRequest){
+        return res.json("This request does not exist. Please enter correct request ID")
+    }
+    //check if this person is the sender of this request
+    if(!currRequest.sentTo.equals(req.user.id)) 
+    return res.status(401).send('This request was not sent to you.Cannot accept or reject.');
+    if(currRequest.state=="Rejected"){
+        return res.json("This request has already been rejected before.")
+    }
+
+    // const sentBy=(await StaffMemberModel.findOne({email:sentByEmail}))._id
+    const reqType=currRequest.reqType
+    const submission_date=currRequest.submission_date
+    const sentBy=currRequest.sentBy
+    const slotNum=currRequest.slotNum
+    const slotDate=currRequest.slotDate
+    const slotLoc=currRequest.slotLoc
     
-//     repSlot={
-//     date: slotDate,
-//     day: moment(slotDate).format('ddddd'),
-//     number: slotNum, 
-//     location: currRequest.slotLoc,
-//     academic_member_id:academicRep._id,
-//    // course: ,
-//     isReplaced: true
-// }
+    
+    // const reqID=currRequest._id
+    const reqUpdated=await request.findOneAndUpdate({requestID:requestID},{state:"Rejected"})
+
+    //delete other requests sent to other academic members since one is already accepted
+    const otherRepReq=await request.find({reqType:reqType,submission_date:submission_date,sentBy:sentBy,
+        slotNum:slotNum,slotDate:slotDate,slotLoc:slotLoc})
+    for(var i=0;i<otherRepReq.length;i++){
+        if(otherRepReq[i].sentTo!=req.user.id){
+           const delID= otherRepReq[i]._id
+            const delReq=await request.findByIdAndDelete(delID)
+        }
+    }
+
+    return res.json("Request successfully rejected.")
+
+
  })
 
 
 
 //-----------------------------------MARIA CANCEL REQUESTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 //MARIAAAAAAAAAAAAAAAAAAAAAAAAAAA REJECT
-router.post('/cancelRequest', async (req, res) => {
+router.get('/viewScheduleAllSemester', authenticateToken, async (req, res) => {
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+
+    if(!userAcademic) return res.status(401).send('You are not an academic member!');
+    const schedule = userAcademic.schedule;
+    const normalSlots = [];
+    const replacementSlots = [];
+
+    for(let index = 0; index < schedule.length; index++) {
+        const slot = schedule[index];
+        const courseTemp = await CourseModel.findById(slot.course);
+        const locationTemp = await LocationModel.findById(slot.location);
+        const returnedSlot = {
+            day: slot.day,
+            locationID: locationTemp.id,
+            courseID: courseTemp.id,
+            date: moment(slot.date).format('YYYY-MM-DD'),
+            number: slot.number
+        }
+        if(slot.isReplaced) replacementSlots.push(returnedSlot);
+        else normalSlots.push(returnedSlot);
+    }
+    const returnObject = {
+        replacementSlots: replacementSlots,
+        normalSlots: normalSlots
+    }
+    return res.status(200).json(returnObject);
+});
+
+router.get('/viewScheduleThisWeek', authenticateToken, async (req, res) => {
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+
+    if(!userAcademic) return res.status(401).send('You are not an academic member!');
+    const schedule = userAcademic.schedule;
+    const normalSlots = [];
+    const replacementSlots = [];
+
+    for(let index = 0; index < schedule.length; index++) {
+        const slot = schedule[index];
+        var flag = false;
+        for(let i = 1; i < 8; i++) {
+            const diff = moment().add(i, "days").format('YYYY-MM-DD');
+            if(moment(slot.date).format('YYYY-MM-DD').toString() == diff.toString()) {
+                flag = true;
+                break;
+            }
+        }
+        if(flag) {
+        const courseTemp = await CourseModel.findById(slot.course);
+        const locationTemp = await LocationModel.findById(slot.location);
+        const returnedSlot = {
+            day: slot.day,
+            locationID: locationTemp.id,
+            courseID: courseTemp.id,
+            date: moment(slot.date).format('YYYY-MM-DD'),
+            number: slot.number
+        }
+        if(slot.isReplaced) replacementSlots.push(returnedSlot);
+        else normalSlots.push(returnedSlot);
+    }
+}
+    const returnObject = {
+        replacementSlots: replacementSlots,
+        normalSlots: normalSlots
+    }
+    return res.status(200).json(returnObject);
+});
+
+router.post('/cancelRequest', authenticateToken, async (req, res) => {
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
 
     if(!userAcademic) return res.status(401).send('You are not an academic member!');
     const {requestID} = req.body;
 
     const request = await RequestModel.findOne({requestID: requestID});
+    if(!request) res.status(400).send('Request not found!');
     if(!request.sentBy.equals(req.user.id)) return res.status(401).send('You are not the one who sent this request!');
+
     if(request.reqType != 'Replacement' && request.reqType != 'Annual Leave') {
-        if(request.state != 'Pending') return res.status(400).send('Cannot cancel a pending request!');
+        if(request.state != 'Pending') return res.status(400).send('Cannot cancel a non-pending request!');
         else {
             await RequestModel.findOneAndDelete({requestID: requestID});
+            return res.status(200).send('Request cancelled successfully!');
         }
     }
     else {
-        if(request.slotDate.getTime() <= moment().getTime()) return res.status(400).send('Cannot cancel a replacement/annual request whose target day has passed!');
+        if(moment(request.slotDate).format('YYYY-MM-DD').toString() <= moment().format('YYYY-MM-DD').toString()) return res.status(400).send('Cannot cancel a replacement/annual request whose target day has passed!');
         else {
             if(request.reqType == 'Annual Leave' && request.state == 'Accepted') {
-                const sentToAcademic = await AcademicStaffModel.findOne({member: request.sentTo});
+                const sentToAcademic = await AcademicStaffModel.findOne({member: request.replacementStaff});
                 const location = await LocationModel.findOne({id: request.slotLoc});
 
                 var position = -1;
-                var SlotExists = sentToAcademic.schedule.some(function(assignedSlot, ind) {
+                sentToAcademic.schedule.some(function(assignedSlot, ind) {
                     var flag = assignedSlot.number == request.slotNum 
                     && assignedSlot.location.equals(location._id)
                     && moment(assignedSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString();
@@ -1697,24 +1808,45 @@ router.post('/cancelRequest', async (req, res) => {
                     }
                 });
 
-                if(SlotExists) {
-                    const slot = sentToAcademic.schedule[position];
-                    sentToAcademic.schedule.splice(position, 1);
-                    await sentToAcademic.save();
+                console.log(position);
+                const slot = sentToAcademic.schedule[position];
+                sentToAcademic.schedule.splice(position, 1);
+                await sentToAcademic.save();
 
-                    slot.isReplaced = false;
+                slot.isReplaced = false;
 
-                    userAcademic.schedule.push(slot);
-                    await userAcademic.save();
-                }
-                else {
+                userAcademic.schedule.push(slot);
+                await userAcademic.save();
 
+                const courses = await CourseModel.find({});
+                for(let i = 0; i < courses.length; i++) {
+                    const course = courses[i];
+                    
+                    var pos = - 1;
+                    var SlotExists = course.schedule.some(function(courseSlot, ind) {
+                        var flag = moment(courseSlot.date).format('YYYY-MM-DD').toString() == moment(request.slotDate).format('YYYY-MM-DD').toString()
+                        && courseSlot.number == slot.number
+                        && courseSlot.location.equals(slot.location);
+    
+                        if(flag) {
+                            pos = ind;
+                            return flag;
+                        }
+                    });
+    
+                    if(SlotExists) {
+                        course.schedule[pos].isReplaced = false;
+                        course.academic_member_id = userAcademic._id;
+                        await course.save();
+                    }
                 }
             }
             await RequestModel.findOneAndDelete({requestID: requestID});
+            return res.status(200).send('Request deleted successfully!');
         }
     }
 });
+
 
 
 

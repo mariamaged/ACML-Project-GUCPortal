@@ -328,9 +328,20 @@ async function  cr(){
 
     const salt=await bcrypt.genSalt();     
     const hashedPassword=await bcrypt.hash("123456",salt);
-    console.log(hashedPassword)
+    // const arr=[1,2,3]
+    // arr.push(4)
+    // console.log(arr)
+    // console.log(hashedPassword)
+    // console.log(await request.findOne({requestID:"Replacement-2"}))
   //  console.log(moment().format("HH:mm".toString()))
         // console.log(moment("2020-12-18T22:00:00.000+00:00").format("YYYY-MM-DD"))
+        // const x=["1","2","3"]
+        // var newSignins=x
+        // newSignins[x.length]=4
+        // console.log("1111111111111111111111111111111111111="+newSignins[0])
+        // console.log("2222222222222222222222222222222222222="+newSignins[1])
+        // signins=newSignins
+        // console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
 }//
 cr()
 
