@@ -776,6 +776,20 @@ router.get('/requestStatus',authenticateToken,async(req,res)=>{
             res.write( "Submission date: "+sent[i].submission_date+"\n")
             res.write("\n")
         }
+        if(reqType=="Slot Linking"){
+            const coordinatorID=sent[i].sentTo
+        const coordinator=await StaffMemberModel.findById(coordinatorID)
+        const coordinatorName=coordinator.name
+            res.write("Request type: "+sent[i].reqType+"\n"),
+            res.write( "Sent to course coordinator: "+coordinatorName+"\n")
+            res.write( "Request state: "+sent[i].state+"\n")
+            res.write( "Slot Day: "+sent[i].slotDay+"\n")
+            res.write( "Slot Number: "+sent[i].slotNum+"\n")
+            res.write( "Course ID: "+sent[i].courseID+"\n")
+            res.write( "Reason: "+sent[i].reason+"\n")
+            res.write( "Submission date: "+sent[i].submission_date+"\n")
+            res.write("\n")
+        }
     }
     res.end();
 })
@@ -851,20 +865,40 @@ router.get('/acceptedRequests',authenticateToken,async(req,res)=>{
             res.write( "Submission date "+sent[i].submission_date+"\n")
             res.write("\n")
         }
+        if(reqType=="Slot Linking"){
+            const coordinatorID=sent[i].sentTo
+        const coordinator=await StaffMemberModel.findById(coordinatorID)
+        const coordinatorName=coordinator.name
+            res.write("Request type: "+sent[i].reqType+"\n"),
+            res.write( "Sent to course coordinator: "+coordinatorName+"\n")
+            res.write( "Request state: "+sent[i].state+"\n")
+            res.write( "Slot Day: "+sent[i].slotDay+"\n")
+            res.write( "Slot Number: "+sent[i].slotNum+"\n")
+            res.write( "Course ID: "+sent[i].courseID+"\n")
+            res.write( "Reason: "+sent[i].reason+"\n")
+            res.write( "Submission date: "+sent[i].submission_date+"\n")
+            res.write("\n")
+        }
     }
     res.end();
 })
 
 router.get('/pendingRequests',authenticateToken,async(req,res)=>{
+    const staff=await StaffMemberModel.findById(req.user.id)
+    const type=staff.staff_type
+    if(type=="HR"){
+        return res.json("HR do not have any leave requests.")
+    }
     const sent=await request.find({sentBy:req.user.id,state:"Pending"})
     if(sent.length==0){
-        return res.json("There are no accepted requests to display.")
+        return res.json("There are no pending requests to display.")
     }
     for(var i=0;i<sent.length;i++){
         const hodID=sent[i].sentTo
         const hod=await StaffMemberModel.findById(hodID)
         const hodName=hod.name
         const type=sent[i].type
+        var reqType=sent[i].reqType
         if(reqType=="Replacement"){
             res.write("Request type: "+sent[i].reqType+"\n")
             res.write( "Sent to academic staff member: "+hodName+"\n")
@@ -917,6 +951,20 @@ router.get('/pendingRequests',authenticateToken,async(req,res)=>{
             res.write( "Missed Day: "+sent[i].missedDay+"\n")
             res.write( "Reason "+sent[i].reason+"\n")
             res.write( "Submission date "+sent[i].submission_date+"\n")
+            res.write("\n")
+        }
+        if(reqType=="Slot Linking"){
+            const coordinatorID=sent[i].sentTo
+        const coordinator=await StaffMemberModel.findById(coordinatorID)
+        const coordinatorName=coordinator.name
+            res.write("Request type: "+sent[i].reqType+"\n"),
+            res.write( "Sent to course coordinator: "+coordinatorName+"\n")
+            res.write( "Request state: "+sent[i].state+"\n")
+            res.write( "Slot Day: "+sent[i].slotDay+"\n")
+            res.write( "Slot Number: "+sent[i].slotNum+"\n")
+            res.write( "Course ID: "+sent[i].courseID+"\n")
+            res.write( "Reason: "+sent[i].reason+"\n")
+            res.write( "Submission date: "+sent[i].submission_date+"\n")
             res.write("\n")
         }
     }
@@ -924,15 +972,21 @@ router.get('/pendingRequests',authenticateToken,async(req,res)=>{
 })
 
 router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
+    const staff=await StaffMemberModel.findById(req.user.id)
+    const type=staff.staff_type
+    if(type=="HR"){
+        return res.json("HR do not have any leave requests.")
+    }
     const sent=await request.find({sentBy:req.user.id,state:"Rejected"})
     if(sent.length==0){
-        return res.json("There are no accepted requests to display.")
+        return res.json("There are no rejected requests to display.")
     }
     for(var i=0;i<sent.length;i++){
         const hodID=sent[i].sentTo
         const hod=await StaffMemberModel.findById(hodID)
         const hodName=hod.name
         const type=sent[i].type
+        var reqType=sent[i].reqType
         if(reqType=="Replacement"){
             res.write("Request type: "+sent[i].reqType+"\n")
             res.write( "Sent to academic staff member: "+hodName+"\n")
@@ -985,6 +1039,20 @@ router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
             res.write( "Missed Day: "+sent[i].missedDay+"\n")
             res.write( "Reason "+sent[i].reason+"\n")
             res.write( "Submission date "+sent[i].submission_date+"\n")
+            res.write("\n")
+        }
+        if(reqType=="Slot Linking"){
+            const coordinatorID=sent[i].sentTo
+        const coordinator=await StaffMemberModel.findById(coordinatorID)
+        const coordinatorName=coordinator.name
+            res.write("Request type: "+sent[i].reqType+"\n"),
+            res.write( "Sent to course coordinator: "+coordinatorName+"\n")
+            res.write( "Request state: "+sent[i].state+"\n")
+            res.write( "Slot Day: "+sent[i].slotDay+"\n")
+            res.write( "Slot Number: "+sent[i].slotNum+"\n")
+            res.write( "Course ID: "+sent[i].courseID+"\n")
+            res.write( "Reason: "+sent[i].reason+"\n")
+            res.write( "Submission date: "+sent[i].submission_date+"\n")
             res.write("\n")
         }
     }
@@ -1026,8 +1094,9 @@ router.put('/cancelRequest',authenticateToken,async(req,res)=>{
     //  const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
     }
     else if(reqType=="Replacement"){
+        const replace=await StaffMemberModel.findOne({id:req.body.replacementID})
         const currRequest=request.findOne({reqType:reqType,submission_date:submission_date,slotDate:req.body.slotDate,
-            slotNum:req.body.slotNum,slotLoc:req.body.slotLoc,sentBy:req.user.id,sentTo:req.body.replacementID})
+            slotNum:req.body.slotNum,slotLoc:req.body.slotLoc,sentBy:req.user.id,sentTo:replace._id})
         const requestState=currRequest.state
         const reqDate=currRequest.slotDate
 
