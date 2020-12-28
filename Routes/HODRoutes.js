@@ -1,12 +1,12 @@
+// Created by Maria Maged 2020-12.
+
 // Models.
 const StaffMemberModel = require('../Models/StaffMemberModel.js');
-const HRModel = require('../Models/HRModel.js');
 const AcademicStaffModel = require('../Models/AcademicStaffModel.js');
 const LocationModel = require('../Models/LocationModel.js');
 const FacultyModel = require('../Models/FacultyModel.js');
 const DepartmentModel = require('../Models/DepartmentModel.js');
 const CourseModel = require('../Models/CourseModel.js');
-const CounterModel = require('../Models/CounterModel.js');
 const RequestModel = require('../Models/RequestModel.js');
 
 const jwt = require('jsonwebtoken');
@@ -16,10 +16,10 @@ const moment = require('moment');
 const express = require('express');
 const router = express.Router();
 
-function authenticateToken(req, res, next){
+function authenticateToken(req, res, next) {
     const token = req.header('x-auth-token');
     if(!token) {
-        return res.sendStatus(401).status('Access deined please log in first');
+        return res.status(401).send('Access denied please log in first');
     }
     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
     req.user = verified;
@@ -234,7 +234,7 @@ router.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
     const HODAcademicModel = await AcademicStaffModel.findOne({member: req.user.id});
     
     if(HODAcademicModel.isHOD) {
-    const off = await RequestModel.find({sentTo: HODAcademicModel.member, reqType: 'Change Day off'});
+    const off = await RequestModel.find({sentTo: req.user.id, reqType: 'Change Day off'});
     const leave = await RequestModel.find({$and: [
         { // First and condition starts.
       $or: [
@@ -264,7 +264,7 @@ router.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
 
         offObject.sentByID = sentByStaff.id;
         offObject.sentByName = sentByStaff.name;
-        if(request.HODRejectionReason) offObject.HODRejectionReason = request.HODRejectionReason;
+        if(request.RejectionReason) offObject.HODRejectionReason = request.RejectionReason;
 
         offObject.newDayOff = request.newDayOff;
 
@@ -288,7 +288,7 @@ router.get('/viewDayOffLeaveRequests', authenticateToken, async (req, res) => {
 
         leaveObject.sentByID = sentByStaff.id;
         leaveObject.sentByName = sentByStaff.name;
-        if(request.HODRejectionReason) leaveObject.HODRejectionReason = request.HODRejectionReason;
+        if(request.RejectionReason) leaveObject.HODRejectionReason = request.RejectionReason;
 
         if(request.reqType == 'Maternity Leave') {
             leaveObject.maternityDoc = request.maternityDoc;
@@ -455,116 +455,6 @@ router.get('/teachingAssignmentAllCourses', authenticateToken, async (req, res) 
     }
 });
 
-// // Route 1.
-// router.route('/CourseInstructorforSingleCourse')
-// .post(async (req, res) => {
-//     if(req.user.isHOD) {
-//         const {courseID, courseInstructorID} = req.body;
-//         const course = await CourseModel.findOne({id: courseID});
-//         if(!course) {
-//             return res.status(400).send('Course does not exist!');
-//         }
-//         else {
-//             const courseInstructorStaffModel = await StaffMemberModel.findOne({id: courseInstructorID});
-//             const courseInstructorAcademicModel = await AcademicStaffModel.findOne({member: courseInstructorStaffModel._id});
-
-//             if(courseInstructorAcademicModel.type == 'Course Instructor') {
-//             const HODStaffModel = await StaffMemberModel.findOne({id: req.user.id});
-//             const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id});
-//             const HODDepartment = HODAcademicModel.department;
-//             const CourseDepartment = course.department;
-
-//             if(HODDepartment.equals(CourseDepartment)) {
-//                 await CourseModel.findOneAndUpdate({id: courseID}, {$addToSet: {academic_staff: courseInstructorAcademicModel._id}}, {new: true}, (error, doc) => {
-//                     if(error) console.log("Something wrong happened while updating the course with course instructor");
-//                     console.log(doc);
-//                 });
-//             }
-//             else {
-//                 return res.status(401).send('Course not under your department!');
-//             }
-//         }
-//         else {
-//                 return res.status(400).send('Staff member is not a course instructor!');
-//             }
-//         }
-//     }
-//     else {
-//         res.status(401).send('Access Denied!');
-//     }
-// })
-
-// .delete(async (req, res) => {
-//  //  if(req.user.isHOD) {
-//        const {courseID, courseInstructorID} = req.body;
-//        const course = await CourseModel.findOne({id: courseID});
-//        if(!course) {
-//            return res.status(400).send('Course does not exist!');
-//        }
-//        else {
-//            const courseInstructorStaffModel = await StaffMemberModel.findOne({id: courseInstructorID});
-//            const courseInstructorAcademicModel = await AcademicStaffModel.findOne({member: courseInstructorStaffModel._id});
-
-//            if(courseInstructorAcademicModel.type == 'Course Instructor') {
-//           // const HODStaffModel = await StaffMemberModel.findOne({id: req.user.id});
-//           // const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id});
-//            const HODAcademicModel = await AcademicStaffModel.findOne({member: courseInstructorStaffModel._id});
-//            const HODDepartment = HODAcademicModel.department;
-//            const CourseDepartment = course.department;
-
-//            if(HODDepartment.equals(CourseDepartment)) {
-//                await CourseModel.findOneAndUpdate({id: courseID}, {$pull: {academic_staff: courseInstructorStaffModel._id}}, {new: true}, (error, doc) => {
-//                    if(error) console.log("Something wrong happened while updating the course with course instructor");
-//                    console.log(doc);
-//                });
-//            }
-//            else {
-//                return res.status(401).send('Course not under your department!');
-//            }
-//        }
-//        else {
-//                return res.status(400).send('Staff member is not a course instructor!');
-//            }
-//        }
-//  //  }
-//  /*  else {
-//        res.status(401).send('Access Denied!');
-//    }*/
-// });
-
-// // Route 2.
-// router.route('/viewDepartmentStaff')
-// .get(async (req, res) => {
-//     //  if(req.user.isHod) {
-//         const HODStaffModel = await StaffMemberModel.findOne({id: "ac-1"}); // Delete later.
-//         const HODAcademicModel = await AcademicStaffModel.findOne({member: HODStaffModel._id}); // member: req.user.id or member: req.user._id.
-//         const HODDepartment = HODAcademicModel.department;
-//         const staffInDepartmentAcademicModel = await AcademicStaffModel.find({department: HODDepartment});
-
-//         const returnArray = [];
-//         for(let index = 0; index < staffInDepartmentAcademicModel.length; index++) {
-//           const staffTemp = await StaffMemberModel.findById(staffInDepartmentAcademicModel[index].member);
-//           const officeTemp = await LocationModel.findById(staffTemp.office);
-//           const departmentTemp = await DepartmentModel.findById(staffInDepartmentAcademicModel[index].department);
-//           const facultyTemp = await FacultyModel.findById(staffInDepartmentAcademicModel[index].faculty);
-          
-//           const returnObject = {};
-//           returnObject.name = staffTemp.name;
-//           returnObject.email = staffTemp.email;
-//           returnObject.id = staffTemp.id;
-//           returnObject.salary = staffTemp.salary;
-//           returnObject.office = officeTemp.id;
-//           returnObject.department = departmentTemp.name;
-//           returnObject.faculty = facultyTemp.id;
-//           if(staffTemp.hasOwnProperty('gender')) returnObject.gender = staffTemp.gender;
-//           returnArray.push(returnObject);
-//       }
-//         return res.send(returnArray);         
-//  // }
-//   /*else {
-//       res.status(401).send('Access Denied!');
-//   }*/
-// });
 
 
 // Export the router.

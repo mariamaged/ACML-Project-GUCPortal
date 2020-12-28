@@ -35,7 +35,7 @@ const RequestSchema = mongoose.Schema({
     missedDay:{type: Date},
 
     // Acceptance
-    HODRejectionReason: {type: String}
+    RejectionReason: {type: String}
 });
 
 RequestSchema.pre('save', function(next) {
