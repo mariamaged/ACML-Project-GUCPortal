@@ -6,126 +6,96 @@
 3. Maya Ahmed 43-6655.
 
 ## Port Number
-3000.
+5000.
 
 ## Which file to run
 	run index.js by running the npm start command.
 ## 2. GUC Staff Members Functionalities
 ### Any GUC staff member can do the following:
-
-**1 . Log in with a unique email and a password.**
+	1. Log in with a unique email and a password.
  
- - **Functionality:** :the user should be able to log in.
-
+ - **Functionality:** The user should be able to log in.
  - **Route:**/staff/login
-
- - **Request Type:** POST
+ - **Request Type:** POST.
  - **Request body:** user must input
- - 1. email
- - 2. password
-
-
+   1. email.
+   2. password.
  -   **Example request body:**
+```json 
+{ 
+	"email":"farida@gmail.com",
+	"password":"asdas"
+}
+```
+ - **Response body:**  
+- Case 1: If the user does not enter an email the response sends back the message :
 
+`"Please enter a valid email."`
+ - Case  2: If the user does not enter password the response sends back the message:
 
- -      { 
-        "email":"farida@gmail.com",
-         "password":"asdas"
-        }
-**Response body:**
+`` "Please enter a valid password."``
+ - Case  3: If the user submits an email that is not saved in the system ,the response sends back the message:
 
+``` "This user is not registered."```
+ - Case  4: If the user enters a  valid email but wrong password, the response sends back the message:
+
+```"Please enter correct password."```
+
+ - Case 5: If the user is logging in for the first time, the response send back the token and the  message
+
+``` "Please enter new password."```
+
+> **To use the token, I copy and paste in manually in the header in postman with key=x-auth-token and the value= token outputted upon login**.
+ 
+  - Case 6: If the user is successfully logged in, the response returns the token and the message
+
+``` "User logged in successfully"```
    
- - Case 1: if the user does not enter an email the response sends back the message :
-
-     ```"Please enter a valid email."```
-
- - Case  2: if the user does not enter password the response sends back the message:
-
-    ``` "Please enter a valid password."```
- 
-
- - Case  3: if the user submits an email that is not saved in the system ,the response sends back the message:
-
-    ``` "This user is not registered."```
- 
-
- - Case  4: if the user enters a  valid email but wrong password, the response sends back the message:
-
-    ```"Please enter correct password."```
->
-
- - Case 4: if the user is logging in for the first time, the response send back the token and the  message
-
-   ``` "Please enter new password."```
-**To use the token I copy and paste in manually in the header in postman with key=x-auth-token and the value= token outputted upon login**
- 
-  - Case 5: if the user is successfully logged in, the response returns the token and the message
-
-    ``` "User logged in successfully"```
-   
-    **To use the token I copy and paste in manually in the header in postman with key=x-auth-token and the value= token outputted upon login**
+> **To use the token, I copy and paste in manually in the header in postman with key=x-auth-token and the value= token outputted upon login**
 ***
-	 1 (b) . Enter new password after first login.
+	 1(b) Enter new password after first login.
  
- - **Functionality:** :the user should be able to change his 123456 password to a new one when first logging in.
-
- - **Route:**/staff/enterNewPass
-
- - **Request Type:** PUT - **Request body:** user must input
- - 1. password
- - 2. password check (I do not ask for old password since I have another  route that changes password normally without being promoted to it on first login)
-
-
+- **Functionality:** The user should be able to change his 123456 password to a new one when first logging in.
+- **Route:**/staff/enterNewPass
+- **Request:** PUT.
+- **Request body:** User must input
+  1. password
+  2. password check (I do not ask for old password since I have another  route that changes password normally without being prompted to it on first login).
  -   **Example request body:**
+```json
+{ 
+	"password":"farida",
+	"passCheck":"farida",
+}
+```
+ - **Response body:**
+- Case 1: if the user does not enter a password the response sends back the message:
 
+```"Please enter a valid password."```
+- Case  2: if the user does not enter password check the response sends back the message:
 
- -      { 
-        "password":"farida",
-        "passCheck":"farida",
-        }
-**Response body:**
+``` "Please enter the password check."```
+- Case  3: if the user enters different password and password check, the response sends back the message:
 
-   
- - Case 1: if the user does not enter a password the response sends back the message :
+``` "Passwords should match."```
+- Case  4: if the user enters a  valid password and password check, the response sends back the message:
 
-     ```"Please enter a valid password."```
+```"Password changed successfully."```
+- Case 4: if there was an error in the system and could not save new password, the response send back the token and the message:
 
- - Case  2: if the user does not enter password check the response sends back the message:
-
-    ``` "Please enter the password check."```
- 
-
- - Case  3: if the user enters different password and password check ,the response sends back the message:
-
-    ``` "Passwords should match."```
- 
-
- - Case  4: if the user enters a  valid password and password check, the response sends back the message:
-
-    ```"Password changed successfully."```
->
-
- - Case 4: if there was an error in the system and could not save new password, the response send back the token and the  message
-
-   ``` "Error. Please try again""```
-  -   **Result in database:**
-
-       - Password of this user id updated 
+``` "Error. Please try again""```
+-  **Result in database:**
+	- Password of this user id updated.
  ***
 	 3. View their profile.
  
- - **Functionality:** :the user should be able to view his profile information.
-
- - **Route:**/staff/profile
-
- - **Request Type:** GET
-  - **Request body:** empty
-
-**Response body:**
-
-  Example of Academic member response body
-  ```json
-  {
+- **Functionality:** The user should be able to view his profile information.
+- **Route:**/staff/profile
+- **Request Type:** GET.
+- **Request body:** empty
+-  **Example of Academic member response body:**
+```json
+{
 "name": "berlant",
 "id": "ac-26565",
 "email": "berlant@gmail.com",
@@ -148,201 +118,173 @@ Example of HR response body
 "staff_type": "HR",
 "day_off": "Saturday"
 }
-````
-***
-	4.Update their profile except for the id and the name. Academic members can’t update their salary, faculty and department.
- 
- - **Functionality:** :the user should be able to update their profile.
-
- - **Route:**/staff/updateProfile
-
- - **Request Type:** PUT
-  - **Request body:** 
-  - email
-  - office 
-
-**Request body:**
 ```
+***
+	4. Update their profile except for the id and the name. 
+> Academic members can’t update their salary, faculty and department.
+ 
+ - **Functionality:**  the user should be able to update their profile.
+ - **Route:**/staff/updateProfile
+ - **Request Type:** PUT.
+  - **Request body:** 
+    - email
+    - office
+- **Example request body:**
+```json
 {
  "email":"nancy3@gmail.com",
  "office":"c1.101"
 }
 ``` 
-**Response body:**
+ - **Response body:**
+ - Case 1: if the user enter a new ID, the response sends back the message:
 
-   
- - Case 1: if the user enter a new ID the response sends back the message :
+```"Cannot change ID."```
+- Case  2: if the user enter new name, the response sends back the message:
 
-     ```"Cannot change ID."```
+``` "Cannot change name."```
+ - Case  3: if the user enters a new password, the response sends back the message:
 
- - Case  2: if the user enter new name the response sends back the message:
+``` "Cannot change password.Please make a reset pasword request."```
+ - Case  4: if the user enters a new day-off, the response sends back the message:
 
-    ``` "Cannot change name."```
- 
-
- - Case  3: if the user enters a new password ,the response sends back the message:
-
-    ``` "Cannot change password.Please make a reset pasword request."```
- - Case  4: if the user enters a new day-off ,the response sends back the message:
-
-    ``` "Must make a request to change day-off."```
+``` "Must make a request to change day-off."```
     
- - Case  5: if the user enters a new office that is not registered in the database ,the response sends back the message:
+- Case  5: if the user enters a new office that is not registered in the database, the response sends back the message:
 
-    ``` "This office does not exist.Please enter a valid office ID."```
- - Case  6: if an academic member enters new department, the response sends back the message:
+``` "This office does not exist.Please enter a valid office ID."```
+- Case  6: if an academic member enters new department, the response sends back the message:
 
-    ``` "Cannot change department."```
- - Case  7: if an academic member enters new faculty, the response sends back the message:
+``` "Cannot change department."```
+- Case  7: if an academic member enters new faculty, the response sends back the message:
 
-    ``` "Cannot change faculty."```
- - Case  8: if an academic member enters new salary, the response sends back the message:
+``` "Cannot change faculty."```
+- Case  8: if an academic member enters new salary, the response sends back the message:
 
-    ``` "Cannot change salary."```
- - Case  9: if an academic member enters new email that already exists in the database, the response sends back the message:
+``` "Cannot change salary."```
+- Case  9: if an academic member enters new email that already exists in the database, the response sends back the message:
 
-    ``` "This email is already registered. Please enter a new one."```
- - Case  10: if an academic member enters new unique email and maybe new office that exists  the response sends back the message:
+``` "This email is already registered. Please enter a new one."```
+- Case  10: if an academic member enters new unique email and maybe new office that exists  the response sends back the message:
 
-    ``` "Profile updated successfully"```  
+``` "Profile updated successfully"```  
 ***
 	5. Reset their passwords.
- 
- - **Functionality:** :the user should be able to reset their passwords..
 
+ - **Functionality:** the user should be able to reset their passwords.
  - **Route:**/staff/resetPassword
-
- - **Request Type:** PUT
+ - **Request :** PUT.
   - **Request body:** 
-  - old password (oldPass)
-  - new password (newPass)
-  - check password (checkPass)
-**Request body:**
-```
+    - old password (oldPass)
+    - new password (newPass)
+    - check password (checkPass)
+- **Example request body:**
+```json
 {
- "oldPass":"nancy"
-,"newPass":"nancy2",
-"checkPass":"nancy2",
+"oldPass":"nancy",
+"newPass":"nancy2",
+"checkPass":"nancy2"
 }
 ``` 
-**Response body:**
+ - **Response body:**  
+ - Case 1: if the user does not enter old password, the response sends back the message:
 
-   
- - Case 1: if the user does not enter old password, response sends back the message :
+```"Please enter old password."```
+ - Case  2: if the user enters incorrect old password,  the response sends back the message:
 
-     ```"Please enter old password."```
+``` "Please enter correct old password"```
+- Case  3: if the user does not enter a new password, the response sends back the message:
 
- - Case  2: if the user enters incorrect old password,  sends back the message:
+``` "Please enter valid new password."```     
+ - Case  4: if the user does not enter password check, the response sends back the message:
 
-    ``` "Please enter correct old password"```
- 
-
- - Case  3: if the user does not enter a new password ,the response sends back the message:
-
-    ``` "Please enter valid new password."```     
- - Case  4: if the user does not enter password check , the response sends back the message:
-
-    ``` "Please enter password check."```     
+``` "Please enter password check."```     
   - Case  5: if the user enters a different password and password check, the response sends back the message:
 
-    ``` "Passwords do not match"```     
+``` "Passwords do not match"```     
   - Case  6: else if all conditions are met, the response sends back the message:
 
     ``` "Password updated successfully."```     
- - Case  7:if there is a problem with the server ,the response sends back the message:
+ - Case  7: if there is a problem with the server, the response sends back the message:
 
-    ``` "An error occured. Please try again."```                   
+``` "An error occured. Please try again."```                   
   -   **Result in database:**
-
-       - Password of this user id updated 
+      - Password of this user id updated.
   ***    
 	6. Sign in.
  
- - **Functionality:** :the user should be able to sign in.
+- **Functionality:** the user should be able to sign in.
+- **Route:**/staff/signin
+- **Request:** PUT.
+- **Request body:** empty
+- **Response body:** 
+- Case 1: if the user is already signed in, response sends back the message:
 
- - **Route:**/staff/signin
+```"This user is already signed in"```
 
- - **Request Type:** PUT
-  - **Request body:** empty
-  - **Response body:** 
-   
- - Case 1: if the user is already signed in, response sends back the message:
+- Case  2: if the user signs in successfully, the response sends back the message:
 
-     ```"This user is already signed in"```
-
- - Case  2:user signs in successfully, response  sends back the message:
-
-    ``` "Succesfully signed in."```
+``` "Succesfully signed in."```
  
+  - Case  3: if there is an error in the server, the response sends back the message:
 
- - Case  3: there is an error in the server ,the response sends back the message:
-
-    ``` "An error occured. Please try again."```     
+``` "An error occured. Please try again."```     
  ****
-	7 . Sign out.
+	7. Sign out.
  
- - **Functionality:** :the user should be able to sign in.
+- **Functionality:** the user should be able to sign in.
+- **Route:**/staff/signout
+- **Request Type:** PUT.
+- **Request body:** empty
+- **Response body:** 
+ - Case 1: if the user is trying to sign out without previously signing in, the response sends back the message:
 
- - **Route:**/staff/signout
+```"Cannot sign out without prior signin."```
 
- - **Request Type:** PUT
-  - **Request body:** empty
-  - **Response body:** 
-   
- - Case 1: if the user is trying to sign out with previously signing in, response sends back the message :
+- Case  2: if the user who is already signed out is trying to sign out again, the response sends back the message:
 
-     ```"Cannot sign out without prior signin."```
-
- - Case  2:user who is already signed out trying to sign out again, response  sends back the message:
-
-    ``` "This user has already signed out."```
+``` "This user has already signed out."```
  
-
- - Case  3:successful sign out ,the response sends back the message:
+- Case  3: successful sign out, the response sends back the message:
 
     ``` "Succesffuly signed out."``` 
-   - Case  4:an error occurred with the serve ,the response sends back the message:
+- Case  4: an error occurred with the server, the response sends back the message:
 
-    ``` "An error occured please try again."```   
+``` "An error occured please try again."```   
   -   **Result in database:**
-
-       - A new record is added to the user's attendance with his sign in time and date and sign out time and date.
+      - A new record is added to the user's attendance with his sign in time and date and sign out time and date.
        - The hours spent between his last sign out and sign in is calculated and accumulated to his spent monthly hours and minutes.
        - These hours are also accumulated to his daily hours and minutes and his extra hours, minutes and missing hours and minutes are recalculated. 
-   **I have used moment library to help manipulate dates and times. In mongo the timestamp of the date may appear as**
-    **```"2020-12-18T22:00:00.000+00:00"```****.
-    **However, when it is formatted and printed**** ```console.log(moment("2020-12-18T22:00:00.000+00:00").format("YYYY-MM-DD"))```
-     **the result would be** 
-     **```2020-12-19```**
+> **I have used moment library to help manipulate dates and times.** 
+> > **In mongo the timestamp of the date may appear as**
+    **`"2020-12-18T22:00:00.000+00:00"`**.
+>   -   **However, when it is formatted and printed**, console.log(moment("2020-12-18T22:00:00.000+00:00").format("YYYY-MM-DD")), **the result would be** **```2020-12-19```**.
    
 ***
-	8 .View all their attendance records, or they can specify exactly which month to view.
+	8. View all their attendance records, or they can specify exactly which month to view.
 
- - **Functionality:** :the user should be able to view the records of all the days they have ATTENDED, or they can specify exactly which month to view. (I did not display all days since in missing days it was stated that days where the user is absent do not have attendance records)
-
- - **Route:**/staff/attendanceRecords
-
- - **Request Type:** GET
-  - **Request body:** 
-      - month (optional)
-  - **Response body example:** 
-      ````
-     {"month":"1"}
-       ````
-  - **Response body:**    
+ - **Functionality:** the user should be able to view the records of all the days they have ATTENDED, or they can specify exactly which month to view. (I did not display all days since in missing days it was stated that days where the user is absent do not have attendance records)
+- **Route:**/staff/attendanceRecords
+- **Request :** GET.
+- **Request body:** 
+     - month (optional).
+- **Example request body:** 
+```json
+{
+"month":"1"
+}
+```
+- **Response body:**    
  - Case 1: if the user anters an incorrect month number response sends back the message :
 
-     ```"Please enter correct month."```
+```"Please enter correct month."```
+- Case  2: if there is currently no attendance records for this user yet, the response sends back the message:
 
- - Case  2:if there is currently no attendance records for this user yet, response  sends back the message:
+``` "There are no attendance records to display.""```
+- Case  3: displays available attendance records 
+- **Response Body example:**
 
-    ``` "There are no attendance records to display.""```
- 
-
- - Case  3:displays available attendance records 
- - Response Body example:
- - 
-```
+```json
 Date: 2020-12-25
 Attended: true
 Hours: 0
@@ -357,10 +299,10 @@ Date: 2020-12-22
 Attended: false
 Hours: 0
 Minutes: 0
-``````
-Example for attendance for a certain month
+```
+ - Example for attendance for a certain month:
 
-````
+```json
 {
 "attendance": [{
 "date": "2021-01-02",
@@ -371,9 +313,9 @@ Example for attendance for a certain month
 "minutes": 0
 }]
 }
-````
+```
 ***
-	9 .View if they have missing days.
+	9. View if they have missing days.
 	
  - **Functionality:** :the user should be able to view if they have missing days.
 
