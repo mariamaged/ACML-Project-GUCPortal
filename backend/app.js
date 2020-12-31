@@ -1,3 +1,4 @@
+const cors = require('cors');
 // Routes Imports.
 const HODRoutes = require('./Routes/HODRoutes.js');
 const StaffRoutes = require('./Routes/StaffMemberRoutes.js');
@@ -9,6 +10,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
+app.use(cors())
 // app.use().
 app.use('/HOD', HODRoutes);
 app.use('/Instructor', InstructorRoutes);

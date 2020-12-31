@@ -19,8 +19,11 @@ const slotSchema=require('../Models/SlotSchema')
 //const authenticateToken=require('../Routes/StaffMemberRoutes')
 const CounterModel=require('../Models/CounterModel')
 function authenticateToken(req,res,next){
-    
-    const token=req.header('x-auth-token');
+    // const token= req.headers.token
+    // console.log("token= "+token)
+    //const token=req.header('x-auth-token');
+    const authHeader=req.headers['Authorization']
+    const token=authHeader && authHeader.split(' ')[1]
     if(!token){
     return res.sendStatus(401).status('Access deined please log in first')
     
@@ -167,13 +170,16 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                     state:"Pending",
                     submission_date:new moment().format("YYYY-MM-DD")
                 })
+                
                 //update notifications of person receiving request
                 const notification=(await StaffMemberModel.findById(replacement.member)).notifications
                 const notNew=notification
                 notNew[notNew.length]="You received a new replacement request"
-                const staffReplacement= await StaffMemberModel.findByIdAndUpdate(replacement.member,{notifications:notNew})
+                const test=(await StaffMemberModel.findById(replacement.member)).name
+                console.log("notttt=============== "+replacement.member)
+                const staffReplacement= (await StaffMemberModel.findByIdAndUpdate(replacement.member,{notifications:notNew}))
                 console.log("new req=========="+newRequest)
-
+                console.log("hereeeeeee")
                 //post request in requests table with sent to added
                 try{
                     console.log("saved")
@@ -204,6 +210,8 @@ router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
         return res.json("HR cannot submit this request.Only academic staff are permitted.")
     }
         const sent=await request.find({reqType:"Replacement",sentBy:req.user.id})
+        const arr=[]
+        var k=0
         for(var i=0;i<sent.length;i++){
             //get name of request receiver to print
                 reqType=sent[i].reqType
@@ -211,24 +219,26 @@ router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
                 const hodName=sentTo.name
                  
             if(reqType=="Replacement"){
-                res.write("Request ID: "+sent[i].requestID)
-                res.write("Request type: "+sent[i].reqType+"\n")
-                res.write( "Sent to academic staff member: "+hodName+"\n")
-                res.write( "Request state: "+sent[i].state+"\n")
-                res.write( "Slot number: "+sent[i].slotNum+"\n")
-                res.write( "Slot date: "+ sent[i].slotDate+"\n")
-                res.write( "Slot location: "+sent[i].slotLoc+"\n")
-                res.write( "Submission date "+sent[i].submission_date+"\n")
-                res.write("\n")
+                // res.write("Request ID: "+sent[i].requestID)
+                // res.write("Request type: "+sent[i].reqType+"\n")
+                // res.write( "Sent to academic staff member: "+hodName+"\n")
+                // res.write( "Request state: "+sent[i].state+"\n")
+                // res.write( "Slot number: "+sent[i].slotNum+"\n")
+                // res.write( "Slot date: "+ sent[i].slotDate+"\n")
+                // res.write( "Slot location: "+sent[i].slotLoc+"\n")
+                // res.write( "Submission date "+sent[i].submission_date+"\n")
+                // res.write("\n")
+                arr[k++]=sent[i]
+               
             }
             
            
                 
         }
-        if(sent.length==0)
-        res.write("There are no sent requests available to display.")
+        // if(sent.length==0)
+        // res.json("There are no sent requests available to display.")
 
-        res.end()
+        res.json(arr)
         return 
 })
 
