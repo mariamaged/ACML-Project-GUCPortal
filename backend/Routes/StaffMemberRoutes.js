@@ -45,7 +45,7 @@ router.post('/login',async(req,res,next)=>{
     try{
         const{email,password}=req.body;
         if(!email ){
-            return res.status(400).json("Please enter a valid email. ");
+            return res.status(400).send({error:"Please enter a valid email. "});
         }
         if(!password)
         return res.status(400).json("Please enter a valid  password.");
