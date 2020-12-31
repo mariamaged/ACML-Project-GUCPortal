@@ -8,7 +8,7 @@ import rootReducer from './reducers/rootReducer'
 import setAuthorizationToken from './components/setAuthorizationToken'
 
 const store=createStore(rootReducer)
-//setAuthorizationToken(localStorage.jwtToken)
+setAuthorizationToken(localStorage.jwtToken)
 
 ReactDOM.render(
   <Provider store={store}>

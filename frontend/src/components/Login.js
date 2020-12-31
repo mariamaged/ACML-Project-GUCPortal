@@ -4,6 +4,7 @@ import React from "react";
 import axios from "axios";
 import setAuthorizationToken from './setAuthorizationToken'
 import jwt from 'jsonwebtoken'
+import setCurrentUser from '../actions/authActions'
 
 class Login extends React.Component{
     state={
@@ -26,6 +27,7 @@ class Login extends React.Component{
        localStorage.setItem('jwtToken',token)
        setAuthorizationToken(token)
         console.log(jwt.decode(token))
+        dispatch(setCurrentUser((jwt.decode(token))))
      }).catch((err)=>{
        console.log("errrrrrr")
        console.log(err);
