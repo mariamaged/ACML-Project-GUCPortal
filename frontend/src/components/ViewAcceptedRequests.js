@@ -1,12 +1,23 @@
 import React,{Component} from 'react'
 import axios from 'axios'
+import '../css/newTables.css'
+//import 'bootstrap/dist/css/bootstrap.min.css';
+/* <link rel="stylesheet" type="text/css" href="../css/reqTable.css" /> */
 
-<link rel="stylesheet" type="text/css" href="/index.css" />
+
 class ViewAcceptedRequests extends Component{
     state={
         requests:[]
     }
     componentDidMount(){
+    //     console.log("here in mount")
+    //      axios.get('/sentReplacementRequests').then(res=>{
+    //         console.log("hereeeeeeeeeeee"+res)
+    //       console.log(res)
+    //       this.setState({
+    //           requests:res.data
+    //       })
+    //   })
     console.log("in view")
         axios.get('http://localhost:5000/academic/acceptedRequests',
         {
@@ -28,16 +39,15 @@ class ViewAcceptedRequests extends Component{
                     //     <p>{request.sentTo}</p>
                     // </div>
     
-    renderRequest(request, index) {
-      return (
-            <tr key={request.requestID}>
-            <td>{request.reqType}</td>
-            <td>{request.submission_date}</td>
-            <td>{request.sentTo}</td>
-            </tr>
-        )
-        }  
-
+                    renderRequest(request, index) {
+                        return (
+                          <tr key={request.requestID}>
+                            <td>{request.reqType}</td>
+                            <td>{request.submission_date}</td>
+                            <td>{request.sentTo}</td>
+                          </tr>
+                        )
+                      }              
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -45,32 +55,41 @@ class ViewAcceptedRequests extends Component{
             empty.map(request=>{
             console.log("in mapping "+request.reqType)
             return(
-                <div class="container">
-                <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Filter
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="/#">Accepted</a>
-                    <a class="dropdown-item" href="/#">Rejected</a>
-                    <a class="dropdown-item" href="/#">Pending</a>
-                </div>
-                </div>
-                <table striped condensed hover  class="table-wrapper" className="rwd-table">
-                
+                <div className="container" >
+                  <div className="dropdown-container">
+                                
+                        
+            <a class="btn btn-secondary dropdown-toggle" href="/#" role="button" id="dropdownMenuLink" 
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown link
+            </a>
 
-                <thead>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <a class="dropdown-item" href="/ViewAcceptedRequests">Accepted</a>
+                <a class="dropdown-item" href="/ViewRejectedRequests">Rejected</a>
+                <a class="dropdown-item" href="/ViewPendignRequests">Pending</a>
+            </div>
+
+
+           </div>
+
+                <div class="container table-responsive py-5"> 
+                <table class="table table-bordered table-hover reqTable">
+                <thead class="thead-dark">
                     <tr>
-                    <th>Request Type</th>
-                    <th>Request Receiver</th>
-                    <th>Submission Date</th>
+                    
+                    <th scope="col">Request Type</th>
+                    <th scope="col">Request Receiver</th>
+                    <th scope="col">Submission Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {reqs.map(this.renderRequest)}
+                {reqs.map(this.renderRequest)}
                 </tbody>
                 </table>
-               
+                </div>
+
+
                 </div>
               )
             })
@@ -82,7 +101,7 @@ class ViewAcceptedRequests extends Component{
         
         return (
            
-           <div>Test{reqList}</div>
+           <div>{reqList}</div>
         )
     }
 }

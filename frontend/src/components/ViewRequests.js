@@ -1,7 +1,9 @@
 import React,{Component} from 'react'
 import axios from 'axios'
-import 'bootstrap/dist/css/bootstrap.min.css';
-<link rel="stylesheet" type="text/css" href="./css/reqTable.css" />
+import '../css/newTables.css'
+//import 'bootstrap/dist/css/bootstrap.min.css';
+/* <link rel="stylesheet" type="text/css" href="../css/reqTable.css" /> */
+
 
 class ViewRequests extends Component{
     state={
@@ -53,35 +55,41 @@ class ViewRequests extends Component{
             empty.map(request=>{
             console.log("in mapping "+request.reqType)
             return(
-                <div class="container">
+                <div className="container" >
+                  <div className="dropdown-container">
+                                
+                        
+            <a class="btn btn-secondary dropdown-toggle" href="/#" role="button" id="dropdownMenuLink" 
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown link
+            </a>
 
-            <div class="dropdown-container">
-            
-                <button class="btn btn-primary dropdown-toggle text-left" type="button" 
-                data-toggle="dropdown">Dropdown Example <span class="caret"></span></button>
-
-                <ul class="dropdown-menu dropdown-menu-left">
-                <li><a href="/ViewAcceptedRequests">HTML</a></li>
-                <li><a href="/#">CSS</a></li>
-                <li><a href="/#">JavaScript</a></li>
-                </ul>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="/ViewAcceptedRequests">Accepted</a>
+                <a class="dropdown-item" href="/ViewRejectedRequests">Rejected</a>
+                <a class="dropdown-item" href="/ViewPendignRequests">Pending</a>
             </div>
-                
-                <table striped condensed hover  class="table-wrapper" className="rwd-table">
-                
 
-                <thead>
+
+           </div>
+
+                <div class="container table-responsive py-5"> 
+                <table class="table table-bordered table-hover reqTable">
+                <thead class="thead-dark">
                     <tr>
-                    <th>Request Type</th>
-                    <th>Request Receiver</th>
-                    <th>Submission Date</th>
+                    
+                    <th scope="col">Request Type</th>
+                    <th scope="col">Request Receiver</th>
+                    <th scope="col">Submission Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {reqs.map(this.renderRequest)}
+                {reqs.map(this.renderRequest)}
                 </tbody>
                 </table>
-               
+                </div>
+
+
                 </div>
               )
             })

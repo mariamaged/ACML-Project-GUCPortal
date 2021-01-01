@@ -1,9 +1,11 @@
 import React,{Component} from 'react'
 import axios from 'axios'
-import 'bootstrap/dist/css/bootstrap.min.css';
-<link rel="stylesheet" type="text/css" href="./css/table.css" />
+import '../css/newTables.css'
+//import 'bootstrap/dist/css/bootstrap.min.css';
+/* <link rel="stylesheet" type="text/css" href="../css/reqTable.css" /> */
 
-class test extends Component{
+
+class ViewPendingRequests extends Component{
     state={
         requests:[]
     }
@@ -17,7 +19,7 @@ class test extends Component{
     //       })
     //   })
     console.log("in view")
-        axios.get('http://localhost:5000/academic/sentReplacementRequests',
+        axios.get('http://localhost:5000/academic/pendingRequests',
         {
             headers:{
                 'x-auth-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmZTVhNmIxZTZiZWU4MWY5ODVlNTYwZiIsInJvbGUiOiJBY2FkZW1pYyBNZW1iZXIiLCJhY2FkZW1pY19yb2xlIjoiQ291cnNlIEluc3RydWN0b3IiLCJpc0hlYWQiOmZhbHNlLCJpYXQiOjE2MDk0Mzk1MDZ9.JDCdnFdtRtiEA-y2ziCUTRjHRg28NtL_jP-dg3UzMkY'
@@ -53,38 +55,42 @@ class test extends Component{
             empty.map(request=>{
             console.log("in mapping "+request.reqType)
             return(
-                <div class="container">
-<h2>Responsive Table with RWD-Table-Patterns</h2>
+                <div className="container" >
+                  <div className="dropdown-container">
+                                
+                        
+            <a class="btn btn-secondary dropdown-toggle" href="/#" role="button" id="dropdownMenuLink" 
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown link
+            </a>
 
-<div class="container">
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="table-responsive" data-pattern="priority-columns">
-        <table summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality" class="table table-bordered table-hover">
-          <caption class="text-center">An example of a responsive table based on RWD-Table-Patterns' <a href="http://gergeo.se/RWD-Table-Patterns/" target="_blank"> solution</a>:</caption>
-          <thead>
-            <tr>
-              <th>Country</th>
-              <th data-priority="1">Languages</th>
-              <th data-priority="2">Population</th>
-            </tr>
-          </thead>
-          <tbody>
-          {reqs.map(this.renderRequest)}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="5" class="text-center">Data retrieved from <a href="http://www.infoplease.com/ipa/A0855611.html" target="_blank">infoplease</a> and <a href="http://www.worldometers.info/world-population/population-by-country/" target="_blank">worldometers</a>.</td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <a class="dropdown-item" href="/ViewAcceptedRequests">Accepted</a>
+                <a class="dropdown-item" href="/ViewRejectedRequests">Rejected</a>
+                <a class="dropdown-item" href="/ViewPendignRequests">Pending</a>
+            </div>
 
 
-         </div>
+           </div>
+
+                <div class="container table-responsive py-5"> 
+                <table class="table table-bordered table-hover reqTable">
+                <thead class="thead-dark">
+                    <tr>
+                    
+                    <th scope="col">Request Type</th>
+                    <th scope="col">Request Receiver</th>
+                    <th scope="col">Submission Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {reqs.map(this.renderRequest)}
+                </tbody>
+                </table>
+                </div>
+
+
+                </div>
               )
             })
         ):
@@ -100,4 +106,4 @@ class test extends Component{
     }
 }
 
-export default test
+export default ViewPendingRequests

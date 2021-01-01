@@ -213,35 +213,94 @@ router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
     if(type=="HR"){
         return res.json("HR cannot submit this request.Only academic staff are permitted.")
     }
-        const sent=await request.find({reqType:"Replacement",sentBy:req.user.id})
+
+
+        const sent1=await request.find({sentBy:req.user.id})
+        const received=await request.find({sentTo:req.user.id})
+        const sent = [...sent1, ...received];
+        console.log("sent= "+sent)
+
         const arr=[]
         var k=0
         for(var i=0;i<sent.length;i++){
-            //get name of request receiver to print
-                reqType=sent[i].reqType
-                const sentTo=(await StaffMemberModel.findById(sent[i].sentTo))
-                const hodName=sentTo.name
-                 
-            if(reqType=="Replacement"){
-                // res.write("Request ID: "+sent[i].requestID)
-                // res.write("Request type: "+sent[i].reqType+"\n")
-                // res.write( "Sent to academic staff member: "+hodName+"\n")
-                // res.write( "Request state: "+sent[i].state+"\n")
-                // res.write( "Slot number: "+sent[i].slotNum+"\n")
-                // res.write( "Slot date: "+ sent[i].slotDate+"\n")
-                // res.write( "Slot location: "+sent[i].slotLoc+"\n")
-                // res.write( "Submission date "+sent[i].submission_date+"\n")
-                // res.write("\n")
-               const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
-                sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
-                slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
-                arr[k++]= reqNew
-               
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+            //replacement
+            // const academicMemberID=sent[i].sentTo
+            // const academicMember=await StaffMemberModel.findById(academicMemberID)
+            // const coordinatorName=coordinator.name
+            var repl=""
+            if (sent[i].replacementStaff)
+            repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
+            if(reqType=="Annual"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
+                    slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
             }
+            if(reqType=="Replacement"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
+                    slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Change Day off"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Accidental Leave"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+    
+            }
+            if(reqType=="Sick Leave"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,sickDay:sent[i].sickDay,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                
+            }
+            if(reqType=="Maternity Leave"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Compensation Leave"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,missedDay:sent[i].missedDay,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Slot Linking"){
+                const coordinatorID=sent[i].sentTo
+            const coordinator=await StaffMemberModel.findById(coordinatorID)
+            const coordinatorName=coordinator.name
+            //res.write("Request ID: "+sent[i].requestID+"\n")
+               
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
+                    slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+        }
+        res.json(arr);
+
+            
+
             
            
                 
-        }
+        
         // if(sent.length==0)
         // res.json("There are no sent requests available to display.")
 
@@ -726,12 +785,14 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
         }
         catch(err){
             res.json(err)
+            console.log(err)
         }
 
         //send notification to hod
     const notification=(await StaffMemberModel.findById(hodAcademic.member)).notifications
     const notNew=notification
     notNew[notNew.length]="You received a new maternity leave request."
+    console.log("notiifaction")
     const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
 
 })
@@ -948,9 +1009,12 @@ router.get('/acceptedRequests',authenticateToken,async(req,res)=>{
     const sent=await request.find({sentBy:req.user.id,state:"Accepted"})
     //const received=await request.find({sentTo:req.user.id,state:"Accepted"})
     console.log("sent= "+sent)
+    var arr=[]
+    var k=0
     if(sent.length==0){
-        return res.json("There are no accepted requests to display.")
+        return res.json(arr)
     }
+   
     for(var i=0;i<sent.length;i++){
         const hodID=sent[i].sentTo
         const hod=await StaffMemberModel.findById(hodID)
@@ -1022,7 +1086,7 @@ router.get('/acceptedRequests',authenticateToken,async(req,res)=>{
                 arr[k++]= reqNew
         }
     }
-    res.end();
+    res.json(arr);
 })
 
 //received requests that got accepted
@@ -1147,107 +1211,88 @@ router.get('/pendingRequests',authenticateToken,async(req,res)=>{
         return res.json("HR do not have any leave requests.")
     }
     const sent=await request.find({sentBy:req.user.id,state:"Pending"})
+    var arr=[]
+    var k=0
     if(sent.length==0){
-        return res.json("There are no pending requests to display.")
+        return res.json(arr)
     }
-    for(var i=0;i<sent.length;i++){
-        const hodID=sent[i].sentTo
-        const hod=await StaffMemberModel.findById(hodID)
-        const hodName=hod.name
-        const type=sent[i].type
-        var reqType=sent[i].reqType
-        var repl=""
-        if (sent[i].replacementStaff)
-        repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
-        if(reqType=="Annual"){
+    
+//////////////////////
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+
+            //replacement
+            // const academicMemberID=sent[i].sentTo
+            // const academicMember=await StaffMemberModel.findById(academicMemberID)
+            // const coordinatorName=coordinator.name
+            var repl=""
+            if (sent[i].replacementStaff)
+            repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
+            if(reqType=="Annual"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
+                    slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Replacement"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
+                    slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Change Day off"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Accidental Leave"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+
+            }
+            if(reqType=="Sick Leave"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,sickDay:sent[i].sickDay,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                
+            }
+            if(reqType=="Maternity Leave"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Compensation Leave"){
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,missedDay:sent[i].missedDay,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Slot Linking"){
+                const coordinatorID=sent[i].sentTo
+            const coordinator=await StaffMemberModel.findById(coordinatorID)
+            const coordinatorName=coordinator.name
             res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n")
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Slot number: "+sent[i].slotNum+"\n")
-            res.write( "Slot date: "+ sent[i].slotDate+"\n")
-            res.write( "Slot location: "+sent[i].slotLoc+"\n")
-            res.write( "Replacement academic staff member: "+repl+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
+            
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
+                    slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
         }
-        if(reqType=="Replacement"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n")
-            res.write( "Sent to academic staff member: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Slot number: "+sent[i].slotNum+"\n")
-            res.write( "Slot date: "+ sent[i].slotDate+"\n")
-            res.write( "Slot location: "+sent[i].slotLoc+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
-        }
-        if(reqType=="Change Day off"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "New DayOff "+sent[i].newDayOff+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
-        }
-        if(reqType=="Accidental Leave"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Accident Date "+sent[i].accidentDate+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
-        }
-        if(reqType=="Sick Leave"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Sick Day: "+sent[i].sickDay+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
-        }
-        if(reqType=="Maternity Leave"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
-        }
-        if(reqType=="Compensation Leave"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Missed Day: "+sent[i].missedDay+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
-        }
-        if(reqType=="Slot Linking"){
-            const coordinatorID=sent[i].sentTo
-        const coordinator=await StaffMemberModel.findById(coordinatorID)
-        const coordinatorName=coordinator.name
-        res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to course coordinator: "+coordinatorName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Slot Day: "+sent[i].slotDay+"\n")
-            res.write( "Slot Number: "+sent[i].slotNum+"\n")
-            res.write( "Course ID: "+sent[i].courseID+"\n")
-            res.write( "Reason: "+sent[i].reason+"\n")
-            res.write( "Submission date: "+sent[i].submission_date+"\n")
-            res.write("\n")
-        }
-    }
-    res.end();
+        res.json(arr);
+
+    //////////////////////////////
+    
 })
 //received requests that are pending
 router.get('/pendingReceivedRequests',authenticateToken,async(req,res)=>{
@@ -1369,8 +1414,10 @@ router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
         return res.json("HR do not have any leave requests.")
     }
     const sent=await request.find({sentBy:req.user.id,state:"Rejected"})
+    var arr=[]
+    var k=0
     if(sent.length==0){
-        return res.json("There are no rejected requests to display.")
+        return res.json(arr)
     }
     for(var i=0;i<sent.length;i++){
         const hodID=sent[i].sentTo
@@ -1378,98 +1425,72 @@ router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
         const hodName=hod.name
         const type=sent[i].type
         var reqType=sent[i].reqType
+
+        //replacement
+        // const academicMemberID=sent[i].sentTo
+        // const academicMember=await StaffMemberModel.findById(academicMemberID)
+        // const coordinatorName=coordinator.name
         var repl=""
         if (sent[i].replacementStaff)
         repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
         if(reqType=="Annual"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n")
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Slot number: "+sent[i].slotNum+"\n")
-            res.write( "Slot date: "+ sent[i].slotDate+"\n")
-            res.write( "Slot location: "+sent[i].slotLoc+"\n")
-            res.write( "Replacement academic staff member: "+repl+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
+            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
+                slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                arr[k++]= reqNew
         }
         if(reqType=="Replacement"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n")
-            res.write( "Sent to academic staff member: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Slot number: "+sent[i].slotNum+"\n")
-            res.write( "Slot date: "+ sent[i].slotDate+"\n")
-            res.write( "Slot location: "+sent[i].slotLoc+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
+            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
+                slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                arr[k++]= reqNew
         }
         if(reqType=="Change Day off"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "New DayOff "+sent[i].newDayOff+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
+            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
+                reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                arr[k++]= reqNew
         }
         if(reqType=="Accidental Leave"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Accident Date "+sent[i].accidentDate+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
+            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
+                reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                arr[k++]= reqNew
+
         }
         if(reqType=="Sick Leave"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Sick Day: "+sent[i].sickDay+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
+            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                sentTo:hodName,state:sent[i].state,sickDay:sent[i].sickDay,
+                reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                arr[k++]= reqNew
+            
         }
         if(reqType=="Maternity Leave"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
+            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                sentTo:hodName,state:sent[i].state,
+                reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                arr[k++]= reqNew
         }
         if(reqType=="Compensation Leave"){
-            res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to head of department: "+hodName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Missed Day: "+sent[i].missedDay+"\n")
-            res.write( "Reason "+sent[i].reason+"\n")
-            res.write( "Submission date "+sent[i].submission_date+"\n")
-            res.write("\n")
+            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                sentTo:hodName,state:sent[i].state,missedDay:sent[i].missedDay,
+                reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                arr[k++]= reqNew
         }
         if(reqType=="Slot Linking"){
             const coordinatorID=sent[i].sentTo
         const coordinator=await StaffMemberModel.findById(coordinatorID)
         const coordinatorName=coordinator.name
         res.write("Request ID: "+sent[i].requestID+"\n")
-            res.write("Request type: "+sent[i].reqType+"\n"),
-            res.write( "Sent to course coordinator: "+coordinatorName+"\n")
-            res.write( "Request state: "+sent[i].state+"\n")
-            res.write( "Slot Day: "+sent[i].slotDay+"\n")
-            res.write( "Slot Number: "+sent[i].slotNum+"\n")
-            res.write( "Course ID: "+sent[i].courseID+"\n")
-            res.write( "Reason: "+sent[i].reason+"\n")
-            res.write( "Submission date: "+sent[i].submission_date+"\n")
-            res.write("\n")
+        
+            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
+                slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                arr[k++]= reqNew
         }
     }
-    res.end();
+    res.json(arr);
 })
 
 //received requests that are rejected

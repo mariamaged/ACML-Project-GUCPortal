@@ -81,7 +81,10 @@ app.get('/trialEndpoint', async (req, res) => {
 // app.listen(4000)
 
 
-
+// const arr1=[1,2]
+// const arr2=[3,4]
+// const array3 = [...arr1, ...arr2];
+// console.log(array3)
 
 
 // const express = require('express');
