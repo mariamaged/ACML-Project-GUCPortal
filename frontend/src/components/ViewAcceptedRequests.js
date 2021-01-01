@@ -2,21 +2,13 @@ import React,{Component} from 'react'
 import axios from 'axios'
 
 <link rel="stylesheet" type="text/css" href="/index.css" />
-class ViewRequests extends Component{
+class ViewAcceptedRequests extends Component{
     state={
         requests:[]
     }
     componentDidMount(){
-    //     console.log("here in mount")
-    //      axios.get('/sentReplacementRequests').then(res=>{
-    //         console.log("hereeeeeeeeeeee"+res)
-    //       console.log(res)
-    //       this.setState({
-    //           requests:res.data
-    //       })
-    //   })
     console.log("in view")
-        axios.get('http://localhost:5000/academic/sentReplacementRequests',
+        axios.get('http://localhost:5000/academic/acceptedRequests',
         {
             headers:{
                 'x-auth-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmZTVhNmIxZTZiZWU4MWY5ODVlNTYwZiIsInJvbGUiOiJBY2FkZW1pYyBNZW1iZXIiLCJhY2FkZW1pY19yb2xlIjoiQ291cnNlIEluc3RydWN0b3IiLCJpc0hlYWQiOmZhbHNlLCJpYXQiOjE2MDk0Mzk1MDZ9.JDCdnFdtRtiEA-y2ziCUTRjHRg28NtL_jP-dg3UzMkY'
@@ -36,15 +28,16 @@ class ViewRequests extends Component{
                     //     <p>{request.sentTo}</p>
                     // </div>
     
-                    renderRequest(request, index) {
-                        return (
-                          <tr key={request.requestID}>
-                            <td>{request.reqType}</td>
-                            <td>{request.submission_date}</td>
-                            <td>{request.sentTo}</td>
-                          </tr>
-                        )
-                      }              
+    renderRequest(request, index) {
+      return (
+            <tr key={request.requestID}>
+            <td>{request.reqType}</td>
+            <td>{request.submission_date}</td>
+            <td>{request.sentTo}</td>
+            </tr>
+        )
+        }  
+
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -58,9 +51,9 @@ class ViewRequests extends Component{
                         Filter
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="#">Accepted</a>
-                    <a class="dropdown-item" href="#">Rejected</a>
-                    <a class="dropdown-item" href="#">Pending</a>
+                    <a class="dropdown-item" >Accepted</a>
+                    <a class="dropdown-item" >Rejected</a>
+                    <a class="dropdown-item" >Pending</a>
                 </div>
                 </div>
                 <table striped condensed hover  class="table-wrapper" className="rwd-table">
@@ -94,4 +87,4 @@ class ViewRequests extends Component{
     }
 }
 
-export default ViewRequests
+export default ViewAcceptedRequests

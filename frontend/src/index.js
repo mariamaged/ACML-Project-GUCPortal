@@ -6,7 +6,7 @@ import {createStore} from 'redux'
 import {Provider} from 'react-redux'
 import rootReducer from './reducers/rootReducer'
 import setAuthorizationToken from './components/setAuthorizationToken'
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 const store=createStore(rootReducer)
 setAuthorizationToken(localStorage.jwtToken)
 

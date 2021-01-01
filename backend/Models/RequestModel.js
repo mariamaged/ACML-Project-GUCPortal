@@ -152,3 +152,4 @@ RequestSchema.pre('save', function(next) {
 });
 
 module.exports = mongoose.model('request', RequestSchema);
+module.exports.reqSchema=RequestSchema
