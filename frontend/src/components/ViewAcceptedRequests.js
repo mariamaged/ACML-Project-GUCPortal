@@ -51,9 +51,9 @@ class ViewAcceptedRequests extends Component{
                         Filter
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" >Accepted</a>
-                    <a class="dropdown-item" >Rejected</a>
-                    <a class="dropdown-item" >Pending</a>
+                    <a class="dropdown-item" href="/#">Accepted</a>
+                    <a class="dropdown-item" href="/#">Rejected</a>
+                    <a class="dropdown-item" href="/#">Pending</a>
                 </div>
                 </div>
                 <table striped condensed hover  class="table-wrapper" className="rwd-table">

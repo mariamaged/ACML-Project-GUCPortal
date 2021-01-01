@@ -1,9 +1,9 @@
 import React,{Component} from 'react'
 import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.min.css';
-<link rel="stylesheet" type="text/css" href="./css/reqTable.css" />
-
-class ViewRequests extends Component{
+ <link rel="stylesheet" type="text/css" href="./css/newTable.css" />
+{/* <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" /> */}
+class test2 extends Component{
     state={
         requests:[]
     }
@@ -45,7 +45,10 @@ class ViewRequests extends Component{
                             <td>{request.sentTo}</td>
                           </tr>
                         )
-                      }              
+                      }    
+                      
+                      
+                     
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -54,34 +57,32 @@ class ViewRequests extends Component{
             console.log("in mapping "+request.reqType)
             return(
                 <div class="container">
+                     
 
-            <div class="dropdown-container">
-            
-                <button class="btn btn-primary dropdown-toggle text-left" type="button" 
-                data-toggle="dropdown">Dropdown Example <span class="caret"></span></button>
-
-                <ul class="dropdown-menu dropdown-menu-left">
-                <li><a href="/ViewAcceptedRequests">HTML</a></li>
-                <li><a href="/#">CSS</a></li>
-                <li><a href="/#">JavaScript</a></li>
-                </ul>
-            </div>
-                
-                <table striped condensed hover  class="table-wrapper" className="rwd-table">
-                
-
-                <thead>
-                    <tr>
-                    <th>Request Type</th>
-                    <th>Request Receiver</th>
-                    <th>Submission Date</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <table class="flatTable">
+            <tr class="titleTr">
+                <td class="titleTd">TABLE TITLE</td>
+                <td colspan="4"></td>
+                <td class="plusTd button"></td>
+            </tr>
+            <tr class="headingTr">
+                <td>REFERENCE</td>
+                <td>DATE ISSUED</td>
+                <td>COMPANY</td>
+                <td></td>
+            </tr>
+            <tbody>
                     {reqs.map(this.renderRequest)}
                 </tbody>
-                </table>
-               
+            </table>
+
+            <div id="sForm" class="sForm sFormPadding">
+                    <span class="button close"><img src="https://i.imgur.com/nnzONel.png" alt="X"  class="" /></span>
+                    <h2 class="title">Add a New Record</h2>  
+                </div>
+
+            <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900' rel='stylesheet' type='text/css'></link>
+                        
                 </div>
               )
             })
@@ -98,4 +99,4 @@ class ViewRequests extends Component{
     }
 }
 
-export default ViewRequests
+export default test2

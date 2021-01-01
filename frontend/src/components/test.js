@@ -1,9 +1,9 @@
 import React,{Component} from 'react'
 import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.min.css';
-<link rel="stylesheet" type="text/css" href="./css/reqTable.css" />
+<link rel="stylesheet" type="text/css" href="./table.css" />
 
-class ViewRequests extends Component{
+class test extends Component{
     state={
         requests:[]
     }
@@ -54,35 +54,37 @@ class ViewRequests extends Component{
             console.log("in mapping "+request.reqType)
             return(
                 <div class="container">
+<h2>Responsive Table with RWD-Table-Patterns</h2>
 
-            <div class="dropdown-container">
-            
-                <button class="btn btn-primary dropdown-toggle text-left" type="button" 
-                data-toggle="dropdown">Dropdown Example <span class="caret"></span></button>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="table-responsive" data-pattern="priority-columns">
+        <table summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality" class="table table-bordered table-hover">
+          <caption class="text-center">An example of a responsive table based on RWD-Table-Patterns' <a href="http://gergeo.se/RWD-Table-Patterns/" target="_blank"> solution</a>:</caption>
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th data-priority="1">Languages</th>
+              <th data-priority="2">Population</th>
+            </tr>
+          </thead>
+          <tbody>
+          {reqs.map(this.renderRequest)}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5" class="text-center">Data retrieved from <a href="http://www.infoplease.com/ipa/A0855611.html" target="_blank">infoplease</a> and <a href="http://www.worldometers.info/world-population/population-by-country/" target="_blank">worldometers</a>.</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
-                <ul class="dropdown-menu dropdown-menu-left">
-                <li><a href="/ViewAcceptedRequests">HTML</a></li>
-                <li><a href="/#">CSS</a></li>
-                <li><a href="/#">JavaScript</a></li>
-                </ul>
-            </div>
-                
-                <table striped condensed hover  class="table-wrapper" className="rwd-table">
-                
 
-                <thead>
-                    <tr>
-                    <th>Request Type</th>
-                    <th>Request Receiver</th>
-                    <th>Submission Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {reqs.map(this.renderRequest)}
-                </tbody>
-                </table>
-               
-                </div>
+         </div>
               )
             })
         ):
@@ -98,4 +100,4 @@ class ViewRequests extends Component{
     }
 }
 
-export default ViewRequests
+export default test

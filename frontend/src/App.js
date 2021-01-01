@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import ViewRequests from './components/ViewRequests'
 import Login from './components/Login.js'
+import Test2 from './components/test2'
 function App() {
   return (
     <div className="App">
