@@ -1,23 +1,48 @@
-.monica{
-    width:500px !important;
+.reqTable{
+    width:580px !important;
    
   
 }
 
-.tdd{
+.reqTd{
     width:10%;
     
 }
 
-.containMonica{
+.containTable{
     position:relative ;
-    top:10vw;
-    right:11vw;
-    width:59% !important;
+    top:5vw;
+    right:23vw;
+    width:45% !important;
     max-height:300px !important;
     overflow-y: scroll;
 }
-.containMonica::-webkit-scrollbar{
-    width:1vw;
-    background-color: firebrick;
+.containTable::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+  }
+
+  .containTable::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: rgb(190, 41, 41);
+  }
+
+ 
+
+   .containDrop{
+    position:relative !important ;
+    top:4.5vw;
+    left:22vw;
+    size:'lg';
+    /* max-width:25% !important; */
+
+  } 
+.btn-group{
+     size:'sm';
+   /* max-width:5% !important; */
+    /* background-color: rgb(202, 13, 13); */
+    color: darkred;
 }
+ 

@@ -7,18 +7,16 @@ import axios from 'axios'
 
 class ViewAcceptedRequests extends Component{
     state={
-        requests:[]
+        requests:[],
+        request_id:"1"
     }
-    componentDidMount(){
-    //     console.log("here in mount")
-    //      axios.get('/sentReplacementRequests').then(res=>{
-    //         console.log("hereeeeeeeeeeee"+res)
-    //       console.log(res)
-    //       this.setState({
-    //           requests:res.data
-    //       })
-    //   })
-    console.log("in view")
+    
+    
+    
+    componentDidMount(props){
+        console.log(this.props.location.state.request_id)
+       // console.log("property_id",this.props.location.state.property_id);
+    console.log("in view accepted");
         axios.get('http://localhost:5000/academic/acceptedRequests',
         {
             headers:{
@@ -33,22 +31,17 @@ class ViewAcceptedRequests extends Component{
         }).catch(console.log("error"))
     }
 
-     // <div className="requests card" key={request.requestID}>
-                    // <div className="cardContent">
-                    //     <span className="request type">{request.reqType}</span>
-                    //     <p>{request.sentTo}</p>
-                    // </div>
-    
-                    renderRequest(request, index) {
-                        return (
-                          <tr key={request.requestID}>
-                            <td>{request.reqType}</td>
-                            <td>{request.submission_date}</td>
-                            <td>{request.sentTo}</td>
-                          </tr>
-                        )
-                      }              
+    renderRequest(request, index) {
+        return (
+            <tr key={request.requestID}>
+            <td>{request.reqType}</td>
+            <td>{request.submission_date}</td>
+            <td>{request.sentTo}</td>
+            </tr>
+        )
+        }              
     render(){
+        console.log(this.props.location.state.request_id)
         const reqs=this.state.requests;
         var empty=["one"]
             const reqList=reqs.length?(

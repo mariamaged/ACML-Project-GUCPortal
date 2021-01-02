@@ -3,6 +3,7 @@ const ObjectID = mongoose.Schema.Types.ObjectId;
 const CounterModel = require('./CounterModel.js');
 
 const RequestSchema = mongoose.Schema({
+  counter:{type:Number},
    requestID: {type: String, unique: true},
 
    // For all requests

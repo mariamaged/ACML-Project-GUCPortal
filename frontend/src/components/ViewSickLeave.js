@@ -10,13 +10,13 @@ import history from '../history';
 import {Link,NavLink} from 'react-router-dom'
 import  { Redirect } from 'react-router-dom'
 
-class ViewRequests extends Component{
+class ViewSickLeave extends Component{
     state={
         requests:[]
     }
     componentDidMount(){
     console.log("in view")
-        axios.get('http://localhost:5000/academic/sentReplacementRequests',
+        axios.get('http://localhost:5000/academic/sickLeave',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
@@ -33,34 +33,29 @@ class ViewRequests extends Component{
          handleClick(e,value){
             e.preventDefault();
             console.log("in click "+value)
-            return  <a className="inTable">
-            < Link to={{ pathname: '/ViewAcceptedRequests', state: { request_id:value}}}/></a>
-        //     <Redirect
-        //     to={{
-        //     pathname: "/ViewAcceptedRequests",
-        //     state: { request_id:value }
-        //   }}
-        // />
+            
 
         }
 
-        // imgFormatter=(cell,row)=> {
-        //     return  <a href="/#" >
-        //             <i className="fa fa-pencil" aria-hidden="true"></i>
-        //             </a>;
-        // }
+        imgFormatter=(cell,row)=> {
+            return  <a href="/#" >
+                    <i className="fa fa-pencil" aria-hidden="true"></i>
+                    </a>;
+        }
         renderRequest=(request, index)=> {
             return (
                 
                 <tr key={request.requestID} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 <td className="reqTd" >{request.counter}</td>
-                
-                <td className="reqTd" >
-               </td>
-
-
-                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd" >{request.requestID}</td>
+                <td className="reqTd" >{request.reqType}</td>
+                <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
+                <td className="reqTd">{request.state}</td>
+                <td className="reqTd">{request.sickDay}</td>
+                <td className="reqTd">{request.reason}</td>
+                <td className="reqTd">{request.submission_date}</td>
+
                 </tr>
                 
             )
@@ -98,20 +93,8 @@ class ViewRequests extends Component{
                     <Dropdown.Divider />
                     <Dropdown.Item eventKey="4" >Separated link</Dropdown.Item>
                     </Dropdown.Menu>
-                </Dropdown>{' '}
-                <Dropdown as={ButtonGroup} className="buttons3">
-                <Dropdown.Toggle id="dropdown-custom-3"  >Type</Dropdown.Toggle>
-                    <Dropdown.Menu className="drop3"></Dropdown.Menu>
-                    <Dropdown.Menu className="super-colors">
-                    <Dropdown.Item eventKey="1">Change Day Off</Dropdown.Item>
-                    <Dropdown.Item eventKey="2">Replacement Request</Dropdown.Item>
-                    <Dropdown.Item eventKey="3">Annual Leave</Dropdown.Item>
-                    <Dropdown.Item eventKey="4">Sick Leave</Dropdown.Item>
-                    <Dropdown.Item eventKey="5">Maternity Leave</Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
-                    </Dropdown.Menu>
-                 </Dropdown>   
+                </Dropdown>
+              
                 </div> 
 
                 
@@ -121,9 +104,15 @@ class ViewRequests extends Component{
                 <thead className="reqHead">
                     <tr className="reqTr">
                     <th className="reqTh">#</th>
-                    <th className="reqTh">First Name</th>
-                    <th className="reqTh">Last Name</th>
-                    <th className="reqTh">Username</th>
+                    <th className="reqTh">Request ID</th>
+                    <th className="reqTh">Request Type</th>
+                    <th className="reqTh">Sent By</th>
+                    <th className="reqTh">Sent To</th>
+                    <th className="reqTh">State</th>
+                    <th className="reqTh">Sick Day</th>
+                    <th className="reqTh">reason</th>
+                    <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">Response</th>
                     </tr>
                 </thead>
                 <tbody className="reqBody">
@@ -149,4 +138,4 @@ class ViewRequests extends Component{
     }
 }
 
-export default ViewRequests
+export default ViewSickLeave
