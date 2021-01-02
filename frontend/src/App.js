@@ -23,7 +23,7 @@ function App() {
         <Route exact path='/' component ={ViewRequests}/>
         <Route exact path='/ViewSickLeave' component ={ViewSickLeave}/>
         <Route exact path='/getRequest' component ={getRequest}/>
-        <Route exact  path="/ViewAcceptedRequests" component={ViewAcceptedRequests}/>
+        <Route exact path="/ViewAcceptedRequests" component={ViewAcceptedRequests}/>
         <Route path='/ViewRejectedRequests' component={ViewRejectedRequests}/>
         {/* <Route path="/ViewAcceptedRequests" render={(props) => <ViewAcceptedRequests {...props}/>}/> */}
     </div>

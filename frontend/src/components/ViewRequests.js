@@ -33,8 +33,7 @@ class ViewRequests extends Component{
          handleClick(e,value){
             e.preventDefault();
             console.log("in click "+value)
-            return  <a className="inTable">
-            < Link to={{ pathname: '/ViewAcceptedRequests', state: { request_id:value}}}/></a>
+           // return 
         //     <Redirect
         //     to={{
         //     pathname: "/ViewAcceptedRequests",
@@ -56,6 +55,11 @@ class ViewRequests extends Component{
                 <td className="reqTd" >{request.counter}</td>
                 
                 <td className="reqTd" >
+                <a className="inTable">
+            <Link to={{ pathname: '/ViewAcceptedRequests', state: { request_id:request.requestID}}}>
+                {request.requestID}
+                </Link>
+                </a>
                </td>
 
 

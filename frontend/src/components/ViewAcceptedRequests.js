@@ -41,6 +41,7 @@ class ViewAcceptedRequests extends Component{
         )
         }              
     render(){
+        console.log("heree")
         console.log(this.props.location.state.request_id)
         const reqs=this.state.requests;
         var empty=["one"]
