@@ -1,0 +1,23 @@
+.monica{
+    width:500px !important;
+   
+  
+}
+
+.tdd{
+    width:10%;
+    
+}
+
+.containMonica{
+    position:relative ;
+    top:10vw;
+    right:11vw;
+    width:59% !important;
+    max-height:300px !important;
+    overflow-y: scroll;
+}
+.containMonica::-webkit-scrollbar{
+    width:1vw;
+    background-color: firebrick;
+}

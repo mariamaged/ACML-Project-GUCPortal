@@ -1,6 +1,6 @@
 import React,{Component} from 'react'
 import axios from 'axios'
-import '../css/newTables.css'
+// import '../css/newTables.css'
 //import 'bootstrap/dist/css/bootstrap.min.css';
 /* <link rel="stylesheet" type="text/css" href="../css/reqTable.css" /> */
 
@@ -73,8 +73,8 @@ class ViewRequests extends Component{
 
            </div>
 
-                <div class="container table-responsive py-5"> 
-                <table class="table table-bordered table-hover reqTable">
+                <div class="container table-responsive py-5 horizontal-scroll  col-md-9" style={{overflow: 'scroll'}} className="divTable"> 
+                <table class="table table-striped header-fixed" className="reqTable">
                 <thead class="thead-dark">
                     <tr>
                     
@@ -83,9 +83,11 @@ class ViewRequests extends Component{
                     <th scope="col">Submission Date</th>
                     </tr>
                 </thead>
+
                 <tbody>
                 {reqs.map(this.renderRequest)}
                 </tbody>
+
                 </table>
                 </div>
 

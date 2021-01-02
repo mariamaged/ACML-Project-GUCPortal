@@ -11,9 +11,9 @@ const store=createStore(rootReducer)
 setAuthorizationToken(localStorage.jwtToken)
 
 ReactDOM.render(
-  <Provider store={store}>
+  <div>
     <App />
-</Provider>,
+    </div>,
   document.getElementById('root')
 );
 

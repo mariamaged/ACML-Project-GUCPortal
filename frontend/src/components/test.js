@@ -1,7 +1,7 @@
 import React,{Component} from 'react'
 import axios from 'axios'
-import 'bootstrap/dist/css/bootstrap.min.css';
-<link rel="stylesheet" type="text/css" href="./css/table.css" />
+//import 'bootstrap/dist/css/bootstrap.min.css';
+import  '../css/lastTable.css'
 
 class test extends Component{
     state={
@@ -36,16 +36,23 @@ class test extends Component{
                     //     <span className="request type">{request.reqType}</span>
                     //     <p>{request.sentTo}</p>
                     // </div>
-    
-                    renderRequest(request, index) {
-                        return (
-                          <tr key={request.requestID}>
-                            <td>{request.reqType}</td>
-                            <td>{request.submission_date}</td>
-                            <td>{request.sentTo}</td>
-                          </tr>
-                        )
-                      }              
+                  //   .table-scroll table {
+                  //     width: 80%;
+                  //     height:80%;
+                  //   margin: auto;
+                  //   border-collapse: separate;
+                  //     border-spacing: 0;
+                      
+                  // }
+    renderRequest(request, index) {
+        return (
+          <tr key={request.requestID}>
+            <td className="td1">{request.reqType}</td>
+            <td className="td2">{request.submission_date}</td>
+            <td className="td3">{request.sentTo}</td>
+          </tr>
+        )
+      }              
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -53,38 +60,37 @@ class test extends Component{
             empty.map(request=>{
             console.log("in mapping "+request.reqType)
             return(
-                <div class="container">
-<h2>Responsive Table with RWD-Table-Patterns</h2>
+                
 
-<div class="container">
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="table-responsive" data-pattern="priority-columns">
-        <table summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality" class="table table-bordered table-hover">
-          <caption class="text-center">An example of a responsive table based on RWD-Table-Patterns' <a href="http://gergeo.se/RWD-Table-Patterns/" target="_blank"> solution</a>:</caption>
-          <thead>
-            <tr>
-              <th>Country</th>
-              <th data-priority="1">Languages</th>
-              <th data-priority="2">Population</th>
-            </tr>
-          </thead>
-          <tbody>
-          {reqs.map(this.renderRequest)}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="5" class="text-center">Data retrieved from <a href="http://www.infoplease.com/ipa/A0855611.html" target="_blank">infoplease</a> and <a href="http://www.worldometers.info/world-population/population-by-country/" target="_blank">worldometers</a>.</td>
-            </tr>
-          </tfoot>
+            <div class="container">
+            <h1 class="intro">Table with fluid height and width fixed header and footer (experimental use at your own risk)</h1>
+<p class="intro"><strong> See <a href="https://codepen.io/paulobrien/pen/RMyMBv" target="_blank">position:sticky version</a> with NO JS required.</strong></p>
+<p class="intro">The table is cloned with JS and then absolutely placed on top of the original table. The cloned copy has the tbody hidden and thus revealing just the footer and header. The content in the body is set to line-height:0 so that the table height can be controlled
+  to exactly 300px (one row of the table needs to have a small line-height or the table height collapses to zero).</p>
+<p class="intro">To avoid the issue with scrollbars eating up space the absolutely placed table is positioned within a holding div that already has scrollbars and thus will account for the different scrollbar widths of browsers, or indeed if scrollbars are only overlaid
+  when needed as in Mac systems.</p>
+
+<div id="table-scroll" class="table-scroll">
+  
+  <div id="table-wrap" class="table-wrap">
+    <table id="main-table" class="main-table">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Header 1</th>
+          <th scope="col">Header 2</th>
+          <th scope="col">Header 3</th>
+       
+        </tr>
+      </thead>
+      <tbody className="testBody">
+      {reqs.map(this.renderRequest)}
+      </tbody>
+     
         </table>
       </div>
     </div>
-  </div>
-</div>
+      </div>
 
-
-         </div>
               )
             })
         ):

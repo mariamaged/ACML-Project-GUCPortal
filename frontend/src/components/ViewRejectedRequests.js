@@ -1,6 +1,6 @@
 import React,{Component} from 'react'
 import axios from 'axios'
-import '../css/newTables.css'
+// import '../css/newTables.css'
 //import 'bootstrap/dist/css/bootstrap.min.css';
 /* <link rel="stylesheet" type="text/css" href="../css/reqTable.css" /> */
 

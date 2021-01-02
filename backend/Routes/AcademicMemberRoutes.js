@@ -244,26 +244,30 @@ router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
             }
             if(reqType=="Replacement"){
                 const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
-                    slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    sentTo:hodName,state:sent[i].state,
+                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
             if(reqType=="Change Day off"){
                 const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
+                    sentTo:hodName,state:sent[i].state,
+                    newDayOff:sent[i].newDayOff,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
             if(reqType=="Accidental Leave"){
                 const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
+                    sentTo:hodName,state:sent[i].state,
+                    accidentDate:sent[i].accidentDate,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
     
             }
             if(reqType=="Sick Leave"){
                 const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,sickDay:sent[i].sickDay,
+                    sentTo:hodName,state:sent[i].state,
+                    sickDay:sent[i].sickDay,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                 
@@ -275,8 +279,8 @@ router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
                     arr[k++]= reqNew
             }
             if(reqType=="Compensation Leave"){
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,missedDay:sent[i].missedDay,
+                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType, sentTo:hodName,state:sent[i].state,
+                    missedDay:sent[i].missedDay,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
@@ -304,7 +308,7 @@ router.get('/sentReplacementRequests',authenticateToken,async(req,res)=>{
         // if(sent.length==0)
         // res.json("There are no sent requests available to display.")
 
-        res.json(arr)
+       // res.json(arr)
         return 
 })
 

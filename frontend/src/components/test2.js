@@ -1,8 +1,7 @@
 import React,{Component} from 'react'
 import axios from 'axios'
-import 'bootstrap/dist/css/bootstrap.min.css';
- <link rel="stylesheet" type="text/css" href="./css/newTable.css" />
-{/* <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" /> */}
+//import 'bootstrap/dist/css/bootstrap.min.css';
+// import '../css/grid.css'
 class test2 extends Component{
     state={
         requests:[]
@@ -56,34 +55,25 @@ class test2 extends Component{
             empty.map(request=>{
             console.log("in mapping "+request.reqType)
             return(
-                <div class="container">
-                     
-
-            <table class="flatTable">
-            <tr class="titleTr">
-                <td class="titleTd">TABLE TITLE</td>
-                <td colspan="4"></td>
-                <td class="plusTd button"></td>
-            </tr>
-            <tr class="headingTr">
-                <td>REFERENCE</td>
-                <td>DATE ISSUED</td>
-                <td>COMPANY</td>
-                <td></td>
-            </tr>
-            <tbody>
-                    {reqs.map(this.renderRequest)}
-                </tbody>
-            </table>
-
-            <div id="sForm" class="sForm sFormPadding">
-                    <span class="button close"><img src="https://i.imgur.com/nnzONel.png" alt="X"  class="" /></span>
-                    <h2 class="title">Add a New Record</h2>  
-                </div>
-
-            <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900' rel='stylesheet' type='text/css'></link>
                         
-                </div>
+            <div class="container table-responsive py-5"> 
+            <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                <th scope="col">#</th>
+                <th scope="col">First</th>
+                <th scope="col">Last</th>
+                <th scope="col">Handle</th>
+                </tr>
+            </thead>
+            <tbody>
+            {reqs.map(this.renderRequest)}
+            </tbody>
+            </table>
+            </div>
+
+                        
+            
               )
             })
         ):
@@ -94,7 +84,7 @@ class test2 extends Component{
         
         return (
            
-           <div>{reqList}</div>
+           reqList
         )
     }
 }

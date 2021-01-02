@@ -16,17 +16,19 @@ class Login extends React.Component{
     }
     handleClick=(e)=>{
      console.log(this.state.email+"  " +this.state.password);
-     let response=axios.post('http://localhost:5000/staff/login',{
-       email:"nancy3@gmail.com",
-       password:"nancy"
-     }).then((res)=>{
+
+
+
+     axios({method:'POST',url:'http://localhost:5000/staff/login',
+     //headers:{'auth-token':token},
+      data:{email:'nancy3@gmail.com',password:'nancy'} }).then((res)=>{
        console.log("WORKING")
        console.log(res);
        const token=res.data.token
        console.log("token= "+token)
        localStorage.setItem('jwtToken',token)
-       setAuthorizationToken(token)
-        console.log(jwt.decode(token))
+      //  setAuthorizationToken(token)
+        // console.log(jwt.decode(token))
         //dispatch(setCurrentUser((jwt.decode(token))))
      }).catch((err)=>{
        console.log("errrrrrr")
