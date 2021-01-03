@@ -8,12 +8,15 @@
     width:10%;
     
 }
-
-.containTable{
+.reqTh{
+    text-align: center !important;
+    white-space: nowrap;
+}
+.containSickTable{
     position:relative ;
-    top:5vw;
-    right:23vw;
-    width:45% !important;
+    top:10vw;
+    right:10vw;
+    width:64.3% !important;
     max-height:300px !important;
     overflow-y: scroll;
 }
@@ -31,8 +34,8 @@
 
    .containDrop{
     position:relative !important ;
-    top:4.5vw;
-    left:22vw;
+    top:9.5vw;
+    left:33vw;
     size:'lg';
     max-height:15% !important;
     max-width:25% !important;
@@ -67,4 +70,9 @@
 }
 .buttons3{
   size:'sm';
+}
+
+.reqTdSick{
+    width:fit-content !important;
+    white-space: nowrap;
 }

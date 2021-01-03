@@ -723,7 +723,7 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
     const hodAcademic=await AcademicStaffModel.findById(hodID)
     
     //create request
-    var reason=''
+    var reason=' '
     if(req.body.reason)
     reason=req.body.reason
     const doc = await CounterModel.findById('SickLeave-');
@@ -1059,9 +1059,11 @@ router.get('/acceptedRequests',authenticateToken,async(req,res)=>{
     if(type=="HR"){
         return res.json("HR do not have any leave requests.")
     }
-    const sent=await request.find({sentBy:req.user.id,state:"Accepted"})
-    //const received=await request.find({sentTo:req.user.id,state:"Accepted"})
+    var sent1=await request.find({sentBy:req.user.id,state:"Accepted"})
+    const received=await request.find({sentTo:req.user.id,state:"Accepted"})
+     sent = [...sent1, ...received];
     console.log("sent= "+sent)
+    // console.log("sent= "+sent)
     var arr=[]
     var k=0
     if(sent.length==0){
@@ -1083,45 +1085,45 @@ router.get('/acceptedRequests',authenticateToken,async(req,res)=>{
         if (sent[i].replacementStaff)
         repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
         if(reqType=="Annual"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                 slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
         }
         if(reqType=="Replacement"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                 slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
         }
         if(reqType=="Change Day off"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
         }
         if(reqType=="Accidental Leave"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
 
         }
         if(reqType=="Sick Leave"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,sickDay:sent[i].sickDay,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
             
         }
         if(reqType=="Maternity Leave"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
         }
         if(reqType=="Compensation Leave"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,missedDay:sent[i].missedDay,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
@@ -1132,7 +1134,7 @@ router.get('/acceptedRequests',authenticateToken,async(req,res)=>{
         const coordinatorName=coordinator.name
         res.write("Request ID: "+sent[i].requestID+"\n")
            
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
                 slotNum:sent[i].slotNum,courseID:sent[i].courseID,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
@@ -1263,7 +1265,10 @@ router.get('/pendingRequests',authenticateToken,async(req,res)=>{
     if(type=="HR"){
         return res.json("HR do not have any leave requests.")
     }
-    const sent=await request.find({sentBy:req.user.id,state:"Pending"})
+    const sent1=await request.find({sentBy:req.user.id,state:"Pending"})
+    const received=await request.find({sentTo:req.user.id,state:"Pending"})
+    const sent = [...sent1, ...received];
+    console.log("sent= "+sent)
     var arr=[]
     var k=0
     if(sent.length==0){
@@ -1286,45 +1291,45 @@ router.get('/pendingRequests',authenticateToken,async(req,res)=>{
             if (sent[i].replacementStaff)
             repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
             if(reqType=="Annual"){
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                     slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
             if(reqType=="Replacement"){
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                     slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
             if(reqType=="Change Day off"){
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
             if(reqType=="Accidental Leave"){
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
 
             }
             if(reqType=="Sick Leave"){
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,sickDay:sent[i].sickDay,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                 
             }
             if(reqType=="Maternity Leave"){
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
             if(reqType=="Compensation Leave"){
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,missedDay:sent[i].missedDay,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
@@ -1335,7 +1340,7 @@ router.get('/pendingRequests',authenticateToken,async(req,res)=>{
             const coordinatorName=coordinator.name
             res.write("Request ID: "+sent[i].requestID+"\n")
             
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
                     slotNum:sent[i].slotNum,courseID:sent[i].courseID,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
@@ -1466,7 +1471,11 @@ router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
     if(type=="HR"){
         return res.json("HR do not have any leave requests.")
     }
-    const sent=await request.find({sentBy:req.user.id,state:"Rejected"})
+    const sent1=await request.find({sentBy:req.user.id,state:"Rejected"})
+    const received=await request.find({sentTo:req.user.id,state:"Rejected"})
+    const sent = [...sent1, ...received];
+    console.log("sent= "+sent)
+
     var arr=[]
     var k=0
     if(sent.length==0){
@@ -1487,45 +1496,45 @@ router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
         if (sent[i].replacementStaff)
         repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
         if(reqType=="Annual"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                 slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
         }
         if(reqType=="Replacement"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                 slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
         }
         if(reqType=="Change Day off"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
         }
         if(reqType=="Accidental Leave"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
 
         }
         if(reqType=="Sick Leave"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,sickDay:sent[i].sickDay,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
             
         }
         if(reqType=="Maternity Leave"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
         }
         if(reqType=="Compensation Leave"){
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:hodName,state:sent[i].state,missedDay:sent[i].missedDay,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                 arr[k++]= reqNew
@@ -1536,7 +1545,7 @@ router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
         const coordinatorName=coordinator.name
         res.write("Request ID: "+sent[i].requestID+"\n")
         
-            const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+            const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                 sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
                 slotNum:sent[i].slotNum,courseID:sent[i].courseID,
                 reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}

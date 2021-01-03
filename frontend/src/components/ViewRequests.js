@@ -56,7 +56,7 @@ class ViewRequests extends Component{
                 
                 <td className="reqTd" >
                 <a className="inTable">
-            <Link to={{ pathname: '/ViewAcceptedRequests', state: { request_id:request.requestID}}}>
+                <Link to={{ pathname: '/getRequest', state: { request_id:request.requestID}}}>
                 {request.requestID}
                 </Link>
                 </a>
@@ -79,10 +79,10 @@ class ViewRequests extends Component{
             return(
                 <div className="containAll">
 
-                 <div className="containDrop">
+                 <div className="containDrop d-inline-block">
                 
                     <Dropdown as={ButtonGroup} className="buttons1">
-                    <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
+                    <Dropdown.Toggle id="dropdown-custom-1" className="buttonName" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
                     <Dropdown.Item ><Link to="/ViewAcceptedRequests">Accepted</Link></Dropdown.Item>
                     <Dropdown.Item><Link to="/ViewRejectedRequests">Rejected</Link></Dropdown.Item>
@@ -92,7 +92,7 @@ class ViewRequests extends Component{
                     <Dropdown.Divider />
                     </Dropdown.Menu>
                 </Dropdown>{' '}
-                <Dropdown as={ButtonGroup}className="buttons2" >
+                <Dropdown as={ButtonGroup} className="buttons2" >
                 <Dropdown.Toggle id="dropdown-custom-2" >R/S</Dropdown.Toggle>
                     <Dropdown.Menu className="drop2"></Dropdown.Menu>
                     <Dropdown.Menu className="super-colors">
@@ -125,9 +125,9 @@ class ViewRequests extends Component{
                 <thead className="reqHead">
                     <tr className="reqTr">
                     <th className="reqTh">#</th>
-                    <th className="reqTh">First Name</th>
-                    <th className="reqTh">Last Name</th>
-                    <th className="reqTh">Username</th>
+                    <th className="reqTh">Request ID</th>
+                    <th className="reqTh">Request Type</th>
+                    <th className="reqTh">Submission Date</th>
                     </tr>
                 </thead>
                 <tbody className="reqBody">

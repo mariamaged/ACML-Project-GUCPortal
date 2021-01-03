@@ -1,26 +1,25 @@
 import React,{Component} from 'react'
 import axios from 'axios'
-//import 'bootstrap/dist/css/bootstrap.min.css';
-import  '../css/lastTable.css'
+import { Button, Table } from 'react-bootstrap';
+import Dropdown from 'react-bootstrap/Dropdown'
+import '../css/test44.css'
+import DropdownButton from 'react-bootstrap/DropdownButton'
+// import Dropdown from 'react-bootstrap/Dropdown'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import history from '../history';
+import {Link,NavLink} from 'react-router-dom'
+import  { Redirect } from 'react-router-dom'
 
 class test extends Component{
     state={
         requests:[]
     }
     componentDidMount(){
-    //     console.log("here in mount")
-    //      axios.get('/sentReplacementRequests').then(res=>{
-    //         console.log("hereeeeeeeeeeee"+res)
-    //       console.log(res)
-    //       this.setState({
-    //           requests:res.data
-    //       })
-    //   })
     console.log("in view")
         axios.get('http://localhost:5000/academic/sentReplacementRequests',
         {
             headers:{
-                'x-auth-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmZTVhNmIxZTZiZWU4MWY5ODVlNTYwZiIsInJvbGUiOiJBY2FkZW1pYyBNZW1iZXIiLCJhY2FkZW1pY19yb2xlIjoiQ291cnNlIEluc3RydWN0b3IiLCJpc0hlYWQiOmZhbHNlLCJpYXQiOjE2MDk0Mzk1MDZ9.JDCdnFdtRtiEA-y2ziCUTRjHRg28NtL_jP-dg3UzMkY'
+                'x-auth-token':localStorage.getItem('jwtToken')
             }
         }
         ).then(res=>{
@@ -31,28 +30,46 @@ class test extends Component{
         }).catch(console.log("error"))
     }
 
-     // <div className="requests card" key={request.requestID}>
-                    // <div className="cardContent">
-                    //     <span className="request type">{request.reqType}</span>
-                    //     <p>{request.sentTo}</p>
-                    // </div>
-                  //   .table-scroll table {
-                  //     width: 80%;
-                  //     height:80%;
-                  //   margin: auto;
-                  //   border-collapse: separate;
-                  //     border-spacing: 0;
-                      
-                  // }
-    renderRequest(request, index) {
-        return (
-          <tr key={request.requestID}>
-            <td className="td1">{request.reqType}</td>
-            <td className="td2">{request.submission_date}</td>
-            <td className="td3">{request.sentTo}</td>
-          </tr>
-        )
-      }              
+         handleClick(e,value){
+            e.preventDefault();
+            console.log("in click "+value)
+           // return 
+        //     <Redirect
+        //     to={{
+        //     pathname: "/ViewAcceptedRequests",
+        //     state: { request_id:value }
+        //   }}
+        // />
+
+        }
+
+        // imgFormatter=(cell,row)=> {
+        //     return  <a href="/#" >
+        //             <i className="fa fa-pencil" aria-hidden="true"></i>
+        //             </a>;
+        // }
+        renderRequest=(request, index)=> {
+            return (
+                
+                <tr key={request.requestID} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <td className="reqTd" >{request.counter}</td>
+                
+                <td className="reqTd" >
+                <a className="inTable">
+                <Link to={{ pathname: '/getRequest', state: { request_id:request.requestID}}}>
+                {request.requestID}
+                </Link>
+                </a>
+               </td>
+
+
+                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd">{request.sentTo}</td>
+                </tr>
+                
+            )
+            }    
+       
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -60,37 +77,43 @@ class test extends Component{
             empty.map(request=>{
             console.log("in mapping "+request.reqType)
             return(
+                <div className="containAll">
+
+                 <div className="containDrop d-inline-block">
+                
+                                <form action="/action_page.php">
+                <label for="cars">Choose a car:</label>
+                <select name="cars" id="cars">
+                    <option value="volvo">Volvo</option>
+                    <option value="saab">Saab</option>
+                    <option value="opel">Opel</option>
+                    <option value="audi">Audi</option>
+                </select>
+                <br><br>
+                <input type="submit" value="Submit">
+                </form> 
+                </div> 
+
                 
 
-            <div class="container">
-            <h1 class="intro">Table with fluid height and width fixed header and footer (experimental use at your own risk)</h1>
-<p class="intro"><strong> See <a href="https://codepen.io/paulobrien/pen/RMyMBv" target="_blank">position:sticky version</a> with NO JS required.</strong></p>
-<p class="intro">The table is cloned with JS and then absolutely placed on top of the original table. The cloned copy has the tbody hidden and thus revealing just the footer and header. The content in the body is set to line-height:0 so that the table height can be controlled
-  to exactly 300px (one row of the table needs to have a small line-height or the table height collapses to zero).</p>
-<p class="intro">To avoid the issue with scrollbars eating up space the absolutely placed table is positioned within a holding div that already has scrollbars and thus will account for the different scrollbar widths of browsers, or indeed if scrollbars are only overlaid
-  when needed as in Mac systems.</p>
-
-<div id="table-scroll" class="table-scroll">
-  
-  <div id="table-wrap" class="table-wrap">
-    <table id="main-table" class="main-table">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">Header 1</th>
-          <th scope="col">Header 2</th>
-          <th scope="col">Header 3</th>
-       
-        </tr>
-      </thead>
-      <tbody className="testBody">
-      {reqs.map(this.renderRequest)}
-      </tbody>
-     
-        </table>
-      </div>
-    </div>
-      </div>
-
+                <div className="container containTable">
+                <Table striped bordered hover size="sm" className="reqTable">
+                <thead className="reqHead">
+                    <tr className="reqTr">
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Request ID</th>
+                    <th className="reqTh">Request Type</th>
+                    <th className="reqTh">Submission Date</th>
+                    </tr>
+                </thead>
+                <tbody className="reqBody">
+                {reqs.map(this.renderRequest)}
+                </tbody>
+                </Table>
+                </div>
+                </div>
+                        
+            
               )
             })
         ):
@@ -101,7 +124,7 @@ class test extends Component{
         
         return (
            
-           <div>{reqList}</div>
+           reqList
         )
     }
 }

@@ -1,28 +1,25 @@
 import React,{Component} from 'react'
 import axios from 'axios'
-// import '../css/newTables.css'
-//import 'bootstrap/dist/css/bootstrap.min.css';
-/* <link rel="stylesheet" type="text/css" href="../css/reqTable.css" /> */
-
+import { Button, Table } from 'react-bootstrap';
+import Dropdown from 'react-bootstrap/Dropdown'
+import '../css/test44.css'
+import DropdownButton from 'react-bootstrap/DropdownButton'
+// import Dropdown from 'react-bootstrap/Dropdown'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import history from '../history';
+import {Link,NavLink} from 'react-router-dom'
+import  { Redirect } from 'react-router-dom'
 
 class ViewRejectedRequests extends Component{
     state={
         requests:[]
     }
     componentDidMount(){
-    //     console.log("here in mount")
-    //      axios.get('/sentReplacementRequests').then(res=>{
-    //         console.log("hereeeeeeeeeeee"+res)
-    //       console.log(res)
-    //       this.setState({
-    //           requests:res.data
-    //       })
-    //   })
     console.log("in view")
         axios.get('http://localhost:5000/academic/rejectedRequests',
         {
             headers:{
-                'x-auth-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmZTVhNmIxZTZiZWU4MWY5ODVlNTYwZiIsInJvbGUiOiJBY2FkZW1pYyBNZW1iZXIiLCJhY2FkZW1pY19yb2xlIjoiQ291cnNlIEluc3RydWN0b3IiLCJpc0hlYWQiOmZhbHNlLCJpYXQiOjE2MDk0Mzk1MDZ9.JDCdnFdtRtiEA-y2ziCUTRjHRg28NtL_jP-dg3UzMkY'
+                'x-auth-token':localStorage.getItem('jwtToken')
             }
         }
         ).then(res=>{
@@ -33,21 +30,42 @@ class ViewRejectedRequests extends Component{
         }).catch(console.log("error"))
     }
 
-     // <div className="requests card" key={request.requestID}>
-                    // <div className="cardContent">
-                    //     <span className="request type">{request.reqType}</span>
-                    //     <p>{request.sentTo}</p>
-                    // </div>
-    
-                    renderRequest(request, index) {
-                        return (
-                          <tr key={request.requestID}>
-                            <td>{request.reqType}</td>
-                            <td>{request.submission_date}</td>
-                            <td>{request.sentTo}</td>
-                          </tr>
-                        )
-                      }              
+         handleClick(e,value){
+            e.preventDefault();
+            console.log("in click "+value)
+           // return 
+        //     <Redirect
+        //     to={{
+        //     pathname: "/ViewAcceptedRequests",
+        //     state: { request_id:value }
+        //   }}
+        // />
+
+        }
+
+        
+        renderRequest=(request, index)=> {
+            return (
+                
+                <tr key={request.requestID} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <td className="reqTd" >{request.counter}</td>
+                
+                <td className="reqTd" >
+                <a className="inTable">
+                <Link to={{ pathname: '/getRequest', state: { request_id:request.requestID}}}>
+                {request.requestID}
+                </Link>
+                </a>
+               </td>
+
+
+                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd">{request.sentTo}</td>
+                </tr>
+                
+            )
+            }    
+       
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -55,42 +73,67 @@ class ViewRejectedRequests extends Component{
             empty.map(request=>{
             console.log("in mapping "+request.reqType)
             return(
-                <div className="container" >
-                  <div className="dropdown-container">
-                                
-                        
-            <a class="btn btn-secondary dropdown-toggle" href="/#" role="button" id="dropdownMenuLink" 
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown link
-            </a>
+                <div className="containAll">
 
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-            <a class="dropdown-item" href="/ViewAcceptedRequests">Accepted</a>
-                <a class="dropdown-item" href="/ViewRejectedRequests">Rejected</a>
-                <a class="dropdown-item" href="/ViewPendignRequests">Pending</a>
-            </div>
-
-
-           </div>
-
-                <div class="container table-responsive py-5"> 
-                <table class="table table-bordered table-hover reqTable">
-                <thead class="thead-dark">
-                    <tr>
+                 <div className="containDrop">
+                
+                    <Dropdown as={ButtonGroup} className="buttons1">
+                    <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    <Dropdown.Item ><Link to="/ViewAcceptedRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewRejectedRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewPendingRequests">Pending</Link></Dropdown.Item>
+                
                     
-                    <th scope="col">Request Type</th>
-                    <th scope="col">Request Receiver</th>
-                    <th scope="col">Submission Date</th>
+                    <Dropdown.Divider />
+                    </Dropdown.Menu>
+                </Dropdown>{' '}
+                <Dropdown as={ButtonGroup}className="buttons2" >
+                <Dropdown.Toggle id="dropdown-custom-2" >R/S</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop2"></Dropdown.Menu>
+                    <Dropdown.Menu className="super-colors">
+                    <Dropdown.Item eventKey="1">Sent</Dropdown.Item>
+                    <Dropdown.Item eventKey="2">Received</Dropdown.Item>
+                
+                    <Dropdown.Divider />
+                    <Dropdown.Item eventKey="4" >Separated link</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>{' '}
+                <Dropdown as={ButtonGroup} className="buttons3">
+                <Dropdown.Toggle id="dropdown-custom-3"  >Type</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop3"></Dropdown.Menu>
+                    <Dropdown.Menu className="super-colors">
+                    <Dropdown.Item eventKey="1">Change Day Off</Dropdown.Item>
+                    <Dropdown.Item eventKey="2">Replacement Request</Dropdown.Item>
+                    <Dropdown.Item eventKey="3">Annual Leave</Dropdown.Item>
+                    <Dropdown.Item eventKey="4">Sick Leave</Dropdown.Item>
+                    <Dropdown.Item eventKey="5">Maternity Leave</Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
+                    </Dropdown.Menu>
+                 </Dropdown>   
+                </div> 
+
+                
+
+                <div className="container containTable">
+                <Table striped bordered hover size="sm" className="reqTable">
+                <thead className="reqHead">
+                    <tr className="reqTr">
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Request ID</th>
+                    <th className="reqTh">Request type</th>
+                    <th className="reqTh">Submission Date</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="reqBody">
                 {reqs.map(this.renderRequest)}
                 </tbody>
-                </table>
+                </Table>
                 </div>
-
-
                 </div>
+                        
+            
               )
             })
         ):
@@ -101,7 +144,7 @@ class ViewRejectedRequests extends Component{
         
         return (
            
-           <div>{reqList}</div>
+           reqList
         )
     }
 }

@@ -2,13 +2,15 @@ import React,{Component} from 'react'
 import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
-import '../css/test44.css'
+import '../css/sickLeave.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import history from '../history';
 import {Link,NavLink} from 'react-router-dom'
 import  { Redirect } from 'react-router-dom'
+import { CheckCircle } from 'react-bootstrap-icons';
+// import Button from 'react-bootstrap/Button'
 
 class ViewSickLeave extends Component{
     state={
@@ -36,12 +38,7 @@ class ViewSickLeave extends Component{
             
 
         }
-
-        imgFormatter=(cell,row)=> {
-            return  <a href="/#" >
-                    <i className="fa fa-pencil" aria-hidden="true"></i>
-                    </a>;
-        }
+        
         renderRequest=(request, index)=> {
             return (
                 
@@ -52,9 +49,15 @@ class ViewSickLeave extends Component{
                 <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
                 <td className="reqTd">{request.state}</td>
-                <td className="reqTd">{request.sickDay}</td>
+                <td className="reqTdSick">{request.sickDay}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTdRes">
+                {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
+                <CheckCircle color="royalblue" size={96} />
+                <Button variant="outline-secondary" className="buttonResponse2">Reject</Button>
+                <Button variant="outline-danger" className="buttonResponse3">Cancel</Button>
+              </td>
 
                 </tr>
                 
@@ -99,18 +102,18 @@ class ViewSickLeave extends Component{
 
                 
 
-                <div className="container containTable">
+                <div className="container containSickTable">
                 <Table striped bordered hover size="sm" className="reqTable">
                 <thead className="reqHead">
                     <tr className="reqTr">
                     <th className="reqTh">#</th>
                     <th className="reqTh">Request ID</th>
                     <th className="reqTh">Request Type</th>
-                    <th className="reqTh">Sent By</th>
-                    <th className="reqTh">Sent To</th>
+                    <th className="reqTh">Sender</th>
+                    <th className="reqTh">Receiver</th>
                     <th className="reqTh">State</th>
                     <th className="reqTh">Sick Day</th>
-                    <th className="reqTh">reason</th>
+                    <th className="reqTh">Reason</th>
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Response</th>
                     </tr>
