@@ -63,7 +63,8 @@ router.post('/login',async(req,res,next)=>{
             
             const isMatched=await bcrypt.compare(password,existingUser.password);       //comparing password entered text with password of the user we got from the database            
             if( isMatched===false){
-                 return res.status(400).json({error:"Please enter correct password."});
+                // return res.status(400).json({error:"Please enter correct password."});
+                return res.status(400).send("Please enter correct password.");
              }
              
              else if(existingUser.staff_type=="HR"){
