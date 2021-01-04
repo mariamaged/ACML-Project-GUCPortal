@@ -1,70 +1,78 @@
 .reqTable{
-    width:580px !important;
-   
-  
+  width:580px !important;
+ 
+
 }
 
 .reqTd{
-    width:10%;
-    
+  width:10%;
+  white-space: nowrap;
 }
-
+.reqTh{
+  text-align: center !important;
+  white-space: nowrap;
+}
 .containTable{
-    position:relative ;
-    top:5vw;
-    right:23vw;
-    width:45% !important;
-    max-height:300px !important;
-    overflow-y: scroll;
+  position:relative ;
+  top:10vw;
+  right:10vw;
+  width:64.3% !important;
+  max-height:300px !important;
+  overflow-y: scroll;
 }
-.containTable::-webkit-scrollbar-track {
-    border-radius: 10px;
-    background: #9c2525 !important;
-  }
+.containTable2::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: #9c2525 !important;
+}
 
-  .containTable::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background:#888 !important;
-  }
+.containTable2::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background:#888 !important;
+}
 
- 
 
-   .containDrop{
-    position:relative !important ;
-    top:4.5vw;
-    left:22vw;
-    size:'lg';
-    max-height:15% !important;
-    max-width:25% !important;
 
-  } 
+ .containDrop{
+  position:relative !important ;
+  top:9.5vw;
+  left:33vw;
+  size:'lg';
+  max-height:15% !important;
+  max-width:25% !important;
+
+} 
 .btn-group{
-     size:'sm';
-     position:relative;
-     left:14.5vw;
-     /* width:5% !important; */
-     max-height: 5% !important;
-   /* max-width:5% !important; */
-    /* background-color: rgb(202, 13, 13); */
-    color: darkred;
+   size:'sm';
+   position:relative;
+   left:14.5vw;
+   /* width:5% !important; */
+   max-height: 5% !important;
+ /* max-width:5% !important; */
+  /* background-color: rgb(202, 13, 13); */
+  color: darkred;
 }
 .btn{
-  font-size:0.8 rem !important;
-  padding:0.15rem 0.1rem !important;
-  background-color: cadetblue !important;
-  border:1px solid #7050ff!important;
-  border-radius: 0.5rem !important;
+font-size:0.8 rem !important;
+padding:0.15rem 0.1rem !important;
+background-color: cadetblue !important;
+border:1px solid #7050ff!important;
+border-radius: 0.5rem !important;
 
 }
- .buttonName{
-   font-size: small;
- }
+.buttonName{
+ font-size: small;
+}
 .buttons2{
-  size:'sm';
+size:'sm';
 }
 .buttons1{
-  size:'sm';
+size:'sm';
 }
 .buttons3{
-  size:'sm';
+size:'sm';
+}
+
+.reqTdSick{
+  width:fit-content !important;
+  white-space: nowrap;
 }

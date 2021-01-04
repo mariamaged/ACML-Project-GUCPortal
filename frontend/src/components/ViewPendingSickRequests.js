@@ -2,30 +2,30 @@ import React,{Component} from 'react'
 import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
-import '../css/sickLeave.css'
+import '../css/test44.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import history from '../history';
 import {Link,NavLink} from 'react-router-dom'
 import  { Redirect } from 'react-router-dom'
-import { CheckCircle } from 'react-bootstrap-icons';
+import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
-class ViewSickLeave extends Component{
+class ViewPendingSickRequests extends Component{
     state={
         requests:[]
     }
     componentDidMount(){
     console.log("in view")
-        axios.get('http://localhost:5000/academic/sickLeave',
+        axios.get('http://localhost:5000/academic/pendingSickRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
             }
         }
         ).then(res=>{
-            console.log(res.data[0].reqType)
+            // console.log(res.data[0].reqType)
             this.setState({requests:res.data})
             console.log("new state= "+this.state.requests)
 
@@ -40,6 +40,7 @@ class ViewSickLeave extends Component{
         }
         
         renderRequest=(request, index)=> {
+            console.log("reqState= "+request.state)
             return (
                 
                 <tr key={request.requestID} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
@@ -54,8 +55,8 @@ class ViewSickLeave extends Component{
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
-                <CheckCircle color="royalblue" size={96} />
-                <Button variant="outline-secondary" className="buttonResponse2">Reject</Button>
+                
+                
                 <Button variant="outline-danger" className="buttonResponse3">Cancel</Button>
               </td>
 
@@ -63,7 +64,9 @@ class ViewSickLeave extends Component{
                 
             )
             }    
-       
+       skip(){
+
+       }
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -78,9 +81,9 @@ class ViewSickLeave extends Component{
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item><Link to="/ViewRejectedRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewPendingRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewAcceptedSickRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewRejectedSickRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item active><Link to="/ViewPendingSickRequests">Pending</Link></Dropdown.Item>
                 
                     
                     <Dropdown.Divider />
@@ -141,4 +144,4 @@ class ViewSickLeave extends Component{
     }
 }
 
-export default ViewSickLeave
+export default ViewPendingSickRequests

@@ -9,21 +9,23 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import history from '../history';
 import {Link,NavLink} from 'react-router-dom'
 import  { Redirect } from 'react-router-dom'
+import { CheckCircle, XCircle } from 'react-bootstrap-icons';
+// import Button from 'react-bootstrap/Button'
 
-class ViewRequests extends Component{
+class ViewRejectedReplacementRequests extends Component{
     state={
         requests:[]
     }
     componentDidMount(){
     console.log("in view")
-        axios.get('http://localhost:5000/academic/sentReplacementRequests',
+        axios.get('http://localhost:5000/academic/sentRejectedReplacementRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
             }
         }
         ).then(res=>{
-            console.log(res.data[0].reqType)
+            // console.log(res.data[0].reqType)
             this.setState({requests:res.data})
             console.log("new state= "+this.state.requests)
 
@@ -33,43 +35,40 @@ class ViewRequests extends Component{
          handleClick(e,value){
             e.preventDefault();
             console.log("in click "+value)
-           // return 
-        //     <Redirect
-        //     to={{
-        //     pathname: "/ViewAcceptedRequests",
-        //     state: { request_id:value }
-        //   }}
-        // />
+            
 
         }
-
-        // imgFormatter=(cell,row)=> {
-        //     return  <a href="/#" >
-        //             <i className="fa fa-pencil" aria-hidden="true"></i>
-        //             </a>;
-        // }
+        
         renderRequest=(request, index)=> {
+            console.log("reqState= "+request.state)
             return (
                 
-                <tr key={index} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 <td className="reqTd" >{request.counter}</td>
-                
-                <td className="reqTd" >
-
-                
-                <Link to={{ pathname: '/getRequest', state: { request_id:request.requestID}}} className="inTable">
-                {request.requestID}
-                </Link>
-               </td>
-
-
-                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd" >{request.requestID}</td>
+                <td className="reqTd" >{request.reqType}</td>
+                <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
+                <td className="reqTd">{request.state}</td>
+                <td className="reqTdSick">{request.slotDate}</td>
+                <td className="reqTdSick">{request.slotNum}</td>
+                <td className="reqTdSick">{request.slotLoc}</td>
+                <td className="reqTd">{request.reason}</td>
+                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTdRes">
+                {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
+                
+                
+                <Button variant="outline-danger" className="buttonResponse3">Cancel</Button>
+              </td>
+
                 </tr>
                 
             )
             }    
-       
+       skip(){
+
+       }
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -79,20 +78,20 @@ class ViewRequests extends Component{
             return(
                 <div className="containAll">
 
-                 <div className="containDrop d-inline-block">
+                 <div className="containDrop">
                 
                     <Dropdown as={ButtonGroup} className="buttons1">
-                    <Dropdown.Toggle id="dropdown-custom-1" className="buttonName" >State</Dropdown.Toggle>
+                    <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item><Link to="/ViewRejectedRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewPendingRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewAcceptedReplacementRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item active><Link to="/ViewRejectedReplacementRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewPendingReplacementRequests">Pending</Link></Dropdown.Item>
                 
                     
                     <Dropdown.Divider />
                     </Dropdown.Menu>
                 </Dropdown>{' '}
-                <Dropdown as={ButtonGroup} className="buttons2" >
+                <Dropdown as={ButtonGroup}className="buttons2" >
                 <Dropdown.Toggle id="dropdown-custom-2" >R/S</Dropdown.Toggle>
                     <Dropdown.Menu className="drop2"></Dropdown.Menu>
                     <Dropdown.Menu className="super-colors">
@@ -102,32 +101,26 @@ class ViewRequests extends Component{
                     <Dropdown.Divider />
                     <Dropdown.Item eventKey="4" >Separated link</Dropdown.Item>
                     </Dropdown.Menu>
-                </Dropdown>{' '}
-                <Dropdown as={ButtonGroup} className="buttons3">
-                <Dropdown.Toggle id="dropdown-custom-3"  >Type</Dropdown.Toggle>
-                    <Dropdown.Menu className="drop3"></Dropdown.Menu>
-                    <Dropdown.Menu className="super-colors">
-                    <Dropdown.Item eventKey="1">Change Day Off</Dropdown.Item>
-                    <Dropdown.Item eventKey="2">Replacement Request</Dropdown.Item>
-                    <Dropdown.Item eventKey="3">Annual Leave</Dropdown.Item>
-                    <Dropdown.Item eventKey="4">Sick Leave</Dropdown.Item>
-                    <Dropdown.Item eventKey="5">Maternity Leave</Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
-                    </Dropdown.Menu>
-                 </Dropdown>   
+                </Dropdown>
+              
                 </div> 
 
                 
 
-                <div className="container containTable">
+                <div className="container containSickTable">
                 <Table striped bordered hover size="sm" className="reqTable">
                 <thead className="reqHead">
                     <tr className="reqTr">
                     <th className="reqTh">#</th>
                     <th className="reqTh">Request ID</th>
                     <th className="reqTh">Request Type</th>
+                    <th className="reqTh">Sender</th>
+                    <th className="reqTh">Receiver</th>
+                    <th className="reqTh">State</th>
+                    <th className="reqTh">New Day-Off</th>
+                    <th className="reqTh">Reason</th>
                     <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">Response</th>
                     </tr>
                 </thead>
                 <tbody className="reqBody">
@@ -153,4 +146,4 @@ class ViewRequests extends Component{
     }
 }
 
-export default ViewRequests
+export default ViewRejectedReplacementRequests

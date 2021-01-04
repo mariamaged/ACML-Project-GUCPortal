@@ -12,7 +12,7 @@
     text-align: center !important;
     white-space: nowrap;
 }
-.containSickTable{
+.containTable{
     position:relative ;
     top:10vw;
     right:10vw;
@@ -20,12 +20,12 @@
     max-height:300px !important;
     overflow-y: scroll;
 }
-.containTable::-webkit-scrollbar-track {
+.containTable2::-webkit-scrollbar-track {
     border-radius: 10px;
     background: #9c2525 !important;
   }
 
-  .containTable::-webkit-scrollbar-thumb {
+  .containTable2::-webkit-scrollbar-thumb {
     border-radius: 10px;
     background:#888 !important;
   }
