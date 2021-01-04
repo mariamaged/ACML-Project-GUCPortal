@@ -10,7 +10,7 @@ const {app} = require('./app.js');
 
 // Database connection parameters.
 const databaseParameters = { useNewUrlParser: true, useUnifiedTopology: true };
-mongoose.connect(process.env.DB_URL_Monica2, databaseParameters)
+mongoose.connect(process.env.DB_URL, databaseParameters)
 .then(console.log('Successfully Connected to The Database'));
 
 

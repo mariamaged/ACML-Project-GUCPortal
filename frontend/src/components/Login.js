@@ -32,6 +32,7 @@ class Login extends Component {
         localStorage.setItem('jwtToken', token);
         this.props.history.push('/homepage');
       })
+
       .catch(err => {
           if(err.response) {
             console.log(err.response.data);
@@ -62,6 +63,5 @@ class Login extends Component {
   }
 
 }
-
 
 export default Login;

@@ -1,7 +1,10 @@
 // Our Components
 import Login from './components/Login.js'
-import ViewRejectedRequests from './components/ViewRejectedRequests.js'
-
+import HODNavbar from './components/HOD/HODNavbar.js';
+import StaffContainer from './components/HOD/StaffContainer.js';
+import DepartmentStaff from './components/HOD/DepartmentStaff.js';
+import CourseStaff from './components/HOD/CourseStaff';
+import DepartmentStaffDayOff from './components/HOD/DepartmentStaffDayOff';
 // React Components
 // React
 import React from 'react'
@@ -18,8 +21,13 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="App">
-        <Route exact path="/" component={Login} />
-        <Route path='/homepage' component={ViewRejectedRequests} />
+     {/*<Route exact path="/" component={Login} />
+       <Route path='/homepage' component={ViewRejectedRequests} />*/}
+      {/* <HODNavbar/> */}
+      <Route exact path='/' component={StaffContainer} />
+      <Route exact path='/viewDepartmentStaff' component={DepartmentStaff} />
+      <Route exact path='/viewCourseStaff' component={CourseStaff} />
+      <Route exact path='/viewDepartmentStaffDayOff' component={DepartmentStaffDayOff} />
       </div>
     </BrowserRouter>
   );
