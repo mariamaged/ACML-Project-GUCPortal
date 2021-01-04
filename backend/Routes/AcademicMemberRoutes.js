@@ -226,7 +226,8 @@ router.get('/sentReplacementRequest',authenticateToken,async(req,res)=>{
         for(var i=0;i<sent.length;i++){
             const hodID=sent[i].sentTo
             const hod=await StaffMemberModel.findById(hodID)
-            const hodName=hod.name
+            const senderID=await StaffMemberModel.findById(req.user.id)
+            const sender=senderID.name
             const type=sent[i].type
             var reqType=sent[i].reqType
     
@@ -236,8 +237,8 @@ router.get('/sentReplacementRequest',authenticateToken,async(req,res)=>{
             // const coordinatorName=coordinator.name
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,
-                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    sentTo:hodName,state:sent[i].state,sentBy:sender,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
                     submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
            
@@ -271,15 +272,16 @@ router.get('/sentAcceptedReplacementRequest',authenticateToken,async(req,res)=>{
             const hodName=hod.name
             const type=sent[i].type
             var reqType=sent[i].reqType
-    
+            const senderID=await StaffMemberModel.findById(req.user.id)
+            const sender=senderID.name
             //replacement
             // const academicMemberID=sent[i].sentTo
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,
-                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    sentTo:hodName,state:sent[i].state,sentBy:sender,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
                     submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
            
@@ -313,15 +315,16 @@ router.get('/sentRejectedReplacementRequest',authenticateToken,async(req,res)=>{
             const hodName=hod.name
             const type=sent[i].type
             var reqType=sent[i].reqType
-    
+            const senderID=await StaffMemberModel.findById(req.user.id)
+            const sender=senderID.name
             //replacement
             // const academicMemberID=sent[i].sentTo
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,
-                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    sentTo:hodName,state:sent[i].state,sentBy:sender,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
                     submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
            
@@ -355,15 +358,16 @@ router.get('/sentPendingReplacementRequest',authenticateToken,async(req,res)=>{
             const hodName=hod.name
             const type=sent[i].type
             var reqType=sent[i].reqType
-    
+            const senderID=await StaffMemberModel.findById(req.user.id)
+            const sender=senderID.name
             //replacement
             // const academicMemberID=sent[i].sentTo
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,
-                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    sentTo:hodName,state:sent[i].state,sentBy:sender,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
                     submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
            
@@ -380,7 +384,7 @@ router.get('/receivedReplacementRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
@@ -394,6 +398,8 @@ router.get('/receivedReplacementRequest',authenticateToken,async(req,res)=>{
         for(var i=0;i<sent.length;i++){
             const hodID=sent[i].sentTo
             const hod=await StaffMemberModel.findById(hodID)
+            const receiverID=await StaffMemberModel.findById(req.user.id)
+            const receiver=receiverID.name
             const hodName=hod.name
             const type=sent[i].type
             var reqType=sent[i].reqType
@@ -404,13 +410,13 @@ router.get('/receivedReplacementRequest',authenticateToken,async(req,res)=>{
             // const coordinatorName=coordinator.name
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,
-                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    sentTo:hodName,state:sent[i].state,sentBy:receiver,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
                     submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
            
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -439,15 +445,16 @@ router.get('/receivedAcceptedReplacementRequest',authenticateToken,async(req,res
             const hodName=hod.name
             const type=sent[i].type
             var reqType=sent[i].reqType
-    
+            const receiverID=await StaffMemberModel.findById(req.user.id)
+            const receiver=receiverID.name
             //replacement
             // const academicMemberID=sent[i].sentTo
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,
-                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    sentTo:hodName,state:sent[i].state,sentBy:receiver,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
                     submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
            
@@ -481,15 +488,16 @@ router.get('/receivedRejectedReplacementRequest',authenticateToken,async(req,res
             const hodName=hod.name
             const type=sent[i].type
             var reqType=sent[i].reqType
-    
+            const receiverID=await StaffMemberModel.findById(req.user.id)
+            const receiver=receiverID.name
             //replacement
             // const academicMemberID=sent[i].sentTo
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,
-                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    sentTo:hodName,state:sent[i].state,sentBy:receiver,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
                     submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
            
@@ -523,15 +531,16 @@ router.get('/receivedPendingReplacementRequest',authenticateToken,async(req,res)
             const hodName=hod.name
             const type=sent[i].type
             var reqType=sent[i].reqType
-    
+            const receiverID=await StaffMemberModel.findById(req.user.id)
+            const receiver=receiverID.name
             //replacement
             // const academicMemberID=sent[i].sentTo
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,
-                    slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,slotLoc:sent[i].slotLoc,
+                    sentTo:hodName,state:sent[i].state,sentBy:receiver,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
                     submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
            
@@ -721,7 +730,7 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
         const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id})
         const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
         const sent = [...sent1, ...received];
-        console.log("sent= "+sent)
+        console.log("sent   mtrenityyyyyyyyyyyy = "+sent)
 
         const arr=[]
         var k=0
@@ -736,13 +745,14 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
             
             
         }
+        console.log("arr= "+arr[1].missedDay)
         res.json(arr);
         return 
 })
@@ -778,7 +788,7 @@ router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -820,7 +830,7 @@ router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                   missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -861,7 +871,7 @@ router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -902,7 +912,7 @@ router.get('/changeDayOffRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    newDayOff:moment(sent[i].newDayOff).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -944,7 +954,7 @@ router.get('/acceptedchangeDayOffRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    newDayOff:moment(sent[i].newDayOff).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -986,7 +996,7 @@ router.get('/rejectedchangeDayOffRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    newDayOff:moment(sent[i].newDayOff).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1027,7 +1037,7 @@ router.get('/pendingchangeDayOffRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    newDayOff:moment(sent[i].newDayOff).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1068,7 +1078,7 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1110,7 +1120,7 @@ router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1152,7 +1162,7 @@ router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1193,7 +1203,7 @@ router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1235,7 +1245,7 @@ router.get('/maternityRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    maternityDoc:sent[i].maternityDoc,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1277,7 +1287,7 @@ router.get('/acceptedMaternityRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    maternityDoc:sent[i].maternityDoc,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1319,7 +1329,7 @@ router.get('/rejectedMaternityRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    maternityDoc:sent[i].maternityDoc,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    
@@ -1360,7 +1370,7 @@ router.get('/pendingMaternityRequest',authenticateToken,async(req,res)=>{
     
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    maternityDoc:sent[i].maternityDoc,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
                    

@@ -19,13 +19,14 @@
   width:64.3% !important;
   max-height:300px !important;
   overflow-y: scroll;
+ 
 }
-.containTable2::-webkit-scrollbar-track {
+.containTable::-webkit-scrollbar-track {
   border-radius: 10px;
   background: #9c2525 !important;
 }
 
-.containTable2::-webkit-scrollbar-thumb {
+.containTable::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background:#888 !important;
 }

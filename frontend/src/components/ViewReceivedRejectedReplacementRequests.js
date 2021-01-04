@@ -117,7 +117,9 @@ class ViewReceivedRejectedReplacementRequests extends Component{
                     <th className="reqTh">Sender</th>
                     <th className="reqTh">Receiver</th>
                     <th className="reqTh">State</th>
-                    <th className="reqTh">New Day-Off</th>
+                    <th className="reqTh">Slot Date</th>
+                    <th className="reqTh">Slot Number</th>
+                    <th className="reqTh">Slot Location</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Response</th>

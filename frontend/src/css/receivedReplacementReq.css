@@ -1,0 +1,80 @@
+.reqTableRep{
+    width:580px !important;
+   
+  
+  }
+  
+  .reqTdRep{
+    width:10%;
+    white-space: nowrap;
+  }
+  .reqThRep{
+    text-align: center !important;
+    white-space: nowrap;
+  }
+  .containTableRep{
+    position:relative ;
+    top:10vw;
+    right:10vw;
+    width:64.3% !important;
+    max-height:300px !important;
+    overflow-y: scroll;
+    overflow-x:scroll;
+   
+  }
+  .containTableRep::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: #9c2525 !important;
+  }
+  
+  .containTableRep::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background:#888 !important;
+  }
+  
+  
+  
+   .containDropRep{
+    position:relative !important ;
+    top:9.5vw;
+    left:33vw;
+    size:'lg';
+    max-height:15% !important;
+    max-width:25% !important;
+  
+  } 
+  .btn-groupRep{
+     size:'sm';
+     position:relative;
+     left:14.5vw;
+     /* width:5% !important; */
+     max-height: 5% !important;
+   /* max-width:5% !important; */
+    /* background-color: rgb(202, 13, 13); */
+    color: darkred;
+  }
+  .btnRep{
+  font-size:0.8 rem !important;
+  padding:0.15rem 0.1rem !important;
+  background-color: cadetblue !important;
+  border:1px solid #7050ff!important;
+  border-radius: 0.5rem !important;
+  
+  }
+  .buttonNameRep{
+   font-size: small;
+  }
+  .buttonsRep{
+  size:'sm';
+  }
+  .buttonsRep{
+  size:'sm';
+  }
+  .buttonsRep{
+  size:'sm';
+  }
+  
+  .reqTdSickRep{
+    width:fit-content !important;
+    white-space: nowrap;
+  }

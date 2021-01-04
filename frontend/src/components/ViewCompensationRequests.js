@@ -50,7 +50,7 @@ class ViewCompensationRequests extends Component{
                 <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
                 <td className="reqTd">{request.state}</td>
-                <th className="reqTh">Missed Day</th>
+                <th className="reqTh">{request.missedDay}</th>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">

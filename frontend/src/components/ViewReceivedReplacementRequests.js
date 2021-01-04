@@ -14,7 +14,8 @@ import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 
 class ViewReceivedReplacementRequests extends Component{
     state={
-        requests:[]
+        requests:[],
+        warning:""
     }
     componentDidMount(){
     console.log("in view")
@@ -26,8 +27,10 @@ class ViewReceivedReplacementRequests extends Component{
         }
         ).then(res=>{
             // console.log(res.data[0].reqType)
-            this.setState({requests:res.data})
-            console.log("new state= "+this.state.requests)
+            this.setState({requests:res.data.arr,warning:res.data.warning})
+            console.log("new state= "+this.state.requests.reqType)
+            console.log("new state= "+this.state.warning)
+            console.log("length= "+this.state.requests.length)
 
         }).catch(console.log("error"))
     }
@@ -43,18 +46,18 @@ class ViewReceivedReplacementRequests extends Component{
             console.log("reqState= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                <td className="reqTd" >{request.counter}</td>
-                <td className="reqTd" >{request.requestID}</td>
-                <td className="reqTd" >{request.reqType}</td>
-                <td className="reqTd">{request.sentBy}</td>
-                <td className="reqTd">{request.sentTo}</td>
-                <td className="reqTd">{request.state}</td>
-                <td className="reqTdSick">{request.slotDate}</td>
-                <td className="reqTdSick">{request.slotNum}</td>
-                <td className="reqTdSick">{request.slotLoc}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.submission_date}</td>
+                <tr key={request.requestID} className="reqTrRep" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <td className="reqTdRep" >{request.counter}</td>
+                <td className="reqTdRep" >{request.requestID}</td>
+                <td className="reqTdRep" >{request.reqType}</td>
+                <td className="reqTdRep">{request.sentBy}</td>
+                <td className="reqTdRep">{request.sentTo}</td>
+                <td className="reqTdRep">{request.state}</td>
+                <td className="reqTdSickRep">{request.slotDate}</td>
+                <td className="reqTdSickRep">{request.slotNum}</td>
+                <td className="reqTdSickRep">{request.slotLoc}</td>
+                <td className="reqTdRep">{request.reason}</td>
+                <td className="reqTdRep">{request.submission_date}</td>
                 <td className="reqTdRes">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
                 
@@ -69,16 +72,19 @@ class ViewReceivedReplacementRequests extends Component{
        skip(){
 
        }
+       
     render(){
         const reqs=this.state.requests;
-        var empty=["one"]
-            const reqList=reqs.length?(
-            empty.map(request=>{
-            console.log("in mapping "+request.reqType)
-            return(
-                <div className="containAll">
+        const warning=this.state.warning;
+        var reqList;
+        if(warning!=="")
+         reqList= <div>{warning}</div>
+        else if (reqs.length>0){
+        
+          reqList=(
+                <div className="containAllRep">
 
-                 <div className="containDrop">
+                 <div className="containDropRep">
                 
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
@@ -107,7 +113,7 @@ class ViewReceivedReplacementRequests extends Component{
 
                 
 
-                <div className="container containSickTable">
+                <div className="containerRep containTableRep">
                 <Table striped bordered hover size="sm" className="reqTable">
                 <thead className="reqHead">
                     <tr className="reqTr">
@@ -117,7 +123,9 @@ class ViewReceivedReplacementRequests extends Component{
                     <th className="reqTh">Sender</th>
                     <th className="reqTh">Receiver</th>
                     <th className="reqTh">State</th>
-                    <th className="reqTh">New Day-Off</th>
+                    <th className="reqTh">Slot Date</th>
+                    <th className="reqTh">Slot Number</th>
+                    <th className="reqTh">Slot Location</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Response</th>
@@ -129,14 +137,14 @@ class ViewReceivedReplacementRequests extends Component{
                 </Table>
                 </div>
                 </div>
-                        
+            
             
               )
-            })
-        ):
-        (
-        <div className="center">No requests yet</div>
-        )
+            }
+
+            else  reqList=<div>No requests yet</div>
+        
+       
 
         
         return (

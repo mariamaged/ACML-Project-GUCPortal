@@ -38,6 +38,7 @@ import ViewReceivedRejectedReplacementRequests from './components/ViewReceivedRe
 import ViewReceivedPendingReplacementRequests from './components/ViewReceivedPendingReplacementRequests'
 //all requests
 import ViewAllAcceptedRequests from './components/ViewAllAcceptedRequests'
+import ViewAllMaternity from './components/ViewAllMaternity'
 import Sick from './components/sick'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter,Router,Route,Switch} from 'react-router-dom'
@@ -49,7 +50,7 @@ function App() {
   return (
     <Router history={history}>
     <div className="App">
-
+        <Route exact path='/login' component ={Login}/>
         <Route exact path='/getRequest' component ={getRequest}/>
         <Route exact path='/' component ={ViewRequests}/>
         <Route exact path="/ViewAcceptedRequests" component={ViewAcceptedRequests}/>
@@ -87,6 +88,7 @@ function App() {
         <Route exact path='/ViewReceivedPendingReplacementRequests' component ={ViewReceivedPendingReplacementRequests}/>
        
         <Route exact path="/ViewAllAcceptedRequests" component={ViewAllAcceptedRequests}/>
+        <Route exact path="/ViewAllMaternity" component={ViewAllMaternity}/>
         {/* <Route path="/ViewAcceptedRequests" render={(props) => <ViewAcceptedRequests {...props}/>}/> */}
     </div>
     </Router>

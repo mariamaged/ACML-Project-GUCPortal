@@ -106,8 +106,8 @@ app.get('/trialEndpoint', async (req, res) => {
 // const moment=require('moment')
 // const slot=require('./Models/SlotSchema.js')
 // const request=require('./Models/RequestModel.js')
-// const jwt = require('jsonwebtoken');
-// const bcrypt=require('bcrypt');
+const jwt = require('jsonwebtoken');
+const bcrypt=require('bcrypt');
 // //----------------------------------------------
 // require('dotenv').config()
 
@@ -326,7 +326,7 @@ app.get('/trialEndpoint', async (req, res) => {
 // //     course:"5fe0e84209a15235b0383352"
 // // })
 
-// async function  cr(){
+async function  cr(){
 // //     const loc=(await StaffMemberModel.findById("5fdf6be566837b398064cf53"))
 // //     const loc3=loc.notifications
 // // //console.log(loc3)
@@ -403,9 +403,9 @@ app.get('/trialEndpoint', async (req, res) => {
 // //    console.log("curr= "+currRequest)
 
 
-// //    const salt=await bcrypt.genSalt();     
-// //         const hashedPassword=await bcrypt.hash("123456",salt);
-// //         // console.log("hashed pass= "+hashedPassword)
+//    const salt=await bcrypt.genSalt();     
+//         const hashedPassword=await bcrypt.hash("jacklyn",salt);
+//         console.log("hashed pass= "+hashedPassword)
 
 // //     const s="08:00"
 // //     const d="12:50"
@@ -440,8 +440,8 @@ app.get('/trialEndpoint', async (req, res) => {
 //         //     console.log("error")
 //         // }
         
-// }//
-// cr()
+}//
+cr()
 
 
 
