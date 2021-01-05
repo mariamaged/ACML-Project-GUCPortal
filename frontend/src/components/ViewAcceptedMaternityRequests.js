@@ -18,7 +18,7 @@ class ViewAcceptedMaternityRequests extends Component{
         ,warning:""
     }
     componentDidMount(){
-    console.log("in view")
+    console.log("in view accepted maternity")
         axios.get('http://localhost:5000/academic/acceptedMaternityRequest',
         {
             headers:{
@@ -107,7 +107,7 @@ class ViewAcceptedMaternityRequests extends Component{
 
                 
 
-                <div className="container containSickTable">
+                <div className="container containMaternityTable">
                 <Table striped bordered hover size="sm" className="reqTable">
                 <thead className="reqHead">
                     <tr className="reqTr">

@@ -18,7 +18,7 @@ class ViewReceivedCompensationRequests extends Component{
         ,warning:""
     }
     componentDidMount(){
-    console.log("in view")
+    console.log("in received compensation")
         axios.get('http://localhost:5000/academic/receivedCompensationRequest',
         {
             headers:{

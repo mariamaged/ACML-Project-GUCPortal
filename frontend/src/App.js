@@ -42,10 +42,20 @@ import ViewAcceptedSlotLinkingRequests from './components/ViewAcceptedSlotLinkin
 import ViewRejectedSlotLinkingRequests from './components/ViewRejectedSlotLinkingRequests'
 import ViewPendingSlotLinkingRequests from './components/ViewPendingSlotLinkingRequests'
 
+//received requests for hod
+//received replacement request
+import ViewReceivedSickRequests from './components/ViewReceivedSickRequests'
+import ViewReceivedMaternityRequests from './components/ViewReceivedMaternityRequests'
+import ViewReceivedChangeRequests from './components/ViewReceivedChangeRequests'
+import ViewReceivedSlotLinkingRequests from './components/ViewReceivedSlotLinkingRequests'
+import ViewReceivedCompensationRequests from './components/ViewReceivedCompensationRequests'
+
+//sentList
+import SentList from './components/sentList'
 //all requests
 import ViewAllAcceptedRequests from './components/ViewAllAcceptedRequests'
 import ViewAllMaternity from './components/ViewAllMaternity'
-import Sick from './components/sick'
+// import Sick from './components/sick'
 import MaternityTable from './components/maternityTable'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter,Router,Route,Switch} from 'react-router-dom'
@@ -57,6 +67,7 @@ function App() {
   return (
     <Router history={history}>
     <div className="App">
+    <Route exact path="/sent" component={SentList}/>
     <Route exact path='/maternityTable' component ={MaternityTable}/>
         <Route exact path='/login' component ={Login}/>
         <Route exact path='/getRequest' component ={getRequest}/>
@@ -100,6 +111,15 @@ function App() {
         <Route exact path='/ViewAcceptedSlotLinkingRequests' component ={ViewAcceptedSlotLinkingRequests}/>
         <Route exact path='/ViewRejectedSlotLinkingRequests' component ={ViewRejectedSlotLinkingRequests}/>
         <Route exact path='/ViewPendingSlotLinkingRequests' component ={ViewPendingSlotLinkingRequests}/>
+
+
+        <Route exact path='/ViewReceivedSickRequests' component ={ViewReceivedSickRequests}/>
+        <Route exact path='/ViewReceivedCompensationRequests' component ={ViewReceivedCompensationRequests}/>
+        <Route exact path='/ViewReceivedSlotLinkingRequests' component ={ViewReceivedSlotLinkingRequests}/>
+        <Route exact path='/ViewReceivedChangeRequests' component ={ViewReceivedChangeRequests}/>
+        <Route exact path='/ViewReceivedMaternityRequests' component ={ViewReceivedMaternityRequests}/>
+       
+       
 
         <Route exact path="/ViewAllAcceptedRequests" component={ViewAllAcceptedRequests}/>
         <Route exact path="/ViewAllMaternity" component={ViewAllMaternity}/>

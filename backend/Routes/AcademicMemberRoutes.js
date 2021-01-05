@@ -426,11 +426,14 @@ router.get('/receivedCompensationRequest',authenticateToken,async(req,res)=>{
         const sent=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
         // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
         // const sent = [...sent1, ...received];
-        console.log("sent   mtrenityyyyyyyyyyyy = "+sent)
+        console.log("l= "+sent.length)
+        for(var k=0;k<sent.length;k++)
+        console.log("sent   mtrenityyyyyyyyyyyy = "+moment(sent[k].missedDay).format("YYYY-MM-DD"))
 
         const arr=[]
         var k=0
         for(var i=0;i<sent.length;i++){
+            console.log(sent[i]._id)
             const hodID=sent[i].sentTo
             const hod=await StaffMemberModel.findById(hodID)
             const sender=await StaffMemberModel.findById(sent[i].sentBy)
@@ -448,7 +451,7 @@ router.get('/receivedCompensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        console.log("arr= "+arr[1].missedDay)
+        // console.log("arr= "+arr[1].missedDay)
         res.json({arr:arr,warning:""});
         return 
 })
@@ -494,50 +497,51 @@ router.get('/receivedChangeDayOffRequest',authenticateToken,async(req,res)=>{
         return 
 })
 
-router.get('/receivedCompensationRequest',authenticateToken,async(req,res)=>{
-    //get all requests where id of sender is this user
-    const user=await StaffMemberModel.findById(req.user.id)
-    const type=user.staff_type
-    // if(type=="HR"){
-    //     return res.json("HR do not have replacement requests")
-    // }
-    if(type=="HR"){
-        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
-    }
+// router.get('/receivedCompensationRequest',authenticateToken,async(req,res)=>{
+//     //get all requests where id of sender is this user
+//     const user=await StaffMemberModel.findById(req.user.id)
+//     const type=user.staff_type
+//     // if(type=="HR"){
+//     //     return res.json("HR do not have replacement requests")
+//     // }
+//     if(type=="HR"){
+//         return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+//     }
 
 
-        const sent=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
-        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
-        // const sent = [...sent1, ...received];
-        console.log("sent= "+sent)
+//         const sent=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
+//         // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
+//         // const sent = [...sent1, ...received];
+//         // console.log("sent= "+sent)
 
-        const arr=[]
-        var k=0
-        for(var i=0;i<sent.length;i++){
-            const hodID=sent[i].sentTo
-            const hod=await StaffMemberModel.findById(hodID)
-            const sender=await StaffMemberModel.findById(sent[i].sentBy)
-            const senderName=sender.name
-            const hodName=hod.name
-            const type=sent[i].type
-            var reqType=sent[i].reqType
+//         const arr=[]
+//         var k=0
+//         for(var i=0;i<sent.length;i++){
+//             console.log("ya monica"+sent[i]._id)
+//             const hodID=sent[i].sentTo
+//             const hod=await StaffMemberModel.findById(hodID)
+//             const sender=await StaffMemberModel.findById(sent[i].sentBy)
+//             const senderName=sender.name
+//             const hodName=hod.name
+//             const type=sent[i].type
+//             var reqType=sent[i].reqType
     
-                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
-                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
-                    arr[k++]= reqNew
+//                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+//                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
+//                     missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
+//                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+//                     arr[k++]= reqNew
                    
             
             
-        }
-        res.json({arr:arr,warning:""});
-        return 
-})
+//         }
+//         res.json({arr:arr,warning:""});
+//         return 
+// })
 
 router.get('/receivedMaternityRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
-    console.log("in maternity")
+    console.log("in maternity monica")
     const user=await StaffMemberModel.findById(req.user.id)
     const type=user.staff_type
     // if(type=="HR"){
@@ -573,7 +577,7 @@ router.get('/receivedMaternityRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        console.log("arr= "+arr)
+        // console.log("arr= "+arr)
         res.json({arr:arr,warning:""});
         return 
 })

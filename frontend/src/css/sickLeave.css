@@ -1,4 +1,4 @@
-.reqTable{
+/* .reqTable{
     width:580px !important;
    
   
@@ -45,10 +45,10 @@
      size:'sm';
      position:relative;
      left:14.5vw;
-     /* width:5% !important; */
+     /* width:5% !important; 
      max-height: 5% !important;
-   /* max-width:5% !important; */
-    /* background-color: rgb(202, 13, 13); */
+   /* max-width:5% !important; 
+    /* background-color: rgb(202, 13, 13); 
     color: darkred;
 }
 .btn{
@@ -75,4 +75,4 @@
 .reqTdSick{
     width:fit-content !important;
     white-space: nowrap;
-}
+} */

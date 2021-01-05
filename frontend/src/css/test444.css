@@ -1,0 +1,27 @@
+/* * {box-sizing: border-box;}
+table {
+	border-collapse: collapse;
+	width: 1000px;
+	table-layout: fixed;
+}
+td,th {
+	padding: 5px;
+	min-width: 200px;
+	border-right: 1px solid #ccc
+}
+thead tr {
+	background: #888;
+	color: #eee;
+	display: block;
+    position: relative;
+}
+tbody {
+	display: block;
+	height: 200px;
+	width: 100%;
+	overflow-y: auto;
+	overflow-x: auto;
+}
+tbody tr:nth-child(even) {
+	background: #ddd;
+} */

@@ -107,7 +107,7 @@ class ViewRejectedMaternityRequests extends Component{
 
                 
 
-                <div className="container containSickTable">
+                <div className="container containMaternityTable">
                 <Table striped bordered hover size="sm" className="reqTable">
                 <thead className="reqHead">
                     <tr className="reqTr">

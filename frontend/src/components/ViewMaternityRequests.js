@@ -53,7 +53,7 @@ class ViewMaternityRequests extends Component{
                 <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
                 <td className="reqTd">{request.state}</td>
-                <td className="reqTdSick">{request.maternityDoc}</td>
+                <td className="reqTd">{request.maternityDoc}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">
@@ -74,39 +74,15 @@ class ViewMaternityRequests extends Component{
             empty.map(request=>{
             console.log("in mapping "+request.reqType)
             return(
+
                 <div className="containAll">
-
-                 <div className="containDrop">
                 
-                    <Dropdown as={ButtonGroup} className="buttons1">
-                    <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
-                    <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item><Link to="/ViewRejectedMaternityRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewPendingMaternityRequests">Pending</Link></Dropdown.Item>
-                
-                    
-                    <Dropdown.Divider />
-                    </Dropdown.Menu>
-                </Dropdown>{' '}
-                <Dropdown as={ButtonGroup}className="buttons2" >
-                <Dropdown.Toggle id="dropdown-custom-2" >R/S</Dropdown.Toggle>
-                    <Dropdown.Menu className="drop2"></Dropdown.Menu>
-                    <Dropdown.Menu className="super-colors">
-                    <Dropdown.Item eventKey="1">Sent</Dropdown.Item>
-                    <Dropdown.Item eventKey="2">Received</Dropdown.Item>
-                
-                    <Dropdown.Divider />
-                    <Dropdown.Item eventKey="4" >Separated link</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-              
-                </div> 
+                 
 
                 
 
-                <div className="container containSickTable">
-                <Table striped bordered hover size="sm" className="reqTable">
+                <div className="container containMaternityTable ">
+                <Table striped bordered variant="dark" hover size="sm" className="reqTable" >
                 <thead className="reqHead">
                     <tr className="reqTr">
                     <th className="reqTh">#</th>
@@ -126,6 +102,37 @@ class ViewMaternityRequests extends Component{
                 </tbody>
                 </Table>
                 </div>
+
+                <div className="containDrop">
+                      <Dropdown as={ButtonGroup}className="buttons2" >
+                <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop2"></Dropdown.Menu>
+                    <Dropdown.Menu className="super-colors">
+                    <Dropdown.Item ><Link to="/ViewSickRequests">Sick Leave Requests</Link></Dropdown.Item>
+                    <Dropdown.Item> <Link to="/ViewCompensationRequests">Compensation Requests</Link></Dropdown.Item>
+                    <Dropdown.Item active><Link to="/ViewMaternityRequests">Maternity Leave Requests</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewSlotLinkingRequests">Slot Linking Requests</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewReplacementRequests">Replacement Requests</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewChangeRequests">Change Day-Off Requests</Link></Dropdown.Item>
+             
+             
+                    </Dropdown.Menu>
+                </Dropdown>{' '} 
+
+                    <Dropdown as={ButtonGroup} className="buttons1">
+                    <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewRejectedMaternityRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewPendingMaternityRequests">Pending</Link></Dropdown.Item>
+                
+                    
+                    <Dropdown.Divider />
+                    </Dropdown.Menu>
+                </Dropdown>
+               
+              
+                </div> 
                 </div>
                         
             
@@ -138,8 +145,10 @@ class ViewMaternityRequests extends Component{
 
         
         return (
-           
-           reqList
+            <div>
+            <h3 className="maternityH">Maternity Requests</h3>
+           {reqList}
+           </div>
         )
     }
 }
