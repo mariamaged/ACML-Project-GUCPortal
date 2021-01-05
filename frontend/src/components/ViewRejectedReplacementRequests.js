@@ -14,7 +14,8 @@ import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 
 class ViewRejectedReplacementRequests extends Component{
     state={
-        requests:[]
+        requests:[],
+        warning:""
     }
     componentDidMount(){
     console.log("in view")
@@ -26,7 +27,9 @@ class ViewRejectedReplacementRequests extends Component{
         }
         ).then(res=>{
             // console.log(res.data[0].reqType)
-            this.setState({requests:res.data})
+            this.setState({requests:res.data.arr,warning:res.data.warning})
+            console.log("new state= "+this.state.requests.reqType)
+            console.log("new state= "+this.state.warning)
             console.log("new state= "+this.state.requests)
 
         }).catch(console.log("error"))
@@ -71,21 +74,23 @@ class ViewRejectedReplacementRequests extends Component{
        }
     render(){
         const reqs=this.state.requests;
-        var empty=["one"]
-            const reqList=reqs.length?(
-            empty.map(request=>{
-            console.log("in mapping "+request.reqType)
-            return(
-                <div className="containAll">
+        const warning=this.state.warning;
+        var reqList;
+        if(warning!=="")
+         reqList= <div>{warning}</div>
+        else if (reqs.length>0){
+        
+          reqList=(
+                <div className="containAllRep">
 
-                 <div className="containDrop">
+                 <div className="containDropRep">
                 
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item><Link to="/ViewAcceptedReplacementRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item active><Link to="/ViewRejectedReplacementRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewPendingReplacementRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewReceivedAcceptedReplacementRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewReceivedRejectedReplacementRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewReceivedPendingReplacementRequests">Pending</Link></Dropdown.Item>
                 
                     
                     <Dropdown.Divider />
@@ -107,7 +112,7 @@ class ViewRejectedReplacementRequests extends Component{
 
                 
 
-                <div className="container containSickTable">
+                <div className="containerRep containTableRep">
                 <Table striped bordered hover size="sm" className="reqTable">
                 <thead className="reqHead">
                     <tr className="reqTr">
@@ -131,15 +136,12 @@ class ViewRejectedReplacementRequests extends Component{
                 </Table>
                 </div>
                 </div>
-                        
+            
             
               )
-            })
-        ):
-        (
-        <div className="center">No requests yet</div>
-        )
+            }
 
+            else  reqList=<div>No requests yet</div>
         
         return (
            

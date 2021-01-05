@@ -12,14 +12,14 @@ import  { Redirect } from 'react-router-dom'
 import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
-class ViewPendingChangeRequests extends Component{
+class ViewReceivedCompensationRequests extends Component{
     state={
         requests:[]
         ,warning:""
     }
     componentDidMount(){
     console.log("in view")
-        axios.get('http://localhost:5000/academic/sentPendingReplacementRequest',
+        axios.get('http://localhost:5000/academic/receivedCompensationRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
@@ -53,13 +53,12 @@ class ViewPendingChangeRequests extends Component{
                 <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
                 <td className="reqTd">{request.state}</td>
-                <td className="reqTdSick">{request.newDayOff}</td>
+                <th className="reqTh">{request.missedDay}</th>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
-                
-                
+               
                 <Button variant="outline-danger" className="buttonResponse3">Cancel</Button>
               </td>
 
@@ -84,9 +83,9 @@ class ViewPendingChangeRequests extends Component{
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedChangeRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item><Link to="/ViewRejectedChangeRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item active><Link to="/ViewPendingChangeRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewAcceptedCompensationRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewRejectedCompensationRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewPendingCompensationRequests">Pending</Link></Dropdown.Item>
                 
                     
                     <Dropdown.Divider />
@@ -118,7 +117,7 @@ class ViewPendingChangeRequests extends Component{
                     <th className="reqTh">Sender</th>
                     <th className="reqTh">Receiver</th>
                     <th className="reqTh">State</th>
-                    <th className="reqTh">New Day-Off</th>
+                    <th className="reqTh">Missed Day</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Response</th>
@@ -147,4 +146,4 @@ class ViewPendingChangeRequests extends Component{
     }
 }
 
-export default ViewPendingChangeRequests
+export default ViewReceivedCompensationRequests

@@ -36,10 +36,17 @@ import ViewReceivedReplacementRequests from './components/ViewReceivedReplacemen
 import ViewReceivedAcceptedReplacementRequests from './components/ViewReceivedAcceptedReplacementRequests'
 import ViewReceivedRejectedReplacementRequests from './components/ViewReceivedRejectedReplacementRequests'
 import ViewReceivedPendingReplacementRequests from './components/ViewReceivedPendingReplacementRequests'
+//slot linking request
+import ViewSlotLinkingRequests from './components/ViewSlotLinkingRequests'
+import ViewAcceptedSlotLinkingRequests from './components/ViewAcceptedSlotLinkingRequests'
+import ViewRejectedSlotLinkingRequests from './components/ViewRejectedSlotLinkingRequests'
+import ViewPendingSlotLinkingRequests from './components/ViewPendingSlotLinkingRequests'
+
 //all requests
 import ViewAllAcceptedRequests from './components/ViewAllAcceptedRequests'
 import ViewAllMaternity from './components/ViewAllMaternity'
 import Sick from './components/sick'
+import MaternityTable from './components/maternityTable'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter,Router,Route,Switch} from 'react-router-dom'
 
@@ -50,6 +57,7 @@ function App() {
   return (
     <Router history={history}>
     <div className="App">
+    <Route exact path='/maternityTable' component ={MaternityTable}/>
         <Route exact path='/login' component ={Login}/>
         <Route exact path='/getRequest' component ={getRequest}/>
         <Route exact path='/' component ={ViewRequests}/>
@@ -87,6 +95,12 @@ function App() {
         <Route exact path='/ViewReceivedRejectedReplacementRequests' component ={ViewReceivedRejectedReplacementRequests}/>
         <Route exact path='/ViewReceivedPendingReplacementRequests' component ={ViewReceivedPendingReplacementRequests}/>
        
+
+        <Route exact path='/ViewSlotLinkingRequests' component ={ViewSlotLinkingRequests}/>
+        <Route exact path='/ViewAcceptedSlotLinkingRequests' component ={ViewAcceptedSlotLinkingRequests}/>
+        <Route exact path='/ViewRejectedSlotLinkingRequests' component ={ViewRejectedSlotLinkingRequests}/>
+        <Route exact path='/ViewPendingSlotLinkingRequests' component ={ViewPendingSlotLinkingRequests}/>
+
         <Route exact path="/ViewAllAcceptedRequests" component={ViewAllAcceptedRequests}/>
         <Route exact path="/ViewAllMaternity" component={ViewAllMaternity}/>
         {/* <Route path="/ViewAcceptedRequests" render={(props) => <ViewAcceptedRequests {...props}/>}/> */}

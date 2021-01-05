@@ -15,6 +15,7 @@ import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 class ViewRejectedSickRequests extends Component{
     state={
         requests:[]
+        ,warning:""
     }
     componentDidMount(){
     console.log("in view")
@@ -26,7 +27,9 @@ class ViewRejectedSickRequests extends Component{
         }
         ).then(res=>{
             // console.log(res.data[0].reqType)
-            this.setState({requests:res.data})
+            this.setState({requests:res.data.arr,warning:res.data.warning})
+            console.log("new state= "+this.state.requests.reqType)
+            console.log("new state= "+this.state.warning)
             console.log("new state= "+this.state.requests)
 
         }).catch(console.log("error"))

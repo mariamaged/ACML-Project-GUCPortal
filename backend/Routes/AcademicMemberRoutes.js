@@ -203,16 +203,13 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
       return res.json({error:"Could not find any eligible candidate to replace with"})
         
 })
-//to get all types of sent  replacment requests
+//to get all types of sent replacment requests
 router.get('/sentReplacementRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
     const type=user.staff_type
-    // if(type=="HR"){
-    //     return res.json("HR do not have replacement requests")
-    // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
@@ -243,7 +240,7 @@ router.get('/sentReplacementRequest',authenticateToken,async(req,res)=>{
                     arr[k++]= reqNew
            
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -251,11 +248,8 @@ router.get('/sentAcceptedReplacementRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
     const type=user.staff_type
-    // if(type=="HR"){
-    //     return res.json("HR do not have replacement requests")
-    // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
@@ -286,7 +280,7 @@ router.get('/sentAcceptedReplacementRequest',authenticateToken,async(req,res)=>{
                     arr[k++]= reqNew
            
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -298,7 +292,7 @@ router.get('/sentRejectedReplacementRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
@@ -329,7 +323,7 @@ router.get('/sentRejectedReplacementRequest',authenticateToken,async(req,res)=>{
                     arr[k++]= reqNew
            
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -341,7 +335,7 @@ router.get('/sentPendingReplacementRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
@@ -372,9 +366,258 @@ router.get('/sentPendingReplacementRequest',authenticateToken,async(req,res)=>{
                     arr[k++]= reqNew
            
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
+/////////////////////////////////////////// RECEIVED REQUESTS
+router.get('/receivedSickRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    // if(type=="HR"){
+    //     return res.json("HR do not have replacement requests")
+    // }
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Sick Leave",sentTo:req.user.id})
+        // const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+router.get('/receivedCompensationRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    // if(type=="HR"){
+    //     return res.json("HR do not have replacement requests")
+    // }
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        console.log("sent   mtrenityyyyyyyyyyyy = "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        console.log("arr= "+arr[1].missedDay)
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+router.get('/receivedChangeDayOffRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    // if(type=="HR"){
+    //     return res.json("HR do not have replacement requests")
+    // }
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Change Day Off",sentTo:req.user.id})
+        // const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    newDayOff:moment(sent[i].newDayOff).format("YYYY-MM-DD"),
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+router.get('/receivedCompensationRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    // if(type=="HR"){
+    //     return res.json("HR do not have replacement requests")
+    // }
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+router.get('/receivedMaternityRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    console.log("in maternity")
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    // if(type=="HR"){
+    //     return res.json("HR do not have replacement requests")
+    // }
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Maternity Leave",sentTo:req.user.id})
+        // const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        // console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    maternityDoc:sent[i].maternityDoc,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        console.log("arr= "+arr)
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+router.get('/receivedSlotLinkingRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    console.log("in slot linkning")
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Slot Linking",sentTo:req.user.id})
+        // const received=await request.find({reqType:"Slot Linking",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        // console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    slotDay:sent[i].slotDay,slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+
 //to get all types of received replacement requests
 router.get('/receivedReplacementRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -428,7 +671,7 @@ router.get('/receivedAcceptedReplacementRequest',authenticateToken,async(req,res
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
@@ -459,7 +702,7 @@ router.get('/receivedAcceptedReplacementRequest',authenticateToken,async(req,res
                     arr[k++]= reqNew
            
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -471,7 +714,7 @@ router.get('/receivedRejectedReplacementRequest',authenticateToken,async(req,res
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
@@ -502,7 +745,7 @@ router.get('/receivedRejectedReplacementRequest',authenticateToken,async(req,res
                     arr[k++]= reqNew
            
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -514,7 +757,7 @@ router.get('/receivedPendingReplacementRequest',authenticateToken,async(req,res)
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
@@ -545,9 +788,11 @@ router.get('/receivedPendingReplacementRequest',authenticateToken,async(req,res)
                     arr[k++]= reqNew
            
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
+
+//new sick 
 ///////////////////////////////////////////////////////////////////
 router.get('/sickRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -557,13 +802,13 @@ router.get('/sickRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Sick Leave",sentBy:req.user.id})
-        const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Sick Leave",sentBy:req.user.id})
+        // const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -586,7 +831,7 @@ router.get('/sickRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -599,13 +844,13 @@ router.get('/acceptedSickRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Sick Leave",sentBy:req.user.id,state:"Accepted"})
-        const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id,state:"Accepted"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Sick Leave",sentBy:req.user.id,state:"Accepted"})
+        // const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id,state:"Accepted"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -628,7 +873,7 @@ router.get('/acceptedSickRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -641,13 +886,13 @@ router.get('/rejectedSickRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Sick Leave",sentBy:req.user.id,state:"Rejected"})
-        const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id,state:"Rejected"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Sick Leave",sentBy:req.user.id,state:"Rejected"})
+        // const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id,state:"Rejected"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -670,7 +915,7 @@ router.get('/rejectedSickRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -682,13 +927,13 @@ router.get('/pendingSickRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Sick Leave",sentBy:req.user.id,state:"Pending"})
-        const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id,state:"Pending"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Sick Leave",sentBy:req.user.id,state:"Pending"})
+        // const received=await request.find({reqType:"Sick Leave",sentTo:req.user.id,state:"Pending"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -711,9 +956,11 @@ router.get('/pendingSickRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
+
+//////////////////////////////NEW COMEPNSATION
 ////////////////////////////////////////////////////////////////////////
 router.get('/compensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -723,13 +970,13 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id})
-        const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Compensation Leave",sentBy:req.user.id})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
         console.log("sent   mtrenityyyyyyyyyyyy = "+sent)
 
         const arr=[]
@@ -753,7 +1000,7 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
             
         }
         console.log("arr= "+arr[1].missedDay)
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -766,13 +1013,13 @@ router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Accepted"})
-        const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Accepted"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Accepted"})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Accepted"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -795,7 +1042,7 @@ router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -808,13 +1055,13 @@ router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Rejected"})
-        const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Rejected"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Rejected"})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Rejected"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -837,7 +1084,7 @@ router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -849,13 +1096,13 @@ router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Pending"})
-        const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Pending"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Pending"})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Pending"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -878,9 +1125,11 @@ router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
+
+//////////////////////////////NEW CHANGE DAY OFF
 ////////////////////////////////////////////////////////////////////
 router.get('/changeDayOffRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -890,13 +1139,13 @@ router.get('/changeDayOffRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Change Day Off",sentBy:req.user.id})
-        const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Change Day Off",sentBy:req.user.id})
+        // const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -919,7 +1168,7 @@ router.get('/changeDayOffRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -932,13 +1181,13 @@ router.get('/acceptedchangeDayOffRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Change Day Off",sentBy:req.user.id,state:"Accepted"})
-        const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id,state:"Accepted"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Change Day Off",sentBy:req.user.id,state:"Accepted"})
+        // const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id,state:"Accepted"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -961,7 +1210,7 @@ router.get('/acceptedchangeDayOffRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -974,13 +1223,13 @@ router.get('/rejectedchangeDayOffRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Change Day Off",sentBy:req.user.id,state:"Rejected"})
-        const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id,state:"Rejected"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Change Day Off",sentBy:req.user.id,state:"Rejected"})
+        // const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id,state:"Rejected"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -1003,7 +1252,7 @@ router.get('/rejectedchangeDayOffRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -1015,13 +1264,13 @@ router.get('/pendingchangeDayOffRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Change Day Off",sentBy:req.user.id,state:"Pending"})
-        const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id,state:"Pending"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Change Day Off",sentBy:req.user.id,state:"Pending"})
+        // const received=await request.find({reqType:"Change Day Off",sentTo:req.user.id,state:"Pending"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -1044,9 +1293,11 @@ router.get('/pendingchangeDayOffRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
+
+///////////////////////////////////// NEW COMPENSATION
 ////////////////////////////////////////////////////////////////////
 router.get('/compensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -1056,13 +1307,13 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id})
-        const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Compensation Leave",sentBy:req.user.id})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -1085,7 +1336,7 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -1098,13 +1349,13 @@ router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Accepted"})
-        const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Accepted"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Accepted"})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Accepted"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -1127,7 +1378,7 @@ router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -1140,13 +1391,13 @@ router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Rejected"})
-        const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Rejected"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Rejected"})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Rejected"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -1169,7 +1420,7 @@ router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -1181,13 +1432,13 @@ router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Pending"})
-        const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Pending"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Compensation Leave",sentBy:req.user.id,state:"Pending"})
+        // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id,state:"Pending"})
+        // const sent = [...sent1, ...received];
         console.log("sent= "+sent)
 
         const arr=[]
@@ -1210,9 +1461,10 @@ router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
+/////////////////////////////////NEW MATERNITY
 ////////////////////////////////////////////////////////////////////
 router.get('/maternityRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -1223,13 +1475,13 @@ router.get('/maternityRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Maternity Leave",sentBy:req.user.id})
-        const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Maternity Leave",sentBy:req.user.id})
+        // const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
         // console.log("sent= "+sent)
 
         const arr=[]
@@ -1252,7 +1504,8 @@ router.get('/maternityRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        console.log("arr= "+arr)
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -1265,13 +1518,13 @@ router.get('/acceptedMaternityRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Maternity Leave",sentBy:req.user.id,state:"Accepted"})
-        const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id,state:"Accepted"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Maternity Leave",sentBy:req.user.id,state:"Accepted"})
+        // const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id,state:"Accepted"})
+        // const sent = [...sent1, ...received];
         // console.log("sent= "+sent)
 
         const arr=[]
@@ -1294,7 +1547,7 @@ router.get('/acceptedMaternityRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -1307,13 +1560,13 @@ router.get('/rejectedMaternityRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Maternity Leave",sentBy:req.user.id,state:"Rejected"})
-        const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id,state:"Rejected"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Maternity Leave",sentBy:req.user.id,state:"Rejected"})
+        // const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id,state:"Rejected"})
+        // const sent = [...sent1, ...received];
         // console.log("sent= "+sent)
 
         const arr=[]
@@ -1336,7 +1589,7 @@ router.get('/rejectedMaternityRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -1348,13 +1601,13 @@ router.get('/pendingMaternityRequest',authenticateToken,async(req,res)=>{
     //     return res.json("HR do not have replacement requests")
     // }
     if(type=="HR"){
-        return res.json("HR cannot submit this request.Only academic staff are permitted.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
 
 
-        const sent1=await request.find({reqType:"Maternity Leave",sentBy:req.user.id,state:"Pending"})
-        const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id,state:"Pending"})
-        const sent = [...sent1, ...received];
+        const sent=await request.find({reqType:"Maternity Leave",sentBy:req.user.id,state:"Pending"})
+        // const received=await request.find({reqType:"Maternity Leave",sentTo:req.user.id,state:"Pending"})
+        // const sent = [...sent1, ...received];
         // console.log("sent= "+sent)
 
         const arr=[]
@@ -1377,7 +1630,173 @@ router.get('/pendingMaternityRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        res.json(arr);
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+////////////////////////// NEW SLOT LINKING
+/////////////////////////////////////////////////////////////
+router.get('/slotLinkingRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    console.log("in slot linkning")
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Slot Linking",sentBy:req.user.id})
+        // const received=await request.find({reqType:"Slot Linking",sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        // console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    slotDay:sent[i].slotDay,slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+
+router.get('/acceptedSlotLinkingRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    // if(type=="HR"){
+    //     return res.json("HR do not have replacement requests")
+    // }
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Slot Linking",sentBy:req.user.id,state:"Accepted"})
+        // const received=await request.find({reqType:"Slot Linking",sentTo:req.user.id,state:"Accepted"})
+        // const sent = [...sent1, ...received];
+        // console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    slotDay:sent[i].slotDay,slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+
+router.get('/rejectedSlotLinkingRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    // if(type=="HR"){
+    //     return res.json("HR do not have replacement requests")
+    // }
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Slot Linking",sentBy:req.user.id,state:"Rejected"})
+        // const received=await request.find({reqType:"Slot Linking",sentTo:req.user.id,state:"Rejected"})
+        // const sent = [...sent1, ...received];
+        // console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    slotDay:sent[i].slotDay,slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+router.get('/pendingSlotLinkingRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    // if(type=="HR"){
+    //     return res.json("HR do not have replacement requests")
+    // }
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({reqType:"Slot Linking",sentBy:req.user.id,state:"Pending"})
+        // const received=await request.find({reqType:"Slot Linking",sentTo:req.user.id,state:"Pending"})
+        // const sent = [...sent1, ...received];
+        // console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hod=await StaffMemberModel.findById(hodID)
+            const sender=await StaffMemberModel.findById(sent[i].sentBy)
+            const senderName=sender.name
+            const hodName=hod.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentBy:senderName,sentTo:hodName,state:sent[i].state,
+                    slotDay:sent[i].slotDay,slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                   
+            
+            
+        }
+        res.json({arr:arr,warning:""});
         return 
 })
 
@@ -1385,52 +1804,33 @@ router.get('/pendingMaternityRequest',authenticateToken,async(req,res)=>{
 
 
 
-
-
-
-/////////////////////////////////////////////////////////////
-
-
-
-
-
-
-router.get('/receivedReplacementRequests',authenticateToken,async(req,res)=>{
-    //get requests where sentTo is equal this user
-    const user=await StaffMemberModel.findById(req.user.id)
-    const type=user.staff_type
-    if(type=="HR"){
-        return res.json("HR do not have replacement requests.")
-    }
-    const sent=await request.find({reqType:"Replacement",sentTo:req.user.id})
-    for(var i=0;i<sent.length;i++){
-            reqType=sent[i].reqType
-            const sentBy=(await StaffMemberModel.findById(sent[i].sentBy))
-            const name=sentBy.name
-            var arr=new Array()
-            if(reqType=="Replacement"){
-                // res.write("Request ID: "+sent[i].requestID)
-                // res.write("Request type: "+sent[i].reqType+"\n")
-                // res.write( "Sent to academic staff member: "+hodName+"\n")
-                // res.write( "Request state: "+sent[i].state+"\n")
-                // res.write( "Slot number: "+sent[i].slotNum+"\n")
-                // res.write( "Slot date: "+ sent[i].slotDate+"\n")
-                // res.write( "Slot location: "+sent[i].slotLoc+"\n")
-                // res.write( "Submission date "+sent[i].submission_date+"\n")
-                // res.write("\n")
-                const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
-                    slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
-                    arr[k++]= reqNew
-            }
+// router.get('/receivedReplacementRequests',authenticateToken,async(req,res)=>{
+//     //get requests where sentTo is equal this user
+//     const user=await StaffMemberModel.findById(req.user.id)
+//     const type=user.staff_type
+//     if(type=="HR"){
+//         return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+//     }
+//     const sent=await request.find({reqType:"Replacement",sentTo:req.user.id})
+//     for(var i=0;i<sent.length;i++){
+//             reqType=sent[i].reqType
+//             const sentBy=(await StaffMemberModel.findById(sent[i].sentBy))
+//             const name=sentBy.name
+//             var arr=new Array()
+//             if(reqType=="Replacement"){
+//                 const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
+//                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
+//                     slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+//                     arr[k++]= reqNew
+//             }
             
            
-    }
-    if(sent.length==0)
-    res.write("There are no received requests.")
-    res.end()
-    return 
-})
+//     }
+//     if(sent.length==0)
+//     res.write("There are no received requests.")
+//     res.end()
+//     return 
+// })
 
 
 router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
@@ -1438,7 +1838,7 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
     if(type=="HR"){
-        return res.json("HR are not permitted to send slot linking requests.Only academic members are allowed.")
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
     if(!req.body.slotDay){
         return res.json("Must submit slot day with the request.")

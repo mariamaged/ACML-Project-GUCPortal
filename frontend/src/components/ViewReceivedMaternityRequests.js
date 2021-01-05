@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
 import '../css/test44.css'
+// import '../css/bootstrap.min.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
@@ -12,14 +13,14 @@ import  { Redirect } from 'react-router-dom'
 import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
-class ViewPendingChangeRequests extends Component{
+class ViewReceivedMaternityRequests extends Component{
     state={
         requests:[]
         ,warning:""
     }
     componentDidMount(){
-    console.log("in view")
-        axios.get('http://localhost:5000/academic/sentPendingReplacementRequest',
+    console.log("in maternity view")
+        axios.get('http://localhost:5000/academic/receivedMaternityRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
@@ -43,22 +44,20 @@ class ViewPendingChangeRequests extends Component{
         }
         
         renderRequest=(request, index)=> {
-            console.log("reqState= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 <td className="reqTd" >{request.counter}</td>
                 <td className="reqTd" >{request.requestID}</td>
                 <td className="reqTd" >{request.reqType}</td>
                 <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
                 <td className="reqTd">{request.state}</td>
-                <td className="reqTdSick">{request.newDayOff}</td>
+                <td className="reqTdSick">{request.maternityDoc}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
-                
                 
                 <Button variant="outline-danger" className="buttonResponse3">Cancel</Button>
               </td>
@@ -67,9 +66,7 @@ class ViewPendingChangeRequests extends Component{
                 
             )
             }    
-       skip(){
-
-       }
+       
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -84,9 +81,9 @@ class ViewPendingChangeRequests extends Component{
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedChangeRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item><Link to="/ViewRejectedChangeRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item active><Link to="/ViewPendingChangeRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewRejectedMaternityRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewPendingMaternityRequests">Pending</Link></Dropdown.Item>
                 
                     
                     <Dropdown.Divider />
@@ -118,7 +115,7 @@ class ViewPendingChangeRequests extends Component{
                     <th className="reqTh">Sender</th>
                     <th className="reqTh">Receiver</th>
                     <th className="reqTh">State</th>
-                    <th className="reqTh">New Day-Off</th>
+                    <th className="reqTh">Maternity Documents</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Response</th>
@@ -147,4 +144,4 @@ class ViewPendingChangeRequests extends Component{
     }
 }
 
-export default ViewPendingChangeRequests
+export default ViewReceivedMaternityRequests

@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
 import '../css/test44.css'
+// import '../css/bootstrap.min.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
@@ -15,6 +16,7 @@ import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 class ViewMaternityRequests extends Component{
     state={
         requests:[]
+        ,warning:""
     }
     componentDidMount(){
     console.log("in maternity view")
@@ -26,7 +28,9 @@ class ViewMaternityRequests extends Component{
         }
         ).then(res=>{
             // console.log(res.data[0].reqType)
-            this.setState({requests:res.data})
+            this.setState({requests:res.data.arr,warning:res.data.warning})
+            console.log("new state= "+this.state.requests.reqType)
+            console.log("new state= "+this.state.warning)
             console.log("new state= "+this.state.requests)
 
         }).catch(console.log("error"))
@@ -54,8 +58,6 @@ class ViewMaternityRequests extends Component{
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
-                <CheckCircle color="royalblue" size={20} />{'    '}
-                <XCircle color="royalblue" size={20} />
                 
                 <Button variant="outline-danger" className="buttonResponse3">Cancel</Button>
               </td>

@@ -12,14 +12,14 @@ import  { Redirect } from 'react-router-dom'
 import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
-class ViewPendingChangeRequests extends Component{
+class ViewReceivedChangeRequests extends Component{
     state={
         requests:[]
         ,warning:""
     }
     componentDidMount(){
-    console.log("in view")
-        axios.get('http://localhost:5000/academic/sentPendingReplacementRequest',
+    console.log("in maternity view")
+        axios.get('http://localhost:5000/academic/receivedChangeDayOffRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
@@ -43,7 +43,6 @@ class ViewPendingChangeRequests extends Component{
         }
         
         renderRequest=(request, index)=> {
-            console.log("reqState= "+request.state)
             return (
                 
                 <tr key={request.requestID} className="reqTr" class='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
@@ -58,7 +57,8 @@ class ViewPendingChangeRequests extends Component{
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
-                
+                <CheckCircle color="royalblue" size={20} />{'    '}
+                <XCircle color="royalblue" size={20} />
                 
                 <Button variant="outline-danger" className="buttonResponse3">Cancel</Button>
               </td>
@@ -67,9 +67,7 @@ class ViewPendingChangeRequests extends Component{
                 
             )
             }    
-       skip(){
-
-       }
+       
     render(){
         const reqs=this.state.requests;
         var empty=["one"]
@@ -86,7 +84,7 @@ class ViewPendingChangeRequests extends Component{
                     <Dropdown.Menu className="drop1">
                     <Dropdown.Item ><Link to="/ViewAcceptedChangeRequests">Accepted</Link></Dropdown.Item>
                     <Dropdown.Item><Link to="/ViewRejectedChangeRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item active><Link to="/ViewPendingChangeRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewPendingChangeRequests">Pending</Link></Dropdown.Item>
                 
                     
                     <Dropdown.Divider />
@@ -147,4 +145,4 @@ class ViewPendingChangeRequests extends Component{
     }
 }
 
-export default ViewPendingChangeRequests
+export default ViewReceivedChangeRequests

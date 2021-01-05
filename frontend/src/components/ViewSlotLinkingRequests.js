@@ -2,31 +2,34 @@ import React,{Component} from 'react'
 import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
-import '../css/sickLeave.css'
+import '../css/test44.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import history from '../history';
 import {Link,NavLink} from 'react-router-dom'
 import  { Redirect } from 'react-router-dom'
-import { CheckCircle } from 'react-bootstrap-icons';
+import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
-class sick extends Component{
+class ViewSlotLinkingRequests extends Component{
     state={
-        requests:[]
+        requests:[],
+        warning:""
     }
     componentDidMount(){
-    console.log("in view")
-        axios.get('http://localhost:5000/academic/acceptedSickLeave',
+    console.log("in view slot linking")
+        axios.get('http://localhost:5000/academic/slotLinkingRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
             }
         }
         ).then(res=>{
-            console.log(res.data[0].reqType)
-            this.setState({requests:res.data})
+            // console.log(res.data[0].reqType)
+            this.setState({requests:res.data.arr,warning:res.data.warning})
+            console.log("new state= "+this.state.requests.reqType)
+            console.log("new state= "+this.state.warning)
             console.log("new state= "+this.state.requests)
 
         }).catch(console.log("error"))
@@ -50,13 +53,15 @@ class sick extends Component{
                 <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
                 <td className="reqTd">{request.state}</td>
-                <td className="reqTdSick">{request.sickDay}</td>
+                <td className="reqTdSick">{request.slotDay}</td>
+                <td className="reqTdSick">{request.slotNum}</td>
+                <td className="reqTdSick">{request.courseID}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
-                <CheckCircle color="royalblue" size={96} />
-                <Button variant="outline-secondary" className="buttonResponse2">Reject</Button>
+                
+                
                 <Button variant="outline-danger" className="buttonResponse3">Cancel</Button>
               </td>
 
@@ -69,21 +74,23 @@ class sick extends Component{
        }
     render(){
         const reqs=this.state.requests;
-        var empty=["one"]
-            const reqList=reqs.length?(
-            empty.map(request=>{
-            console.log("in mapping "+request.reqType)
-            return(
-                <div className="containAll">
+        const warning=this.state.warning;
+        var reqList;
+        if(warning!=="")
+         reqList= <div>{warning}</div>
+        else if (reqs.length>0){
+        
+          reqList=(
+                <div className="containAllRep">
 
-                 <div className="containDrop">
+                 <div className="containDropRep">
                 
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item active><Link to="/ViewAcceptedRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item><Link to="/ViewRejectedRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewPendingRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewReceivedAcceptedReplacementRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewReceivedRejectedReplacementRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewReceivedPendingReplacementRequests">Pending</Link></Dropdown.Item>
                 
                     
                     <Dropdown.Divider />
@@ -105,7 +112,7 @@ class sick extends Component{
 
                 
 
-                <div className="container containSickTable">
+                <div className="containerRep containTableRep">
                 <Table striped bordered hover size="sm" className="reqTable">
                 <thead className="reqHead">
                     <tr className="reqTr">
@@ -115,7 +122,9 @@ class sick extends Component{
                     <th className="reqTh">Sender</th>
                     <th className="reqTh">Receiver</th>
                     <th className="reqTh">State</th>
-                    <th className="reqTh">Sick Day</th>
+                    <th className="reqTh">Slot Day</th>
+                    <th className="reqTh">Slot Number</th>
+                    <th className="reqTh">Course ID</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Response</th>
@@ -127,14 +136,12 @@ class sick extends Component{
                 </Table>
                 </div>
                 </div>
-                        
+            
             
               )
-            })
-        ):
-        (
-        <div className="center">No requests yet</div>
-        )
+            }
+
+            else  reqList=<div>No requests yet</div>
 
         
         return (
@@ -144,4 +151,4 @@ class sick extends Component{
     }
 }
 
-export default sick
+export default ViewSlotLinkingRequests

@@ -12,14 +12,14 @@ import  { Redirect } from 'react-router-dom'
 import { CheckCircle, XCircle } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
-class ViewPendingChangeRequests extends Component{
+class ViewRejectedSlotLinkingRequests extends Component{
     state={
-        requests:[]
-        ,warning:""
+        requests:[],
+        warning:""
     }
     componentDidMount(){
     console.log("in view")
-        axios.get('http://localhost:5000/academic/sentPendingReplacementRequest',
+        axios.get('http://localhost:5000/academic/rejectedSlotLinkingRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
@@ -53,7 +53,9 @@ class ViewPendingChangeRequests extends Component{
                 <td className="reqTd">{request.sentBy}</td>
                 <td className="reqTd">{request.sentTo}</td>
                 <td className="reqTd">{request.state}</td>
-                <td className="reqTdSick">{request.newDayOff}</td>
+                <td className="reqTdSick">{request.slotDay}</td>
+                <td className="reqTdSick">{request.slotNum}</td>
+                <td className="reqTdSick">{request.courseID}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdRes">
@@ -72,21 +74,23 @@ class ViewPendingChangeRequests extends Component{
        }
     render(){
         const reqs=this.state.requests;
-        var empty=["one"]
-            const reqList=reqs.length?(
-            empty.map(request=>{
-            console.log("in mapping "+request.reqType)
-            return(
-                <div className="containAll">
+        const warning=this.state.warning;
+        var reqList;
+        if(warning!=="")
+         reqList= <div>{warning}</div>
+        else if (reqs.length>0){
+        
+          reqList=(
+                <div className="containAllRep">
 
-                 <div className="containDrop">
+                 <div className="containDropRep">
                 
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1"  >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedChangeRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item><Link to="/ViewRejectedChangeRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item active><Link to="/ViewPendingChangeRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewReceivedAcceptedReplacementRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item><Link to="/ViewReceivedRejectedReplacementRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewReceivedPendingReplacementRequests">Pending</Link></Dropdown.Item>
                 
                     
                     <Dropdown.Divider />
@@ -108,7 +112,7 @@ class ViewPendingChangeRequests extends Component{
 
                 
 
-                <div className="container containSickTable">
+                <div className="containerRep containTableRep">
                 <Table striped bordered hover size="sm" className="reqTable">
                 <thead className="reqHead">
                     <tr className="reqTr">
@@ -118,7 +122,9 @@ class ViewPendingChangeRequests extends Component{
                     <th className="reqTh">Sender</th>
                     <th className="reqTh">Receiver</th>
                     <th className="reqTh">State</th>
-                    <th className="reqTh">New Day-Off</th>
+                    <th className="reqTh">Slot Day</th>
+                    <th className="reqTh">Slot Number</th>
+                    <th className="reqTh">Course ID</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Response</th>
@@ -130,14 +136,12 @@ class ViewPendingChangeRequests extends Component{
                 </Table>
                 </div>
                 </div>
-                        
+            
             
               )
-            })
-        ):
-        (
-        <div className="center">No requests yet</div>
-        )
+            }
+
+            else  reqList=<div>No requests yet</div>
 
         
         return (
@@ -147,4 +151,4 @@ class ViewPendingChangeRequests extends Component{
     }
 }
 
-export default ViewPendingChangeRequests
+export default ViewRejectedSlotLinkingRequests
