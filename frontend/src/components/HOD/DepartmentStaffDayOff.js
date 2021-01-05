@@ -32,7 +32,7 @@ class DepartmentStaffDayOff extends Component {
     render() {
         return (
         <div className='container'>
-            <StaffDayOff members={this.state.departmentStaffDayOff} />
+            <StaffDayOff members={this.state.departmentStaffDayOff} role="the department you are the head of."/>
         </div>
         );
     }

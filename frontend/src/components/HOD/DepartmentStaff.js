@@ -32,7 +32,7 @@ class DepartmentStaff extends Component {
     render() {
         return (
         <div className='container'>
-            <Staff members={this.state.departmentStaff} />
+            <Staff members={this.state.departmentStaff} role="the department you are the head of."/>
         </div>
         );
     }

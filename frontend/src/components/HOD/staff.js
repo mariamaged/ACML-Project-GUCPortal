@@ -4,29 +4,34 @@
 import React from 'react'
 // Reacter Router and axios
 // CSS and images.
-
-const staff = ({ members }) => {
-    const departmentStaffList = members.length? (members.map(staff => {
-        return (<div className="post card" key={staff.id}>
-            <div className="card-content">
-                <span className="card-title">{staff.id}</span>
-                <p>{staff.name}</p>
-                <p>{staff.email}</p>
-                <p>{staff.salary}</p>
-                <p>{staff.faculty}</p>
-                <p>{staff.office}</p>
-                <p>{staff.gender}</p>
-                <p>{staff.department}</p>
-                <p>{staff.academicType}</p>
-            </div>
-        </div>) })) :
-        (<div className="center">AAAA</div>);
+import './HODNavbar.css';
+const staff = ({ members, role }) => {
+    const departmentStaffList = members.length ? (members.map(staff => {
+        return (
+            <div class="card border-secondary mb-3" key={staff.id}>
+                <div class="card-header">{staff.id}</div>
+                <div class="card-body">
+                    <h4 class="card-title" style={{color: "#4d4d4d"}}>{staff.name}</h4>
+                    <p class="card-text">{'Email: ' + staff.email}</p>
+                    <p class="card-text">{'Salary: ' + staff.salary}</p>
+                    <p class="card-text">{'Office: ' + staff.office}</p>
+                    <p class="card-text">{'Gender: ' + staff.gender}</p>
+                    <p class="card-text">{'Department: ' + staff.department}</p>
+                    <p class="card-text">{'Faculty: ' + staff.faculty}</p>
+                    <p class="card-text">{'Academic Role: ' + staff.academicType}</p>
+                </div>
+            </div>)
+    })) :
+        (<div><h3>
+            Loading
+            &nbsp;<small class="text-muted">the staff members of {role}</small>
+        </h3></div>);
 
     return (
         <div>
-        <div className="container">
+            <br/>
+            <br/>
             {departmentStaffList}
-        </div>
         </div>
     )
 }

@@ -13,12 +13,12 @@ const StaffContainer = () => {
         <Accordion>
             <Card>
                 <Accordion.Toggle as={Card.Header} eventKey="0">
-                    Department
+                    Staff
                      </Accordion.Toggle>
                 <Accordion.Collapse eventKey="0">
                     <div>
-                        <LinkContainer to='/viewDepartmentStaff'><Card.Body>View Staff</Card.Body></LinkContainer>
-                        <LinkContainer to='/viewDepartmentStaffDayOff'><Card.Body>View Staff Day Off</Card.Body></LinkContainer>
+                        <LinkContainer to='/instructor/hodDepartmentStaff'><Card.Body>View Staff</Card.Body></LinkContainer>
+                        <LinkContainer to='/instructor/hodDepartmentStaffDayOff'><Card.Body>View Staff Day Off</Card.Body></LinkContainer>
                     </div>
                 </Accordion.Collapse>
             </Card>
@@ -28,7 +28,7 @@ const StaffContainer = () => {
                     </Accordion.Toggle>
                 <Accordion.Collapse eventKey="1">
                 <div>
-                        <LinkContainer to='/viewCourseStaff'><Card.Body>View Course Staff</Card.Body></LinkContainer>
+                        <LinkContainer to='/instructor/hodCourseStaff/all'><Card.Body>View Course Staff</Card.Body></LinkContainer>
                     </div>
                 </Accordion.Collapse>
             </Card>
