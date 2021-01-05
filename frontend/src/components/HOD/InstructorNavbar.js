@@ -36,7 +36,7 @@ class InstructorNavbar extends Component {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
                 <NavLink to='/instructor'><a class="navbar-brand">Instructor</a>
                     {this.state.isHOD &&
-                        <a class="navbar-brand department">Head of {this.state.departmentName}</a>}
+                        <a class="navbar-brand" style={{fontSize: "0.8em"}}>Head of {this.state.departmentName}</a>}
                 </NavLink>
 
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
