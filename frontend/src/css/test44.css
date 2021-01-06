@@ -103,3 +103,7 @@ top:2vw;
   position:relative;
   top:10vw !important;
 }
+
+.cancelButton{
+  border:1px solid transparent!important
+}

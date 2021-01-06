@@ -16,7 +16,8 @@ import { CheckCircle, XCircle, XCircleFill } from 'react-bootstrap-icons';
 class ViewMaternityRequests extends Component{
     state={
         requests:[]
-        ,warning:""
+        ,warning:"",
+        cancelWarning:""
     }
     componentDidMount(){
     console.log("in maternity view")
@@ -36,37 +37,35 @@ class ViewMaternityRequests extends Component{
         }).catch(console.log("error"))
     }
 
-         handleClick(e,value){
-            e.preventDefault();
-            console.log("in click "+value)
+        //  handleClick(e,value){
+        //     e.preventDefault();
+        //     console.log("in click "+value)
             
 
-        }
-        handleCancel(e){
+        // }
+        handleClick(e,value){
             e.preventDefault();
             axios.post('http://localhost:5000/academic/cancelRequest',
             {
                 headers:{
                     'x-auth-token':localStorage.getItem('jwtToken')
-                }
+                },
+                data: {
+                    requestID: value, // This is the body part
+                  }
             }
             ).then(res=>{
-                // console.log(res.data[0].reqType)
-                // this.setState({requests:res.data.arr,warning:res.data.warning})
-                // console.log("new state= "+this.state.requests.reqType)
-                // console.log("new state= "+this.state.warning)
-                // console.log("new state= "+this.state.requests)
+                console.log("successfull")
     
-            }).catch(
-                console.log("error")
-                
-                )
+            }).catch(res=>{
+                this.setState({cancelWarning:res.data});
+                })
         }
         
         renderRequest=(request, index)=> {
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} className="reqTr">
                
                 {/* <td className="reqTd" >{request.requestID}</td> */}
                 {/* <td className="reqTd" >{request.reqType}</td> */}
@@ -77,11 +76,11 @@ class ViewMaternityRequests extends Component{
                 <td className="reqTd">{request.maternityDoc}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
+
                 <td className="reqTd">
-                {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
-               <a > <XCircleFill color="darkred" className="cancelBtn" size={15} /></a>
-                {/* <Button variant="outline-danger" className="buttonResponse3">Cancel</Button> */}
-              </td>
+               <Button variant="outline-light" size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
+               <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
+                </td>
 
                 </tr>
                 
