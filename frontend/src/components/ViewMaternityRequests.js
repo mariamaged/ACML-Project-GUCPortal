@@ -161,7 +161,10 @@ class ViewMaternityRequests extends Component{
             })
         ):
         (
-        <div className="center">No requests yet</div>
+        <div className="center">
+        <h3>Maternity Requests</h3>
+       <h4> No requests yet</h4>
+        </div>
         )
 
         

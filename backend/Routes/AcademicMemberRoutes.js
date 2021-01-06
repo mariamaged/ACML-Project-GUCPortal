@@ -1003,7 +1003,7 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
             
             
         }
-        console.log("arr= "+arr[1].missedDay)
+        // console.log("arr= "+arr[1].missedDay)
         res.json({arr:arr,warning:""});
         return 
 })

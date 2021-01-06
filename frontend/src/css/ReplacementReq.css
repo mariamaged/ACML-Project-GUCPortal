@@ -76,11 +76,11 @@ top:2vw;
 }
 
 
-.buttons2{
-  margin-left: 37vw;
+.buttons2Rep{
+  margin-left: 33vw;
 }
 
-.buttons1{
+.buttons1Rep{
   margin-left: 1.5vw;
 }
 
@@ -92,14 +92,4 @@ top:2vw;
   position:relative;
   top:7vw;
   left:1vw;
-}
-
-.reqTitle{
-  position:relative;
-  top:9vw !important;
-  left:2vw;
-}
-.noReq{
-  position:relative;
-  top:10vw !important;
 }

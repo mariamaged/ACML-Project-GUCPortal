@@ -153,7 +153,10 @@ class ViewChangeRequests extends Component{
             })
         ):
         (
-        <div className="center">No requests yet</div>
+            <div className="center">
+            <h3 className="reqTitle">Change Day-Off Requests</h3>
+           <h4 className="noReq"> No requests yet</h4>
+            </div>
         )
 
         

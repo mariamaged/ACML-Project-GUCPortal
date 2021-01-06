@@ -1,0 +1,94 @@
+.reqTable{
+    width:80vw !important;
+    /* background-color: #78c2ad !important; */
+    background-color: rgb(217 228 224)!important;
+     color:rgb(0, 0, 0) !important;
+     margin-top: 2vw;
+     text-align: center !important;
+  }
+  
+  .reqTd{
+    width:5vw;
+    color:rgb(0, 0, 0) !important;
+    font-weight:500 !important;
+  
+  }
+  .reqTdRes{
+    color:rgb(0, 0, 0) !important;
+    font-weight:500 !important;
+  }
+  .reqTh{
+    text-align: center !important;
+    font-weight:650 !important;
+    
+  }
+  .containAll{
+    /* width:80vw; */
+    
+  }
+  .buttonResponse3{
+    color:darkgreen !important;
+    size:0.5vw !important;
+  
+  }
+  .containMaternityTable {
+    max-height:300px !important;
+    overflow-y: scroll;
+   
+   
+  }
+  
+  
+  .containMaternityTable::-webkit-scrollbar {
+    width:0.5vw !important;
+    border-radius:1vw ;
+    background:#3d544e !important;
+  }
+  
+  
+  
+   .containDrop{
+    /* max-height:15% !important; */
+    /* max-width:25% !important; */
+    display:flex;
+    flex-direction: row;
+   
+  
+  } 
+  
+  .btn-group{
+     size:'sm';
+     max-height: 5% !important;
+    
+  }
+  
+  .btn{
+  font-size:0.8 rem !important;
+  border:1px solid #7050ff!important;
+  border-radius: 0.5rem !important;
+  max-height: 3vw !important;
+  position:relative;
+  top:2vw;
+  }
+  .pickBtn{
+    background-color: #4aa48a !important;
+  }
+  
+  
+  .buttons2Slot{
+    margin-left: 35vw;
+  }
+  
+  .buttons1Slot{
+    margin-left: 1.5vw;
+  }
+  
+  .maternityH{
+    font-size: 3vw;
+  }
+  
+  .containAll{
+    position:relative;
+    top:7vw;
+    left:1vw;
+  }

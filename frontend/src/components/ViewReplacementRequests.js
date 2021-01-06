@@ -2,7 +2,8 @@ import React,{Component} from 'react'
 import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
-import '../css/test44.css'
+// import '../css/test44.css'
+import '../css/ReplacementReq.css'
 // import '../css/bootstrap.min.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
@@ -100,7 +101,7 @@ class ViewReplacementRequests extends Component{
             
             <div className="containDrop">
             <span className="maternityH">Replacement Requests</span>
-                      <Dropdown as={ButtonGroup}className="buttons2" >
+                      <Dropdown as={ButtonGroup}className="buttons2Rep" >
                 <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
                     <Dropdown.Menu className="super-colors">
                     <Dropdown.Item ><Link to="/ViewSickRequests">Sick Leave Requests</Link></Dropdown.Item>
@@ -114,7 +115,7 @@ class ViewReplacementRequests extends Component{
                     </Dropdown.Menu>
                 </Dropdown>{' '} 
 
-                    <Dropdown as={ButtonGroup} className="buttons1">
+                    <Dropdown as={ButtonGroup} className="buttons1Rep">
                     <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
                     <Dropdown.Item ><Link to="/ViewAcceptedReplacementRequests">Accepted</Link></Dropdown.Item>

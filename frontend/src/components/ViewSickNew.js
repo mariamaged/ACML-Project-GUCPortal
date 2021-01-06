@@ -13,14 +13,15 @@ import  { Redirect } from 'react-router-dom'
 import { CheckCircle, XCircle, XCircleFill } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
-class ViewReceivedSickRequests extends Component{
+class ViewSickNew extends Component{
     state={
         requests:[]
-        ,warning:""
+        ,warning:"",
+        reqState:""
     }
     componentDidMount(){
     console.log("in maternity view")
-        axios.get('http://localhost:5000/academic/receivedSickRequest',
+        axios.get('http://localhost:5000/academic/sickRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
@@ -28,6 +29,7 @@ class ViewReceivedSickRequests extends Component{
         }
         ).then(res=>{
             // console.log(res.data[0].reqType)
+            // if(this.location.props.state.reqState)
             this.setState({requests:res.data.arr,warning:res.data.warning})
             console.log("new state= "+this.state.requests.reqType)
             console.log("new state= "+this.state.warning)
@@ -110,6 +112,15 @@ class ViewReceivedSickRequests extends Component{
              
              
                     </Dropdown.Menu>
+                </Dropdown>{' '} 
+
+                    <Dropdown as={ButtonGroup} className="buttons1">
+                    <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    <Dropdown.Item ><Link to="/ViewAcceptedSickRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewRejectedSickRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewPendingSickRequests">Pending</Link></Dropdown.Item>
+                    </Dropdown.Menu>
                 </Dropdown>
                
               
@@ -156,4 +167,4 @@ class ViewReceivedSickRequests extends Component{
     }
 }
 
-export default ViewReceivedSickRequests
+export default ViewSickNew

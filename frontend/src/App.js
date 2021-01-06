@@ -4,7 +4,7 @@ import ViewRequests from './components/ViewRequests'
 import Login from './components/Login.js'
 //all requests
 import ViewAcceptedRequests from './components/ViewAcceptedRequests'
-import ViewRejectedRequests from './components/ViewRejectedRequests'
+// import ViewRejectedRequests from './components/ViewRejectedRequests'
 import ViewPendingRequests from './components/ViewPendingRequests'
 //sick requests
 import ViewSickRequests from './components/ViewSickRequests'
@@ -33,9 +33,7 @@ import ViewRejectedReplacementRequests from './components/ViewRejectedReplacemen
 import ViewPendingReplacementRequests from './components/ViewPendingReplacementRequests'
 //received replacement request
 import ViewReceivedReplacementRequests from './components/ViewReceivedReplacementRequests'
-import ViewReceivedAcceptedReplacementRequests from './components/ViewReceivedAcceptedReplacementRequests'
-import ViewReceivedRejectedReplacementRequests from './components/ViewReceivedRejectedReplacementRequests'
-import ViewReceivedPendingReplacementRequests from './components/ViewReceivedPendingReplacementRequests'
+
 //slot linking request
 import ViewSlotLinkingRequests from './components/ViewSlotLinkingRequests'
 import ViewAcceptedSlotLinkingRequests from './components/ViewAcceptedSlotLinkingRequests'
@@ -68,10 +66,7 @@ function App() {
         <Route exact path='/login' component ={Login}/>
         <Route exact path='/getRequest' component ={getRequest}/>
         <Route exact path='/' component ={ViewRequests}/>
-        <Route exact path="/ViewAcceptedRequests" component={ViewAcceptedRequests}/>
-        <Route exact path="/ViewPendingRequests" component={ViewPendingRequests}/>
-        <Route path='/ViewRejectedRequests' component={ViewRejectedRequests}/>
-        {/* <Route exact path='/sick' component ={Sick}/> */}
+
         <Route exact path='/ViewSickRequests' component ={ViewSickRequests}/>
         <Route exact path='/ViewAcceptedSickRequests' component ={ViewAcceptedSickRequests}/>
         <Route exact path='/ViewRejectedSickRequests' component ={ViewRejectedSickRequests}/>
@@ -98,9 +93,6 @@ function App() {
         <Route exact path='/ViewPendingReplacementRequests' component ={ViewPendingReplacementRequests}/>
 
         <Route exact path='/ViewReceivedReplacementRequests' component ={ViewReceivedReplacementRequests}/>
-        <Route exact path='/ViewReceivedAcceptedReplacementRequests' component ={ViewReceivedAcceptedReplacementRequests}/>
-        <Route exact path='/ViewReceivedRejectedReplacementRequests' component ={ViewReceivedRejectedReplacementRequests}/>
-        <Route exact path='/ViewReceivedPendingReplacementRequests' component ={ViewReceivedPendingReplacementRequests}/>
        
 
         <Route exact path='/ViewSlotLinkingRequests' component ={ViewSlotLinkingRequests}/>
@@ -117,9 +109,7 @@ function App() {
        
        
 
-        <Route exact path="/ViewAllAcceptedRequests" component={ViewAllAcceptedRequests}/>
-        <Route exact path="/ViewAllMaternity" component={ViewAllMaternity}/>
-        {/* <Route path="/ViewAcceptedRequests" render={(props) => <ViewAcceptedRequests {...props}/>}/> */}
+        
     </div>
     </Router>
   );
