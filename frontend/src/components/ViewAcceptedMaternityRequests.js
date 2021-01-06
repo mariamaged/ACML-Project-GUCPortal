@@ -13,14 +13,14 @@ import  { Redirect } from 'react-router-dom'
 import { CheckCircle, XCircle, XCircleFill } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
-class ViewMaternityRequests extends Component{
+class ViewAcceptedMaternityRequests extends Component{
     state={
         requests:[]
         ,warning:""
     }
     componentDidMount(){
     console.log("in maternity view")
-        axios.get('http://localhost:5000/academic/maternityRequest',
+        axios.get('http://localhost:5000/academic/acceptedMaternityRequest',
         {
             headers:{
                 'x-auth-token':localStorage.getItem('jwtToken')
@@ -67,11 +67,7 @@ class ViewMaternityRequests extends Component{
             return (
                 
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                {/* <td className="reqTd" >{request.counter}</td> */}
-                {/* <td className="reqTd" >{request.requestID}</td> */}
-                {/* <td className="reqTd" >{request.reqType}</td> */}
-                {/* <td className="reqTd">{request.sentBy}</td> */}
-                {/* <td className="reqTd">{request.sentTo}</td> */}
+                
                 <td className="reqTd">{request.state}</td>
                 <td className="reqTd">{request.maternityDoc}</td>
                 <td className="reqTd">{request.reason}</td>
@@ -118,7 +114,7 @@ class ViewMaternityRequests extends Component{
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item active><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item>
                     <Dropdown.Item><Link to="/ViewRejectedMaternityRequests">Rejected</Link></Dropdown.Item>
                     <Dropdown.Item ><Link to="/ViewPendingMaternityRequests">Pending</Link></Dropdown.Item>
                     </Dropdown.Menu>
@@ -173,4 +169,4 @@ class ViewMaternityRequests extends Component{
     }
 }
 
-export default ViewMaternityRequests
+export default ViewAcceptedMaternityRequests
