@@ -1,37 +1,43 @@
 .reqTable{
-  width:585px !important;
-  background-color:rgb(223 238 241)!important;
-  color:#05042f !important;
+  width:80vw !important;
+
+  background-color: rgb(217 228 224)!important;
+   color:rgb(0, 0, 0) !important;
+   margin-top: 2vw;
+ 
 }
 
 .reqTd{
-  width:10%;
-  white-space: nowrap;
-  color:tomato !important;
+  width:5vw;
+  color:rgb(0, 0, 0) !important;
+  font-weight:500 !important;
+
+}
+.reqTdRes{
+  color:rgb(0, 0, 0) !important;
+  font-weight:500 !important;
 }
 .reqTh{
   text-align: center !important;
-  white-space: nowrap;
+  font-weight:650 !important;
   
 }
-.header-fixed {
-  position: fixed;
-  top: 0px; display:none;
-  background-color:white;
+.containAll{
+  /* width:80vw; */
+  
 }
-.containMaternityTable{
-  position:relative ;
-  top:12vw;
-  right:3vw;
-  width:78.7% !important;
+.buttonResponse3{
+  color:darkgreen !important;
+  size:0.5vw !important;
+
+}
+.containMaternityTable {
   max-height:300px !important;
   overflow-y: scroll;
  
+ 
 }
-.containTable::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background: #9c2525 !important;
-}
+
 
 .containMaternityTable::-webkit-scrollbar {
   width:0.5vw !important;
@@ -42,65 +48,44 @@
 
 
  .containDrop{
-   /* position:absolute; */
-  position:relative !important ;
-  top:-14.25vw !important;
-  left:58vw !important;
-  size:'lg';
-  max-height:15% !important;
-  max-width:25% !important;
+  /* max-height:15% !important; */
+  /* max-width:25% !important; */
+  display:flex;
+  flex-direction: row;
  
 
 } 
-/* .containAll{
-  display: inline-block; 
-text-align: right;
-} */
 
 .btn-group{
    size:'sm';
-   position:relative;
-   left:14.5vw;
-   /* width:5% !important; */
    max-height: 5% !important;
- /* max-width:5% !important; */
-  /* background-color: rgb(202, 13, 13); */
-  /* color: darkred; */
   
 }
+
 .btn{
 font-size:0.8 rem !important;
-padding:0.15rem 0.1rem !important;
-
 border:1px solid #7050ff!important;
 border-radius: 0.5rem !important;
-/* color: rgb(128, 0, 96) !important; */
 }
 .pickBtn{
   background-color: #4aa48a !important;
 }
-.buttonName{
- font-size: small;
-}
+
+
 .buttons2{
-size:'sm';
-}
-.buttons1{
-size:'sm';
-}
-.buttons3{
-size:'sm';
+  margin-left: 30vw;
 }
 
-.reqTdSick{
-  width:fit-content !important;
-  white-space: nowrap;
+.buttons1{
+  margin-left: 3vw;
 }
 
 .maternityH{
-  size:5vw;
-  position:relative;
-  top:6vw;
-  left:9vw;
+  font-size: 3vw;
+}
 
+.containAll{
+  position:relative;
+  top:7vw;
+  left:1vw;
 }

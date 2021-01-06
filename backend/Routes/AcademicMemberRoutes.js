@@ -3377,10 +3377,13 @@ router.post('/cancelRequest', authenticateToken, async (req, res) => {
 
     const currRequest = await request.findOne({requestID: requestID});
     if(!currRequest) res.status(400).send('Request not found!');
-    if(!currRequest.sentBy.equals(req.user.id)) return res.status(401).send('You are not the one who sent this request!');
+
+    if(!currRequest.sentBy.equals(req.user.id)) 
+    return res.status(401).send('You are not the one who sent this request!');
 
     if(currRequest.reqType != 'Replacement' && currRequest.reqType != 'Annual Leave') {
-        if(currRequest.state != 'Pending') return res.status(400).send('Cannot cancel a non-pending request!');
+        if(currRequest.state != 'Pending') 
+        return res.status(400).send('Cannot cancel a non-pending request!');
         else {
             await request.findOneAndDelete({requestID: requestID});
             return res.status(200).send('Request cancelled successfully!');
