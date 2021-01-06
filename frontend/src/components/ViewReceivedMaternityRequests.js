@@ -72,10 +72,12 @@ class ViewReceivedMaternityRequests extends Component{
                 {/* <td className="reqTd" >{request.reqType}</td> */}
                 {/* <td className="reqTd">{request.sentBy}</td> */}
                 {/* <td className="reqTd">{request.sentTo}</td> */}
-                <td className="reqTd">{request.state}</td>
+                     
+                <td className="reqTd" >{request.counter}</td>
+                <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.maternityDoc}</td>
                 <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd">{request.state}</td>
                 <td className="reqTd">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
                <a > <XCircleFill color="darkred" className="cancelBtn" size={15} /></a>
@@ -130,10 +132,11 @@ class ViewReceivedMaternityRequests extends Component{
                     {/* <th className="reqTh">Request Type</th> */}
                     {/* <th className="reqTh">Sender</th> */}
                     {/* <th className="reqTh">Receiver</th> */}
-                    <th className="reqTh">State</th>
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Documents</th>
                     <th className="reqTh">Reason</th>
-                    <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">State</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>

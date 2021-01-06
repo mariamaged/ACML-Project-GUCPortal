@@ -3,9 +3,9 @@ import logo from './logo.svg';
 import ViewRequests from './components/ViewRequests'
 import Login from './components/Login.js'
 //all requests
-import ViewAcceptedRequests from './components/ViewAcceptedRequests'
-// import ViewRejectedRequests from './components/ViewRejectedRequests'
-import ViewPendingRequests from './components/ViewPendingRequests'
+// import ViewAcceptedRequests from './components/ViewAcceptedRequests'
+// // import ViewRejectedRequests from './components/ViewRejectedRequests'
+// import ViewPendingRequests from './components/ViewPendingRequests'
 //sick requests
 import ViewSickRequests from './components/ViewSickRequests'
 import ViewAcceptedSickRequests from './components/ViewAcceptedSickRequests'

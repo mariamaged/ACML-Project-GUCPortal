@@ -69,13 +69,13 @@ class ViewReplacementRequests extends Component{
                 
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 
-               
-                <td className="reqTd">{request.state}</td>
+                <td className="reqTd" >{request.counter}</td>
+                <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.slotDate}</td>
                 <td className="reqTd">{request.slotNum}</td>
                 <td className="reqTd">{request.slotLoc}</td>
                 <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd">{request.state}</td>
                 <td className="reqTd">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
                <a > <XCircleFill color="darkred" className="cancelBtn" size={15} /></a>
@@ -134,12 +134,13 @@ class ViewReplacementRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">State</th>
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Slot Date</th>
                     <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Slot Location</th>
                     <th className="reqTh">Reason</th>
-                    <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">State</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>

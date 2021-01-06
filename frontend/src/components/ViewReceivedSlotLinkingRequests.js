@@ -70,12 +70,13 @@ class ViewReceivedSlotLinkingRequests extends Component{
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 
                
-                <td className="reqTd">{request.state}</td>
+                <td className="reqTd" >{request.counter}</td>
+                <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.slotDay}</td>
                 <td className="reqTd">{request.slotNum}</td>
                 <td className="reqTd">{request.courseID}</td>
                 <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd">{request.state}</td>
                 <td className="reqTd">
                 {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
                <a > <XCircleFill color="darkred" className="cancelBtn" size={15} /></a>
@@ -124,13 +125,14 @@ class ViewReceivedSlotLinkingRequests extends Component{
                 {/* <span id="spanSurrounder"> */}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
-                    <tr className="reqTr">
-                    <th className="reqTh">State</th>
+                <tr className="reqTr">
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Slot Day</th>
                     <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Course ID</th>
                     <th className="reqTh">Reason</th>
-                    <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">State</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
