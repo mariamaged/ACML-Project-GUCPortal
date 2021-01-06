@@ -99,7 +99,7 @@ class ViewAcceptedSlotLinkingRequests extends Component{
             
             
             <div className="containDrop">
-            <span className="maternityH">Maternity Requests</span>
+            <span className="maternityH">Slot Linking Requests</span>
                       <Dropdown as={ButtonGroup}className="buttons2" >
                 <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
                     <Dropdown.Menu className="super-colors">
