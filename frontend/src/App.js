@@ -53,10 +53,6 @@ import ViewReceivedCompensationRequests from './components/ViewReceivedCompensat
 //sentList
 import SentList from './components/sentList'
 //all requests
-import ViewAllAcceptedRequests from './components/ViewAllAcceptedRequests'
-import ViewAllMaternity from './components/ViewAllMaternity'
-// import Sick from './components/sick'
-import MaternityTable from './components/maternityTable'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter,Router,Route,Switch} from 'react-router-dom'
 
@@ -68,7 +64,7 @@ function App() {
     <Router history={history}>
     <div className="App">
     <Route exact path="/sent" component={SentList}/>
-    <Route exact path='/maternityTable' component ={MaternityTable}/>
+    {/* <Route exact path='/maternityTable' component ={MaternityTable}/> */}
         <Route exact path='/login' component ={Login}/>
         <Route exact path='/getRequest' component ={getRequest}/>
         <Route exact path='/' component ={ViewRequests}/>

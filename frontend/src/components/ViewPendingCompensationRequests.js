@@ -69,7 +69,7 @@ class ViewPendingCompensationRequests extends Component{
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 
                 <td className="reqTd">{request.state}</td>
-                <td className="reqTdSick">{request.missedDay}</td>
+                <td className="reqTd">{request.missedDay}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">
@@ -96,7 +96,7 @@ class ViewPendingCompensationRequests extends Component{
             
             
             <div className="containDrop">
-            <span className="maternityH">Maternity Requests</span>
+            <span className="maternityH">Compensation Requests</span>
                       <Dropdown as={ButtonGroup}className="buttons2" >
                 <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
                     <Dropdown.Menu className="super-colors">

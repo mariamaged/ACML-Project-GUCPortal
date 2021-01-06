@@ -117,9 +117,9 @@ class ViewRejectedReplacementRequests extends Component{
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedSlotLinkingRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item active><Link to="/ViewRejectedSlotLinkingRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewPendingSlotLinkingRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewAcceptedReplacementRequests">Accepted</Link></Dropdown.Item>
+                    <Dropdown.Item active><Link to="/ViewRejectedReplacementRequests">Rejected</Link></Dropdown.Item>
+                    <Dropdown.Item ><Link to="/ViewPendingReplacementRequests">Pending</Link></Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
                
