@@ -8,17 +8,19 @@ function DeleteLocation() {
             <input type="text" className="form-control" placeholder="Default input" id="inputDefault0"></input>
           </div>
           <button type="button" className="btn btn-primary" onClick={()=>{var id = document.getElementById("inputDefault0").value; 
-         var maximum_capacity = document.getElementById("inputDefault1").value;
-         var type=document.getElementById("exampleSelect1").value;
-         axios.post('http://localhost:3000/Location',{headers:{'x-auth-token':localStorage.getItem('jwtToken')}},
-         {
-            id:id,type:type,maximum_capacity:maximum_capacity
-            
-         }).catch(err=>{
-             alert(err.response.data);
-            })
+         axios.delete('http://localhost:5000/HR/Location',{headers:{"auth-token":localStorage.getItem('auth-token')},data:{id:id}},
+         ).then(async(response)=>{
+                alert("done");}
+          ).catch((error) => {
+              console.log(localStorage);
+             if (error.response) {
+               alert(error.response.data.msg);
+             } else {
+               alert(error.msg);
+             }
+           });
 
-        }}>Add Location</button> 
+        }}>Delete Location</button> 
         </div>
     );
 }

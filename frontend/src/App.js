@@ -28,7 +28,7 @@ import {
   Switch,
   Route
 } from "react-router-dom"
-
+import Login from "./Components/Login";
 
 function App() {
   return(
@@ -39,6 +39,7 @@ function App() {
         
         
       <Switch>
+        <Route exact path="/" component={Login}/>
          <Route exact path='/HR'><HR name="Maya"/></Route>
          <Route path='/HR/AddLocation'><HR name="Maya"/><AddLocation/></Route>
          <Route path='/HR/DeleteLocation'><HR name="Maya"/><DeleteLocation/></Route>

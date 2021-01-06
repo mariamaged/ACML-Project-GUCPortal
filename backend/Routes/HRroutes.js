@@ -11,11 +11,11 @@ const course=require('../Models/CourseModel');
 const jwt=require('jsonwebtoken');
 
 
-function authenticateToken(req,res,next){
-    
-    const token=req.header('x-auth-token');
-    if(!token){
-    return res.sendStatus(401).status('Access deined please log in first.')
+async function authenticateToken(req, res, next) {
+    const token = req.header("auth-token");
+    if (!token) {
+      res.status(401).send({ msg: "Access deined please log in first." });
+      return;
     }
     // const verified= jwt.verify(token, process.env.TOKEN_SECRET)
     // if(!verified){
@@ -24,15 +24,15 @@ function authenticateToken(req,res,next){
     // req.user=verified
     // console.log("in auth "+req.user)
     // next();
-    try{
-        const verified= jwt.verify(token, process.env.TOKEN_SECRET)
-        req.user= verified
-        next()
+    try {
+      const verified = await jwt.verify(token, process.env.TOKEN_SECRET);
+      req.user = verified;
+      next();
+    } catch (err) {
+      res.status(400).send({ msg: "Invalid Request." });
+      return;
     }
-    catch(err){
-        res.status(400).send('Invalid Request.')
-    }
-}
+  }
 
 
 
@@ -49,24 +49,24 @@ function authenticateToken(req,res,next){
 //Locations Adding,deleting, and updating
 //fadel autherization
 //adding
-router.route('Location').post(authenticateToken,async(req,res)=>{
+router.route('/Location').post(authenticateToken,async(req,res)=>{
     //to authorize
-     const st=await StaffMember.findOne({"id":req.user.id});
-     if(st.staff_type=="HR")
-      res.status(401).send('Access Denied');
+     const st=await StaffMember.findOne({"_id":req.user.id});
+     if(st==null||st.staff_type!="HR")
+      res.status(401).send({msg:'Access Denied'});
     else{  
     try{
         //yedakhaly max_capacity wla ahotaha ana based 3la el type?
         const{id,type,maximum_capacity}=req.body;
         if(!id || !type || !maximum_capacity)
-           return res.status(400).json({msg:"Please enter a correct location"});
+           return res.status(401).send({msg:"Please enter a correct location"});
         else{
             const loc=await location.findOne({"id":id});
-            if(loc!=null) res.status(400).json({msg:"a location with this id already exists"});
+            if(loc!=null) res.status(401).send({msg:"a location with this id already exists"});
             else{
               toAdd= new location({id,type,maximum_capacity,current_capacity:0});
               await toAdd.save();
-              res.json(toAdd);
+              res.send({toAdd});
               console.log(toAdd);   
         }
     }
@@ -80,12 +80,12 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
 //deleting
 .delete(authenticateToken,async (req,res)=>{
     try{
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
       res.status(401).send('Access Denied');
     else{ 
      const{id}=req.body;
-    if(!id) res.status(400).json({msg:"please enter the id of the location to be deleted"});
+    if(!id) res.status(400).send({msg:"please enter the id of the location to be deleted"});
     else{ 
      const loc=await location.findOne({"id":id});
      if(loc== null) res.send("this location does not exist");
@@ -111,20 +111,21 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
         }
      }
         await location.deleteOne({"id":id});
-        res.send("done");
+        res.status(200).send({message:"done"});
          
      }
      }}
  }catch(err){
-     res.status(500).json({error:err.message});
+     res.status(500).send({error:err.message});
  }
  })
 
 //updating 
-.put(authenticateToken,async(req,res)=>{
+// authenticateToken,
+.put(async(req,res)=>{
     try{
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
         res.status(401).send('Access Denied');
         else{ 
         const{oldid,id,type,maximum_capacity}=req.body;
@@ -148,7 +149,7 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
                else{
                    const staff=await AcademicStaff.find();
                    for(var i=0;i<staff.length;i++){
-                       for(var j=0;j<staff.schedule.length;j++){
+                       for(var j=0;j<staff[i].schedule.length;j++){
                            if(staff[i].schedule[j].location==Obid._id)
                               staff[i].schedule[j].location=null;
                        }
@@ -160,11 +161,12 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
              }
              const newob=await location.findOne({"id":id});
              if(newob==null|| id==oldid){
-             Obid.id=id;}
-             else res.status(400).json({msg:"the new id already exists"})
+             Obid.id=id;
              Obid.maximum_capacity=maximum_capacity;
              await Obid.save();
-             res.send("done");  
+             res.status(400).send({msg:"done"});  }
+             else res.status(400).json({msg:"the new id already exists"})
+             
               }
               }  
             }}
@@ -178,8 +180,8 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
 router.route('/Faculty').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
     res.status(401).send('Access Denied');
     else{
     const{name}=req.body;
@@ -201,10 +203,10 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
 .delete(authenticateToken,async (req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
-    res.status(401).send('Access Denied');
-    else{
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
+        res.status(401).send('Access Denied');
+        else{
         const{name}=req.body;
         if(!name) res.status(400).json({msg:"Please insert the name of the faculty you want to delete."});
         else{
@@ -237,9 +239,9 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
 .put(authenticateToken, async (req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
-    res.status(401).send('Access Denied');
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
+    res.status(401).send({msg:'Access Denied'});
     else{
         const{oldname,name}=req.body;
         if(!name||!oldname) res.status(400).json({msg:"Please insert the old and new name of the faculty you want to update."});
@@ -259,30 +261,31 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
 router.route('/department').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
-    res.status(401).send('Access Denied');
-    else{
-     const{name,facultyname,hod}=req.body;
-     //HOD could be null as in not yet assigned
-     if(!name || !facultyname) res.status(400).json({msg:"Please fill the fields correctly"});
-     else{
-         if(await department.findOne({"name":name})) res.status(400).json({msg:"A department with this name already exists."});
-         else{
-         var toAdd=null;
-         const fid=await faculty.findOne({"name":facultyname});
-         if(fid==null) res.status(400).json({msg:"The faculty name you entered is incorrect"});
-         else{
-         if(hod==null) toAdd=new department({"name":name,"faculty":fid._id,"HOD":null});
-         else toAdd=new department({"name":name,"faculty":fid._id,"HOD":hod});
-         await toAdd.save();
-         res.json(toAdd);
-         console.log(toAdd);
-        }
-       }
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
+          res.status(401).send('Access Denied');
+        else{
+          const{name,facultyname,hod}=req.body;
+          //HOD could be null as in not yet assigned
+          if(!name || !facultyname) res.status(401).send({msg:"Please fill the fields correctly"});
+          else{
+              const dep=await department.findOne({"name":name});
+            if(dep!=null) res.status(401).send({msg:"A department with this name already exists."});
+            else{
+            var toAdd=null;
+            const fid=await faculty.findOne({"name":facultyname});
+            if(fid==null) res.status(401).send({msg:"The faculty name you entered is incorrect"});
+            else{
+            if(hod==null) toAdd=new department({"name":name,"faculty":fid._id,"HOD":null});
+            else toAdd=new department({"name":name,"faculty":fid._id,"HOD":hod});
+            await toAdd.save();
+            res.status(200).send({msg:"done"});
+            console.log(toAdd);
+            }
+            }
     }}
     }catch(err){
-        res.status(500).json({error:err.message});
+        res.status(500).send({error:err.message});
     }
 })
 //deleting
@@ -502,12 +505,12 @@ const bcrypt=require('bcrypt');
 router.route('/staffmember').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
     res.status(401).send('Access Denied');
     else{
        const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname}=req.body;
-       if(!email||!salary||!officelocation|| !gender||!type) res.status(400).json({msg:"please fill all the fields"});
+       if(!email||!salary||!officelocation|| !gender||!type||!name) res.status(400).json({msg:"please fill all the fields"});
        else{
            var flag=false;
            const isemail=await StaffMember.findOne({"email":email});
@@ -534,7 +537,7 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                      }}else{
                         var fac;
                         var dep;
-                         if(!actype||!departmentname||!facultyname)message="please fill the required data fields";
+                         if(!actype||!departmentname||!facultyname)message="please fill all the academic staff data fields";
                          else{
                           for(var i=num;i>=0;i--){
                              if(i==0){
@@ -544,12 +547,14 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                             var tuple=await StaffMember.findOne({"id":"ac-"+i});
                             if(tuple!=null) {sid="ac-"+(i+1); break;} 
                             }
-                            }
+                            
                              dep=await department.findOne({"name":departmentname});
                              fac=await faculty.findOne({"name":facultyname});
                             if(dep==null||fac==null) message="the data you entered is incorrect";
                             else flag=true;
-                     }
+                     }}
+                     console.log("ablo aho");
+                     if(type=="HR"|| flag){
                      const salt=await bcrypt.genSalt(10);
                      const hashedPassword=await bcrypt.hash("123456",salt);
                      const toAdd=await new StaffMember({"password":hashedPassword,"newStaffMember":true,"id":sid,"email":email,"salary":salary,"name":name,"office":office._id,"staff_type":type,"dayoff":doff,"gender":gender});
@@ -560,13 +565,14 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                      const ac= await new AcademicStaff({"member":toAdd._id,"day_off":dayoff,"faculty":fac._id,"department":dep._id,"type":actype});
                      await ac.save();
                     }
-                    else {const hr=new HR({"member":toAdd._id,"day_off":"Saturday"}); 
+                    else if(type=="HR"){const hr=new HR({"member":toAdd._id,"day_off":"Saturday"}); 
                      await hr.save();
                     } 
                     
-                     res.send(message);
-                 }
+                    
+                 }}
              }
+             res.send({msg:message});
            }
            else res.status(400).json({msg:"this email is already registered"})
        }}
@@ -574,38 +580,29 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
         res.status(500).json({error:err.message});
     }
 })
+
 .delete(authenticateToken,async (req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
-    res.status(401).send('Access Denied');
-    else{
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
+          res.status(401).send({msg:'Access Denied'});
+        else{
         //ydeeny email wla id?
         const{email}=req.body;
-        if(!email) res.status(400).json({msg:"please insert the email of the staff member you want to delete"});
+        if(!email) res.status(401).json({msg:"please insert the email of the staff member you want to delete"});
         else{
           const person= await StaffMember.findOne({"email":email});
-          if(person==null) res.send("a person with this email already does not exist");
+          if(person==null) res.status(401).send({msg:"a person with this email already does not exist"});
           else{
            const office=await location.findOne({"_id":person.office});
-           if(Office!=null){
+           if(office!=null){
            office.current_capacity-=1;
            await office.save();}
            if(person.staff_type=="Academic Member"){
             const ac=await AcademicStaff.findOne({"member":person._id});   
             const courses=ac.courses;
             const schedule=ac.schedule;
-            // for(var i=0;i<schedule.length;i++){
-            //     for(var j=0;j<courses.length;j++){
-            //        if(((String)(schedule[i].course))==((String)(courses[j]))){
-            //            var c=await course.findOne({"_id":courses[j]});
-            //            c.slots_covered-=1;
-            //            await c.save();
-            //            break;
-            //        }
-            //     }
-            // }
             for(var i=0;i<courses.length;i++){
                 var thec=await course.findOne({"_id":courses[i]});
                 //remove from academic staff
@@ -623,7 +620,7 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
             await AcademicStaff.deleteOne({"member":ac.member});
           }else await HR.deleteOne({"member":person._id});
            await StaffMember.deleteOne({"email":email});
-           res.send("done");
+           res.status(200).send({msg:"done"});
           }
         }}
     }catch(err){
@@ -634,15 +631,15 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
 .put(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
     res.status(401).send('Access Denied');
     else{
-       const{oldemail,email,password,office,newStaffMember,annualdays,lastupdatedannual,accidentaldaysleft,attendcompensationday}=req.body;
-       if(!oldemail) res.status(400).json({msg:"please insert the email of the staff member you want to update"});
+       const{id,email,password,office,newStaffMember,annualdays,lastupdatedannual,accidentaldaysleft,attendcompensationday}=req.body;
+       if(!id) res.status(400).json({msg:"please insert the id of the staff member you want to update"});
        else{
-           const ob=await StaffMember.findOne({"email":oldemail});
-           if(ob==null) res.status(400).json({msg:"there is no staff member with that email"});
+           const ob=await StaffMember.findOne({"id":id});
+           if(ob==null) res.status(401).json({msg:"there is no staff member with that id"});
            else{
                var message="";
                 if(office){
@@ -659,9 +656,9 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                         }}
                 if(email){
                     const newob=await StaffMember.findOne({"email":email});
-                    if(newob==null || email==oldemail){
+                    if(newob==null || email==ob.email){
                        (await ob).email=email;}
-                    else message="a user with this email already exists";
+                    else message="A user with this email already exists";
                 }
                 //fadel hettet bcrypt dy  
                 if(password){
@@ -675,7 +672,7 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                 if(attendcompensationday) ob.attendcompensationday=attendcompensationday;
                 await ob.save();
                 if(message=="") message="done";
-                res.send(message);
+                res.status(200).send({msg:message});
            }
        }}
     }catch(err){
