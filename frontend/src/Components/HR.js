@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from "react-router-dom"
+import axios from 'axios'
 
 function  HR(props) {
     const [locationsMenu, setLocationsMenu]=useState(false);
@@ -140,8 +141,8 @@ function  HR(props) {
        <a className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" onClick={()=> setattendanceMenu(!attendanceMenu)}>Attendance</a>
        <div className="dropdown-menu show">
           <Link to='/HR/ViewMemberAttendance' className="dropdown-item">View a member's attendance record</Link>
-          <Link to='/HR/ViewStaffWithMissingHours' className="dropdown-item">View staff members with missing hours</Link>
-          <Link to='/HR/ViewStaffWithMissingDays' className="dropdown-item">View staff members with missing days</Link>
+          <Link to='/HR/ViewStaffWithMissingHours' className="dropdown-item" >View staff members with missing hours</Link>
+          <Link to='/HR/ViewStaffWithMissingDays' className="dropdown-item" >View staff members with missing days</Link>
           <Link to='/HR/AddMissingRecord' className="dropdown-item">Add a missing record</Link>
        </div>
      </li>
