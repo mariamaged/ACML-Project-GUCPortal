@@ -107,3 +107,12 @@ top:2vw;
 .cancelButton{
   border:1px solid transparent!important
 }
+.cancelWarning{
+  color:rgb(180, 16, 16);
+  font-size:large !important;
+}
+
+.acceptButton{
+  position:relative !important;
+  top:0vw !important;
+}

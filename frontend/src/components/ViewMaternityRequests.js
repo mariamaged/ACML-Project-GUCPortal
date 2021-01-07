@@ -14,13 +14,18 @@ import { CheckCircle, XCircle, XCircleFill } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
 
 class ViewMaternityRequests extends Component{
+    
     state={
-        requests:[]
+        requests:[],
+        stateRequests:[],
+        stateBool:false
         ,warning:"",
-        cancelWarning:""
+        cancelWarning:"",
+        cancelSuccess:"",
+        reqState:""
     }
     componentDidMount(){
-    console.log("in maternity view")
+    console.log("in maternity view "+ localStorage.getItem('jwtToken'))
         axios.get('http://localhost:5000/academic/maternityRequest',
         {
             headers:{
@@ -29,48 +34,58 @@ class ViewMaternityRequests extends Component{
         }
         ).then(res=>{
             // console.log(res.data[0].reqType)
-            this.setState({requests:res.data.arr,warning:res.data.warning})
+            this.setState({requests:res.data.arr,warning:res.data.warning,stateBool:false})
             console.log("new state= "+this.state.requests.reqType)
             console.log("new state= "+this.state.warning)
             console.log("new state= "+this.state.requests)
+            var reqs=this.state.requests
 
         }).catch(console.log("error"))
     }
-
-        //  handleClick(e,value){
-        //     e.preventDefault();
-        //     console.log("in click "+value)
-            
-
-        // }
         handleClick(e,value){
             e.preventDefault();
-            axios.post('http://localhost:5000/academic/cancelRequest',
-            {
-                headers:{
+            console.log("in cancel btn clicked")
+            console.log("token "+localStorage.getItem('jwtToken'))
+          
+            axios.request({
+                method: 'POST',
+                url: 'http://localhost:5000/academic/cancelRequest',
+                headers: {
                     'x-auth-token':localStorage.getItem('jwtToken')
                 },
                 data: {
-                    requestID: value, // This is the body part
-                  }
-            }
-            ).then(res=>{
+                    requestID: value
+                },
+              
+              }).then(res=>{
                 console.log("successfull")
+                this.setState({cancelSuccess:res.data});
     
-            }).catch(res=>{
-                this.setState({cancelWarning:res.data});
+            }).catch(error=>{
+                console.log("cancel error= "+error.response.data)
+                this.setState({cancelWarning:error.response.data});
                 })
         }
-        
+        handleStateClick(e,value){
+            e.preventDefault();
+            if(value=="All"){
+               return this.setState({stateBool:false,reqState:""})
+                console.log("all= "+this.state.requests)
+            }
+            if(this.state.requests.length>0){
+               const accept=this.state.requests.filter(request=>{
+                   return request.state==value
+               })
+               console.log("accept= "+accept)
+                this.setState({stateRequests:accept,stateBool:true,reqState:value})
+                // var reqs=this.state.stateRequests
+            }
+
+        }
         renderRequest=(request, index)=> {
             return (
                 
                 <tr key={request.requestID} className="reqTr">
-               
-                {/* <td className="reqTd" >{request.requestID}</td> */}
-                {/* <td className="reqTd" >{request.reqType}</td> */}
-                {/* <td className="reqTd">{request.sentBy}</td> */}
-                {/* <td className="reqTd">{request.sentTo}</td> */}
                 <td className="reqTd" >{request.counter}</td>
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.maternityDoc}</td>
@@ -88,7 +103,15 @@ class ViewMaternityRequests extends Component{
             }    
        
     render(){
-        const reqs=this.state.requests;
+        var reqs=[];
+        if(!this.state.stateBool){
+            console.log("here")
+         reqs=this.state.requests;
+        }
+        else if(this.state.stateBool){
+            console.log("other")
+         reqs=this.state.stateRequests;
+        }
         var empty=["one"]
             const reqList=reqs.length?(
             empty.map(request=>{
@@ -118,9 +141,19 @@ class ViewMaternityRequests extends Component{
                     <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item><Link to="/ViewRejectedMaternityRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewPendingMaternityRequests">Pending</Link></Dropdown.Item>
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Rejected</Button></Dropdown.Item >}
+                    
+                    
                     </Dropdown.Menu>
                 </Dropdown>
                
@@ -131,14 +164,11 @@ class ViewMaternityRequests extends Component{
 
                 <div className=" containMaternityTable  ">
                 {/* <span id="spanSurrounder"> */}
+
+                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    
-                    {/* <th className="reqTh">Request ID</th> */}
-                    {/* <th className="reqTh">Request Type</th> */}
-                    {/* <th className="reqTh">Sender</th> */}
-                    {/* <th className="reqTh">Receiver</th> */}
                     <th className="reqTh">#</th>
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Documents</th>

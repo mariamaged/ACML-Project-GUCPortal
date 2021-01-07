@@ -21,7 +21,9 @@ const CounterModel=require('../Models/CounterModel')
 const reqSchema=require('../Models/RequestModel').reqSchema
 function authenticateToken(req,res,next){
      //const token= req.headers.token
+     console.log("in authenticate")
      const token=req.header('x-auth-token');
+     console.log(token)
     //  console.log("token= "+token)
     //const token=req.header('x-auth-token');
     // const authHeader=req.headers['Authorization']
@@ -29,6 +31,7 @@ function authenticateToken(req,res,next){
     // const token=authHeader && authHeader.split(' ')[1]
     // console.log("token= "+token)
     if(!token){
+        console.log('Access deined please log in first')
     return res.sendStatus(401).status('Access deined please log in first')
     
     }
@@ -203,6 +206,46 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
       return res.json({error:"Could not find any eligible candidate to replace with"})
         
 })
+router.get('/submittedRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    const user=await StaffMemberModel.findById(req.user.id)
+    const type=user.staff_type
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+
+        const sent=await request.find({sentBy:req.user.id})
+        // const received=await request.find({sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hodName=await StaffMemberModel.findById(hodID).name
+            const senderID=await StaffMemberModel.findById(req.user.id)
+            const sender=senderID.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+    
+            //replacement
+            // const academicMemberID=sent[i].sentTo
+            // const academicMember=await StaffMemberModel.findById(academicMemberID)
+            // const coordinatorName=coordinator.name
+            
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,sentBy:sender,
+                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
+                    submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+           
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
 //to get all types of sent replacment requests
 router.get('/sentReplacementRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -3370,20 +3413,27 @@ router.get('/viewScheduleThisWeek', authenticateToken, async (req, res) => {
 });
 
 router.post('/cancelRequest', authenticateToken, async (req, res) => {
+    console.log("cancel req id= "+req.body.requestID);
+    console.log("req.user.id= "+req.user.id)
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
 
     if(!userAcademic) return res.status(401).send('You are not an academic member!');
     const {requestID} = req.body;
-
+    console.log("reqID"+requestID)
     const currRequest = await request.findOne({requestID: requestID});
-    if(!currRequest) res.status(400).send('Request not found!');
+    if(!currRequest){
+        console.log("not found")
+        return res.status(400).send('Request not found!');
+        }
 
     if(!currRequest.sentBy.equals(req.user.id)) 
     return res.status(401).send('You are not the one who sent this request!');
 
     if(currRequest.reqType != 'Replacement' && currRequest.reqType != 'Annual Leave') {
-        if(currRequest.state != 'Pending') 
+        if(currRequest.state != 'Pending') {
+            console.log("req not pending")
         return res.status(400).send('Cannot cancel a non-pending request!');
+        }
         else {
             await request.findOneAndDelete({requestID: requestID});
             return res.status(200).send('Request cancelled successfully!');

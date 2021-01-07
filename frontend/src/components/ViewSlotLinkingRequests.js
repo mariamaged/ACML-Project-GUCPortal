@@ -16,8 +16,13 @@ import { CheckCircle, XCircle, XCircleFill } from 'react-bootstrap-icons';
 
 class ViewSlotLinkingRequests extends Component{
     state={
-        requests:[]
-        ,warning:""
+        requests:[],
+        stateRequests:[],
+        stateBool:false
+        ,warning:"",
+        cancelWarning:"",
+        cancelSuccess:"",
+        reqState:""
     }
     componentDidMount(){
     console.log("in maternity view")
@@ -63,7 +68,22 @@ class ViewSlotLinkingRequests extends Component{
                 
                 )
         }
-        
+        handleStateClick(e,value){
+            e.preventDefault();
+            if(value=="All"){
+               return this.setState({stateBool:false,reqState:""})
+                console.log("all= "+this.state.requests)
+            }
+            if(this.state.requests.length>0){
+               const accept=this.state.requests.filter(request=>{
+                   return request.state==value
+               })
+               console.log("accept= "+accept)
+                this.setState({stateRequests:accept,stateBool:true,reqState:value})
+                // var reqs=this.state.stateRequests
+            }
+
+        }
         renderRequest=(request, index)=> {
             return (
                 
@@ -88,7 +108,15 @@ class ViewSlotLinkingRequests extends Component{
             }    
        
     render(){
-        const reqs=this.state.requests;
+        var reqs=[];
+        if(!this.state.stateBool){
+            console.log("here")
+         reqs=this.state.requests;
+        }
+        else if(this.state.stateBool){
+            console.log("other")
+         reqs=this.state.stateRequests;
+        }
         var empty=["one"]
             const reqList=reqs.length?(
             empty.map(request=>{
@@ -118,9 +146,10 @@ class ViewSlotLinkingRequests extends Component{
                     <Dropdown as={ButtonGroup} className="buttons1Slot">
                     <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
-                    <Dropdown.Item ><Link to="/ViewAcceptedSlotLinkingRequests">Accepted</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewRejectedSlotLinkingRequests">Rejected</Link></Dropdown.Item>
-                    <Dropdown.Item ><Link to="/ViewPendingSlotLinkingRequests">Pending</Link></Dropdown.Item>
+                    <Dropdown.Item > <Button variant="outline-light" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >
+                    <Dropdown.Item > <Button variant="outline-light" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >
+                    <Dropdown.Item > <Button variant="outline-light" size="sm" className="rejectButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >
+                    <Dropdown.Item > <Button variant="outline-light" size="sm" className="pendingButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >
                     </Dropdown.Menu>
                 </Dropdown>
                
