@@ -229,17 +229,71 @@ router.get('/submittedRequest',authenticateToken,async(req,res)=>{
             const sender=senderID.name
             const type=sent[i].type
             var reqType=sent[i].reqType
-    
+            var reqNew;
             //replacement
             // const academicMemberID=sent[i].sentTo
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
+            if (sent[i].replacementStaff)
+             repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
+             
+            if(reqType=="Annual"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
+                    slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Replacement"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
+                    slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Change Day off"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Accidental Leave"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+    
+            }
+            if(reqType=="Sick Leave"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,
+                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),medicalDoc:sent[i].medicalDoc,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                
+            }
+            if(reqType=="Maternity Leave"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,maternityDoc:sent[i].maternityDoc,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Compensation Leave"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Slot Linking"){
+                const coordinatorID=sent[i].sentTo
+            const coordinator=await StaffMemberModel.findById(coordinatorID)
+            const coordinatorName=coordinator.name
+            // res.write("Request ID: "+sent[i].requestID+"\n")
             
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,sentBy:sender,
-                    slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),slotLoc:sent[i].slotLoc,
-                    submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
+                    slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
+            }    
            
         }
         res.json({arr:arr,warning:""});
@@ -540,47 +594,6 @@ router.get('/receivedChangeDayOffRequest',authenticateToken,async(req,res)=>{
         return 
 })
 
-// router.get('/receivedCompensationRequest',authenticateToken,async(req,res)=>{
-//     //get all requests where id of sender is this user
-//     const user=await StaffMemberModel.findById(req.user.id)
-//     const type=user.staff_type
-//     // if(type=="HR"){
-//     //     return res.json("HR do not have replacement requests")
-//     // }
-//     if(type=="HR"){
-//         return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
-//     }
-
-
-//         const sent=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
-//         // const received=await request.find({reqType:"Compensation Leave",sentTo:req.user.id})
-//         // const sent = [...sent1, ...received];
-//         // console.log("sent= "+sent)
-
-//         const arr=[]
-//         var k=0
-//         for(var i=0;i<sent.length;i++){
-//             console.log("ya monica"+sent[i]._id)
-//             const hodID=sent[i].sentTo
-//             const hod=await StaffMemberModel.findById(hodID)
-//             const sender=await StaffMemberModel.findById(sent[i].sentBy)
-//             const senderName=sender.name
-//             const hodName=hod.name
-//             const type=sent[i].type
-//             var reqType=sent[i].reqType
-    
-//                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-//                     sentBy:senderName,sentTo:hodName,state:sent[i].state,
-//                     missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
-//                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
-//                     arr[k++]= reqNew
-                   
-            
-            
-//         }
-//         res.json({arr:arr,warning:""});
-//         return 
-// })
 
 router.get('/receivedMaternityRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -1847,37 +1860,6 @@ router.get('/pendingSlotLinkingRequest',authenticateToken,async(req,res)=>{
         return 
 })
 
-
-
-
-
-// router.get('/receivedReplacementRequests',authenticateToken,async(req,res)=>{
-//     //get requests where sentTo is equal this user
-//     const user=await StaffMemberModel.findById(req.user.id)
-//     const type=user.staff_type
-//     if(type=="HR"){
-//         return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
-//     }
-//     const sent=await request.find({reqType:"Replacement",sentTo:req.user.id})
-//     for(var i=0;i<sent.length;i++){
-//             reqType=sent[i].reqType
-//             const sentBy=(await StaffMemberModel.findById(sent[i].sentBy))
-//             const name=sentBy.name
-//             var arr=new Array()
-//             if(reqType=="Replacement"){
-//                 const reqNew={requestID:sent[i].requestID,reqType:sent[i].reqType,
-//                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
-//                     slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
-//                     arr[k++]= reqNew
-//             }
-            
-           
-//     }
-//     if(sent.length==0)
-//     res.write("There are no received requests.")
-//     res.end()
-//     return 
-// })
 
 
 router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{

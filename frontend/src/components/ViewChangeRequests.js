@@ -157,7 +157,6 @@ class ViewChangeRequests extends Component{
                 
 
                 <div className=" containMaternityTable  ">
-                {/* <span id="spanSurrounder"> */}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                 <tr className="reqTr">
@@ -173,7 +172,6 @@ class ViewChangeRequests extends Component{
                 {reqs.map(this.renderRequest)}
                 </tbody>
                 </Table>
-                {/* </span> */}
                 </div>
 
                 

@@ -111,8 +111,9 @@ class ViewSubmittedRequests extends Component{
         }
         renderMaternityRequest=(request, index)=> {
             console.log("submissiondate= "+request.submission_date+
-            "\n"+"maternityDoc= "+request.maternityDoc+"\n"+"reason= "+
-            request.reason+"\n"+"state= "+request.state)
+            "\n"+"maternityDoc= "+request.maternityDoc+
+            "\n"+"reason= "+request.reason+
+            "\n"+"state= "+request.state)
             return (
                 
                 <tr key={request.requestID} className="reqTr">
@@ -132,6 +133,10 @@ class ViewSubmittedRequests extends Component{
             )
             }    
             renderSickRequest=(request, index)=> {
+                console.log("submissiondate= "+request.submission_date+
+                "\n"+"sickDay= "+request.sickDay+
+                "\n"+"reason= "+request.reason+
+                "\n"+"state= "+request.state)
                 return (
                     
                     <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
@@ -151,6 +156,12 @@ class ViewSubmittedRequests extends Component{
                 )
                 }
                 renderReplacementRequest=(request, index)=> {
+                    console.log("submissiondate= "+request.submission_date+
+                    "\n"+"slotDate= "+request.slotDate+
+                    "\n"+"slotNum= "+request.slotNum+
+                    "\n"+"slotLoc= "+request.slotLoc+
+                    "\n"+"reason= "+request.reason+
+                    "\n"+"state= "+request.state)
             return (
                 
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
@@ -173,6 +184,10 @@ class ViewSubmittedRequests extends Component{
             )
             } 
             renderCompensationRequest=(request, index)=> {
+                console.log("submissiondate= "+request.submission_date+
+                    "\n"+"missedDAY= "+request.missedDay+
+                    "\n"+"reason= "+request.reason+
+                    "\n"+"state= "+request.state)
                 return (
                     
                     <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
@@ -191,7 +206,103 @@ class ViewSubmittedRequests extends Component{
                     </tr>
                     
                 )
-                }    
+                } 
+                
+        renderChangeDayOffRequest=(request, index)=> {
+            console.log("submissiondate= "+request.submission_date+
+                "\n"+"missedDAY= "+request.missedDay+
+                "\n"+"reason= "+request.reason+
+                "\n"+"state= "+request.state)
+            return (
+                
+                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                
+                <td className="reqTd" >{request.counter}</td>
+                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTdSick">{request.newDayOff}</td>
+                <td className="reqTd">{request.reason}</td>
+                <td className="reqTd">{request.state}</td>
+                <td className="reqTd">
+                {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
+                <a > <XCircleFill color="darkred" className="cancelBtn" size={15} /></a>
+                {/* <Button variant="outline-danger" className="buttonResponse3">Cancel</Button> */}
+                </td>
+
+                </tr>
+                
+            )
+            }
+        renderSlotLinkingRequest=(request, index)=> {
+            console.log("submissiondate= "+request.submission_date+
+                "\n"+"missedDAY= "+request.missedDay+
+                "\n"+"reason= "+request.reason+
+                "\n"+"state= "+request.state)
+            return (
+                
+                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <td className="reqTd" >{request.counter}</td>
+                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd">{request.slotDay}</td>
+                <td className="reqTd">{request.slotNum}</td>
+                <td className="reqTd">{request.courseID}</td>
+                <td className="reqTd">{request.reason}</td>
+                <td className="reqTd">{request.state}</td>
+                <td className="reqTd">
+                {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
+                <a > <XCircleFill color="darkred" className="cancelBtn" size={15} /></a>
+                {/* <Button variant="outline-danger" className="buttonResponse3">Cancel</Button> */}
+                </td>
+                </tr>
+                
+            )
+            }
+            renderAccidentalRequest=(request, index)=> {
+                console.log("submissiondate= "+request.submission_date+
+                    "\n"+"missedDAY= "+request.missedDay+
+                    "\n"+"reason= "+request.reason+
+                    "\n"+"state= "+request.state)
+                return (
+                    
+                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                    <td className="reqTd" >{request.counter}</td>
+                    <td className="reqTd">{request.submission_date}</td>
+                    <td className="reqTd">{request.accidentDay}</td>
+                    <td className="reqTd">{request.reason}</td>
+                    <td className="reqTd">{request.state}</td>
+                    <td className="reqTd">
+                    {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
+                    <a > <XCircleFill color="darkred" className="cancelBtn" size={15} /></a>
+                    {/* <Button variant="outline-danger" className="buttonResponse3">Cancel</Button> */}
+                    </td>
+                    </tr>
+                    
+                )
+                }
+                renderAnnualRequest=(request, index)=> {
+            console.log("submissiondate= "+request.submission_date+
+                "\n"+"missedDAY= "+request.missedDay+
+                "\n"+"reason= "+request.reason+
+                "\n"+"state= "+request.state)
+            return (
+                
+                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <td className="reqTd" >{request.counter}</td>
+                <td className="reqTd">{request.submission_date}</td>
+                <td className="reqTd">{request.slotNum}</td>
+                <td className="reqTd">{request.slotDate}</td>
+                <td className="reqTd">{request.replacementStaff}</td>
+                <td className="reqTd">{request.reason}</td>
+                <td className="reqTd">{request.state}</td>
+                <td className="reqTd">
+                {/* <Button variant="outline-success" className="buttonResponse">Accept</Button> */}
+                <a > <XCircleFill color="darkred" className="cancelBtn" size={15} /></a>
+                {/* <Button variant="outline-danger" className="buttonResponse3">Cancel</Button> */}
+                </td>
+                </tr>
+                
+            )
+            }              
+                        
                 
     render(){
         var reqs=[];
@@ -223,6 +334,10 @@ class ViewSubmittedRequests extends Component{
                     <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >
                     <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >
                     <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >
+                    <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Accidental Leave")}>Accidental Leave</Button></Dropdown.Item >
+                    <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Annual Leave")}>Annual Leave</Button></Dropdown.Item >
+                    <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >
+                    <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Slot Linking")}>Slot Linking</Button></Dropdown.Item >
                     </Dropdown.Menu>
                 </Dropdown>{' '} 
 
@@ -283,7 +398,7 @@ class ViewSubmittedRequests extends Component{
                 <tr className="reqTr">
                     <th className="reqTh">#</th>
                     <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Documents</th>
+                    <th className="reqTh">Sick Day</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
                     <th className="reqTh">Action</th>
@@ -341,6 +456,97 @@ class ViewSubmittedRequests extends Component{
                 </Table>
                 {/* </span> */}
                 </div> }
+
+                {this.state.reqType=="Change Day off" &&
+                <div className=" containMaternityTable ">
+                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
+                <thead className="reqHead">
+                <tr className="reqTr">
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">New Day-Off</th>
+                    <th className="reqTh">Reason</th>
+                    <th className="reqTh">State</th>
+                    <th className="reqTh">Action</th>
+                    </tr>
+                </thead>
+                <tbody className="reqBody">
+                {reqs.map(this.renderChangeDayOffRequest)}
+                </tbody>
+                </Table>
+                </div>}
+
+                {this.state.reqType=="Slot Linking" &&<div className=" containMaternityTable  ">
+                {/* <span id="spanSurrounder"> */}
+                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
+                <thead className="reqHead">
+                    <tr className="reqTr">
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">Slot Day</th>
+                    <th className="reqTh">Slot Number</th>
+                    <th className="reqTh">Course ID</th>
+                    <th className="reqTh">Reason</th>
+                    <th className="reqTh">State</th>
+                    <th className="reqTh">Action</th>
+                    </tr>
+                </thead>
+                <tbody className="reqBody">
+                {reqs.map(this.renderSlotLinkingRequest)}
+                </tbody>
+                </Table>
+                {/* </span> */}
+                </div>}
+
+                {this.state.reqType=="Accidental Leave" && <div className=" containMaternityTable  ">
+                {/* <span id="spanSurrounder"> */}
+                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
+                <thead className="reqHead">
+                    <tr className="reqTr">
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">Accident Date</th>
+                    <th className="reqTh">Reason</th>
+                    <th className="reqTh">State</th>
+                    <th className="reqTh">Action</th>
+                    </tr>
+                </thead>
+                <tbody className="reqBody">
+                {reqs.map(this.renderAccidentalRequest)}
+                </tbody>
+                </Table>
+                {/* </span> */}
+                </div>}
+
+                {this.state.reqType=="Annual"&&
+                /* ,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
+                    slotLoc:sent[i].slotLoc, replacementStaff:repl, */
+                <div className=" containMaternityTable">
+                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
+                <thead className="reqHead">
+                    <tr className="reqTr">
+                    <th className="reqTh">#</th>
+                    <th className="reqTh">Submission Date</th>
+                    <th className="reqTh">Slot Number</th>
+                    <th className="reqTh">Slot Date</th>
+                    <th className="reqTh">Replacement Staff</th>
+                    <th className="reqTh">Reason</th>
+                    <th className="reqTh">State</th>
+                    <th className="reqTh">Action</th>
+                    </tr>
+                </thead>
+                <tbody className="reqBody">
+                {reqs.map(this.renderAnnualRequest)}
+                </tbody>
+                </Table>
+                {/* </span> */}
+                </div>}
+                    
+                    
+                    
+                    
+                    
+                    
 
 
                 </div>
