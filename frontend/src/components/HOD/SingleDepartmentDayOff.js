@@ -1,5 +1,5 @@
 // Our Components
-import Staff from './staff.js';
+import StaffDayOff from './staffdayoff.js';
 import Warning from './warning.js';
 
 // React Components
@@ -9,24 +9,26 @@ import React, { Component } from 'react'
 // Reacter Router and axios
 import axios from 'axios';
 
-class SingleCourseStaff extends Component {
+class SingleDepartmentDayOff extends Component {
     state = {
-        courseStaff: [],
+        departmentStaffDayOff: [],
         warning: null,
         warningFlag: false
     }
 
     componentDidMount() {
-        const courseID = this.props.match.params.courseID;
-        console.log(courseID);
-        axios.get('http://localhost:5000/HOD/viewDepartmentStaffPerCourse/' + courseID, {
+        const academicMemberID = this.props.match.params.academicMemberID;
+        console.log(academicMemberID);
+        axios.get('http://localhost:5000/HOD/viewDepartmentStaffMemberDayOff/' + academicMemberID, {
             headers: {
                 'x-auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmZjUxNDNmMDg0ZDY3MGNmODA5MjBlNSIsInJvbGUiOiJBY2FkZW1pYyBNZW1iZXIiLCJhY2FkZW1pY19yb2xlIjoiQ291cnNlIEluc3RydWN0b3IiLCJpc0hlYWQiOnRydWUsImlhdCI6MTYxMDExODgzN30.ZLMWayyNy5SaRrnvk3daCEeVt5vK6pEiSCaxER-yNtE'
             }
         })
             .then(response => {
-                this.setState({ courseStaff: response.data, warningFlag: false });
-                console.log('Response for GET /viewDepartmentStaffPerCourse/:courseID: ', response.data);
+                const departmentStaffDayOffUpdated = [response.data];
+                departmentStaffDayOffUpdated[0].academicMemberID = academicMemberID;
+                this.setState({ departmentStaffDayOff: departmentStaffDayOffUpdated, warningFlag: false });
+                console.log('Response for GET viewDepartmentStaffMemberDayOff/:academicMemberID: ', response.data);
                 console.log('State for getting staff for course with certain id: ', this.state);
             })
             .catch(error => {
@@ -38,16 +40,18 @@ class SingleCourseStaff extends Component {
 
     componentDidUpdate(prevProps) {
         if(this.props !== prevProps) {
-        const courseID = this.props.match.params.courseID;
-        console.log(courseID);
-        axios.get('http://localhost:5000/HOD/viewDepartmentStaffPerCourse/' + courseID, {
+        const academicMemberID = this.props.match.params.academicMemberID;;
+        console.log(academicMemberID);
+        axios.get('http://localhost:5000/HOD/viewDepartmentStaffMemberDayOff/' + academicMemberID, {
             headers: {
                 'x-auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmZjUxNDNmMDg0ZDY3MGNmODA5MjBlNSIsInJvbGUiOiJBY2FkZW1pYyBNZW1iZXIiLCJhY2FkZW1pY19yb2xlIjoiQ291cnNlIEluc3RydWN0b3IiLCJpc0hlYWQiOnRydWUsImlhdCI6MTYxMDExODgzN30.ZLMWayyNy5SaRrnvk3daCEeVt5vK6pEiSCaxER-yNtE'
             }
         })
             .then(response => {
-                this.setState({ courseStaff: response.data, warningFlag: false });
-                console.log('Response for GET /viewDepartmentStaffPerCourse/:courseID: ', response.data);
+                const departmentStaffDayOffUpdated = [response.data];
+                departmentStaffDayOffUpdated[0].academicStaffMemberID = academicMemberID;
+                this.setState({ departmentStaffDayOff: departmentStaffDayOffUpdated, warningFlag: false });
+                console.log('Response for GET viewDepartmentStaffMemberDayOff/:academicMemberID: ', response.data);
                 console.log('State for getting staff for course with certain id: ', this.state);
             })
             .catch(error => {
@@ -61,12 +65,12 @@ class SingleCourseStaff extends Component {
     render() {
         return (
             <div className='container'>
-                {!this.state.warningFlag && <Staff members={this.state.courseStaff} role="the department you are the head of." />}
+                {!this.state.warningFlag && <StaffDayOff members={this.state.departmentStaffDayOff} role="the department you are the head of." />}
                 {this.state.warningFlag && <Warning warning={this.state.warning} />}
             </div>
         )
     }
 }
 
-export default SingleCourseStaff;
+export default SingleDepartmentDayOff;
 

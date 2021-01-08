@@ -62,12 +62,12 @@ router.post('/login',async(req,res,next)=>{
             
             
             const isMatched=await bcrypt.compare(password,existingUser.password);       //comparing password entered text with password of the user we got from the database            
-            if( isMatched===false){
+           /* if( isMatched===false){
                 // return res.status(400).json({error:"Please enter correct password."});
                 return res.status(400).send("Please enter correct password.");
-             }
+             } */
              
-             else if(existingUser.staff_type=="HR"){
+             if(existingUser.staff_type=="HR"){
                 const token=await jwt.sign({id:existingUser._id,role:existingUser.staff_type,academic_role:'',isHead:false,isCoordinator:false},process.env.TOKEN_SECRET);
                // res.header('auth-token', token).send(token);
                if(existingUser.newStaffMember===true){

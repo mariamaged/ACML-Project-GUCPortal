@@ -18,7 +18,7 @@ const StaffContainer = () => {
                 <Accordion.Collapse eventKey="0">
                     <div>
                         <LinkContainer to='/instructor/hodDepartmentStaff'><Card.Body>View Staff</Card.Body></LinkContainer>
-                        <LinkContainer to='/instructor/hodDepartmentStaffDayOff'><Card.Body>View Staff Day Off</Card.Body></LinkContainer>
+                        <LinkContainer to='/instructor/hodDepartmentStaffDayOff/all'><Card.Body>View Staff Day Off</Card.Body></LinkContainer>
                     </div>
                 </Accordion.Collapse>
             </Card>
