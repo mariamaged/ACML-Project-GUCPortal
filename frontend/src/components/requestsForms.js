@@ -39,7 +39,7 @@ class requestsForms extends Component{
     handleAccidentalChange=(e)=>{
         console.log("e.target.value= "+e.target.value)
         this.setState({
-            [e.target.controlId]:e.target.value
+            [e.target.id]:e.target.value
         })
         console.log("ad= "+this.state.accidentalDate)
         console.log("r= "+this.state.accidentalReason)
@@ -96,16 +96,18 @@ class requestsForms extends Component{
             </div>
         {this.state.formType=="Accidental Leave" &&
     
-        /*{ <form onSubmit={this.onFormSubmit}>
+         <form onSubmit={this.onFormAccidentalSubmit}>
         <label class="col-form-label" htmlFor="inputAccDate">Accident Date</label>
-        <input type="text" class="form-control" placeholder="Enter Date" id="inputAccDate" required/>
+        <input type="date" class="form-control" 
+        placeholder="YYYY-MM-DD" id="accidentalDate" required onChange={this.handleAccidentalChange}/>
         <label class="col-form-label" htmlFor="inputDefault">Reason</label>
-        <input type="text" class="form-control" placeholder="Default input" id="inputDefault2" />
+        <input type="text" class="form-control" placeholder="Default input" id="accidentalReason" onChange={this.handleAccidentalChange}/>
         <Button variant="primary" type="submit">
-    Submit
-  </Button> }
-         </form> }onSubmit={this.onFormAccidentalSubmit}*/
-        <Form >
+         Submit
+        </Button> 
+         </form>
+
+        /* <Form onSubmit={this.onFormAccidentalSubmit}>
             <Form.Group controlId="formBasicEmail">
                 <Form.Label>Accident Date</Form.Label>
                 <Form.Control type="date" placeholder="YYYY-MM-DD"
@@ -119,7 +121,7 @@ class requestsForms extends Component{
             <Button variant="primary" type="submit">
                 Submit
             </Button>
-            </Form>
+            </Form> */}
         }
     
      {this.state.formType=="Annual Leave" &&
