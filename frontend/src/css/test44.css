@@ -138,3 +138,15 @@ top:2vw;
   position:relative !important;
   top:3vw !important;
 }
+
+.reqForm{
+  display:flex;
+  flex-direction: row;
+  position:relative !important;
+  left:2vw !important;
+  top:2vw !important;
+}
+
+.reqFormDrop{
+  margin-left: 10vw !important;
+}

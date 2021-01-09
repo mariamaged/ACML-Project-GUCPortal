@@ -36,12 +36,17 @@ import history from './history';
 import getRequest from './components/getRequest'
 import CallGetRequests from  './components/callGetRequests'
 import CallGetReceivedRequests from  './components/callGetReceivedRequests'
+import GetRequestsForms from './components/getRequestsForms'
+import RequestsForms from './components/requestsForms'
 
 function App() {
   return (
     <Router history={history}>
     <div className="App">
     {/* <Route exact path='/maternityTable' component ={MaternityTable}/> */}
+    <Route exact path='/getRequestsForms' component={GetRequestsForms}/>
+    <Route exact path='/requestsForms' component={RequestsForms}/>
+    
     <Route exact path='/callGetReceivedRequests' component={CallGetReceivedRequests}/>
     <Route exact path='/callGetRequests' component={CallGetRequests}/>
         <Route exact path='/submittedRequests' component={SubmittedRequests}/>

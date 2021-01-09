@@ -421,6 +421,7 @@ async function  cr(){
 // var check=new_date.isBefore("2021-01-05")
 // console.log(new_date)
 // console.log(check)
+console.log(moment("2020-20-01").format("YYYY-MM-DD"))
 
 //     const salt=await bcrypt.genSalt();     
 //     const hashedPassword=await bcrypt.hash("123456",salt);

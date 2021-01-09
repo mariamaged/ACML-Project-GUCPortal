@@ -2218,16 +2218,16 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
       const departmentRec=await department.findById(departmentID)
       const hodID=departmentRec.HOD
       if(!hodID){
-          return res.json("There is currently no head of this department to send this request to.")
+          return res.status(401).json("There is currently no head of this department to send this request to.")
       }
       const hodAcademic=await AcademicStaffModel.findById(hodID)
 
     //check of number of accidental days left or annual days is equal to 0
     if(accidentalDaysLeft==0){
-        return res.json("Cannot submit request.Maximum number of accidental day leaves have been reached.")
+        return res.status(401).json("Cannot submit request.Maximum number of accidental day leaves have been reached.")
     }
     if(annual_days==0){
-        return res.json("Cannot submit request. Annual leave balance is currently empty.")
+        return res.status(401).json("Cannot submit request. Annual leave balance is currently empty.")
     }
 
     //make request
