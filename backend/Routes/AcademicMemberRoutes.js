@@ -2224,12 +2224,13 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
 
     //check of number of accidental days left or annual days is equal to 0
     if(accidentalDaysLeft==0){
-        return res.status(401).json("Cannot submit request.Maximum number of accidental day leaves have been reached.")
+        return res.status(401).json("Cannot submit request.Maximum number of accidental day leaves have been reached!")
     }
     if(annual_days==0){
-        return res.status(401).json("Cannot submit request. Annual leave balance is currently empty.")
+        return res.status(401).json("Cannot submit request. Annual leave balance is currently empty!")
     }
-
+    if(!(moment(req.body.accidentDate).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD"))))
+     return res.status(401).json("Must only submit requests for accidents that already happened!")
     //make request
     var reason=''
     if(req.body.reason)

@@ -45,27 +45,27 @@ class requestsForms extends Component{
         console.log("r= "+this.state.accidentalReason)
         console.log("working")
     }
-    // onFormAccidentalSubmit = e => {
-    //     e.preventDefault();
-    //     console.log("accidental submitted")
-    //     axios.request({
-    //         method: 'POST',
-    //         url: 'http://localhost:5000/academic/accidentalLeave',
-    //         headers: {
-    //             'x-auth-token':localStorage.getItem('jwtToken')
-    //         },
-    //         data: {
-    //             accidentDate:,
-    //             reason:
-    //         },
+    onFormAccidentalSubmit = e => {
+        e.preventDefault();
+        console.log("accidental submitted")
+        axios.request({
+            method: 'POST',
+            url: 'http://localhost:5000/academic/accidentalLeave',
+            headers: {
+                'x-auth-token':localStorage.getItem('jwtToken')
+            },
+            data: {
+                accidentDate:this.state.accidentalDate,
+                reason:this.state.accidentalReason
+            },
           
-    //       }).then(res=>{
-    //         console.log("successfull");
-    //     }).catch(error=>{
-    //         console.log("cancel error= "+error.response.data)
-    //         this.setState({accidentalWarning:error.response.data});
-    //         })
-    // }
+          }).then(res=>{
+            console.log("successfull");
+        }).catch(error=>{
+            console.log("cancel error= "+error.response.data)
+            this.setState({accidentalWarning:error.response.data});
+            })
+    }
     handleReqForm(e,formType,formTitle){
         e.preventDefault();
         const location = {
@@ -96,19 +96,21 @@ class requestsForms extends Component{
             </DropdownButton>
             </div>
         {this.state.formType=="Accidental Leave" &&
-    
+       
          <form onSubmit={this.onFormAccidentalSubmit}>
-        <label class="col-form-label" htmlFor="inputAccDate">Accident Date</label>
+         
+        <label class="col-form-label" htmlFor="accidentalDate">Accident Date</label>
         <input type="date" class="form-control" 
         placeholder="YYYY-MM-DD" id="accidentalDate" required onChange={this.handleAccidentalChange}/>
-        <label class="col-form-label" htmlFor="inputDefault">Reason</label>
+        <label class="col-form-label" htmlFor="accidentalReason">Reason</label>
         <input type="text" class="form-control" placeholder="Default input" id="accidentalReason" onChange={this.handleAccidentalChange}/>
         <Button variant="primary" type="submit">
          Submit
         </Button> 
-         </form>
+        {this.state.accidentalWarning!="" && <h6 class="accidentalWarning">{this.state.accidentalWarning}</h6>}
+         </form>}
 
-        /* <Form onSubmit={this.onFormAccidentalSubmit}>
+        {/* /* <Form onSubmit={this.onFormAccidentalSubmit}>
             <Form.Group controlId="formBasicEmail">
                 <Form.Label>Accident Date</Form.Label>
                 <Form.Control type="date" placeholder="YYYY-MM-DD"
@@ -123,7 +125,7 @@ class requestsForms extends Component{
                 Submit
             </Button>
             </Form> */}
-        }
+        
     
      {this.state.formType=="Annual Leave" &&
     
