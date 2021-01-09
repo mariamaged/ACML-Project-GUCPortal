@@ -681,8 +681,23 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             const user= await StaffMemberModel.findById(req.user.id)
             /////////////////////////////////////////////////////////////////////////////
            //we can signout so get extra and missing hours and minutes and add them
-            const currMonth=new moment().format("M")
-            const currYear=new moment().format("Y")
+            var currMonth=new moment().format("M")
+            var currYear=new moment().format("Y")
+
+            //new MILESTONE2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            const currDay=new moment().format("D")
+            if(currDay<=10){
+                if(Integer.parseInt(currMonth)==1){
+                    currMonth=12
+                    currYear=Integer.parseInt(currYear)-1;
+                }
+                else
+                    currMonth=Integer.parseInt(currMonth)-1;
+
+            }
+
+
+
             var c=false;
             var newMonthlyArr=new Array()
 
@@ -1168,8 +1183,20 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
 router.get('/missingHours',authenticateToken,async(req,res)=>{
         const user=await StaffMemberModel.findById(req.user.id)
         const monthly=user.time_attended
-        const month=new moment().format('M')
-        const year=new moment().format('Y')
+        var month=new moment().format('M')
+        var year=new moment().format('Y')
+        const day=new moment().format('D')
+
+        //new Milestone2!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if(day<=10){
+            if(month==1){
+                month=12
+                year=Integer.parseInt(year)-1
+            }
+            else
+            month=Integer.parseInt(month)-1
+        }
+
         var check=false;
         if(user.time_attended.length>0){
             for(var i=0;i<monthly.length;i++){
@@ -1182,6 +1209,12 @@ router.get('/missingHours',authenticateToken,async(req,res)=>{
             }
         }  
       else {
+            // if(day>=11){
+            
+            // }
+            // else if(day<=10){
+
+            // }
             
             const newMonthly=new monthlyHoursSchema({
                 num:month,

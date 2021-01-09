@@ -19,6 +19,12 @@ const slotSchema=require('../Models/SlotSchema')
 //const authenticateToken=require('../Routes/StaffMemberRoutes')
 const CounterModel=require('../Models/CounterModel')
 const reqSchema=require('../Models/RequestModel').reqSchema
+
+// MILESTONE2
+// const AttendanceSchema=StaffMemberModel.attendanceSchema
+// const monthlyHoursSchema=StaffMemberModel.monthlyHoursSchema
+
+
 function authenticateToken(req,res,next){
      //const token= req.headers.token
      console.log("in authenticate")
@@ -299,6 +305,106 @@ router.get('/submittedRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
+
+
+router.get('/receivedRequest',authenticateToken,async(req,res)=>{
+    //get all requests where id of sender is this user
+    console.log("in received requests")
+    const user=await StaffMemberModel.findById(req.user.id)
+    console.log("user="+user)
+    const type=user.staff_type
+    if(type=="HR"){
+        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+    }
+
+        console.log("here before sent")
+        const sent=await request.find({sentTo:req.user.id})
+        // const received=await request.find({sentTo:req.user.id})
+        // const sent = [...sent1, ...received];
+        console.log("sent= "+sent)
+
+        const arr=[]
+        var k=0
+        for(var i=0;i<sent.length;i++){
+            const hodID=sent[i].sentTo
+            const hodName=await StaffMemberModel.findById(hodID).name
+            const senderID=await StaffMemberModel.findById(req.user.id)
+            const sender=senderID.name
+            const type=sent[i].type
+            var reqType=sent[i].reqType
+            var reqNew;
+            //replacement
+            // const academicMemberID=sent[i].sentTo
+            // const academicMember=await StaffMemberModel.findById(academicMemberID)
+            // const coordinatorName=coordinator.name
+            if (sent[i].replacementStaff)
+             repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
+             
+            if(reqType=="Annual"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
+                    slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Replacement"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
+                    slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Change Day off"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Accidental Leave"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+    
+            }
+            if(reqType=="Sick Leave"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,
+                    sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),medicalDoc:sent[i].medicalDoc,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+                
+            }
+            if(reqType=="Maternity Leave"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,maternityDoc:sent[i].maternityDoc,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Compensation Leave"){
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:hodName,state:sent[i].state,missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }
+            if(reqType=="Slot Linking"){
+                const coordinatorID=sent[i].sentTo
+            const coordinator=await StaffMemberModel.findById(coordinatorID)
+            const coordinatorName=coordinator.name
+            // res.write("Request ID: "+sent[i].requestID+"\n")
+            
+                const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
+                    sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
+                    slotNum:sent[i].slotNum,courseID:sent[i].courseID,
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    arr[k++]= reqNew
+            }    
+           
+        }
+        res.json({arr:arr,warning:""});
+        return 
+})
+
+
+
 
 //to get all types of sent replacment requests
 router.get('/sentReplacementRequest',authenticateToken,async(req,res)=>{
@@ -676,8 +782,6 @@ router.get('/receivedSlotLinkingRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 //to get all types of received replacement requests
 router.get('/receivedReplacementRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -765,7 +869,6 @@ router.get('/receivedAcceptedReplacementRequest',authenticateToken,async(req,res
         res.json({arr:arr,warning:""});
         return 
 })
-
 router.get('/receivedRejectedReplacementRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -808,7 +911,6 @@ router.get('/receivedRejectedReplacementRequest',authenticateToken,async(req,res
         res.json({arr:arr,warning:""});
         return 
 })
-
 router.get('/receivedPendingReplacementRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -850,9 +952,7 @@ router.get('/receivedPendingReplacementRequest',authenticateToken,async(req,res)
         }
         res.json({arr:arr,warning:""});
         return 
-})
-
-//new sick 
+}) 
 ///////////////////////////////////////////////////////////////////
 router.get('/sickRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
@@ -894,8 +994,6 @@ router.get('/sickRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/acceptedSickRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -936,8 +1034,6 @@ router.get('/acceptedSickRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/rejectedSickRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1018,10 +1114,7 @@ router.get('/pendingSickRequest',authenticateToken,async(req,res)=>{
         }
         res.json({arr:arr,warning:""});
         return 
-})
-
-//////////////////////////////NEW COMEPNSATION
-////////////////////////////////////////////////////////////////////////
+})//////////////////////////////////////////////////////////////
 router.get('/compensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1063,8 +1156,6 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1105,8 +1196,6 @@ router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1147,7 +1236,6 @@ router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
 router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1188,9 +1276,6 @@ router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-//////////////////////////////NEW CHANGE DAY OFF
-////////////////////////////////////////////////////////////////////
 router.get('/changeDayOffRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1231,8 +1316,6 @@ router.get('/changeDayOffRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/acceptedchangeDayOffRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1273,8 +1356,6 @@ router.get('/acceptedchangeDayOffRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/rejectedchangeDayOffRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1356,9 +1437,6 @@ router.get('/pendingchangeDayOffRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-///////////////////////////////////// NEW COMPENSATION
-////////////////////////////////////////////////////////////////////
 router.get('/compensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1399,8 +1477,6 @@ router.get('/compensationRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1441,8 +1517,6 @@ router.get('/acceptedCompensationRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1483,7 +1557,6 @@ router.get('/rejectedCompensationRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
 router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1524,8 +1597,6 @@ router.get('/pendingCompensationRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-/////////////////////////////////NEW MATERNITY
-////////////////////////////////////////////////////////////////////
 router.get('/maternityRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     console.log("in maternity")
@@ -1568,8 +1639,6 @@ router.get('/maternityRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/acceptedMaternityRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1610,8 +1679,6 @@ router.get('/acceptedMaternityRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/rejectedMaternityRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1652,7 +1719,6 @@ router.get('/rejectedMaternityRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
 router.get('/pendingMaternityRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1734,8 +1800,6 @@ router.get('/slotLinkingRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/acceptedSlotLinkingRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1776,8 +1840,6 @@ router.get('/acceptedSlotLinkingRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
-
 router.get('/rejectedSlotLinkingRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -1818,7 +1880,6 @@ router.get('/rejectedSlotLinkingRequest',authenticateToken,async(req,res)=>{
         res.json({arr:arr,warning:""});
         return 
 })
-
 router.get('/pendingSlotLinkingRequest',authenticateToken,async(req,res)=>{
     //get all requests where id of sender is this user
     const user=await StaffMemberModel.findById(req.user.id)
@@ -2061,7 +2122,81 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
 
 
 })
+//Annual
+router.post('/annualRequest',authenticateToken,async(req,res)=>{
+    //input will be new day off (req.body.newDayOff , (OPTIONAL) req.user.reason)
+    const staff=await StaffMemberModel.findById(req.user.id)
+    const type=staff.staff_type
+    if(type=="HR"){
+        return res.json("HR are not permitted to send this request.Only academic members are allowed.")
+    }
+// console.log("dayyyyyyyyyyyy= "+req.body.day_off)
+    
+    
+     //getting department of this user to get head of department to send request to
+     const academic=await AcademicStaffModel.findOne({member:req.user.id})
+     const departmentID=academic.department
+     const departmentName=await department.findById(departmentID)
+     const hodID=departmentName.HOD
+     if(!hodID){
+         return res.json("There is currently no head of this department to send this request to.")
+     }
+     const hodAcademic=await AcademicStaffModel.findById(hodID)
+    if(!req.body.slotDate){
+        return res.json("Must enter day you are requesting a leave for.")
+    }
 
+    //make a request
+    var reason=""
+    if(req.body.reason)
+    reason=req.body.reason
+
+    const doc = await CounterModel.findById('AnnualLeave-');
+    if(!doc) {
+        // console.log("NOTTTTTTTTTTTTTTTTTT DOCCCCCCCCCC")
+    const counterAcademic = new CounterModel({
+    _id: 'AnnualLeave-'
+    });
+    try{
+    await counterAcademic.save();
+    // console.log("successsssssssssssssssssss")
+    }
+    catch(err){
+            // console.log("errooooooooooooooooooooooooooooooooor")
+    }
+}
+    var repl=""
+    if(req.body.replacementStaff){
+        repl=req.body.replacementStaff
+    }
+
+    var newRequest=new request({
+        reqType:"Annual Leave",
+        sentBy:req.user.id,
+        sentTo:hodAcademic.member,
+        replacementStaff:repl,
+        slotDate:moment(req.body.slotDate).format("YYYY-MM-DD"),
+        state:"Pending",
+        reason:reason,
+        submission_date:new moment().format("YYYY-MM-DD")
+    })
+    try{
+     res.json("Request successfully submitted.")
+    await newRequest.save()
+    }
+    catch(err){
+        res.json(err)
+    }
+
+    //sending notification to hod
+    const notification=(await StaffMemberModel.findById(hodAcademic.member)).notifications
+    const notNew=notification
+    notNew[notNew.length]="You received a new Annual request."
+    const staffReplacement= await StaffMemberModel.findByIdAndUpdate(hodAcademic.member,{notifications:notNew})
+
+
+})
+///////
 router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     //input is (req.body.accidentDate , OPTIONAL req.body.reason)
     const staff=await StaffMemberModel.findById(req.user.id)
@@ -2259,6 +2394,12 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
         if(!req.body.maternityDoc){
             return res.json("Documents to prove the maternity condition must be submitted.")
         }
+        if(!req.body.startDate){
+            return res.json("Must input start date!")
+        }
+        if(!req.body.endDate){
+            return res.json("Must input end date!")
+        }
         const academic=await AcademicStaffModel.findOne({member:req.user.id})
         const departmentID=academic.department
         const departmentRec=await department.findById(departmentID)
@@ -2291,6 +2432,8 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
             sentBy:req.user.id,
             sentTo:hodAcademic.member,
             maternityDoc:maternityDoc,
+            startDate:moment(req.body.startDate).format("YYYY-MM-DD"),
+            endDate:moment(req.body.endDate).format("YYYY-MM-DD"),
             state:"Pending",
             reason:reason,
             submission_date:new moment().format("YYYY-MM-DD")
@@ -3543,6 +3686,94 @@ router.delete('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
 
 });
 
+router.post('/acceptRequest',authenticateToken,async(req,res)=>{
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+    if(!userAcademic) 
+    return res.status(401).send('You are not an academic member!');
 
+    if(!req.body.requestID){
+        return res.json("Please enter request ID.")
+    }
+    const currRequest=await request.findOne({requestID:req.body.requestID})
+    if(!currRequest)
+    return res.json("This request does not exist.")
+
+    const reqType=currRequest.reqType;
+    if(reqType=="Change Day off"){
+        const upReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+    }
+    if(reqType=="Accidental Leave" || reqType=="Sick Leave" ||reqType=="Compensation" || reqType=="Slot Linking"){
+        var attDay
+        if(reqType=="Slot Linking")
+        attDay=currRequest.slotDate
+
+        if(reqType=="Compensation")
+        attDay=currRequest.missedDay
+        
+        if(reqType=="Sick Leave")
+        attDay=currRequest.sickDay
+        
+        if(reqType=="Accidental Leave")
+        attDay=currRequest.accidentDate
+
+        const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+        const newAtt=new AttendanceSchema({
+            date:attDay,
+            time:time,
+            attended:true,
+            day:day
+        })
+
+        const user=await StaffMemberModel.findById(req.user.id)
+         var oldMonthUp=user.time_attended
+        oldMonthUp[oldMonthUp.length-1]=newAtt
+        const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:oldMonthUp})
+                 
+    }
+
+    if(reqType=="Maternity Leave"){
+        const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+        var bool=false;
+        var newAtt=new Array()
+        var k=0
+        const startDate=currRequest.startDate
+        const endDate=currRequest.endDate
+        const startDateYear=moment(currRequest.startDate).format("Y")
+        const startDateMonth=moment(currRequest.startDate).format("M")
+        var endDay;
+        
+        while(!bool){
+            var newAtt=new AttendanceSchema({
+                date:startDate,
+                attended:true,
+                day:day
+            })
+            newAtt[k++]=newAtt
+            startDate = moment(startDate, "YYYY-MM-DD").add(1, 'days');
+            var check=new_date.isBefore(moment(endDate).format("YYYY-MM-DD"))
+            if(!check)
+            bool=true
+        }
+        const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:newAtt})
+    }
+
+})
+
+router.post('/rejectRequest',authenticateToken,async(req,res)=>{
+    const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+    if(!userAcademic) 
+    return res.status(401).send('You are not an academic member!');
+
+    if(!req.body.requestID){
+        return res.json("Please enter request ID.")
+    }
+    const currRequest=await request.findOne({requestID:req.body.requestID})
+    if(!currRequest)
+    return res.json("This request does not exist.")
+
+    const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Rejected"})
+ 
+
+})
 
 module.exports=router;

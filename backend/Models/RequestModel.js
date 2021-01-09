@@ -31,6 +31,8 @@ const RequestSchema = mongoose.Schema({
     reason: {type: String},
     medicalDoc: {type: String},
     maternityDoc: {type: String},
+    startDate:{type:Date},
+    endDate:{type:Date},
     accidentDate: {type: Date},
     sickDay: {type: Date},
     missedDay:{type: Date},

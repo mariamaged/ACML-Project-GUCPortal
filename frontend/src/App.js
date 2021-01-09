@@ -27,20 +27,25 @@ import ViewReceivedSlotLinkingRequests from './components/ViewReceivedSlotLinkin
 import ViewReceivedCompensationRequests from './components/ViewReceivedCompensationRequests'
 
 import SubmittedRequests from './components/submittedRequests'
+import ReceivedRequests from './components/receivedRequests'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter,Router,Route,Switch} from 'react-router-dom'
 
 import history from './history';
 import getRequest from './components/getRequest'
+import CallGetRequests from  './components/callGetRequests'
+import CallGetReceivedRequests from  './components/callGetReceivedRequests'
 
 function App() {
   return (
     <Router history={history}>
     <div className="App">
     {/* <Route exact path='/maternityTable' component ={MaternityTable}/> */}
+    <Route exact path='/callGetReceivedRequests' component={CallGetReceivedRequests}/>
+    <Route exact path='/callGetRequests' component={CallGetRequests}/>
         <Route exact path='/submittedRequests' component={SubmittedRequests}/>
-        
+        <Route exact path='/receivedRequests' component={ReceivedRequests}/>
         <Route exact path='/login' component ={Login}/>
         <Route exact path='/getRequest' component ={getRequest}/>
         <Route exact path='/' component ={ViewRequests}/>

@@ -105,7 +105,12 @@ top:2vw;
 }
 
 .cancelButton{
-  border:1px solid transparent!important
+  border:1px solid transparent!important;
+  position:relative !important;
+  top:0vw !important;
+  background-color:transparent !important;
+  border: transparent !important;
+  /* box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6) !important; */
 }
 .cancelWarning{
   color:rgb(180, 16, 16);
@@ -115,4 +120,21 @@ top:2vw;
 .acceptButton{
   position:relative !important;
   top:0vw !important;
+}
+
+.noReq{
+  position:reative !important;
+  top:2vw !important;
+  left:2vw !important;
+}
+
+ .alert{
+  position:relative !important;
+  top:7vw !important;
+  left:2vw !important;
+  width:60% !important;
+} 
+.c2{
+  position:relative !important;
+  top:3vw !important;
 }

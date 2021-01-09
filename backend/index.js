@@ -99,11 +99,11 @@ app.get('/trialEndpoint', async (req, res) => {
 // const AcademicStaffModel=require('./Models/AcademicStaffModel')
 // const faculty=require('./Models/FacultyModel')
 // const location=require('./Models/LocationModel.js')
-// const StaffMemberModel = require('./Models/StaffMemberModel');
+const StaffMemberModel = require('./Models/StaffMemberModel');
 // const HRModel = require('./Models/HRModel');
 // const CourseModel = require('./Models/CourseModel');
 // const attendanceSchema=StaffMemberModel.attendanceSchema
-// const moment=require('moment')
+const moment=require('moment')
 // const slot=require('./Models/SlotSchema.js')
 // const request=require('./Models/RequestModel.js')
 const jwt = require('jsonwebtoken');
@@ -411,8 +411,16 @@ async function  cr(){
 // //     const d="12:50"
 // //     const check=(s>d)
 // //     console.log(check)
-
-
+// try{
+// const user=await StaffMemberModel.findById("5fe5a6b1e6bee81f985e560f")
+// if(!user)
+// console.log("no user")
+// console.log("user=" +user)}
+// catch(error) {console.log("err= "+error)}
+// var new_date = moment("2020-12-31", "YYYY-MM-DD").add(5, 'days');
+// var check=new_date.isBefore("2021-01-05")
+// console.log(new_date)
+// console.log(check)
 
 //     const salt=await bcrypt.genSalt();     
 //     const hashedPassword=await bcrypt.hash("123456",salt);
