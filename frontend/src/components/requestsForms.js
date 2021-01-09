@@ -43,6 +43,7 @@ class requestsForms extends Component{
         })
         console.log("ad= "+this.state.accidentalDate)
         console.log("r= "+this.state.accidentalReason)
+        console.log("working")
     }
     // onFormAccidentalSubmit = e => {
     //     e.preventDefault();
