@@ -446,7 +446,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            var dayOffBool=false
         //    console.log("at 2nd"+signins)
            console.log("dayofBool at signin= "+dayOffBool)
-            const newAttendance=new AttendanceSchema({
+            const newAttendance=({
                 date:newSignInDate,
                 time,
                 hours,
