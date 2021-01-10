@@ -105,7 +105,7 @@ const StaffMemberModel = require('./Models/StaffMemberModel');
 // const attendanceSchema=StaffMemberModel.attendanceSchema
 const moment=require('moment')
 // const slot=require('./Models/SlotSchema.js')
-// const request=require('./Models/RequestModel.js')
+const request=require('./Models/RequestModel.js')
 const jwt = require('jsonwebtoken');
 const bcrypt=require('bcrypt');
 // //----------------------------------------------
@@ -404,9 +404,11 @@ async function  cr(){
 
 
 //    const salt=await bcrypt.genSalt();     
-//         const hashedPassword=await bcrypt.hash("jacklyn",salt);
+//         const hashedPassword=await bcrypt.hash("123456",salt);
 //         console.log("hashed pass= "+hashedPassword)
-
+//         const r=await request.find({slotDate:new Date("2021-01-12")})
+//         console.log(r)
+    //  console.log("2021-01-11T22:00:00.000Z"==moment("2021-01-12").format())
 // //     const s="08:00"
 // //     const d="12:50"
 // //     const check=(s>d)
@@ -448,7 +450,7 @@ console.log(moment("2020-20-01").format("YYYY-MM-DD"))
 //         // catch(err){
 //         //     console.log("error")
 //         // }
-        
+        console.log(moment("2021-01-11T22:00:00.000+00:00").format("YYYY-MM-DD"))
 }//
 cr()
 

@@ -87,11 +87,11 @@ class requestsForms extends Component{
             headers: {
                 'x-auth-token':localStorage.getItem('jwtToken')
             },
-            data: {
-                slotNum:,
-                slotDate:,
-                slotLoc:
-            },
+            // data: {
+            //     slotNum:,
+            //     slotDate:,
+            //     slotLoc:
+            // },
           
           }).then(res=>{
             console.log("successfull");

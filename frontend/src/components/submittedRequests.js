@@ -23,12 +23,13 @@ class ViewSubmittedRequests extends Component{
         ,warning:"",
         cancelWarning:"",
         cancelSuccess:"",
-        reqState:"",
+        reqState:"All",
         reqType:"",
         reqTitle:""
     }
     componentDidMount(props){
     console.log("in maternity view "+localStorage.getItem('jwtToken'))
+    console.log("start state= "+this.state.reqState)
         axios.get('http://localhost:5000/academic/submittedRequest',
         {
             headers:{
@@ -149,7 +150,8 @@ class ViewSubmittedRequests extends Component{
 
 
                 this.setState({reqType:value,reqTitle:typeTitle,requests:type,reqState:"All",cancelWarning:""})
-               console.log("this.state.reqType alooooooo"+this.state.reqType)
+               console.log("this.state.reqType alooooooo"+value)
+               
                 const location = {
                     pathname: '/submittedRequests',
                     state: { reqType: value,reqTitle: typeTitle}
@@ -168,11 +170,13 @@ class ViewSubmittedRequests extends Component{
             return (
                 
                 <tr key={request.requestID} className="reqTr">
-                <td className="reqTd" >{request.counter}</td>
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.maternityDoc}</td>
-                <td className="reqTd">{request.reason}</td>
+                <td className="reqTd">{request.reason}</td>    
                 <td className="reqTd">{request.state}</td>
+                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                
 
                 <td className="reqTd">
                <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
@@ -191,11 +195,13 @@ class ViewSubmittedRequests extends Component{
                 return (
                     
                     <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                    <td className="reqTd" >{request.counter}</td>
+                    {/* <td className="reqTd" >{request.counter}</td> */}
                     <td className="reqTd">{request.submission_date}</td>
                     <td className="reqTd">{request.sickDay}</td>
                     <td className="reqTd">{request.reason}</td>
                     <td className="reqTd">{request.state}</td>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                    
                     <td className="reqTd">
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
@@ -216,13 +222,15 @@ class ViewSubmittedRequests extends Component{
                 
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 
-                <td className="reqTd" >{request.counter}</td>
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.slotDate}</td>
                 <td className="reqTd">{request.slotNum}</td>
                 <td className="reqTd">{request.slotLoc}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
+                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                
                 <td className="reqTd">
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
@@ -241,11 +249,13 @@ class ViewSubmittedRequests extends Component{
                     
                     <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                     
-                    <td className="reqTd" >{request.counter}</td>
+                    {/* <td className="reqTd" >{request.counter}</td> */}
                      <td className="reqTd">{request.submission_date}</td>
                     <td className="reqTd">{request.missedDay}</td>
+                    <td className="reqTd">{request.compensatedDay}</td>
                     <td className="reqTd">{request.reason}</td>
                     <td className="reqTd">{request.state}</td>
+                     {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
                     <td className="reqTd">
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
@@ -258,18 +268,20 @@ class ViewSubmittedRequests extends Component{
                 
         renderChangeDayOffRequest=(request, index)=> {
             console.log("submissiondate= "+request.submission_date+
-                "\n"+"missedDAY= "+request.missedDay+
+                "\n"+"newDayOff= "+request.newDayOff+
                 "\n"+"reason= "+request.reason+
                 "\n"+"state= "+request.state)
             return (
                 
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 
-                <td className="reqTd" >{request.counter}</td>
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdSick">{request.newDayOff}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
+                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                
                 <td className="reqTd">
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
@@ -287,13 +299,15 @@ class ViewSubmittedRequests extends Component{
             return (
                 
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                <td className="reqTd" >{request.counter}</td>
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.slotDay}</td>
                 <td className="reqTd">{request.slotNum}</td>
                 <td className="reqTd">{request.courseID}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
+                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                
                 <td className="reqTd">
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
@@ -304,17 +318,19 @@ class ViewSubmittedRequests extends Component{
             }
             renderAccidentalRequest=(request, index)=> {
                 console.log("submissiondate= "+request.submission_date+
-                    "\n"+"missedDAY= "+request.missedDay+
+                    "\n"+"accidentalDAY= "+request.accidentDate+
                     "\n"+"reason= "+request.reason+
                     "\n"+"state= "+request.state)
                 return (
                     
                     <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                    <td className="reqTd" >{request.counter}</td>
+                    {/* <td className="reqTd" >{request.counter}</td> */}
                     <td className="reqTd">{request.submission_date}</td>
-                    <td className="reqTd">{request.accidentDay}</td>
+                    <td className="reqTd">{request.accidentDate}</td>
                     <td className="reqTd">{request.reason}</td>
                     <td className="reqTd">{request.state}</td>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                    
                     <td className="reqTd">
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
@@ -331,13 +347,15 @@ class ViewSubmittedRequests extends Component{
             return (
                 
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                <td className="reqTd" >{request.counter}</td>
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.slotNum}</td>
                 <td className="reqTd">{request.slotDate}</td>
                 <td className="reqTd">{request.replacementStaff}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
+                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                
                 <td className="reqTd">
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
@@ -373,20 +391,27 @@ class ViewSubmittedRequests extends Component{
                       <Dropdown as={ButtonGroup} className="buttons2" >
                 <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
                     <Dropdown.Menu className="super-colors">
-                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
-                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
-                    {this.state.reqType!="Sick Leave" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >}
-                    {this.state.reqType=="Sick Leave" && <Dropdown.Item  active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >}
-                    {this.state.reqType!="Replacement" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
-                    {this.state.reqType=="Replacement" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
-                    {this.state.reqType!="Compensation Leave"  &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
-                    {this.state.reqType=="Compensation Leave"  &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
+                     
                     {this.state.reqType!="Accidental Leave" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Accidental Leave")}>Accidental Leave</Button></Dropdown.Item >}
                     {this.state.reqType=="Accidental Leave" &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Accidental Leave")}>Accidental Leave</Button></Dropdown.Item >}
                     {this.state.reqType!="Annual Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Annual Leave")}>Annual Leave</Button></Dropdown.Item >}
                     {this.state.reqType=="Annual Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Annual Leave")}>Annual Leave</Button></Dropdown.Item >}
+
+
                     {this.state.reqType!="Change Day Off" &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >}
                     {this.state.reqType=="Change Day Off" &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >}
+                    {this.state.reqType!="Compensation Leave"  &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
+                    {this.state.reqType=="Compensation Leave"  &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
+
+
+                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
+                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
+                    {this.state.reqType!="Replacement" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
+                    {this.state.reqType=="Replacement" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
+                    
+                    {this.state.reqType!="Sick Leave" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >}
+                    {this.state.reqType=="Sick Leave" && <Dropdown.Item  active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >}
+                   
                     {this.state.reqType!="Slot Linking" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Slot Linking")}>Slot Linking</Button></Dropdown.Item >}
                     {this.state.reqType=="Slot Linking" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Slot Linking")}>Slot Linking</Button></Dropdown.Item >}
                     </Dropdown.Menu>
@@ -423,11 +448,13 @@ class ViewSubmittedRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Documents</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                    
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -447,11 +474,13 @@ class ViewSubmittedRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                 <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Sick Day</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                    
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -469,13 +498,15 @@ class ViewSubmittedRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Slot Date</th>
                     <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Slot Location</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                    
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -493,11 +524,13 @@ class ViewSubmittedRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                 <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Missed Day</th>
+                    <th className="reqTh">Compensation Day</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                   {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -514,11 +547,13 @@ class ViewSubmittedRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                 <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">New Day-Off</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                    
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -533,13 +568,15 @@ class ViewSubmittedRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Slot Day</th>
                     <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Course ID</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                    
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -555,11 +592,12 @@ class ViewSubmittedRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Accident Date</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -578,13 +616,15 @@ class ViewSubmittedRequests extends Component{
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Slot Date</th>
                     <th className="reqTh">Replacement Staff</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                    
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>

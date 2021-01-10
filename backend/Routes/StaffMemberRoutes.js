@@ -446,7 +446,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            var dayOffBool=false
         //    console.log("at 2nd"+signins)
            console.log("dayofBool at signin= "+dayOffBool)
-            const newAttendance=({
+            const newAttendance={
                 date:newSignInDate,
                 time,
                 hours,
@@ -457,9 +457,9 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_calculated_signOut:SignIn,
                 last_signOut,
                 day,
-                dayOffBool:dayOffBool
+                dayOffBool:dayOffBool,
                 // signins:[SignInTime]
-            })
+            }
             console.log("SignIn= "+SignIn)
             console.log("newAttendance "+newAttendance)
             //enter new record to already existing attendance array
@@ -686,16 +686,19 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             var currYear=new moment().format("Y")
 
             //new MILESTONE2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // const currDay=new moment().format("D")
-            // if(currDay<=10){
-            //     if(Integer.parseInt(currMonth)==1){
-            //         currMonth=12
-            //         currYear=Integer.parseInt(currYear)-1;
-            //     }
-            //     else
-            //         currMonth=Integer.parseInt(currMonth)-1;
+            const currDay=new moment().format("D")
+            if(currDay<=10){
+                if((parseInt(currMonth))==1){
+                    currMonth=12
+                    currYear=parseInt(currYear)-1;
+                    console.log("currYear= "+currYear)
+                }
+                else{
+                    currMonth=parseInt(currMonth)-1;
+                    console.log("currMonth= "+currMonth)
+                }
 
-            // }
+            }
 
 
 

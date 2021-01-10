@@ -246,46 +246,56 @@ router.get('/submittedRequest',authenticateToken,async(req,res)=>{
             if(reqType=="Annual"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
-                    slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")
+                    ,RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
             }
             if(reqType=="Replacement"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
-                    slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    slotLoc:sent[i].slotLoc,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")
+                    ,RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
             }
             if(reqType=="Change Day off"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,newDayOff:sent[i].newDayOff,
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")
+                    ,RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
             }
             if(reqType=="Accidental Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    sentTo:hodName,state:sent[i].state,accidentDate:moment(sent[i].accidentDate).format("YYYY-MM-DD"),
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")
+                    ,RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
+
+                    console.log("reqNewAccidenta= "+reqNew.accidentDate)
     
             }
             if(reqType=="Sick Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,
                     sickDay:moment(sent[i].sickDay).format("YYYY-MM-DD"),medicalDoc:sent[i].medicalDoc,
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD"),
+                    RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
                 
             }
             if(reqType=="Maternity Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,maternityDoc:sent[i].maternityDoc,
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD"),
+                    RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
             }
             if(reqType=="Compensation Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD"),
+                compensatedDay:moment(sent[i].compensatedDay).format("YYYY-MM-DD")
+                ,RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
             }
             if(reqType=="Slot Linking"){
@@ -297,7 +307,8 @@ router.get('/submittedRequest',authenticateToken,async(req,res)=>{
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:coordinatorName,state:sent[i].state,slotDay:sent[i].slotDay,
                     slotNum:sent[i].slotNum,courseID:sent[i].courseID,
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")
+                    ,RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
             }    
            
@@ -360,7 +371,7 @@ router.get('/receivedRequest',authenticateToken,async(req,res)=>{
             }
             if(reqType=="Accidental Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
-                    sentTo:hodName,state:sent[i].state,accidentDate:sent[i].accidentDate,
+                    sentTo:hodName,state:sent[i].state,accidentDate:moment(sent[i].accidentDate).format("YYYY-MM-DD"),
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
     
@@ -382,7 +393,8 @@ router.get('/receivedRequest',authenticateToken,async(req,res)=>{
             if(reqType=="Compensation Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,missedDay:moment(sent[i].missedDay).format("YYYY-MM-DD"),
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD"),
+                    compensatedDay:moment(sent[i].compensatedDay).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
             if(reqType=="Slot Linking"){
@@ -2463,8 +2475,8 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
 })
 
 router.post('/compensationLeave',authenticateToken,async(req,res)=>{
-    //enter absent day he wants to compensate for (req.body.missedDay, req.body.reason)
-
+    //enter absent day he wants to compensate for (req.body.missedDay,req.body.compensatedDay, req.body.reason)
+        console.log("in compenstion")
     //check if user is HR
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
@@ -2473,6 +2485,9 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     }
     if(!req.body.missedDay){
         return res.json("Must submit the missed day date with the request.")
+    }
+    if(!req.body.compensatedDay){
+        return res.json("Must submit the compensated day date with the request.")
     }
 
     //check if he is asking to compensate for a day off or friday
@@ -2487,6 +2502,18 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
         return res.json("Cannot compensate for a day off.")
     }
 
+   
+
+    // //check if he actually attended this day_off    WILL ADD IT TO ACCEPT/REJECT COMPENSATION REQUEST
+    // const attendace=staff.attendance
+    // var attended=false
+    // for(var h=0;h<attendance.length;h++){
+    //     if(moment(attendance[h].date).format("YYYY-MM-DD")==moment(req.body.compensatedDay).format("YYYY-MM-DD"))
+    //         attended=true;
+    // }
+    // if(attended==false){
+    //     return res.json("This compensation day was not attended.")
+    // }
     //check is missedDay entered is actually a day which the user attended
     const missedDay=req.body.missedDay
     //const reason=req.body.reason
@@ -2498,6 +2525,14 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
                 return res.json("You already attended this day.Cannot send a compensation request for it.")
             }
     }
+
+     //check that compensation day is his day off
+     if(academic.day_off!=moment(req.body.compensatedDay).format("dddd")){
+         console.log("offfffff= "+academic.day_off)
+         console.log("comp offfffffffffffff= "+moment(req.body.compensatedDay).format("dddd"))
+        return res.json("This compensation day is not on your day off.")
+    }
+
     const reason=req.body.reason
     if(!reason)
     return res.json("Must submit a reason for compensation leave request.")
@@ -2533,7 +2568,8 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
         missedDay:moment(req.body.missedDay),
         state:"Pending",
         reason:reason,
-        submission_date:new moment().format("YYYY-MM-DD")
+        submission_date:new moment().format("YYYY-MM-DD"),
+        compensatedDay:req.body.compensatedDay
     })
     try{
     await newRequest.save()
@@ -3643,27 +3679,41 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
     const userSchedule=userAcademic.schedule
     var acceptedRequests=new Array()
     var l=0;
+    const requestsSameSlot =new Array()
+    var n=0
+    console.log("sched= "+userSchedule)
     for(var k=0;k<userSchedule.length;k++){
             if(moment(userSchedule[k].date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
+               console.log("inside loop hereeeeeeeeeeeeeeeee")
                 var acceptedRequest = await request.findOne({
-                    slotNum: userSchedule[k].slotNum, slotDate: userSchedule[k].slotDate, slotLoc:userSchedule[k]. slotLoc, 
+                    slotNum: userSchedule[k].number, slotDate: new Date(slotDate),
+                     slotLoc:userSchedule[k]. location, 
                     state: 'Accepted',
                     sentBy: req.user.id});
                 if(acceptedRequest){
-                    var accepted=new acceptedReplacementSchema({
+                    console.log("accepted founddddddddddddd")
+                    var accepted=({
                         replacementID:acceptedRequest.sentTo,
-                        slotNum:userSchedule[k].slotNum,
-                        slotLoc:userSchedule[k].slotLoc
+                        slotNum:userSchedule[k].number,
+                        slotLoc:userSchedule[k].location
                     })
+                    console.log( userSchedule[k].number+" "+userSchedule[k].date+" "+
+                     userSchedule[k].location, 
+                        )
                     acceptedRequests[l++]=accepted
+
+                    // requestsSameSlot[n++]=await request.find({
+                    //     slotNum: userSchedule[k].slotNum, slotDate: userSchedule[k].slotDate
+                    //     , slotLoc: userSchedule[k].slotLoc,
+                    //     sentBy: req.user.id});    
                 }
             }
+            for(var g=0;g<acceptedRequests.length;g++)
+            console.log(acceptedRequests[g].replacementID+" "+acceptedRequests[g].slotNum)
     }
     
     
-    const requestsSameSlot = await request.find({
-         slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc,
-         sentBy: req.user.id});
+   
 
          var currReason=""
          if(req.body.reason)
@@ -3677,10 +3727,8 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
             submission_date: moment(),
 
             reason:currReason,
-            slotNum: slotNum,
             slotDate: slotDate,
-            slotLoc: slotLoc,
-            replacementStaff: acceptedRequest.sentTo,
+            // replacementStaff: acceptedRequest.sentTo,
 
             //milestone2
             acceptedReplacement:acceptedRequests
@@ -3693,7 +3741,7 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
         //send notification to hod
       const notification=(await StaffMemberModel.findById(HODStaffModel._id)).notifications
       const notNew=notification
-      notNew[notNew.length]="You received a new compensation leave request."
+      notNew[notNew.length]="You received a new annual leave request."
       const staffReplacement= await StaffMemberModel.findByIdAndUpdate(HODStaffModel._id,{notifications:notNew})
 
         return res.status(200).send('Annual Leave request sent to HOD with the details about the academic member who accepted your request: ' 
@@ -3702,10 +3750,10 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
 
 
     }
-    else {
-        if(requestsSameSlot.length == 0) {
-            return res.status(400).send('You do not have a replacement request with such details!');
-        }
+    // else {
+        // if(requestsSameSlot.length == 0) {
+        //     return res.status(400).send('You do not have a replacement request with such details!');
+        // }
         else {
 
             var currReason=""
@@ -3719,9 +3767,7 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
                 submission_date: moment(),
     
                 reason:currReason,
-                slotNum: slotNum,
                 slotDate: slotDate,
-                slotLoc: slotLoc,
 
                 //milestone2
                 acceptedReplacement:[]
@@ -3735,7 +3781,7 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
 
             return res.status(200).send('Annual Leave request sent to HOD with request that has no accept responses.');
         }
-    }
+    // }
 
 });
 
@@ -3752,6 +3798,46 @@ router.post('/acceptRequest',authenticateToken,async(req,res)=>{
     return res.json("This request does not exist.")
 
     const reqType=currRequest.reqType;
+
+
+    if(reqType=="Replacement"){
+        //check if this person is the sender of this request
+        if(!currRequest.sentTo.equals(req.user.id)) 
+        return res.status(401).send('This request was not sent to you.Cannot accept or reject.');
+        if(currRequest.state=="Accepted"){
+            return res.json("This request has already been accepted before.")
+        }
+    
+        // const sentBy=(await StaffMemberModel.findOne({email:sentByEmail}))._id
+        const reqType=currRequest.reqType
+        const submission_date=currRequest.submission_date
+        const sentBy=currRequest.sentBy
+        const slotNum=currRequest.slotNum
+        const slotDate=currRequest.slotDate
+        const slotLoc=currRequest.slotLoc
+        
+        
+        // const reqID=currRequest._id
+        const reqUpdated=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+    
+        //delete other requests sent to other academic members since one is already accepted
+        const otherRepReq=await request.find({reqType:reqType,submission_date:submission_date,sentBy:sentBy,
+            slotNum:slotNum,slotDate:slotDate,slotLoc:slotLoc})
+        for(var i=0;i<otherRepReq.length;i++){
+            if(otherRepReq[i].sentTo!=req.user.id){
+               const delID= otherRepReq[i]._id
+                const delReq=await request.findByIdAndDelete(delID)
+            }
+        }
+
+        const notification=(await StaffMemberModel.findById(currRequest.sentBy)).notifications
+            const notNew=notification
+            notNew[notNew.length]="Your request has been accepted."
+            const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
+        return res.json("Request successully accepted.")
+    
+    }
+
     if(reqType=="Change Day off"){
         const upReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
     }

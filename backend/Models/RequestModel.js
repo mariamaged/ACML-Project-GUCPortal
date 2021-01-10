@@ -48,7 +48,10 @@ const RequestSchema = mongoose.Schema({
     missedDay:{type: Date},
 
     // Acceptance
-    RejectionReason: {type: String}
+    RejectionReason: {type: String,default:""},
+
+    //compensation day
+    compensatedDay:{type:Date}
 });
 
 RequestSchema.pre('save', function(next) {
