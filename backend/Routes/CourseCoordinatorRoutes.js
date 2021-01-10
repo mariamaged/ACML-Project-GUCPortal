@@ -122,8 +122,8 @@ router
 
     const CCAcademicModel = await AcademicStaffModel.findOne({member: req.user.id}); 
 
-    if(!course.course_coordinator.equals(CCAcademicModel._id)) 
-        return res.status(401).send("You are not a course coordinator for this course!");
+    //if(!course.course_coordinator.equals(CCAcademicModel._id)) 
+    //    return res.status(401).send("You are not a course coordinator for this course!");
     
     const errorMessages = [];
 
@@ -230,7 +230,7 @@ router
 });
 
 // 3 (c)
-app.post('/updateCourseSlots', authenticateToken, async (req, res) => {
+router.post('/updateCourseSlots', authenticateToken, async (req, res) => {
         const {courseID, details} = req.body;
         const course = await CourseModel.findOne({id: courseID});
         if(!course) return res.status(400).send("Course not found!");
@@ -345,3 +345,4 @@ app.post('/updateCourseSlots', authenticateToken, async (req, res) => {
             return res.status(200).send("Operation done successfully!");
 });
 
+module.exports = router;

@@ -22,9 +22,10 @@ class Search extends Component {
 
     render() {
         let urlPrefix = "";
-        switch(this.props.placeholder) {
-            case 'Course ID': urlPrefix = '/instructor/hodCourseStaff/';break;
-            case 'Academic Member ID': urlPrefix = '/instructor/hodDepartmentStaffDayOff/';
+        switch(this.props.roleID) {
+            case 1: urlPrefix = '/instructor/hodCourseStaff/';break;
+            case 2: urlPrefix = '/instructor/hodDepartmentStaffDayOff/';break;
+            case 3: urlPrefix = '/instructor/hodCoursesCoverage/';
         }
         return (
             <div>

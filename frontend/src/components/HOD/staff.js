@@ -1,14 +1,12 @@
 // Our Components
+import Loading from './loading';
 // React Components
-import Spinner from 'react-bootstrap/Spinner';
 // React
 import React from 'react';
 
 // Reacter Router and axios
-// CSS and images.
+// CSS and images
 import './HODNavbar.css';
-import './staff.css';
-import GUC from '../../GUC.png';
 
 const staff = ({ members, role }) => {
     const departmentStaffList = members.length ? (members.map(staff => {
@@ -27,20 +25,7 @@ const staff = ({ members, role }) => {
                 </div>
             </div>)
     })) :
-        (<div>
-            <div style={{ float: "left" }}>
-                <h3>
-                    Loading
-            &nbsp;<small class="text-muted">the staff members of {role}</small>
-                </h3></div>
-
-            <div id="rightSpinner">
-                &nbsp;
-        <Spinner animation="border" style={{ color: "red", width: "50px", height: "50px", position: "absolute", top: "-8px", left: "-2px" }} />
-                <img src={GUC} alt="GUCimage" width="30px" height="30px" />
-            </div>
-
-        </div>);
+        (<Loading role={role}/>);
 
     return (
         <div>

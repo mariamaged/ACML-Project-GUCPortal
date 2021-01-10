@@ -1,9 +1,11 @@
 // Our Components
+import Loading from './loading.js';
 // React Components
 // React
 import React from 'react'
 // Reacter Router and axios
-// CSS and images.
+// CSS and images
+import './HODNavbar.css';
 
 const staffdayoff = ({ members, role }) => {
     const departmentStaffList = members.length ? (members.map(staff => {
@@ -16,10 +18,7 @@ const staffdayoff = ({ members, role }) => {
                 </div>
             </div>)
     })) :
-        (<div><h3>
-            Loading
-            &nbsp;<small class="text-muted">the day off of staff members of {role}</small>
-        </h3></div>);
+        (<Loading role={role} />);
 
     return (
         <div>

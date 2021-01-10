@@ -24,11 +24,13 @@ const StaffContainer = () => {
             </Card>
             <Card>
                 <Accordion.Toggle as={Card.Header} eventKey="1">
-                    Course
+                    Courses
                     </Accordion.Toggle>
                 <Accordion.Collapse eventKey="1">
                 <div>
                         <LinkContainer to='/instructor/hodCourseStaff/all'><Card.Body>View Course Staff</Card.Body></LinkContainer>
+                        <LinkContainer to='/instructor/hodCoursesCoverage/all'><Card.Body>View Course Coverage</Card.Body></LinkContainer>
+                        <LinkContainer to='/instructor/hodteachingAssignment/all'><Card.Body>View Course Teaching Assignment</Card.Body></LinkContainer>
                     </div>
                 </Accordion.Collapse>
             </Card>
