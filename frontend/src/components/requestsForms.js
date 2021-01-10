@@ -21,10 +21,18 @@ class requestsForms extends Component{
         fields:[],
         accidentalWarning:"",
         accidentalDate:"",
-        accidentalReason:""
+        accidentalReason:"",
+        accidentalSuccess:false,
+        annualReason:"",
+        annualSlotDate:"",
+        annualSlotNum:"",
+        annualSlotLoc:"",
+        annualWarning:"",
+        annualSucces:""
     }
     componentDidMount(props){
         console.log("here in reqForms")
+        console.log("success at start? "+this.state.accidentalSuccess)
         console.log("this.state.reqType= "+this.props.location.state.formType)
              const temp=this.props.location.state.formType;
              const tempTitle=this.props.location.state.formTitle;
@@ -46,6 +54,7 @@ class requestsForms extends Component{
         console.log("working")
     }
     onFormAccidentalSubmit = e => {
+        this.setState({accidentalWarning:"",accidentalSuccess:false})
         e.preventDefault();
         console.log("accidental submitted")
         axios.request({
@@ -61,12 +70,39 @@ class requestsForms extends Component{
           
           }).then(res=>{
             console.log("successfull");
+            this.setState({accidentalSuccess:true});
+        }).catch(error=>{
+            console.log("cancel error= "+error.response.data)
+            this.setState({accidentalWarning:error.response.data});
+            })
+    }
+
+    onFormAnnualSubmit = e => {
+        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        e.preventDefault();
+        console.log("accidental submitted")
+        axios.request({
+            method: 'POST',
+            url: 'http://localhost:5000/academic/annualLeave',
+            headers: {
+                'x-auth-token':localStorage.getItem('jwtToken')
+            },
+            data: {
+                slotNum:,
+                slotDate:,
+                slotLoc:
+            },
+          
+          }).then(res=>{
+            console.log("successfull");
+            this.setState({accidentalSuccess:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
             this.setState({accidentalWarning:error.response.data});
             })
     }
     handleReqForm(e,formType,formTitle){
+        console.log("check= "+this.state.accidentalSuccess)
         e.preventDefault();
         const location = {
             pathname: '/requestsForms',
@@ -99,15 +135,16 @@ class requestsForms extends Component{
        
          <form onSubmit={this.onFormAccidentalSubmit}>
          
-        <label class="col-form-label" htmlFor="accidentalDate">Accident Date</label>
-        <input type="date" class="form-control" 
+        <label className="col-form-label" htmlFor="accidentalDate">Accident Date</label>
+        <input type="date" className="form-control" 
         placeholder="YYYY-MM-DD" id="accidentalDate" required onChange={this.handleAccidentalChange}/>
-        <label class="col-form-label" htmlFor="accidentalReason">Reason</label>
-        <input type="text" class="form-control" placeholder="Default input" id="accidentalReason" onChange={this.handleAccidentalChange}/>
+        <label className="col-form-label" htmlFor="accidentalReason">Reason</label>
+        <input type="text" className="form-control" placeholder="Default input" id="accidentalReason" onChange={this.handleAccidentalChange}/>
         <Button variant="primary" type="submit">
          Submit
         </Button> 
-        {this.state.accidentalWarning!="" && <h6 class="accidentalWarning">{this.state.accidentalWarning}</h6>}
+        {this.state.accidentalSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
+        {this.state.accidentalWarning!="" && <h6 className="accidentalWarning">{this.state.accidentalWarning}</h6>}
          </form>}
 
         {/* /* <Form onSubmit={this.onFormAccidentalSubmit}>
@@ -127,9 +164,25 @@ class requestsForms extends Component{
             </Form> */}
         
     
-     {this.state.formType=="Annual Leave" &&
-    
-        <Form onSubmit={this.onFormSubmit}>
+     {this.state.formType=="Annual Leave" && 
+     <form onSubmit={this.onFormAnnualSubmit}>
+         
+        <label className="col-form-label" htmlFor="annualDate">Day Off Date</label>
+        <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
+
+        {/* <label className="col-form-label" htmlFor="annualReplacement">Replacement Staff</label>
+        <input type="text" className="form-control" placeholder="Default input" id="annualReplacement" onChange={this.handleAnnualChange}/>
+         */}
+        <label className="col-form-label" htmlFor="annualReason">Reason</label>
+        <input type="text" className="form-control" placeholder="Default input" id="annualReason" onChange={this.handleAnnualChange}/>
+        <Button variant="primary" type="submit">
+         Submit
+        </Button> 
+        {this.state.annualSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
+        {this.state.annualWarning!="" && <h6 className="accidentalWarning">{this.state.annualWarning}</h6>}
+         </form>}
+
+        {/* /* {<Form onSubmit={this.onFormSubmit}>
             <Form.Group controlId="formBasicEmail">
                 <Form.Label>Day Off Date</Form.Label>
                 <Form.Control type="date" placeholder="YYYY-MM-DD" required/>
@@ -145,10 +198,10 @@ class requestsForms extends Component{
             <Button variant="primary" type="submit">
                 Submit
             </Button>
-            </Form>
+            </Form> }*/}
 
 
-        }
+   
 
     {this.state.formType=="Compensation Leave" &&
         <Form onSubmit={this.onFormSubmit}>
@@ -259,16 +312,16 @@ class requestsForms extends Component{
     } 
 
     {/* {this.state.formType=="Slot Linking" &&
-    <div class="form-group">
-    <label class="col-form-label" htmlFor="inputDefault">Slot Day</label>
-    <input type="text" class="form-control" placeholder="Default input" id="inputDefault" required/>
-    <label class="col-form-label" htmlFor="inputDefault">Slot Number</label>
-    <input type="text" class="form-control" placeholder="Default input" id="inputDefault" required/>
-    <label class="col-form-label" htmlFor="inputDefault">Course ID</label>
-    <input type="text" class="form-control" placeholder="Default input" id="inputDefault" required/>
+    <div className="form-group">
+    <label className="col-form-label" htmlFor="inputDefault">Slot Day</label>
+    <input type="text" className="form-control" placeholder="Default input" id="inputDefault" required/>
+    <label className="col-form-label" htmlFor="inputDefault">Slot Number</label>
+    <input type="text" className="form-control" placeholder="Default input" id="inputDefault" required/>
+    <label className="col-form-label" htmlFor="inputDefault">Course ID</label>
+    <input type="text" className="form-control" placeholder="Default input" id="inputDefault" required/>
    
-   <label class="col-form-label" htmlFor="inputDefault">Reason</label>
-    <input type="text" class="form-control" placeholder="Default input" id="inputDefault" />   
+   <label className="col-form-label" htmlFor="inputDefault">Reason</label>
+    <input type="text" className="form-control" placeholder="Default input" id="inputDefault" />   
     </div>}   */}
 
     </div>

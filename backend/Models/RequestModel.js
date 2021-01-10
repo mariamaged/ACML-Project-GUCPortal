@@ -2,6 +2,14 @@ const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const CounterModel = require('./CounterModel.js');
 
+
+//mielstone2
+const acceptedReplacementSchema=mongoose.Schema({
+      replacementID:{type: ObjectID, ref: 'StaffMemberModel'},
+      slotNum:{type:Number},
+      slotLoc:{type:String}
+})
+
 const RequestSchema = mongoose.Schema({
   counter:{type:Number},
    requestID: {type: String, unique: true},
@@ -22,6 +30,8 @@ const RequestSchema = mongoose.Schema({
     slotNum: {type: Number},
     slotLoc: {type: String},
     replacementStaff: {type: ObjectID, ref: 'StaffMemberModel'},
+    //milestone2
+    acceptedReplacement:[acceptedReplacementSchema],
 
     // for Slot Linking
     slotDay: {type: String, enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday']},
@@ -156,3 +166,6 @@ RequestSchema.pre('save', function(next) {
 
 module.exports = mongoose.model('request', RequestSchema);
 module.exports.reqSchema=RequestSchema
+
+//mileston2
+module.exports.acceptedReplacementSchema=acceptedReplacementSchema

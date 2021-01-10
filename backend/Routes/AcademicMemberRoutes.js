@@ -19,7 +19,7 @@ const slotSchema=require('../Models/SlotSchema')
 //const authenticateToken=require('../Routes/StaffMemberRoutes')
 const CounterModel=require('../Models/CounterModel')
 const reqSchema=require('../Models/RequestModel').reqSchema
-
+const acceptedReplacementSchema=require('../Models/RequestModel').acceptedReplacementSchema
 // MILESTONE2
 // const AttendanceSchema=StaffMemberModel.attendanceSchema
 // const monthlyHoursSchema=StaffMemberModel.monthlyHoursSchema
@@ -2199,6 +2199,8 @@ router.post('/annualRequest',authenticateToken,async(req,res)=>{
 ///////
 router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     //input is (req.body.accidentDate , OPTIONAL req.body.reason)
+    // const check=(moment(req.body.accidentDate).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD")))
+    // console.log("in accidental req"+check)
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
     if(type=="HR"){
@@ -2229,8 +2231,11 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     if(annual_days==0){
         return res.status(401).json("Cannot submit request. Annual leave balance is currently empty!")
     }
-    if(!(moment(req.body.accidentDate).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD"))))
-     return res.status(401).json("Must only submit requests for accidents that already happened!")
+    if(!(moment(req.body.accidentDate).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD")))){
+     console.log("beforeeeeeeeeeeee")
+        return res.status(401).json("Must only submit requests for accidents that already happened!")
+
+    }
     //make request
     var reason=''
     if(req.body.reason)
@@ -3623,7 +3628,9 @@ router.post('/cancelRequest', authenticateToken, async (req, res) => {
     }
 });
 
-router.delete('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
+router.post('/annualLeave', authenticateToken, async (req, res) => {
+    //input is slotDate
+    console.log("in annual leave")
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
 
     const currDepartment = await department.findById(userAcademic.department);
@@ -3631,18 +3638,37 @@ router.delete('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
     const HODAcademicModel = await AcademicStaffModel.findById(currDepartment.HOD);
     const HODStaffModel = await StaffMemberModel.findById(HODAcademicModel.member);
     
-    const {slotNum, slotDate, slotLoc} = req.body;
-    const acceptedRequest = await request.findOne({
-          slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc, 
-          state: 'Accepted',
-          sentBy: req.user.id});
+    //get slotDate and user's schedule to get slots on this day
+    const slotDate = req.body.slotDate;
+    const userSchedule=userAcademic.schedule
+    var acceptedRequests=new Array()
+    var l=0;
+    for(var k=0;k<userSchedule.length;k++){
+            if(moment(userSchedule[k].date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
+                var acceptedRequest = await request.findOne({
+                    slotNum: userSchedule[k].slotNum, slotDate: userSchedule[k].slotDate, slotLoc:userSchedule[k]. slotLoc, 
+                    state: 'Accepted',
+                    sentBy: req.user.id});
+                if(acceptedRequest){
+                    var accepted=new acceptedReplacementSchema({
+                        replacementID:acceptedRequest.sentTo,
+                        slotNum:userSchedule[k].slotNum,
+                        slotLoc:userSchedule[k].slotLoc
+                    })
+                    acceptedRequests[l++]=accepted
+                }
+            }
+    }
+    
     
     const requestsSameSlot = await request.find({
          slotNum: slotNum, slotDate: slotDate, slotLoc: slotLoc,
          sentBy: req.user.id});
 
-
-    if(acceptedRequest) {
+         var currReason=""
+         if(req.body.reason)
+          currReason = req.body.reason;
+    if(acceptedRequests.length>0) {
         const newAnnualRequest = new request({
             reqType: 'Annual Leave',
             sentTo: HODStaffModel._id,
@@ -3650,23 +3676,41 @@ router.delete('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
             state: 'Pending',
             submission_date: moment(),
 
+            reason:currReason,
             slotNum: slotNum,
             slotDate: slotDate,
             slotLoc: slotLoc,
-            replacementStaff: acceptedRequest.sentTo
+            replacementStaff: acceptedRequest.sentTo,
+
+            //milestone2
+            acceptedReplacement:acceptedRequests
         });
-        if(req.body.reason) newAnnualRequest.reason = req.body.reason;
+       
         await newAnnualRequest.save();
 
         const acceptedStaff = await StaffMemberModel.findById(acceptedRequest.sentTo);
+
+        //send notification to hod
+      const notification=(await StaffMemberModel.findById(HODStaffModel._id)).notifications
+      const notNew=notification
+      notNew[notNew.length]="You received a new compensation leave request."
+      const staffReplacement= await StaffMemberModel.findByIdAndUpdate(HODStaffModel._id,{notifications:notNew})
+
         return res.status(200).send('Annual Leave request sent to HOD with the details about the academic member who accepted your request: ' 
         + acceptedStaff.name + ", with id: " + acceptedStaff.id + '.');
+
+
+
     }
     else {
         if(requestsSameSlot.length == 0) {
             return res.status(400).send('You do not have a replacement request with such details!');
         }
         else {
+
+            var currReason=""
+            if(req.body.reason)
+             currReason = req.body.reason;
             const newAnnualRequest = new request({
                 reqType: 'Annual Leave',
                 sentTo: HODStaffModel._id,
@@ -3674,12 +3718,20 @@ router.delete('/sendAnnualLeavetoHOD', authenticateToken, async (req, res) => {
                 state: 'Pending',
                 submission_date: moment(),
     
+                reason:currReason,
                 slotNum: slotNum,
                 slotDate: slotDate,
                 slotLoc: slotLoc,
+
+                //milestone2
+                acceptedReplacement:[]
             });
-            if(req.body.reason) newAnnualRequest.reason = req.body.reason;
             await newAnnualRequest.save();
+             //send notification to hod
+            const notification=(await StaffMemberModel.findById(HODStaffModel._id)).notifications
+            const notNew=notification
+            notNew[notNew.length]="You received a new compensation leave request."
+            const staffReplacement= await StaffMemberModel.findByIdAndUpdate(HODStaffModel._id,{notifications:notNew})
 
             return res.status(200).send('Annual Leave request sent to HOD with request that has no accept responses.');
         }
