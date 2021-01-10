@@ -11,6 +11,7 @@ const Course=require('../Models/CourseModel.js')
 const location=require('../Models/LocationModel.js')
 const department=require('../Models/DepartmentModel.js')
 const faculty=require('../Models/FacultyModel.js')
+
 const AttendanceSchema=StaffMemberModel.attendanceSchema
 const monthlyHoursSchema=StaffMemberModel.monthlyHoursSchema
 var moment = require('moment');
@@ -380,14 +381,14 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 check=true;
                 idx=i;
               
-                newSigninsTemp=attendance[i].signins
+                // newSigninsTemp=attendance[i].signins
                console.log("------------------------------------="+attendance[i])
                //console.log("000000000000000000000000000000000000="+newSignins)
-               newSigninsTemp[attendance[i].signins.length]=SignInTime
-            //    console.log("1111111111111111111111111111111111111="+newSignins[0])
-            //    console.log("2222222222222222222222222222222222222="+newSignins[1])
-               newSignins=newSigninsTemp
-                console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
+            //    newSigninsTemp[attendance[i].signins.length]=SignInTime
+            // //    console.log("1111111111111111111111111111111111111="+newSignins[0])
+            // //    console.log("2222222222222222222222222222222222222="+newSignins[1])
+            //    newSignins=newSigninsTemp
+            //     console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
                 //const signins=
                 
             }
@@ -399,7 +400,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
         //found today's record will update it then insert it into attendance array
         if(check===true){
             // console.log("SIGNINSSSSSSSSSSS INSIDEEEEE=" +signins)
-            const newAtt=new AttendanceSchema({
+            const newAtt={
                 date:date,
                 time:time,
                 hours:hours,
@@ -411,8 +412,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_calculated_signOut:last_signIn,
                 day:day,
                 dayOffBool:dayOffBool,
-                signins:newSignins
-            })
+                // signins:newSignins
+            }
             console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newAtt)
             attArr[idx]=newAtt
             
@@ -456,8 +457,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_calculated_signOut:SignIn,
                 last_signOut,
                 day,
-                dayOffBool:dayOffBool,
-                signins:[SignInTime]
+                dayOffBool:dayOffBool
+                // signins:[SignInTime]
             })
             console.log("SignIn= "+SignIn)
             console.log("newAttendance "+newAttendance)
@@ -685,16 +686,16 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             var currYear=new moment().format("Y")
 
             //new MILESTONE2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            const currDay=new moment().format("D")
-            if(currDay<=10){
-                if(Integer.parseInt(currMonth)==1){
-                    currMonth=12
-                    currYear=Integer.parseInt(currYear)-1;
-                }
-                else
-                    currMonth=Integer.parseInt(currMonth)-1;
+            // const currDay=new moment().format("D")
+            // if(currDay<=10){
+            //     if(Integer.parseInt(currMonth)==1){
+            //         currMonth=12
+            //         currYear=Integer.parseInt(currYear)-1;
+            //     }
+            //     else
+            //         currMonth=Integer.parseInt(currMonth)-1;
 
-            }
+            // }
 
 
 
@@ -729,14 +730,14 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                        // console.log("extras= "+finEM+" "+finEH)
 
                         //new monthlyTime with updated hours and minutes
-                        const newMonthly=new monthlyHoursSchema({
+                        const newMonthly={
                             num:user.time_attended[l].num
                            ,yearNum:currYear
                             ,extraHours:finEH
                             ,extraMinutes:finEM
                              ,missingHours:finMH
                              ,missingMinutes:finMM
-                        })
+                        }
                         //adding updated month to array
                         c=true
                         newMonthlyArr[l]=newMonthly
@@ -753,14 +754,14 @@ router.put('/signout',authenticateToken,async(req,res)=>{
         
             //didn't find record for this month or any records at all should add new record
             if(c==false || user.time_attended.length==0){
-                const newMonthly=new monthlyHoursSchema({
+                const newMonthly= {
                     num:parseInt(currMonth)
                     ,yearNum:parseInt(currYear)
                     ,extraHours:extraHrs
                     ,extraMinutes:extraMin
                      ,missingHours:missingHrs
                      ,missingMinutes:missingMin
-                })
+                }
                 //if month array is empty simply add this new record
                 if(user.time_attended.length==0){
                     console.log("newMonthly= "+newMonthly)
@@ -781,7 +782,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
 
             //updating attendance to enter signed out date
             ///////////////////////////////////////////////////////////////////////////////////
-            const newAtt=new AttendanceSchema({
+            const newAtt={
                 date:date,
                 time:time,
                 attended:true,
@@ -793,7 +794,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 last_signIn:last_signIn,
                 last_signOut:SignOut,
                 day:day
-            })
+            }
             console.log("signout down= "+moment(SignOut).format("HH:mm"))
             attArr[idx]=newAtt
             try{
