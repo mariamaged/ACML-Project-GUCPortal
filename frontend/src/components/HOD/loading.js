@@ -13,7 +13,7 @@ const loading = ({ role }) => {
     return (<div>
         <div style={{ float: "left" }}>
             <h3>
-                Loading &nbsp; <small className="text-muted">the staff members of {role}</small>
+                Loading &nbsp; <small className="text-muted">{role}</small>
             </h3>
         </div>
 

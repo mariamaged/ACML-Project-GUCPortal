@@ -10,8 +10,11 @@ const CourseCoordinatorRoutes = require('./Routes/CourseCoordinatorRoutes.js');
 const express = require('express');
 const app = express();
 app.use(express.json());
-
-app.use(cors())
+const corsOptions = {
+    exposedHeaders: 'auth-token',
+  };
+  
+app.use(cors(corsOptions));
 // app.use().
 app.use('/HOD', HODRoutes);
 app.use('/Instructor', InstructorRoutes);

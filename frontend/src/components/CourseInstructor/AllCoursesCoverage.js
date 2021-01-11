@@ -1,5 +1,5 @@
 // Our Components
-import Loading from './loading.js';
+import Loading from '../HOD/loading.js';
 // React Components
 // React
 import React, { Component } from 'react'
@@ -8,7 +8,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 
 // CSS and images
-import './HODNavbar.css';
+import '../HOD/HODNavbar.css';
 
 class AllCoursesCoverage extends Component {
     state = {
@@ -16,7 +16,7 @@ class AllCoursesCoverage extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5000/HOD/coursesCoverage', {
+        axios.get('http://localhost:5000/Instructor/coursecoverage', {
             headers: {
                 'x-auth-token': localStorage.getItem("auth-token")
             }
@@ -27,7 +27,7 @@ class AllCoursesCoverage extends Component {
                 console.log(this.state);
             })
             .catch(error => {
-                console.log('Error with getting course coverage for all courses under the HOD department.');
+                console.log('Error with getting course coverage for all courses the course instructor is assigned to.');
                 console.log(error);
             });
     }
@@ -35,10 +35,10 @@ class AllCoursesCoverage extends Component {
     render() {
         const coursesCoverageList = this.state.coursesCoverage.length ? (this.state.coursesCoverage.map(course => {
             return (
-                <div class="card border-secondary mb-3" key={course.courseID}>
-                    <div class="card-header">{course.courseID}</div>
+                <div class="card border-secondary mb-3" key={course["course id"]}>
+                    <div class="card-header">{course["course id"]}</div>
                     <div class="card-body">
-                        {course.courseCoverage && <h4 class="card-title" style={{ color: "#4d4d4d" }}>Course Coverage: {course.courseCoverage}</h4>}
+                        {course.coverage && <h4 class="card-title" style={{ color: "#4d4d4d" }}>Course Coverage: {course.coverage}</h4>}
                         {course.courseDoesNotHaveSlotsAssigned && <h4 class="card-title" style={{ color: "#4d4d4d" }}>Course does not have slots assigned.</h4>}
                     </div>
                 </div>)

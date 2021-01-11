@@ -25,7 +25,9 @@ class Search extends Component {
         switch(this.props.roleID) {
             case 1: urlPrefix = '/instructor/hodCourseStaff/';break;
             case 2: urlPrefix = '/instructor/hodDepartmentStaffDayOff/';break;
-            case 3: urlPrefix = '/instructor/hodCoursesCoverage/';
+            case 3: urlPrefix = '/instructor/hodCoursesCoverage/';break;
+            case 4: urlPrefix = '/instructor/hodteachingAssignment/';
+            case 5: urlPrefix = '/instructor/instructorCoursesCoverage/';
         }
         return (
             <div>

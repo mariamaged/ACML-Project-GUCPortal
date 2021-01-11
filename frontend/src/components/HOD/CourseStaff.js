@@ -16,7 +16,7 @@ class CourseStaff extends Component {
     componentDidMount() {
         axios.get('http://localhost:5000/HOD/viewDepartmentStaffAllCourses', {
             headers: {
-                'x-auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmZjUxNDNmMDg0ZDY3MGNmODA5MjBlNSIsInJvbGUiOiJBY2FkZW1pYyBNZW1iZXIiLCJhY2FkZW1pY19yb2xlIjoiQ291cnNlIEluc3RydWN0b3IiLCJpc0hlYWQiOnRydWUsImlhdCI6MTYxMDExODgzN30.ZLMWayyNy5SaRrnvk3daCEeVt5vK6pEiSCaxER-yNtE'
+                'x-auth-token': localStorage.getItem("auth-token")
             }
         })
             .then(response => {

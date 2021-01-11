@@ -32,7 +32,7 @@ router.get('/isHod', authenticateToken, async (req, res) => {
     if (academicMember.isHOD) {
         const HODDepartment = academicMember.department;
         const department = await DepartmentModel.findById(HODDepartment);
-        return res.status(200).json({ isHOD: true, departmentName: department.name});
+        return res.status(200).json({ isHOD: true, departmentName: department.name });
     }
     else return res.status(200).json({ isHOD: false });
 });
@@ -393,7 +393,7 @@ router.get('/coursesCoverage', authenticateToken, async (req, res) => {
     }
 });
 
-// 8
+// 8 (a)
 router.get('/teachingAssignmentAllCourses', authenticateToken, async (req, res) => {
     const HODAcademicModel = await AcademicStaffModel.findOne({ member: req.user.id });
 
@@ -467,7 +467,74 @@ router.get('/teachingAssignmentAllCourses', authenticateToken, async (req, res) 
     }
 });
 
+// 8 (b)
+router.get('/teachingAssignmentAllCourses/:courseID', authenticateToken, async (req, res) => {
+    const HODAcademicModel = await AcademicStaffModel.findOne({ member: req.user.id });
+    const courseID = req.params.courseID;
 
+    if (HODAcademicModel.isHOD) {
+        const HODDepartment = HODAcademicModel.department;
+        const course = await CourseModel.findOne({ id: courseID });
+        if (!course) return res.status(400).send('Course does not exist!');
+        if (!course.department.equals(HODDepartment)) return res.status(403).send('Course not under your department!');
+
+        // Has objectID of academic staff and his respective slots.
+        const academic_staff = course.academic_staff;
+        const oneCourseTeachingAssignment = [];
+
+        academic_staff.forEach((oneStaff) => {
+            const slotsTaughtbyStaff = course.schedule.filter((slot) => {
+                if (slot.academic_member_id) return oneStaff.equals(slot.academic_member_id)
+            });
+
+            for (let j = 0; j < slotsTaughtbyStaff.length; j++) {
+                const oldSlot = slotsTaughtbyStaff[j];
+                const newSlot = {
+                    date: moment(oldSlot.date).format('YYYY-MM-DD'),
+                    day: oldSlot.day,
+                    number: oldSlot.number,
+                    location: oldSlot.location,
+                    isReplaced: oldSlot.isReplaced
+                };
+
+                slotsTaughtbyStaff[j] = newSlot;
+            }
+            const teachingAssignment = {
+                staffID: oneStaff,
+                staffName: oneStaff,
+                slotsTaughtbyStaff: slotsTaughtbyStaff
+            }
+            oneCourseTeachingAssignment.push(teachingAssignment);
+        });
+
+        const oneCourse = {
+            courseID: course.id,
+            courseName: course.name,
+            oneCourseTeachingAssignment: oneCourseTeachingAssignment
+        }
+
+        // Change ObjectIDs with real ids.
+        for (let i = 0; i < oneCourse.oneCourseTeachingAssignment.length; i++) {
+            const staffID = oneCourse.oneCourseTeachingAssignment[i].staffID;
+            const academicStaff = await AcademicStaffModel.findById(staffID);
+            const staff = await StaffMemberModel.findById(academicStaff.member);
+            oneCourse.oneCourseTeachingAssignment[i].staffID = staff.id;
+            oneCourse.oneCourseTeachingAssignment[i].staffName = staff.name;
+
+            for (let j = 0; j < oneCourse.oneCourseTeachingAssignment[i].slotsTaughtbyStaff.length; j++) {
+                const oldSlot = oneCourse.oneCourseTeachingAssignment[i].slotsTaughtbyStaff[j];
+                const location = await LocationModel.findById(oldSlot.location);
+                oldSlot.location = location.id;
+                oneCourse.oneCourseTeachingAssignment[i].slotsTaughtbyStaff[j] = oldSlot;
+            }
+        }
+
+        return res.status(200).json(oneCourse);
+    }
+    else {
+        return res.status(401).send('Access Denied!');
+    }
+});
 
 // Export the router.
 module.exports = router;

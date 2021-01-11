@@ -40,61 +40,79 @@ function authenticateToken(req,res,next){
 }
 module.exports=authenticateToken
 //login
-router.post('/login',async(req,res,next)=>{
-    console.log("here in login")
-    try{
-        const{email,password}=req.body;
-        if(!email ){
-            return res.status(400).json("Please enter a valid email. ");
+router.post("/login", async (req, res, next) => {
+    console.log("here in login");
+    try {
+      const { email, password } = req.body;
+      if (!email) {
+        res.status(400).send({ msg: "Please enter a valid email. " });
+        return;
+      }
+      if (!password) {
+        res.status(400).send({ msg: "Please enter a valid  password." });
+        return;
+      }
+      const existingUser = await StaffMemberModel.findOne({ email: email });
+      if (!existingUser) {
+        res.status(400).send({ msg: "This user is not registered." });
+        return;
+      } else {
+        const isMatched = await bcrypt.compare(password, existingUser.password);
+        if (isMatched === false) {
+          res.status(400).send({ msg: "Please enter correct password." });
+          return;
+        } else if (existingUser.staff_type == "HR") {
+          const token = await jwt.sign(
+            {
+              id: existingUser._id,
+              role: existingUser.staff_type,
+              academic_role: "",
+              isHead: false,
+              isCoordinator: false,
+            },
+            process.env.TOKEN_SECRET
+          );
+  
+          const user = {
+            objectId: existingUser._id,
+            role: "HR",
+            name: existingUser.name,
+            id: existingUser.id,
+            salary: existingUser.salary,
+            newMember: existingUser.newStaffMember,
+          };
+          res.header("auth-token", token).status(200).send({ user });
+          return;
+        } else {
+          const user = await AcademicStaff.findOne({ member: existingUser._id });
+          console.log("user= " + user);
+          const token = await jwt.sign(
+            {
+              id: existingUser._id,
+              role: existingUser.staff_type,
+              academic_role: user.type,
+              isHead: user.isHOD,
+              isCoordinator: user.isCoordinator,
+            },
+            process.env.TOKEN_SECRET
+          );
+          const output = {
+            name: existingUser.name,
+            id: existingUser._id,
+            role: user.type,
+            isHOD: user.isHOD,
+            isCC: user.isCourseCoordinator,
+            salary: existingUser.salary,
+            newMember: existingUser.newStaffMember,
+          };
+          res.header("auth-token", token).status(200).send({ user: output });
+          return;
         }
-        if(!password)
-        return res.status(400).json("Please enter a valid  password.");
-
-        const existingUser=await StaffMemberModel.findOne({email:email})
-        if(!existingUser){
-            return res.status(400).json({msg:"This user is not registered."});
-        }
-        else{
-            //user first login original pass='123456'
-            // if(existingUser.newStaffMember===true){
-            //     res.status(500).json("Please enter new password")
-            // }
-            
-            
-            const isMatched=await bcrypt.compare(password,existingUser.password);       //comparing password entered text with password of the user we got from the database            
-           /* if( isMatched===false){
-                // return res.status(400).json({error:"Please enter correct password."});
-                return res.status(400).send("Please enter correct password.");
-             } */
-             
-             if(existingUser.staff_type=="HR"){
-                const token=await jwt.sign({id:existingUser._id,role:existingUser.staff_type,academic_role:'',isHead:false,isCoordinator:false},process.env.TOKEN_SECRET);
-               // res.header('auth-token', token).send(token);
-               if(existingUser.newStaffMember===true){
-                return res.status(500).json({message:"Please enter new password.",token:token})
-                }
-             return  res.json({token,msg:"User logged in successfully"});
-            }
-            else{
-                
-                const user=await AcademicStaff.findOne({member:existingUser._id});
-                console.log("user= "+user)
-                const token=await jwt.sign({id:existingUser._id,role:existingUser.staff_type,academic_role:user.type,isHead:user.isHOD,isCoordinator:user.isCoordinator},process.env.TOKEN_SECRET);
-               // res.header('auth-token', token).send(token);
-               if(existingUser.newStaffMember===true){
-                return  res.status(500).json({message:"Please enter new password.",token:token})
-            }
-            return  (res.json({token,msg:"User logged in successfully"}));
-
-         }
-        
+      }
+    } catch (err) {
+      return res.status(500).send({ msg: err.message });
     }
-}
-        catch(err){
-          return  res.status(500).json({error:err.message});
-        }
-    
-})
+  });
 
 //user first login should change password hash it and update his account
 router.put('/enterNewPass',authenticateToken,async(req,res)=>{
