@@ -1969,8 +1969,10 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     
 
     const courseName=await Course.findOne({id:req.body.courseID})
-    if(!courseName)
+    console.log("coursenAME= "+courseName)
+    if(!courseName){
     return res.json("No such course exists. Please enter correct course ID.")
+    }
     const courseID=courseName.id
     const courseCoordinatorID=courseName.course_coordinator
      const courseCoordinator= await AcademicStaffModel.findById(courseCoordinatorID)
@@ -2020,10 +2022,15 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     const coursesIDs=academic.courses
     var teaches=false
     const enteredCourseID=(await Course.findOne({id:courseID}))._id
-    console.log(enteredCourseID)
+    // console.log(enteredCourseID)
     for(var i=0;i< coursesIDs.length;i++){
-        if(coursesIDs[i]==enteredCourseID)
+        // console.log("ccccccccccccc= "+coursesIDs[i])
+        const check=(coursesIDs[i].toString()==enteredCourseID)
+        // console.log("ccccccchhhhhhhhhhhhhheeeeeeeeee= "+check)
+        if(coursesIDs[i].toString()==enteredCourseID){
             teaches=true
+            console.log("hereetttttttttttttttttttttttttttt")
+        }
     }
     if(teaches==false)
     return res.json("Not permitted to send this request because user does not teach this course.")
@@ -2089,7 +2096,7 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
     }
 // console.log("dayyyyyyyyyyyy= "+req.body.day_off)
     if(!(req.body.newDayOff =="Saturday" || req.body.newDayOff =="Sunday"||req.body.newDayOff =="Monday"
-    ||req.body.newDayOff =="Tuesday"||req.body.newDayOff =="Wednesday"||req.body.newDayOff =="Thursday" || req.body.newDayOff =="Thursday")){
+    ||req.body.newDayOff =="Tuesday"||req.body.newDayOff =="Wednesday"||req.body.newDayOff =="Thursday" || req.body.newDayOff =="Friday")){
         return res.json("Please enter a day with correct format (eg.Saturday).")
     }
 
@@ -2501,12 +2508,17 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
         if(!req.body.maternityDoc){
             return res.json("Documents to prove the maternity condition must be submitted.")
         }
-        if(!req.body.startDate){
+        if(!(req.body.startDate)){
             return res.json("Must input start date!")
         }
-        if(!req.body.endDate){
+        if(!(req.body.endDate)){
             return res.json("Must input end date!")
         }
+        if(req.body.startDate<=(new moment().format("YYYY-MM-DD")))
+        return res.json("Start date must be a date after current day.")
+        if(req.body.endDate<=req.body.startDate)
+        return res.json("End date must be a date after start date.")
+
         const academic=await AcademicStaffModel.findOne({member:req.user.id})
         const departmentID=academic.department
         const departmentRec=await department.findById(departmentID)
@@ -2581,6 +2593,7 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
 
     //check if he is asking to compensate for a day off or friday
     const day=moment(req.body.missedDay).format('dddd')
+    const compensationDay=moment(req.body.compensatedDay).format('dddd')
     const academic=await AcademicStaffModel.findOne({member:req.user.id})
     // console.log("aca=" +academic)
     const day_off=academic.day_off
@@ -2589,6 +2602,34 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     }
     if(day==day_off){
         return res.json("Cannot compensate for a day off.")
+    }
+
+    if(compensationDay=="Friday")
+    return res.json("Cannot compensate on Friday!")
+    if(compensationDay!=day_off)
+    return res.json("Compensation day should be a day off.")
+
+
+    if(moment(missedDay).format("D")<=10){
+        var prevMonth;
+        var prevYear;
+        var prevDay=11;
+        var currDay=10;
+        const currYear=moment(missedDay).format("Y")
+        const currMonth=moment(missedDay).format("M")
+        if(currMonth==1){
+            prevMonth=12
+            prevYear=parseInt(currYear)-1
+        }
+        else{
+            prevMonth=parseInt(currMonth)-1
+            prevYear=currYear
+        }
+        const begin=new moment(prevYear+"-"+prevMonth+"-"+prevDay).format("YYYY-MM-DD")
+        const end=new moment(currYear+"-"+currMonth+"-"+currDay).format("YYYY-MM-DD")
+        if(!(moment(compensationDay).format("YYYY-MM-DD")>=begin && 
+        moment(compensationDay).format("YYYY-MM-DD")<=end))
+        return res.json("Compensation day should be in same month as missed day **a month start fromthe 11th to the 10th")
     }
 
    
