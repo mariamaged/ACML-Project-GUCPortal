@@ -191,9 +191,9 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
     if(f!=null) res.status(400).json({msg:"a faculty with this name already exists"});
     else{   
     toAdd=new faculty({name});
-    await toAdd.save();}
+    await toAdd.save();
     res.json(toAdd);
-    console.log(toAdd);}}}
+    console.log(toAdd);}}}}
     catch(err){
         res.status(500).json({msg:{error:err.message}});
     }
@@ -498,6 +498,7 @@ router.route('/course').post(authenticateToken,async(req,res)=>{
 //elmafrood a bcrypt el password hatta lw default?
 //when academic staff add lel table/delete/update
 const bcrypt=require('bcrypt');
+// authenticateToken,
 router.route('/staffmember').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
@@ -1151,29 +1152,33 @@ function compare( a, b ) {
 }
 
 
-
+// 
 router.put('/addrecord',authenticateToken,async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
-    res.status(401).send('Access Denied');
+       const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
+    res.status(401).send({msg:'Access Denied'});
     else{
        const{userid,thedate,signintime,signouttime}=req.body;
-       if(!userid || !thedate) res.status(400).json({msg:"please fill the required fields"});
+       if(!userid || !thedate) res.status(401).json({msg:"please fill the required fields"});
        else{
-           if(userid==req.user.id)
-              res.status(400).json({msg:"Cannot add record to this user"});
+           if(userid==st.id)
+              res.status(401).json({msg:"Sorry, Cannot add record to yourself"});
            else{
+            if(!signintime && !signouttime) res.status(401).json({msg:"please insert the record to add"});
+            else{
                var index=0;
                const person=await StaffMember.findOne({"id":userid});
+               if(person==null) res.status(401).json({msg:"The user id you entered is incorrect"});
+               else{
                if(signintime){
                    if(signintime>="07:00") {
                    for(var i=0;i<person.attendance.length;i++){
                         //to add sorted   
-                        if(moment(person.attendance[i].date).format("YYYY-MM-DD")==thedate){
+                        if(moment(person.attendance[i].date).format("DD/MM/YYY")==thedate){
                             index=i;
-                            if(person.attendance[i].signins.length==0)signins.push(signintime);
+                            if(person.attendance[i].signins.length==0) person.attendance[i].signins.push(signintime);
                            for(var j=0;j<person.attendance[i].signins.length;j++){
                                if(person.attendance[i].signins[j]>signintime){ 
                                 var temp2=signintime;
@@ -1199,7 +1204,7 @@ router.put('/addrecord',authenticateToken,async(req,res)=>{
                 for(var i=0;i<person.attendance.length;i++){
                      //to add sorted   
                      if(person.attendance[i].date==thedate){
-                        if(person.attendance[i].signouts.length==0)signouts.push(signouttime);
+                        if(person.attendance[i].signouts.length==0)person.attendance[i].signouts.push(signouttime);
                         for(var j=0;j<person.attendance[i].signouts.length;j++){
                             if(person.attendance[i].signouts[j]>signouttime){ 
                              var temp2=signouttime;
@@ -1220,6 +1225,7 @@ router.put('/addrecord',authenticateToken,async(req,res)=>{
             }
         }
 
+            if(person.attendance.length>0){
             //hours should be calculated again here
             var min=0;
             if(person.attendance[index].signins.length<person.attendance[index].signouts.length) min=person.attendance[index].signins.length;
@@ -1234,17 +1240,16 @@ router.put('/addrecord',authenticateToken,async(req,res)=>{
             }
              person.attendance[i].hours=hours;
              
-            await person.save();
-            if(!signintime&& !signouttime) res.status(400).json({msg:"please insert the record to add"});
-            else res.send("done");
+            await person.save();}
+            res.send({msg:"done"});
+           
 
 
 
 
+        }
 
-
-
-               
+        }
            
            }   
        }}

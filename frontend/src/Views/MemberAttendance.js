@@ -4,7 +4,7 @@ import axios from 'axios'
 function MemberAttendance() {
     const [length,setlength]=useState(-1);
     var attendance=[]    
-    let theAttendance=<h1>hwa mabytl3sh leeh</h1>;
+    let theAttendance=null;
     var getTuples=(attendance,index)=>{
         return(<tr>
       <th scope="row">attendance[index].date</th>
@@ -46,7 +46,6 @@ function MemberAttendance() {
     }
     return(
         <div>
-            {theAttendance}
           <div className="form-group">
            <label className="col-form-label">Staff Member id:</label>
            <input type="Text" min="1" className="form-control" placeholder="Default input" id="inputDefault1" required></input>
@@ -68,8 +67,8 @@ function MemberAttendance() {
       }
     });
     }}>View Attendance</button>
-
-    
+   <hr></hr>
+{theAttendance}
     </div>
     );
 }

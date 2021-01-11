@@ -24,7 +24,7 @@ function AddMember() {
           <label>Type:</label>
             <select className="form-control" id="exampleSelect1" required>
                 <option>HR</option>
-                <option>Instructor</option>
+                <option>Course Instructor</option>
                 <option>Teaching Assistant</option>
             </select>
         </div>
