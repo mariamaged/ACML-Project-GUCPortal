@@ -1956,6 +1956,17 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     if(!req.body.courseID){
         return res.json("Must submit course ID with the request.")
     }
+    if(!(req.body.slotNum>=1 && req.body.slotNum<=5))
+    return res.json("Please enter correct slot number.")
+
+    const academic=await AcademicStaffModel.findOne({member:req.user.id})
+     //check if this slot day is his day off
+     const day_off=academic.day_off
+     const slotDayEntered=req.body.slotDay
+     if(day_off==slotDayEntered || slotDayEntered=="Friday")
+     return res.json("Cannot make an slot linking request for a day that is your day-off!")
+
+    
 
     const courseName=await Course.findOne({id:req.body.courseID})
     if(!courseName)
@@ -1968,13 +1979,16 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
          return res.json("Currently there is not an assigned course coorinator to this course send this request to.")
      }
     const coordinatorID=courseCoordinator.member
-    // console.log("coorindatorID= "+coordinatorID)
     //will compare slot timings with user schedule to make sure that he is free during this slot
     const slotNum=req.body.slotNum
     const slotDay=req.body.slotDay
-    const academic=await AcademicStaffModel.findOne({member:req.user.id})
+    
     const schedule=academic.schedule
     var check=false;
+
+     //check if this slot on this day for this course actually exists
+
+
 
 
 
@@ -1987,19 +2001,35 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
 
     //check if user teaches this course
     //const academic=await AcademicStaffModel.find({member:req.user.id})
+    // const coursesIDs=academic.courses
+    // var teaches=false
+    // // console.log(coursesIDs)
+    // for(var i=0;i< coursesIDs.length;i++){
+    //    // console.log(coursesIDs[i])
+    //     var courses=await Course.findById(coursesIDs[i])
+    //     // console.log(courses)
+    //     // console.log(courses.id)
+    //     if(courses.id==courseID)
+    //         teaches=true
+    // }
+    // if(teaches==false)
+    // return res.json("Not permitted to send this request because user does not teach this course.")
+
+    //more time efficient for above code
+    //to only get ._id of entered course and compare it with other course ids so ot to waste time searching
     const coursesIDs=academic.courses
     var teaches=false
-    // console.log(coursesIDs)
+    const enteredCourseID=(await Course.findOne({id:courseID}))._id
+    console.log(enteredCourseID)
     for(var i=0;i< coursesIDs.length;i++){
-       // console.log(coursesIDs[i])
-        var courses=await Course.findById(coursesIDs[i])
-        // console.log(courses)
-        // console.log(courses.id)
-        if(courses.id==courseID)
+        if(coursesIDs[i]==enteredCourseID)
             teaches=true
     }
     if(teaches==false)
     return res.json("Not permitted to send this request because user does not teach this course.")
+
+
+
 
     //creating new slot linking request
     var reason=''
@@ -2221,8 +2251,37 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     if(!req.body.accidentDate){
         return res.json("Must submit accident date with the request.")
     }
-    //get annual and accidental leave balance
+
+     //check if the accident day is a day where the user didnt actually attend
+     const attendance=staff.attendance
+     if(attendance){
+         console.log("att= "+attendance)
+     for(var i=0;i<attendance.length;i++){
+        console.log("i= "+i)
+        console.log(" "+moment(attendance[i].date).format("YYYY-MM-DD"))
+        if(moment(attendance[i].date).format("YYYY-MM-DD")==req.body.accidentDate){
+            // console.log("i= "+i)
+            // console.log(" "+moment(attendance[i]).format("YYYY-MM-DD"))
+            console.log("sickDay= "+req.body.accidentDate)
+            return res.json("Cannot make an accidental leave request for a day that was attended!")
+        }
+     }
+    }
     const academic=await AcademicStaffModel.findOne({member:req.user.id})
+
+     //check if this sick day is his day off
+     const day_off=academic.day_off
+     const accidentDateEntered=moment(req.body.accidentDate).format("dddd")
+     if(day_off==accidentDateEntered || accidentDateEntered=="Friday")
+     return res.json("Cannot make an accidental leave request for a day that is your day-off!")
+
+     if(moment(req.body.accidentDate).format("YYYY-MM-DD")>new moment().format("YYYY-MM-DD"))
+     return res.json("Cannot submit an accidental leave request for an accident that has not already happened!")
+
+
+
+    //get annual and accidental leave balance
+    // const academic=await AcademicStaffModel.findOne({member:req.user.id})
     //const staff=await StaffMemberModel.findById(req.user.id)
     const accidentalDaysLeft=staff.accidentalDaysLeft
     const annual_days=staff.annual_days
@@ -2318,6 +2377,36 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
      if(!hodID){
          return res.json("There is currently no head of this department to send this request to.")
      }
+
+     // ---------------------------------MILESTONE2---------------------------------
+     //check if the sick day is a day where the user didnt actually attend
+     const attendance=staff.attendance
+     if(attendance){
+         console.log("att= "+attendance)
+     for(var i=0;i<attendance.length;i++){
+        console.log("i= "+i)
+        console.log(" "+moment(attendance[i].date).format("YYYY-MM-DD"))
+        if(moment(attendance[i].date).format("YYYY-MM-DD")==req.body.sickDay){
+            // console.log("i= "+i)
+            // console.log(" "+moment(attendance[i]).format("YYYY-MM-DD"))
+            console.log("sickDay= "+req.body.sickDay)
+            return res.json("Cannot make a sick leave request for a day that was attended!")
+        }
+     }
+    }
+     //check if this sick day is his day off
+     const day_off=academic.day_off
+     const sickDayEntered=moment(req.body.sickDay).format("dddd")
+     if(day_off==sickDayEntered || sickDayEntered=="Friday")
+     return res.json("Cannot make a sick leave request for a day that is your day-off!")
+     console.log(moment(req.body.sickDay).format("YYYY-MM-DD"))
+     console.log(new moment().format("YYYY-MM-DD"))
+     if(!(moment(req.body.sickDay).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD")))){
+        console.log("beforeeeeeeeeeeee")
+           return res.status(401).json("You are only allowed to submit a sick leave request for an absence that has happened by maximum 3 days ago!")
+   
+       }
+
     //getting all days allowed to send request which is 3 days from today
     var diff3=moment().subtract(3, "days").format("YYYY-MM-DD");
    var diff2=moment().subtract(2, "days").format("YYYY-MM-DD");
@@ -2387,7 +2476,7 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
 
    //request sent after 3 days deadline has passed
    else if(moment(req.body.sickDay).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
-       return res.json("Deadline for sending sick leave request has been exceeded.\n Cannot send request")
+       return res.json("Deadline for sending sick leave request has been exceeded.Cannot send request!")
    }
    else if(moment(req.body.sickDay).format("YYYY-MM-DD")>moment().format("YYYY-MM-DD")){
     return res.json("Sick day leave request must be submitted by a maximum of 3 days after sick day date.")
@@ -3673,7 +3762,7 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
 
     const HODAcademicModel = await AcademicStaffModel.findById(currDepartment.HOD);
     const HODStaffModel = await StaffMemberModel.findById(HODAcademicModel.member);
-    
+    console.log("hod nameeeeeeeeeeeeeeeeeeeeeeeee= "+HODStaffModel.name)
     //get slotDate and user's schedule to get slots on this day
     const slotDate = req.body.slotDate;
     const userSchedule=userAcademic.schedule
@@ -3681,40 +3770,55 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
     var l=0;
     const requestsSameSlot =new Array()
     var n=0
-    console.log("sched= "+userSchedule)
+
+    var allReplacementRequest=[];
+    var m=0;
+    // console.log("sched= "+userSchedule)
     for(var k=0;k<userSchedule.length;k++){
             if(moment(userSchedule[k].date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
-               console.log("inside loop hereeeeeeeeeeeeeeeee")
+            //    console.log("inside loop hereeeeeeeeeeeeeeeee")
+            //    console.log("date= "+new Date(slotDate))
+            //    console.log("NUM= "+ userSchedule[k].number)
+               
+               const slotLocation=(await location.findById(userSchedule[k]. location)).id
+            //    console.log("loc ="+slotLocation)
                 var acceptedRequest = await request.findOne({
+                    reqType:"Replacement",
                     slotNum: userSchedule[k].number, slotDate: new Date(slotDate),
-                     slotLoc:userSchedule[k]. location, 
+                     slotLoc:slotLocation, 
                     state: 'Accepted',
                     sentBy: req.user.id});
-                if(acceptedRequest){
-                    console.log("accepted founddddddddddddd")
+                
+                //need to add all requests to check that user 
+                //even sent replacement requests before sending annual
+                var allReq = await request.findOne({
+                    reqType:"Replacement",
+                    slotNum: userSchedule[k].number, slotDate: new Date(slotDate),
+                        slotLoc:slotLocation, 
+                    sentBy: req.user.id});
+                allReplacementRequest[m++]=allReq   
+                
+                
+                    if(acceptedRequest){
+                    
                     var accepted=({
                         replacementID:acceptedRequest.sentTo,
                         slotNum:userSchedule[k].number,
-                        slotLoc:userSchedule[k].location
+                        slotLoc:slotLocation
                     })
-                    console.log( userSchedule[k].number+" "+userSchedule[k].date+" "+
-                     userSchedule[k].location, 
-                        )
-                    acceptedRequests[l++]=accepted
-
-                    // requestsSameSlot[n++]=await request.find({
-                    //     slotNum: userSchedule[k].slotNum, slotDate: userSchedule[k].slotDate
-                    //     , slotLoc: userSchedule[k].slotLoc,
-                    //     sentBy: req.user.id});    
+                    
+                    acceptedRequests[l++]=accepted 
                 }
             }
-            for(var g=0;g<acceptedRequests.length;g++)
-            console.log(acceptedRequests[g].replacementID+" "+acceptedRequests[g].slotNum)
+           
     }
     
-    
+    // console.log("llllllllllllllll= "+acceptedRequests.length)
+    // for(var g=0;g<acceptedRequests.length;g++)
+    // console.log(acceptedRequests[g].replacementID+" "+acceptedRequests[g].slotNum+" "+
+    // acceptedRequests[g].slotLoc)
    
-
+        console.log("sasdsadadasd= "+allReplacementRequest.length)
          var currReason=""
          if(req.body.reason)
           currReason = req.body.reason;
@@ -3736,24 +3840,22 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
        
         await newAnnualRequest.save();
 
-        const acceptedStaff = await StaffMemberModel.findById(acceptedRequest.sentTo);
+        //const acceptedStaff = await StaffMemberModel.findById(acceptedRequest.sentTo);
 
         //send notification to hod
       const notification=(await StaffMemberModel.findById(HODStaffModel._id)).notifications
       const notNew=notification
       notNew[notNew.length]="You received a new annual leave request."
       const staffReplacement= await StaffMemberModel.findByIdAndUpdate(HODStaffModel._id,{notifications:notNew})
-
-        return res.status(200).send('Annual Leave request sent to HOD with the details about the academic member who accepted your request: ' 
-        + acceptedStaff.name + ", with id: " + acceptedStaff.id + '.');
+    return res.status(200).send('Annual Leave request sent to HOD with the details about the academic member who accepted your request');
 
 
 
     }
-    // else {
-        // if(requestsSameSlot.length == 0) {
-        //     return res.status(400).send('You do not have a replacement request with such details!');
-        // }
+    else {
+        if(allReplacementRequest.length == 0) {
+            return res.status(400).send('You do not have a replacement request with such details!');
+        }
         else {
 
             var currReason=""
@@ -3776,16 +3878,16 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
              //send notification to hod
             const notification=(await StaffMemberModel.findById(HODStaffModel._id)).notifications
             const notNew=notification
-            notNew[notNew.length]="You received a new compensation leave request."
+            notNew[notNew.length]="You received a new annual leave request."
             const staffReplacement= await StaffMemberModel.findByIdAndUpdate(HODStaffModel._id,{notifications:notNew})
 
             return res.status(200).send('Annual Leave request sent to HOD with request that has no accept responses.');
         }
-    // }
+    }
 
 });
 
-router.post('/acceptRequest',authenticateToken,async(req,res)=>{
+router.put('/acceptRequest',authenticateToken,async(req,res)=>{
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
     if(!userAcademic) 
     return res.status(401).send('You are not an academic member!');
@@ -3798,15 +3900,17 @@ router.post('/acceptRequest',authenticateToken,async(req,res)=>{
     return res.json("This request does not exist.")
 
     const reqType=currRequest.reqType;
-
+    if(currRequest.state!="Pending"){
+        return res.json("This request has already been responded to before.")
+    }
 
     if(reqType=="Replacement"){
         //check if this person is the sender of this request
-        if(!currRequest.sentTo.equals(req.user.id)) 
-        return res.status(401).send('This request was not sent to you.Cannot accept or reject.');
-        if(currRequest.state=="Accepted"){
-            return res.json("This request has already been accepted before.")
-        }
+        // if(!currRequest.sentTo.equals(req.user.id)) 
+        // return res.status(401).send('This request was not sent to you.Cannot accept or reject.');
+        // if(currRequest.state=="Accepted"){
+        //     return res.json("This request has already been accepted before.")
+        // }
     
         // const sentBy=(await StaffMemberModel.findOne({email:sentByEmail}))._id
         const reqType=currRequest.reqType
@@ -3839,15 +3943,23 @@ router.post('/acceptRequest',authenticateToken,async(req,res)=>{
     }
 
     if(reqType=="Change Day off"){
+        if(!currRequest.sentTo.equals(req.user.id)) 
+        return res.status(401).send('This request was not sent to you.Cannot accept or reject.');
+        if(currRequest.state!="Pending"){
+            return res.json("This request has already been responded to before.")
+        }
         const upReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+        const notification=(await StaffMemberModel.findById(currRequest.sentBy)).notifications
+        const notNew=notification
+        notNew[notNew.length]="Your request has been accepted."
+        const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
+        return res.json("Request successully accepted.")
     }
-    if(reqType=="Accidental Leave" || reqType=="Sick Leave" ||reqType=="Compensation" || reqType=="Slot Linking"){
-        var attDay
-        if(reqType=="Slot Linking")
-        attDay=currRequest.slotDate
 
-        if(reqType=="Compensation")
-        attDay=currRequest.missedDay
+
+    if(reqType=="Accidental Leave" || reqType=="Sick Leave" ){
+        var attDay
+
         
         if(reqType=="Sick Leave")
         attDay=currRequest.sickDay
@@ -3867,6 +3979,13 @@ router.post('/acceptRequest',authenticateToken,async(req,res)=>{
          var oldMonthUp=user.time_attended
         oldMonthUp[oldMonthUp.length-1]=newAtt
         const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:oldMonthUp})
+
+        //notify
+        const notification=(await StaffMemberModel.findById(currRequest.sentBy)).notifications
+        const notNew=notification
+        notNew[notNew.length]="Your request has been accepted."
+        const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
+        return res.json("Request successully accepted.")
                  
     }
 

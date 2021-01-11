@@ -846,6 +846,7 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
         if(user.attendance.length>0){
            
             for(var i=0;i<user.attendance.length;i++){
+                console.log("attendance")
                 const currDay=user.attendance[i]
                 if(month ){
                      const dateMonth=moment(currDay.date).format("M")
@@ -867,6 +868,7 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
             if(arr.length==0)
             return res.json("There are no attendance records to display.")
             else{
+                //to display records before today only
                 var check=false
                 for(var k=0;k<arr.length;k++){
                     if(moment(arr[k].date).format("YYYY-MM-DD")<=new moment().format("YYYY-MM-DD")){
@@ -881,6 +883,8 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
                     check=true
                     }
                 }
+
+                //if no records to show before today
                 if(check==false){
                     return res.json("There are no attendance records to display.")
                 }
