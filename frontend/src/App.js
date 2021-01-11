@@ -2,7 +2,8 @@ import './App.css';
 import Login from "./Components/Login";
 import React from "react";
 import {BrowserRouter,Route} from "react-router-dom";
-
+import "./minty.css";
+//import "./bootstrap.bundle.min"
 
 import HR from "./Components/HR"
 import Assisant from "./Components/Assistant"

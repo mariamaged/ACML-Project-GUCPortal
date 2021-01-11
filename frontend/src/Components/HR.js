@@ -1,14 +1,24 @@
 import React from "react";
+import ViewProfile from "./StaffMember/ViewProfile";
+import UpdateProfile from "./StaffMember/UpdateProfile";
+import Attendance from "./StaffMember/Attendance";
+import axios from "axios";
 
 class HR extends React.Component{
     state={
-        user:{}
+        user:{},
+        newMember:localStorage.getItem("newMember"),
+        newPassword:"",
+        passCheck:""
+
     }
 
     componentDidMount(){
-    const user=localStorage.getItem('user');
-    const parsed= JSON.parse(user);
-    this.setState({user:parsed})
+        console.log(this.state.newMember)
+    //const user=localStorage.getItem('user');
+   // const parsed= JSON.parse(user);
+    //this.setState({user:parsed})
+  
 }
 
 
@@ -18,45 +28,68 @@ class HR extends React.Component{
         }
        
         return(
-
-            <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a className="navbar-brand" href="#">HR:{this.state.user.name}</a>
-            <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-              <span className="navbar-toggler-icon"></span>
-            </button>
-          
-            <div className="collapse navbar-collapse" id="navbarColor01">
-              <ul className="navbar-nav mr-auto">
-                <li className="nav-item active">
-                  <a className="nav-link" href="#">Home
-                    <span className="sr-only">(current)</span>
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">Features</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">Pricing</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">About</a>
-                </li>
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">Action</a>
-                    <a className="dropdown-item" href="#">Another action</a>
-                    <a className="dropdown-item" href="#">Something else here</a>
-                    <div className="dropdown-divider"></div>
-                    <a className="dropdown-item" href="#">Separated link</a>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </nav>
+          <div>
+              
+              {this.state.newMember==="true"?this.passwordReset():this.routes()}
+             
+          </div>
         )
     }
 
 
+    routes=()=>{
+        return(
+            <div>
+                tmam
+            </div>
+
+
+        )
+    }
+    passwordReset=()=>{
+        return(
+      <div className="container">
+          <h2 className="text-center mt-5 mb-5">Rest Password:</h2>
+          <p>You have to reset your password on your first Login</p>
+          <form onSubmit={this.resetPass}>
+          <label  htmlFor="newPassword">New Password</label>
+          <input style={{width:"15rem"}} className="form-control mb-3" id="newPassword" name="newPassword" type="password" placeholder="NEW PASSWORD" value={this.state.newPassword} onChange={this.passChange}/>
+          <label htmlFor="passCheck">Confirm New Password</label>
+          <input style={{width:"15rem"}} className="form-control mb-3" id="passCheck" name="passCheck" type="password" placeholder="CONFIRM NEW PASSWORD" value={this.state.passCheck} onChange={this.passChange}  />
+          <input style={{width:"7rem"}} className=" btn btn-primary form-control" onSubmit={this.resetPass} type="submit"/>
+          </form>
+      </div>
+
+        )
+    }
+    passChange=(e)=>{
+        this.setState({[e.target.name]:e.target.value});
+    }
+    resetPass=(e)=>{
+        e.preventDefault();
+        if(this.state.newPassword!==this.state.passCheck){
+            alert("Passwords must be the same");
+            return;
+        }
+       axios.put("http://localhost:5000/staff/enterNewPass",{
+           passCheck:this.state.passCheck,
+           newPassword:this.state.newPassword
+       },{
+           headers:{
+               "auth-token":localStorage.getItem("auth-token")
+           }
+       }).then(res=>{
+           alert("Password changed successfully");
+           this.setState({newMember:false});
+       }).catch(err=>{
+           if(err.response){
+               alert(err.response.data.msg);
+               console.log(err.message);
+           }else{
+               alert("Error Ocurred\n"+err.message);
+               console.log(err)
+           }
+       })
+    }
 }
 export default HR

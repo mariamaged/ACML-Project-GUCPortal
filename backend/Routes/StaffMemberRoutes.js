@@ -23,13 +23,6 @@ async function authenticateToken(req, res, next) {
     res.status(401).send({ msg: "Access deined please log in first." });
     return;
   }
-  // const verified= jwt.verify(token, process.env.TOKEN_SECRET)
-  // if(!verified){
-  //     return res.json("Token is unauthorized.")
-  // }
-  // req.user=verified
-  // console.log("in auth "+req.user)
-  // next();
   try {
     const verified = await jwt.verify(token, process.env.TOKEN_SECRET);
     req.user = verified;
@@ -73,16 +66,16 @@ router.post("/login", async (req, res, next) => {
           },
           process.env.TOKEN_SECRET
         );
-      
-        const user={
-            objectId: existingUser._id,
-            role: "HR",
-            name:existingUser.name,
-            id:existingUser.id,
-            salary:existingUser.salary,
-            newMember:existingUser.newStaffMember
-        }
-        res.header('auth-token', token).status(200).send({ user});
+
+        const user = {
+          objectId: existingUser._id,
+          role: "HR",
+          name: existingUser.name,
+          id: existingUser.id,
+          salary: existingUser.salary,
+          newMember: existingUser.newStaffMember,
+        };
+        res.header("auth-token", token).status(200).send({ user });
         return;
       } else {
         const user = await AcademicStaff.findOne({ member: existingUser._id });
@@ -97,16 +90,16 @@ router.post("/login", async (req, res, next) => {
           },
           process.env.TOKEN_SECRET
         );
-        const output={
-          name:existingUser.name,
-          id:existingUser._id,
-          role:user.type,
-          isHOD:user.isHOD,
-          isCC:user.isCourseCoordinator,
-          salary:existingUser.salary,
-          newMember:existingUser.newStaffMember
-        }
-        res.header('auth-token', token).status(200).send({ user:output});
+        const output = {
+          name: existingUser.name,
+          id: existingUser._id,
+          role: user.type,
+          isHOD: user.isHOD,
+          isCC: user.isCourseCoordinator,
+          salary: existingUser.salary,
+          newMember: existingUser.newStaffMember,
+        };
+        res.header("auth-token", token).status(200).send({ user: output });
         return;
       }
     }
@@ -120,12 +113,12 @@ router.put("/enterNewPass", authenticateToken, async (req, res) => {
   const passNew = req.body.newPassword;
   const passCheck = req.body.passCheck;
   const user = await StaffMemberModel.findById(req.user.id);
-  if (!passNew) return res.json("Please enter a valid new password.");
+  if (!passNew) return res.status(400).send({msg:"Please enter a valid new password."});
   if (!passCheck) {
-    return res.json("Please enter the password check.");
+    return res.status(400).send({msg:"Please enter the password check."});
   }
   if (passNew != passCheck) {
-    return res.status(400).json({ msg: "Passwords should match." });
+    return res.status(400).send({ msg: "Passwords should match." });
   } else {
     console.log("in else");
     console.log(req.user.id);
@@ -137,27 +130,16 @@ router.put("/enterNewPass", authenticateToken, async (req, res) => {
         password: hashedPassword,
         newStaffMember: false,
       });
-      return res.json("Password changed successfully.");
+      return res.send({msg:"Password changed successfully."});
     } catch (err) {
-      return res.json("Error. Please try again");
+      return res.status(500).send({msg:"Error. Please try again"});
     }
   }
 });
 
-// //logout
-// router.get('/logout',async(req,res)=>{
-//     try{
-
-//     console.log("token= "+req.header('x-auth-token'))
-// }
-//     catch(err){
-//         res.status(500).send("error "+err)
-//     }
-// })
-
 // LOGOUT NOT COMPLETE !!!!!!!!! # mark
 router.get("/logout", async (req, res) => {
-  const token = req.headers["x-auth-token"];
+  const token = req.header("auth-token");
   if (!token) {
     res.status(400).send({ msg: "Auth Token Missing" });
   }
@@ -175,7 +157,10 @@ router.get("/profile", authenticateToken, async (req, res) => {
     var off = "";
     if (!office) off = "";
     else off = office.id;
-    res.json({
+    res.send({
+      dayOff: "Saturday",
+      salary: staff.salary,
+      gender: staff.gender,
       name: staff.name,
       id: staff.id,
       email: staff.email,
@@ -208,7 +193,10 @@ router.get("/profile", authenticateToken, async (req, res) => {
     if (!loc) locName = "";
     else locName = loc.id;
 
-    res.json({
+    res.send({
+      dayOff: staff.day_off,
+      salary: staff.salary,
+      gender: staff.gender,
       name: staff.name,
       id: staff.id,
       email: staff.email,
@@ -234,10 +222,6 @@ router.put("/updateProfile", authenticateToken, async (req, res) => {
   const user = await StaffMemberModel.findById(req.user.id);
   const role = user.staff_type;
   console.log("user= " + user);
-  if (req.body.id) return res.json("Cannot change ID.");
-  if (req.body.name) return res.json("Cannot change name.");
-  if (req.body.day_off)
-    return res.json("Must make a request to change day-off.");
 
   var email = "";
   var office = "";
@@ -248,29 +232,20 @@ router.put("/updateProfile", authenticateToken, async (req, res) => {
       email: req.body.email,
     });
     if (mailPresent) {
-      return res.json(
-        "This email is already registered. Please enter a new one."
-      );
+      res.status(400).send({
+        msg: "This email is already registered. Please enter a new one.",
+      });
+      return;
     }
     email = req.body.email;
   } else email = user.email;
 
   console.log("email= " + email);
-  //update password
-  if (req.body.password) {
-    return res.json(
-      "Cannot change password.Please make a reset pasword request."
-    );
-  }
 
   if (role == "HR") {
     await StaffMemberModel.findByIdAndUpdate(req.user.id, { email: email });
-    return res.json("Profile updated successfully.");
+    return res.send({ msg: "Profile updated successfully." });
   } else {
-    if (req.body.salary) return res.json("Cannot change salary.");
-    if (req.body.department) return res.json("Cannot change department.");
-    if (req.body.faculty) return res.json("Cannot change faculty.");
-
     // const academicUser=AcademicStaffModel.findOne({member:req.user.id})
     // const academicUserID=academicUser.id
 
@@ -279,10 +254,12 @@ router.put("/updateProfile", authenticateToken, async (req, res) => {
     if (req.body.office) {
       const off = await location.findOne({ id: req.body.office });
       console.log("offfffffffffff=" + off);
-      if (!off)
-        return res.json(
-          "This office does not exist.Please enter a valid office ID."
-        );
+      if (!off) {
+        res.status(400).send({
+          msg: "This office does not exist.Please enter a valid office ID.",
+        });
+        return;
+      }
       offID = off._id;
     } else {
       offID = user.office;
@@ -293,29 +270,40 @@ router.put("/updateProfile", authenticateToken, async (req, res) => {
       office: offID,
     });
 
-    res.json("Profile updated successfully");
+    res.send({ msg: "Profile updated successfully" });
   }
 });
 
 router.put("/resetPassword", authenticateToken, async (req, res) => {
+  console.log("INSIDE RESET!!!")
   const user = await StaffMemberModel.findById(req.user.id);
   const userPass = user.password;
   //console.log(user+" userPass= "+userPass)
   const oldPass = req.body.oldPass;
   if (!oldPass) {
-    return res.json("Please enter old password.");
+     res.status(400).send({msg:"Please enter old password."});
+     return;
   }
   const isMatched = await bcrypt.compare(oldPass, user.password);
   console.log(isMatched);
-  if (!isMatched) return res.json("Please enter correct old password");
+  if (!isMatched){
+    res.status(400).send({msg:"Please enter correct old password"});
+    return;
+  } 
   const newPass = req.body.newPass;
-  if (!newPass) return res.json("Please enter valid new password.");
+  if (!newPass){
+    res.status(400).send({msg:"Please enter valid new password."});
+    return;
+  } 
   const checkPass = req.body.checkPass;
   if (!checkPass) {
-    return res.json("Please enter password check.");
+    res.status(400).send({msg:"Please enter password check."});
+    return;
   }
-  if (newPass != checkPass) return res.json("Passwords do not match");
-
+  if (newPass != checkPass){
+    res.status(400).send({msg:"Passwords do not match"});
+    return;
+  }
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(newPass, salt);
 
@@ -323,510 +311,517 @@ router.put("/resetPassword", authenticateToken, async (req, res) => {
     const userUpdated = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
       password: hashedPassword,
     });
-    //const userUpdated2=await StaffMemberModel.findById(req.user.id)
-    // console.log(userUpdated.password)
-    return res.json("Password updated successfully.");
+     res.send({msg:"Password updated successfully."});
+     return;
   } catch (err) {
-    return res.json("An error occured. Please try again.");
+     res.status(500).send({msg:"An error occured. Please try again."});
+     return;
   }
 });
-//USE MOMENT LIBRARY moment().utc().format('hh:mm:ss')
-router.put("/signin", authenticateToken, async (req, res) => {
-  var datetime = new Date();
-  var check = false;
-  const today = new moment().format("dddd");
 
-  const SignIn = moment();
-  var SignInTime = moment().format("HH:mm").toString();
+router.put('/signin',authenticateToken,async(req,res)=>{
+  var datetime = new Date();
+  var check=false;
+  const today=new moment().format('dddd')
+  
+  const SignIn=moment()
+  var SignInTime=moment().format("HH:mm").toString()
   //(moment(currentTime).format("HH:mm"))
   var currentTime = moment();
-  //console.log("SignIn= "+SignIn)
-  const user = await StaffMemberModel.findById(req.user.id);
+ //console.log("SignIn= "+SignIn)
+  const user=await StaffMemberModel.findById(req.user.id)
   //if there is objects in attendance array will check if today's date is present to update it
-  if (user.attendance) {
-    var attendance = user.attendance;
-    var date = new moment();
-    var time = new Date();
-    var hours = 0;
-    var minutes = 0;
-    var last_signIn = 0;
-    var last_signOut = 0;
-    var day = "Saturday";
-    var signedOut = true;
-    var newSignins = [];
-    var signinsTemp = [];
-    var idx = -1;
-    var attArr = new Array();
-    for (var i = 0; i < attendance.length; i++) {
-      var momentA = moment(attendance[i].date).format("YYYY-MM-DD");
-      var momentB = currentTime.format("YYYY-MM-DD");
-      console.log("momentA= " + momentA);
-      console.log("momentB= " + momentB);
+  if(user.attendance){
+     var attendance=user.attendance
+     var date=new moment()
+     var time=new Date()
+     var hours=0
+     var minutes=0
+     var last_signIn =0
+     var last_signOut=0
+     var day="Saturday";
+     var signedOut=true;
+     var newSignins=[]
+     var signinsTemp=[]
+      var idx=-1;
+      var attArr=new Array()
+      for(var i=0;i<attendance.length;i++){
 
-      //checking if today's date and this object's date are the same and if user is signedOut
-      //
-      if (momentA == momentB && attendance[i].signedOut == true) {
-        if (today == "Friday") {
-          var dayOffBool = true;
-        } else var dayOffBool = false;
+          var momentA =moment(attendance[i].date).format('YYYY-MM-DD');
+          var momentB = currentTime.format('YYYY-MM-DD');
+          console.log("momentA= "+momentA)
+          console.log("momentB= "+momentB)
 
-        console.log("herer");
-        console.log("dayOfBool at singin " + dayOffBool);
-        date = attendance[i].date;
-        time = attendance[i].time;
-        hours = attendance[i].hours;
-        minutes = attendance[i].minutes;
-        last_signIn = SignIn;
-        last_signOut = attendance[i].last_signOut;
-        day = attendance[i].day;
-        check = true;
-        idx = i;
+          //checking if today's date and this object's date are the same and if user is signedOut 
+          //
+          if(momentA==momentB &&attendance[i].signedOut==true ){
+              if(today=="Friday"){
+                  var dayOffBool=true
+              }
+              else
+              var dayOffBool=false
 
-        newSigninsTemp = attendance[i].signins;
-        console.log("------------------------------------=" + attendance[i]);
-        //console.log("000000000000000000000000000000000000="+newSignins)
-        newSigninsTemp[attendance[i].signins.length] = SignInTime;
-        //    console.log("1111111111111111111111111111111111111="+newSignins[0])
-        //    console.log("2222222222222222222222222222222222222="+newSignins[1])
-        newSignins = newSigninsTemp;
-        console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= " + newSignins);
-        //const signins=
-      } else if (momentA == momentB && attendance[i].signedOut == false)
-        return res.send("This user is already signed in.");
-      attArr[i] = attendance[i];
-    }
-    //found today's record will update it then insert it into attendance array
-    if (check === true) {
-      // console.log("SIGNINSSSSSSSSSSS INSIDEEEEE=" +signins)
-      const newAtt = new AttendanceSchema({
-        date: date,
-        time: time,
-        hours: hours,
-        minutes: minutes,
-        signedIn: true,
-        signedOut: false,
-        last_signIn: last_signIn,
-        last_signOut: last_signOut,
-        last_calculated_signOut: last_signIn,
-        day: day,
-        dayOffBool: dayOffBool,
-        signins: newSignins,
-      });
-      console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= " + newAtt);
-      attArr[idx] = newAtt;
+              console.log("herer")
+              console.log("dayOfBool at singin "+dayOffBool)
+              date=attendance[i].date
+              time=attendance[i].time
+               hours=attendance[i].hours
+               minutes=attendance[i].minutes
+               last_signIn =SignIn
+               last_signOut=attendance[i].last_signOut
+               day=attendance[i].day
+              check=true;
+              idx=i;
+            
+              // newSigninsTemp=attendance[i].signins
+             console.log("------------------------------------="+attendance[i])
+             //console.log("000000000000000000000000000000000000="+newSignins)
+          //    newSigninsTemp[attendance[i].signins.length]=SignInTime
+          // //    console.log("1111111111111111111111111111111111111="+newSignins[0])
+          // //    console.log("2222222222222222222222222222222222222="+newSignins[1])
+          //    newSignins=newSigninsTemp
+          //     console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
+              //const signins=
+              
+          }
+          else if(momentA==momentB &&attendance[i].signedOut==false )
+              return res.status(400).send({msg:"This user is already signed in."})
+          attArr[i]=attendance[i];
 
-      const up = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
-        attendance: attArr,
-      });
-      console.log("uppppppppppppppppp= " + up);
-      const user = await StaffMemberModel.findById(req.user.id);
-      const att = user.attendance[idx].last_signIn;
-      const dateToday = user.attendance[idx].date;
-      const signedInToday = user.attendance[idx].signedIn;
-      const hour = user.attendance[idx].hours;
-      const minute = user.attendance[idx].minutes;
-      const dayoff = user.attendance[idx].dayOffBool;
-      //  console.log("signed in true= "+signedInToday)
+      }
+      //found today's record will update it then insert it into attendance array
+      if(check===true){
+          // console.log("SIGNINSSSSSSSSSSS INSIDEEEEE=" +signins)
+          const newAtt={
+              date:date,
+              time:time,
+              hours:hours,
+              minutes:minutes,
+              signedIn:true,
+              signedOut:false,
+              last_signIn:last_signIn,
+              last_signOut:last_signOut,
+              last_calculated_signOut:last_signIn,
+              day:day,
+              dayOffBool:dayOffBool,
+              // signins:newSignins
+          }
+          console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newAtt)
+          attArr[idx]=newAtt
+          
+          const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+          console.log("uppppppppppppppppp= "+up)
+          const user= await StaffMemberModel.findById(req.user.id)
+          const att=user.attendance[idx].last_signIn
+          const dateToday=user.attendance[idx].date
+          const signedInToday=user.attendance[idx].signedIn
+          const hour=user.attendance[idx].hours
+          const minute=user.attendance[idx].minutes
+          const dayoff=user.attendance[idx].dayOffBool
+        //  console.log("signed in true= "+signedInToday)
       //     return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(att).format("HH:mm")),
       //    hours:hour,minutes:minute,signins:up.attendance})
-      return res.json("Succesfully signed in");
-    }
+         return res.send({msg:"Succesfully signed in"})
+      }
   }
   //if didn't find today's date or array empty from the beginnning
   //will create a new record and insert it
   //using dayOffBool to check in signout because if signed in and out on friday will not count hours
-  if (check === false || user.attendance.length == 0) {
-    const newSignInDate = new moment();
-    // moment.utc( //).format('YYYY-MM-DD');
-    // console.log("new date= "+newSignInDate)
-    if (today == "Friday") {
-      var dayOffBool = true;
-    } else var dayOffBool = false;
-    //    console.log("at 2nd"+signins)
-    console.log("dayofBool at signin= " + dayOffBool);
-    const newAttendance = new AttendanceSchema({
-      date: newSignInDate,
-      time,
-      hours,
-      minutes,
-      signedIn: true,
-      signedOut: false,
-      last_signIn: SignIn,
-      last_calculated_signOut: SignIn,
-      last_signOut,
-      day,
-      dayOffBool: dayOffBool,
-      signins: [SignInTime],
-    });
-    console.log("SignIn= " + SignIn);
-    console.log("newAttendance " + newAttendance);
-    //enter new record to already existing attendance array
-    if (check === false) {
-      const attArr = user.attendance;
-      attArr[attArr.length] = newAttendance;
-      const update = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
-        attendance: attArr,
-      });
-      const userNow = await StaffMemberModel.findById(req.user.id);
-      const dateToday = userNow.attendance[attendance.length - 1].date;
-      const att = userNow.attendance[attendance.length - 1].last_signIn;
-      const signedInToday = userNow.attendance[attendance.length - 1].signedIn;
-      console.log("att= " + moment(att).format("HH:mm"));
-      // return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),
-      // last_signIn:(moment(att).format("HH:mm")),signins:[SigninTime]
-      // })
-      return res.json("Succesfully signed in");
-    }
-    //enter new array with new record
-    else {
-      const attArr = new Array();
-      attArr[0] = newAttendance;
-      console.log(attendance);
-      const update = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
-        attendance: attArr,
-      });
-      const user = await StaffMemberModel.findById(req.user.id);
-      const att = user.attendance[0].last_signIn;
-      const dateToday = user.attendance[0].date;
-      const signedInToday = user.attendance[0].signedIn;
+  if(check===false || user.attendance.length==0){
+      const newSignInDate=new moment()
+     // moment.utc( //).format('YYYY-MM-DD');
+         // console.log("new date= "+newSignInDate)
+         if(today=="Friday"){
+             var dayOffBool=true
+         }
+         else
+         var dayOffBool=false
+      //    console.log("at 2nd"+signins)
+         console.log("dayofBool at signin= "+dayOffBool)
+          const newAttendance=({
+              date:newSignInDate,
+              time,
+              hours,
+              minutes,
+              signedIn:true,
+              signedOut:false,
+              last_signIn:SignIn,
+              last_calculated_signOut:SignIn,
+              last_signOut,
+              day,
+              dayOffBool:dayOffBool
+              // signins:[SignInTime]
+          })
+          console.log("SignIn= "+SignIn)
+          console.log("newAttendance "+newAttendance)
+          //enter new record to already existing attendance array
+      if(check===false){
+         const attArr=user.attendance
+         attArr[attArr.length]=newAttendance
+         const update=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+          const userNow= await StaffMemberModel.findById(req.user.id)
+          const dateToday=userNow.attendance[attendance.length-1].date
+          const att=userNow.attendance[attendance.length-1].last_signIn
+          const signedInToday=userNow.attendance[attendance.length-1].signedIn
+          console.log("att= "+(moment(att).format("HH:mm")))
+          // return res.json({name:userNow.name,date:(moment(dateToday).format("YYYY-MM-DD")),
+          // last_signIn:(moment(att).format("HH:mm")),signins:[SigninTime]
+          // })
+         return res.send({msg:"Succesfully signed in"})
+      }
+      //enter new array with new record
+      else{
+         const attArr=new Array()
+         attArr[0]=newAttendance
+         console.log(attendance)
+         const update=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+         const user= await StaffMemberModel.findById(req.user.id)
+         const att=user.attendance[0].last_signIn
+         const dateToday=user.attendance[0].date
+         const signedInToday=user.attendance[0].signedIn
       //    return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),
       //    last_signIn:(moment(att).format("HH:mm")),signins:signins})
-      return res.json("Succesfully signed in.");
-    }
-  }
-  return res.json("An error occured. Please try again.");
-});
+         return res.send({msg:"Succesfully signed in."})
+      }
+      
 
-router.put("/signout", authenticateToken, async (req, res) => {
+  }
+  return res.status(400).send({msg:"An error occured. Please try again."})
+  
+})
+
+router.put('/signout',authenticateToken,async(req,res)=>{
   var datetime = new moment();
-  var check = false;
-  const SignOut = moment();
+  var check=false;
+  const SignOut=moment()
   var currentTime = moment();
-  const user = await StaffMemberModel.findById(req.user.id);
-  var day_off = "";
-  if (user.staff_type == "HR")
-    day_off = (await HRModel.findOne({ member: req.user.id })).day_off;
+  const user=await StaffMemberModel.findById(req.user.id)
+ var day_off=""
+  if(user.staff_type=="HR")
+  day_off=(await HRModel.findOne({member:req.user.id})).day_off
   else
-    day_off = (await AcademicStaffModel.findOne({ member: req.user.id }))
-      .day_off;
-
-  //  console.log("req.user.id= "+req.user.id)
+  day_off=(await AcademicStaffModel.findOne({member:req.user.id})).day_off
+  
+//  console.log("req.user.id= "+req.user.id)
   //if there is attendance to check
-  if (user.attendance.length > 0) {
-    var attendance = user.attendance;
-    var date = new moment();
-    var time = new Date();
-    var hours = 0;
-    var minutes = 0;
-    var last_signIn = 0;
-    var last_signOut = 0;
-    var day = "Saturday";
-    var signedIn = false;
-    var idx = -1;
-    var attArr = new Array();
-    var OldSignIn = new moment().format("HH:mm");
-    //searching for a record with this date to check if previously signed in
-    for (var i = 0; i < attendance.length; i++) {
-      var momentA = moment(attendance[i].date).format("YYYY-MM-DD");
-      var momentB = currentTime.format("YYYY-MM-DD");
-      // console.log("understand "+ attendance[i].last_signIn )
-      //searching for today's date and signedout is false otherwise will say
-      //already signed out
-      if (
-        momentA == momentB &&
-        attendance[i].last_signIn &&
-        attendance[i].signedOut == false
-      ) {
-        var dayOffBool = attendance[i].dayOffBool;
-        console.log(attendance[i]);
-        console.log("dayofBool at signout= " + dayOffBool);
-        OldSignIn = attendance[i].last_signIn;
-        var start = moment(attendance[i].last_signIn);
-        console.log("start= " + start.format("HH:mm"));
-        var end = moment(SignOut);
-        console.log("end " + end.format("HH:mm"));
+  if(user.attendance.length>0){
+     var attendance=user.attendance
+     var date=new moment()
+     var time=new Date()
+     var hours=0
+     var minutes=0
+     var last_signIn =0
+     var last_signOut=0
+     var day="Saturday";
+     var signedIn=false;
+      var idx=-1;
+      var attArr=new Array()
+      var OldSignIn=new moment().format("HH:mm")
+      //searching for a record with this date to check if previously signed in
+      for(var i=0;i<attendance.length;i++){
+          var momentA = moment(attendance[i].date).format('YYYY-MM-DD');
+          var momentB = currentTime.format('YYYY-MM-DD')
+         // console.log("understand "+ attendance[i].last_signIn )
+         //searching for today's date and signedout is false otherwise will say
+         //already signed out
+          if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==false ){
+              var dayOffBool=attendance[i].dayOffBool
+              console.log(attendance[i])
+              console.log("dayofBool at signout= "+dayOffBool)
+              OldSignIn=attendance[i].last_signIn
+                 var start = moment(attendance[i].last_signIn);
+                 console.log("start= "+start.format('HH:mm'))
+                 var end = moment(SignOut); 
+                  console.log("end "+end.format("HH:mm"))
+                 
+                 //get date today and time at 7 form new moment object to compare 
+                 //if person is signing out after 7 we will not count extra hours will set end=19:00
 
-        //get date today and time at 7 form new moment object to compare
-        //if person is signing out after 7 we will not count extra hours will set end=19:00
+                 //datetime at 7pm
+                 var date = new moment().format('YYYY-MM-DD')
+                 var time = "19:00";
+                 datetime = moment(date + ' ' + time).format();
+                 var minutes = end.diff(datetime, 'minutes');
+                 var interval = moment().hour(0).minute(minutes);
 
-        //datetime at 7pm
-        var date = new moment().format("YYYY-MM-DD");
-        var time = "19:00";
-        datetime = moment(date + " " + time).format();
-        var minutes = end.diff(datetime, "minutes");
-        var interval = moment().hour(0).minute(minutes);
 
-        //datetime at 7am
-        var date = new moment().format("YYYY-MM-DD");
-        var time = "07:00";
-        datetime2 = moment(date + " " + time).format();
-        var minutes = end.diff(datetime, "minutes");
-        var interval = moment().hour(0).minute(minutes);
-        console.log("datetime2= " + moment(datetime2).format("HH:mm"));
+                 //datetime at 7am
+                 var date = new moment().format('YYYY-MM-DD')
+                 var time = "07:00";
+                 datetime2 = moment(date + ' ' + time).format();
+                 var minutes = end.diff(datetime, 'minutes');
+                 var interval = moment().hour(0).minute(minutes);
+                  console.log("datetime2= "+moment(datetime2).format("HH:mm"))
 
-        //if person is signingout after 7
-        if (end.isBefore(datetime) == false) {
-          var date = new moment().format("YYYY-MM-DD");
-          //  console.log("date= "+date)
-          var time = "19:00";
-          end = moment(date + " " + time);
-          console.log("new end= " + moment(end).format("HH:mm"));
-        }
+                 //if person is signingout after 7 
+                 if((end.isBefore(datetime))==false){
+                 var date = new moment().format('YYYY-MM-DD')
+               //  console.log("date= "+date)
+                 var time = "19:00";
+                 end = moment(date + ' ' + time);
+                 console.log("new end= "+moment(end).format("HH:mm"))
+                 }
+                
 
-        //if person is signing in before 7
-        if (start.isBefore(datetime2) == true) {
-          var date = new moment().format("YYYY-MM-DD");
-          //  console.log("date= "+date)
-          var time = "07:00";
-          start = moment(date + " " + time);
-          console.log("new start= " + moment(start).format("HH:mm"));
-        }
+                 //if person is signing in before 7
+                 if((start.isBefore(datetime2))==true){
+                  var date = new moment().format('YYYY-MM-DD')
+                //  console.log("date= "+date)
+                  var time = "07:00";
+                  start = moment(date + ' ' + time);
+                  console.log("new start= "+moment(start).format("HH:mm"))
+                  }
 
-        //calculating difference between start and end
-        // const check1=((start.isBefore(end))==true)
-        // const check2=dayOffBool
-        // console.log("check1= "+check1)
-        // console.log("check2= "+check2)
+                  //calculating difference between start and end
+                  // const check1=((start.isBefore(end))==true)
+                  // const check2=dayOffBool
+                  // console.log("check1= "+check1)
+                  // console.log("check2= "+check2)
 
-        //checking if today is not friday
-        //if it is will not add hours to monthly hours
-        //and checking if we signed in before 7 pm
-        //because after we will not add any hours
-        if (start.isBefore(end) == true && dayOffBool == false) {
-          console.log("new start= " + moment(start).format("HH:mm"));
-          console.log("new end= " + moment(end).format("HH:mm"));
-          var minutes = end.diff(start, "minutes");
-          var interval = moment().hour(0).minute(minutes);
-          var hrs = moment.duration(interval.format("HH:mm")).get("hours");
-          var minute = moment.duration(interval.format("HH:mm")).get("minutes");
-          // var Hrs=hrs-8
-          // var Min=minute-24
-        } else {
-          var hrs = 0;
-          var minute = 0;
-          // var Hrs=0
-          // var Min=0
-        }
+                  //checking if today is not friday
+                  //if it is will not add hours to monthly hours
+                  //and checking if we signed in before 7 pm
+                  //because after we will not add any hours
+                  if((start.isBefore(end))==true && dayOffBool==false){
+                  console.log("new start= "+moment(start).format("HH:mm"))
+                  console.log("new end= "+moment(end).format("HH:mm"))
+                  var minutes = end.diff(start, 'minutes');
+                  var interval = moment().hour(0).minute(minutes);
+                  var hrs=moment.duration(interval.format("HH:mm")).get('hours')
+                  var minute=moment.duration(interval.format("HH:mm")).get('minutes')
+                  // var Hrs=hrs-8
+                  // var Min=minute-24
+                  }
+                  else{
+                      var hrs=0
+                      var minute=0 
+                      // var Hrs=0
+                      // var Min=0
+                  }
 
-        var fin = minute + attendance[i].minutes;
-        var finH = hrs + attendance[i].hours;
-        console.log("attendance[i].signedIn= " + attendance[i].signedIn);
-        if (attendance[i].miuntes + minutes > 60) {
-          console.log("signedin true");
-          hrs = hrs + 1;
-          finH++;
-          fin = minute + attendance[i].minutes - 60;
-        }
+                 
 
-        var Hrs = finH - 8;
-        var Min = fin - 24;
-        console.log("extraHrs= " + Hrs);
-        console.log("extraMin= " + Min);
-        var extraHrs = 0;
-        var extraMin = 0;
-        var missingHrs = 0;
-        var missingMin = 0;
 
-        if (Hrs < 0) missingHrs = -Hrs;
-        else extraHrs = Hrs;
-        if (Min < 0) missingMin = -Min;
-        else extraMin = Min;
-        if (extraMin > 0 && missingHrs > 0) {
-          missingHrs--;
-          missingMin = 60 - extraMin;
-          extraMin = 0;
-          console.log("her paleeeeease");
-          console.log(
-            "missingHrs= " + missingHrs + " missingMin= " + missingMin
-          );
-        }
-        if (extraHrs > 0 && missingMin > 0) {
-          extraHrs--;
-          extraMin = 60 - missingMin;
-          missingMin = 0;
-          console.log(
-            "extraHrs= " +
-              extraHrs +
-              " extraMin= " +
-              extraMin +
-              " missingMin= " +
-              missingMin
-          );
-        }
+                  var fin=minute+attendance[i].minutes
+                  var finH=hrs+attendance[i].hours
+                  console.log("attendance[i].signedIn= "+attendance[i].signedIn)
+                  if(attendance[i].miuntes+minutes>60){
+                      console.log("signedin true")
+                      hrs=hrs+1
+                      finH++
+                      fin=minute+attendance[i].minutes-60
+                  }
 
-        // console.log("herer")
-        date = attendance[i].date;
-        time = attendance[i].time;
-        hours = hrs + attendance[i].hours;
-        minutes = fin;
-        signedIn = false;
-        last_signIn = attendance[i].last_signIn;
-        // console.log(moment(last_signIn).format("HH:mm"))
-        last_signOut = SignOut;
-        //console.log("check signout= "+moment(last_signOut).format("HH:mm"))
-        day = attendance[i].day;
-        check = true;
-        idx = i;
-      } else if (
-        momentA == momentB &&
-        attendance[i].last_signIn &&
-        attendance[i].signedOut == true
-      )
-        return res.send("This user has already signed out.");
+                  var Hrs=finH-8
+                  var Min=fin-24
+                  console.log("extraHrs= "+Hrs)
+                  console.log("extraMin= "+Min)
+                  var extraHrs=0;
+                  var extraMin=0
+                  var missingHrs=0
+                  var missingMin=0
 
-      attArr[i] = attendance[i];
-    }
+                  if(Hrs<0)
+                  missingHrs=-Hrs
+                  else
+                  extraHrs=Hrs
+                  if(Min<0)
+                  missingMin=-Min
+                  else
+                 extraMin=Min
+                 if(extraMin>0 && missingHrs>0){
+                  missingHrs--
+                  missingMin=60-extraMin
+                  extraMin=0
+                  console.log("her paleeeeease")
+                  console.log("missingHrs= "+missingHrs+" missingMin= "+missingMin)
+              }
+              if(extraHrs>0 && missingMin>0){
+                 extraHrs--
+                  extraMin=60-missingMin
+                  missingMin=0
+                  console.log("extraHrs= "+extraHrs+" extraMin= "+extraMin+" missingMin= "+missingMin)
+              }
 
-    //found today's date and not signed out yet
-    // will update monthly hrs,min
-    //wil update the record with new missing hrs,min
-    if (check == true) {
-      const user = await StaffMemberModel.findById(req.user.id);
-      /////////////////////////////////////////////////////////////////////////////
-      //we can signout so get extra and missing hours and minutes and add them
-      const currMonth = new moment().format("M");
-      const currYear = new moment().format("Y");
-      var c = false;
-      var newMonthlyArr = new Array();
 
-      //search in months hours for this person then add new hours
-      //and minutes if there is already a record
 
-      console.log("length= " + user.time_attended.length);
-      const check = user.time_attended.length > 0;
-      console.log("check= " + check);
-      if (user.time_attended.length > 0) {
-        console.log("inside first if");
-        for (var l = 0; l < user.time_attended.length; l++) {
-          if (
-            user.time_attended[l].num == currMonth &&
-            user.time_attended[l].yearNum == currYear
-          ) {
-            console.log("inside if");
-
-            console.log(
-              "before ifs " +
-                "missingHrs= " +
-                missingHrs +
-                " missingMin= " +
-                missingMin
-            );
-            console.log(
-              "before ifs " +
-                "extraHrs= " +
-                extraHrs +
-                " extraMin= " +
-                extraMin +
-                " missingMin= " +
-                missingMin
-            );
-
-            var finEM = extraMin;
-            var finMM = missingMin;
-            var finEH = extraHrs;
-            var finMH = missingHrs;
-
-            console.log("finEM= " + finEM);
-            console.log("inEH= " + finEH);
-            // console.log("extras= "+finEM+" "+finEH)
-
-            //new monthlyTime with updated hours and minutes
-            const newMonthly = new monthlyHoursSchema({
-              num: user.time_attended[l].num,
-              yearNum: currYear,
-              extraHours: finEH,
-              extraMinutes: finEM,
-              missingHours: finMH,
-              missingMinutes: finMM,
-            });
-            //adding updated month to array
-            c = true;
-            newMonthlyArr[l] = newMonthly;
+                 // console.log("herer")
+                  date=attendance[i].date
+                  time=attendance[i].time
+                  hours=hrs+attendance[i].hours
+                  minutes=fin
+                  signedIn=false
+                  last_signIn =attendance[i].last_signIn
+                 // console.log(moment(last_signIn).format("HH:mm"))
+                  last_signOut=SignOut
+                  //console.log("check signout= "+moment(last_signOut).format("HH:mm"))
+                  day=attendance[i].day
+                  check=true;
+                  idx=i;
+              
           }
-          //adding other months in the array
-          else newMonthlyArr[l] = user.time_attended[l];
-        }
-        //updating staff member info'
-        console.log("will update " + newMonthlyArr);
-        const up = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
-          time_attended: newMonthlyArr,
-        });
+           else if(momentA==momentB && attendance[i].last_signIn && attendance[i].signedOut==true )
+               return res.status(400).send({msg:"This user has already signed out."})
+
+          attArr[i]=attendance[i];
+
       }
+      
+      //found today's date and not signed out yet
+      // will update monthly hrs,min
+      //wil update the record with new missing hrs,min
+      if(check==true){
+          const user= await StaffMemberModel.findById(req.user.id)
+          /////////////////////////////////////////////////////////////////////////////
+         //we can signout so get extra and missing hours and minutes and add them
+          var currMonth=new moment().format("M")
+          var currYear=new moment().format("Y")
 
-      //didn't find record for this month or any records at all should add new record
-      if (c == false || user.time_attended.length == 0) {
-        const newMonthly = new monthlyHoursSchema({
-          num: parseInt(currMonth),
-          yearNum: parseInt(currYear),
-          extraHours: extraHrs,
-          extraMinutes: extraMin,
-          missingHours: missingHrs,
-          missingMinutes: missingMin,
-        });
-        //if month array is empty simply add this new record
-        if (user.time_attended.length == 0) {
-          console.log("newMonthly= " + newMonthly);
-          const up = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
-            time_attended: newMonthly,
-          });
-          //  res.json({monthly:up.time_attended[0]})
-        }
-        //if array not empty but doesn't contain this month update it
-        else {
-          var oldMonthUp = user.time_attended;
-          oldMonthUp[oldMonthUp.length - 1] = newMonthly;
+          //new MILESTONE2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          // const currDay=new moment().format("D")
+          // if(currDay<=10){
+          //     if(Integer.parseInt(currMonth)==1){
+          //         currMonth=12
+          //         currYear=Integer.parseInt(currYear)-1;
+          //     }
+          //     else
+          //         currMonth=Integer.parseInt(currMonth)-1;
 
-          const up = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
-            time_attended: oldMonthUp,
-          });
-          //  res.json(up)
-        }
+          // }
+
+
+
+          var c=false;
+          var newMonthlyArr=new Array()
+
+          //search in months hours for this person then add new hours 
+          //and minutes if there is already a record
+          
+          console.log("length= "+user.time_attended.length)
+          const check=(user.time_attended.length>0)
+          console.log("check= "+check)
+          if(user.time_attended.length>0){
+              console.log("inside first if")
+              for(var l=0;l<user.time_attended.length;l++){
+                  if(user.time_attended[l].num==currMonth && user.time_attended[l].yearNum==currYear){
+                      console.log("inside if")
+                      
+                      
+                      console.log("before ifs "+"missingHrs= "+missingHrs+" missingMin= "+missingMin)
+                      console.log("before ifs "+"extraHrs= "+extraHrs+" extraMin= "+extraMin+" missingMin= "+missingMin)
+                     
+                     
+                      
+                      var finEM=extraMin
+                      var finMM=missingMin
+                      var finEH=extraHrs
+                      var finMH=missingHrs
+                      
+                      console.log("finEM= "+finEM)
+                   console.log("inEH= "+finEH)
+                     // console.log("extras= "+finEM+" "+finEH)
+
+                      //new monthlyTime with updated hours and minutes
+                      const newMonthly={
+                          num:user.time_attended[l].num
+                         ,yearNum:currYear
+                          ,extraHours:finEH
+                          ,extraMinutes:finEM
+                           ,missingHours:finMH
+                           ,missingMinutes:finMM
+                      }
+                      //adding updated month to array
+                      c=true
+                      newMonthlyArr[l]=newMonthly
+                  }
+                  //adding other months in the array
+                  else
+                  newMonthlyArr[l]=user.time_attended[l]
+              }
+              //updating staff member info'
+              console.log("will update "+ newMonthlyArr)
+              const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:newMonthlyArr})
+
+          }
+      
+          //didn't find record for this month or any records at all should add new record
+          if(c==false || user.time_attended.length==0){
+              const newMonthly= {
+                  num:parseInt(currMonth)
+                  ,yearNum:parseInt(currYear)
+                  ,extraHours:extraHrs
+                  ,extraMinutes:extraMin
+                   ,missingHours:missingHrs
+                   ,missingMinutes:missingMin
+              }
+              //if month array is empty simply add this new record
+              if(user.time_attended.length==0){
+                  console.log("newMonthly= "+newMonthly)
+                  const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:newMonthly})
+              //  res.json({monthly:up.time_attended[0]})
+              }
+              //if array not empty but doesn't contain this month update it
+              else {
+                  var oldMonthUp=user.time_attended
+                  oldMonthUp[oldMonthUp.length-1]=newMonthly
+              
+                  const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:oldMonthUp})
+                //  res.json(up)
+              }
+          }
+
+
+
+          //updating attendance to enter signed out date
+          ///////////////////////////////////////////////////////////////////////////////////
+          const newAtt={
+              date:date,
+              time:time,
+              attended:true,
+              hours:hours,
+              minutes:minutes,
+              attended:true,
+              signedIn:false,
+              signedOut:true,
+              last_signIn:last_signIn,
+              last_signOut:SignOut,
+              day:day
+          }
+          console.log("signout down= "+moment(SignOut).format("HH:mm"))
+          attArr[idx]=newAtt
+          try{
+          const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{attendance:attArr})
+          
+         // const user= await StaffMemberModel.findById(req.user.id)
+          const signin=user.attendance[idx].last_signIn
+          const signout=user.attendance[idx].last_signOut
+          console.log("signing out at"+moment(SignOut).format("HH:mm"))
+          const dateToday=user.attendance[idx].date
+          const lastCal=user.attendance[idx].last_calculated_signOut
+          // return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(OldSignIn).format("HH:mm")),last_signOut:(moment(SignOut).format("HH:mm")),
+          //     hours:hours,minutes:minutes,signedIn:signedIn})
+              return res.send({msg:"Succesffuly signed out."})
+          }
+              catch{
+                  return res.json("An error occured please try again.")
+              }
       }
-
-      //updating attendance to enter signed out date
-      ///////////////////////////////////////////////////////////////////////////////////
-      const newAtt = new AttendanceSchema({
-        date: date,
-        time: time,
-        attended: true,
-        hours: hours,
-        minutes: minutes,
-        attended: true,
-        signedIn: false,
-        signedOut: true,
-        last_signIn: last_signIn,
-        last_signOut: SignOut,
-        day: day,
-      });
-      console.log("signout down= " + moment(SignOut).format("HH:mm"));
-      attArr[idx] = newAtt;
-      try {
-        const up = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
-          attendance: attArr,
-        });
-
-        // const user= await StaffMemberModel.findById(req.user.id)
-        const signin = user.attendance[idx].last_signIn;
-        const signout = user.attendance[idx].last_signOut;
-        console.log("signing out at" + moment(SignOut).format("HH:mm"));
-        const dateToday = user.attendance[idx].date;
-        const lastCal = user.attendance[idx].last_calculated_signOut;
-        // return res.json({name:user.name,date:(moment(dateToday).format("YYYY-MM-DD")),last_signIn:(moment(OldSignIn).format("HH:mm")),last_signOut:(moment(SignOut).format("HH:mm")),
-        //     hours:hours,minutes:minutes,signedIn:signedIn})
-        return res.json("Succesffuly signed out.");
-      } catch {
-        return res.json("An error occured please try again.");
-      }
-    }
   }
+
 
   //no attendance or this day is not found so no prior signin
-  if (check === false || user.attendance.length == 0) {
-    return res.json("Cannot sign out without prior signin.");
+  if(check===false || user.attendance.length==0){
+      return res.status(400).send({msg:"Cannot sign out without prior signin."})
   }
-});
+
+      
+})
 ///////////////////MUST MAKE SURE THAT USER INPUTS NUMBERSSSSSSSSSSSSSSSSS/////////
 router.get("/attendanceRecords", authenticateToken, async (req, res) => {
+  
+  console.log(req.query.month);
+  req.body.month=req.query.month;
+  console.log(req.body.month)
   const user = await StaffMemberModel.findById(req.user.id);
   // if(user.attendance){
   const attendance = user.attendance;
@@ -835,9 +830,9 @@ router.get("/attendanceRecords", authenticateToken, async (req, res) => {
   if (req.body.month) {
     month = true;
     if (!(req.body.month > 0 && req.body.month < 13))
-      return res.send("Please enter correct month.");
+      return res.status(400).send({msg:"Please enter correct month."});
     if (req.body.month <= 0 || req.body.month >= 13)
-      return res.send("Please enter correct month.");
+      return res.status(400).send({msg:"Please enter correct month."});
   }
 
   var arr = new Array();
@@ -868,9 +863,10 @@ router.get("/attendanceRecords", authenticateToken, async (req, res) => {
         };
     }
     if (arr.length == 0)
-      return res.json("There are no attendance records to display.");
+      return res.send({records:[]});
     else {
       var check = false;
+      const output=[];
       for (var k = 0; k < arr.length; k++) {
         if (
           moment(arr[k].date).format("YYYY-MM-DD") <=
@@ -879,27 +875,42 @@ router.get("/attendanceRecords", authenticateToken, async (req, res) => {
           console.log(
             "aaaaaaaaaaaaaaa= " + moment(arr[k].date).format("YYYY-MM-DD")
           );
-          res.write("Date: " + moment(arr[k].date).format("YYYY-MM-DD") + "\n");
-          res.write("Attended: " + arr[k].attended + "\n");
-          // res.write("last_signIn: "+moment(arr[k].last_signIn).format("HH:mm")+"\n")
-          // res.write("last_signOut: "+moment(arr[k].last_signOut).format("HH:mm")+"\n")
-          res.write("Hours: " + arr[k].hours + "\n");
-          res.write("Minutes: " + arr[k].minutes + "\n");
-          res.write("\n");
+
+
+          const record={
+            date:moment(arr[k].date).format("YYYY-MM-DD"),
+            attended:arr[k].attended,
+            last_signIn:moment(arr[k].last_signIn).format("HH:mm"),
+            last_signOut:moment(arr[k].last_signOut).format("HH:mm"),
+            hours:arr[k].hours,
+            minutes:arr[k].minutes
+
+          }
+          console.log(arr[k]);
+          output.push(arr[k]);
+          console.log(record);
+          
+          // res.write("Date: " + moment(arr[k].date).format("YYYY-MM-DD") + "\n");
+          // res.write("Attended: " + arr[k].attended + "\n");
+          // // res.write("last_signIn: "+moment(arr[k].last_signIn).format("HH:mm")+"\n")
+          // // res.write("last_signOut: "+moment(arr[k].last_signOut).format("HH:mm")+"\n")
+          // res.write("Hours: " + arr[k].hours + "\n");
+          // res.write("Minutes: " + arr[k].minutes + "\n");
+          // res.write("\n");
           check = true;
         }
       }
       if (check == false) {
-        return res.json("There are no attendance records to display.");
+        return res.send({records:[]});
       }
-      res.end();
+      res.send({records:output});
       // return res.json({attendance:arr})
     }
   }
 
   //}
   else {
-    return res.json("There are no attendance records to display.");
+    return res.send({records:[]});
   }
 });
 function compare(a, b) {
@@ -1154,7 +1165,8 @@ router.get("/missingDays", authenticateToken, async (req, res) => {
         if (lastDName != "Friday" && lastDName != day_off) {
           missedDays[k++] = new moment(
             lastYear + "-" + dateMonth + "-" + lastDay
-          ).format("YYYY-MM-DD");``
+          ).format("YYYY-MM-DD");
+          ``;
         }
         lastDay++;
         lastDName = new moment(
@@ -1255,7 +1267,7 @@ router.get("/missingDays", authenticateToken, async (req, res) => {
     )
       returnArr[s++] = missedDays[d];
   }
-  return res.json(returnArr);
+  return res.send(returnArr);
 });
 
 router.get("/missingHours", authenticateToken, async (req, res) => {
@@ -1268,7 +1280,7 @@ router.get("/missingHours", authenticateToken, async (req, res) => {
     for (var i = 0; i < monthly.length; i++) {
       if (monthly[i].num == month && monthly[i].yearNum == year) {
         check = true;
-        return res.json({
+        return res.send({
           missingHours: monthly[i].missingHours,
           missingMinutes: monthly[i].missingMinutes,
           extraHours: monthly[i].extraHours,
@@ -1295,7 +1307,7 @@ router.get("/missingHours", authenticateToken, async (req, res) => {
     const userUp = await StaffMemberModel.findByIdAndUpdate(req.user.id, {
       time_attended: arr,
     });
-    res.json({
+    res.send({
       missingHours: 0,
       missingMinutes: 0,
       extraHours: 0,
@@ -1356,5 +1368,18 @@ function calculateHrs(dateMonth, day_off) {
   console.log("inside " + hours + " m=" + minutes);
   return { hours, minutes };
 }
+
+// ADDED ROUTES FOR FRONTEND DISPLAY # MARK
+router.get("/offices", async (req, res) => {
+  try {
+    const offices = await location.find({ type: "Office" });
+    //console.log(offices);
+    res.send(offices);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ msg: "ERROR RETRIEVING LIST OF OFFICES" });
+  }
+});
+/////
 
 module.exports = router;

@@ -2,7 +2,6 @@ import React from "react";
 import "./Login.css";
 import GUC from "../assets/GUC.jpeg";
 import axios from "axios";
-import "./boot.min.css";
 
 class Login extends React.Component {
   state = {
@@ -27,9 +26,12 @@ class Login extends React.Component {
         const token=res.headers['auth-token'];
         localStorage.setItem("auth-token",token);
         const user=res.data.user;
-        console.log(JSON.stringify(user));
-        localStorage.setItem('user',JSON.stringify(user));
+        //console.log(JSON.stringify(user));
+        //localStorage.setItem('user',JSON.stringify(user));
+        localStorage.setItem("role",user.role)
+        localStorage.setItem("newMember",user.newMember)
         if(user.role==="HR"){
+          
           this.props.history.push('/hr');
         }
         if(user.role==="Course Instructor"){
@@ -45,18 +47,18 @@ class Login extends React.Component {
           alert(error.response.data.msg);
         } else {
           console.error(error);
-          alert("ERROR???");
+          alert("ERROR???/n"+error.message);
         }
       });
   };
 
   render() {
     return (
-      <div className="container text-center parent">
+      <div className="container cont text-center parent">
         <main className="form-signin">
           <form onSubmit={this.handleClick.bind(this)}>
             <img
-              className="mb-4"
+              className="mb-4 logo"
               src={GUC}
               alt="eeehhh"
               width="72"
