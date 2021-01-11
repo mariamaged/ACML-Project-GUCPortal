@@ -4193,8 +4193,46 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
             attended:true,
         })
        oldMonthUp[oldMonthUp.length]=newAttendance
-       
        const up=await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{attendance:oldMonthUp})
+
+
+       //updating replacements schedule
+       if(currRequest.acceptedReplacement.length>0){
+           for(var s=0;s<currRequest.acceptedReplacement.length;s++){
+           var replacement=await AcademicStaffModel.findOne({member:acceptedReplacement[s].replacementID})
+           var repacementSchedule=replacement.schedule
+           var replacementSlotDate=currRequest.slotDate
+           var replacementSlotNum=acceptedReplacement[s].slotNum
+           var replacementSlotLoc=acceptedReplacement[s].slotLoc
+           const slotLoc=await Location.findOne({id=replacementSlotLoc})
+           const slotLocID=slotLoc._ID
+            const slotDay=moment(currRequest.slotDate).format("dddd")
+            const courseID;
+
+            //get course id by getting it from schedule of person who sent the replacement request
+            const sender=await AcademicStaffModel.findOne({member:currRequest.sentBy})
+            const senderSchedule=sender.schedule
+            for(var g=0;g<senderSchedulelength;g++){
+                if(moment(senderSchedule[g].date).format("YYYY-MM-DD")==currRequest.slotDate
+                && senderSchedule[g].number==replacementSlotNum,senderSchedule[g].location==slotLocID)
+               courseID=senderSchedule[g].course
+            }
+           var newSlot=({date:currRequest.slotDate ,
+                        day: slotDay,
+                        number:replacementSlotNum, 
+                        location:slotLocID,
+                        academic_member_id:replacement._id,
+                        course:courseID ,
+                        isReplaced:true })
+
+            replacementSchedule.push(newSlot);
+            var upReplacement=await AcademicStaffModel.findOneAndUpdate({
+                member:acceptedReplacement[s].replacementID},{schedule:replacementSchedule})
+           
+
+
+           }
+       }
 
        //notify
        const notification=user.notifications
@@ -4204,6 +4242,39 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
        return res.json("Request successully accepted.")
 
     }
+
+    // if(reqType=="Slot Linking"){
+    //     const user=await StaffMemberModel.findById(currRequest.sentBy)
+    //     const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+    //     const academicMember=await AcademicStaffModel.findOne({member:currRequest.sentBy})
+    //     const userSchedule=academicMember.schedule
+    //     const reqCourse=await Course.findOne({id=currRequest.courseID})
+    //     const reqCourseID=reqCourse._id
+    //     for(var k=0;k<userSchedule.length;k++){
+    //         if(userSchedule[k].day==currRequest.slotDay){
+    //             var newSlot=({date: userSchedule[k].date,
+    //                 day: userSchedule[k].day,
+    //                 number: userSchedule[k].number, 
+    //                 location:userSchedule[k].location,
+    //                 academic_member_id: userSchedule[k].academic_member_id,
+    //                 course:reqCourseID ,
+    //                 isReplaced:false })
+    //             userSchedule[k].push(newSlot)
+    //         }
+    //     }
+    //     if(userSchedule.length==0)
+    //     userSchedule.push
+
+    //     const up=await AcademicStaffModel.findOneAndUpdate({member:currRequest.sentBy},{schedule:userSchedule})
+
+
+    //     const notification=user.notifications
+    //     const notNew=notification
+    //     notNew[notNew.length]="Your Slot Linking request has been accepted!"
+    //     const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
+    //     return res.json("Request successully accepted.")
+        
+    // }
 
 })
 
@@ -4216,11 +4287,21 @@ router.post('/rejectRequest',authenticateToken,async(req,res)=>{
         return res.json("Please enter request ID.")
     }
     const currRequest=await request.findOne({requestID:req.body.requestID})
+    const reqType=currRequest.reqType
     if(!currRequest)
     return res.json("This request does not exist.")
 
+    if(req.body.reason)
+    const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Rejected",RejectionReason:req.body.reason})
+    else
     const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Rejected"})
- 
+
+    const user=await StaffMemberModel.findById(currRequest.sentBy)
+    const notification=user.notifications
+    const notNew=notification
+    notNew[notNew.length]="Your "+reqType+" request has been rejected!"
+    const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
+    return res.json("Request successully rejected.")
 
 })
 
