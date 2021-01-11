@@ -499,13 +499,13 @@ router.route('/course').post(authenticateToken,async(req,res)=>{
 //when academic staff add lel table/delete/update
 const bcrypt=require('bcrypt');
 // authenticateToken,
-router.route('/staffmember').post(authenticateToken,async(req,res)=>{
+router.route('/staffmember').post(async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"_id":req.user.id});
-        if(st.staff_type!="HR")
-    res.status(401).send('Access Denied');
-    else{
+        //const st=await StaffMember.findOne({"_id":req.user.id});
+    //     if(st.staff_type!="HR")
+    // res.status(401).send('Access Denied');
+    // else{
        const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname}=req.body;
        if(!email||!salary||!officelocation|| !gender||!type||!name) res.status(400).json({msg:"please fill all the fields"});
        else{
@@ -547,7 +547,7 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                             
                              dep=await department.findOne({"name":departmentname});
                              fac=await faculty.findOne({"name":facultyname});
-                            if(dep==null||fac==null) message="the data you entered is incorrect";
+                            if(dep==null||fac==null) message="the data you entered is incorrect"+facultyname+"   ,"+departmentname;
                             else flag=true;
                      }}
                      console.log("ablo aho");
@@ -572,7 +572,7 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
              res.send({msg:message});
            }
            else res.status(400).json({msg:"this email is already registered"})
-       }}
+       }//}
     }catch(err){
         res.status(500).json({error:err.message});
     }

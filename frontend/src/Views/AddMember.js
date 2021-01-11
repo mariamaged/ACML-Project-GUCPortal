@@ -67,8 +67,10 @@ function AddMember() {
          }
          var dayoff=document.getElementById("exampleSelect2").value;
          var gender=document.getElementById("exampleSelect3").value;
-         var facultyname = document.getElementById("inputDefault4").value;
-         var departmentname = document.getElementById("inputDefault5").value;
+         var facultyname = document.getElementById("inputDefault5").value;
+         var departmentname = document.getElementById("inputDefault4").value;
+         console.log(departmentname);
+         console.log(facultyname);
          axios.post('http://localhost:5000/HR/staffmember',{name:name,email:email,salary:salary,officelocation:office,type:type,actype:actype,dayoff:dayoff,gender:gender,facultyname:facultyname,departmentname:departmentname},{headers:{"auth-token":localStorage.getItem('auth-token')}},
         ).then(async(response)=>{
             console.log("fel thennnnn");
