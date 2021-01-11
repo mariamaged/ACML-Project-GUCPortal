@@ -23,7 +23,6 @@ class Login extends React.Component {
       })
       .then(async (res) => {
         console.log("REQUEST SUCCESS");
-        console.log(res.headers);
         const token = res.headers['auth-token'];
         console.log(token);
         localStorage.setItem("auth-token", token);

@@ -43,8 +43,8 @@ class AllCoursesCoverage extends Component {
                     </div>
                 </div>)
         })) :
-            (<Loading role="the course coverage of all courses under your department."/>);
-    
+            (<Loading role="the course coverage of all courses under your department." />);
+
         return (
             <div className='container'>
                 <br />

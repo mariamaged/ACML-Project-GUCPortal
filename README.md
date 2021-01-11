@@ -1,13 +1,11 @@
-# Advanced Computer Lab - GUCPortal
+~~# Advanced Computer Lab - GUCPortal
 ## Milestone 1
 ### Collaborators
 1. Maria Maged 43-1498.
 2. Monica George 43-0818.
 3. Maya Ahmed 43-6655.
-
 ## Port Number
-5000.
-
+3000.
 ## Which file to run
 	run index.js by running the npm start command.
 ## 2. GUC Staff Members Functionalities
@@ -29,26 +27,19 @@
 ```
  - **Response body:**  
 - Case 1: If the user does not enter an email the response sends back the message :
-
 `"Please enter a valid email."`
  - Case  2: If the user does not enter password the response sends back the message:
-
 `` "Please enter a valid password."``
  - Case  3: If the user submits an email that is not saved in the system ,the response sends back the message:
-
 ``` "This user is not registered."```
  - Case  4: If the user enters a  valid email but wrong password, the response sends back the message:
-
 ```"Please enter correct password."```
-
+>
  - Case 5: If the user is logging in for the first time, the response send back the token and the  message
-
 ``` "Please enter new password."```
-
 > **To use the token, I copy and paste in manually in the header in postman with key=x-auth-token and the value= token outputted upon login**.
  
   - Case 6: If the user is successfully logged in, the response returns the token and the message
-
 ``` "User logged in successfully"```
    
 > **To use the token, I copy and paste in manually in the header in postman with key=x-auth-token and the value= token outputted upon login**
@@ -70,19 +61,14 @@
 ```
  - **Response body:**
 - Case 1: if the user does not enter a password the response sends back the message:
-
 ```"Please enter a valid password."```
 - Case  2: if the user does not enter password check the response sends back the message:
-
 ``` "Please enter the password check."```
 - Case  3: if the user enters different password and password check, the response sends back the message:
-
 ``` "Passwords should match."```
 - Case  4: if the user enters a  valid password and password check, the response sends back the message:
-
 ```"Password changed successfully."```
 - Case 4: if there was an error in the system and could not save new password, the response send back the token and the message:
-
 ``` "Error. Please try again""```
 -  **Result in database:**
 	- Password of this user id updated.
@@ -107,7 +93,6 @@
 "type": "Course Instructor"
 }
 ``` 
-
 Example of HR response body
 ```json
 {
@@ -138,39 +123,28 @@ Example of HR response body
 ``` 
  - **Response body:**
  - Case 1: if the user enter a new ID, the response sends back the message:
-
 ```"Cannot change ID."```
 - Case  2: if the user enter new name, the response sends back the message:
-
 ``` "Cannot change name."```
  - Case  3: if the user enters a new password, the response sends back the message:
-
 ``` "Cannot change password.Please make a reset pasword request."```
  - Case  4: if the user enters a new day-off, the response sends back the message:
-
 ``` "Must make a request to change day-off."```
     
 - Case  5: if the user enters a new office that is not registered in the database, the response sends back the message:
-
 ``` "This office does not exist.Please enter a valid office ID."```
 - Case  6: if an academic member enters new department, the response sends back the message:
-
 ``` "Cannot change department."```
 - Case  7: if an academic member enters new faculty, the response sends back the message:
-
 ``` "Cannot change faculty."```
 - Case  8: if an academic member enters new salary, the response sends back the message:
-
 ``` "Cannot change salary."```
 - Case  9: if an academic member enters new email that already exists in the database, the response sends back the message:
-
 ``` "This email is already registered. Please enter a new one."```
 - Case  10: if an academic member enters new unique email and maybe new office that exists  the response sends back the message:
-
 ``` "Profile updated successfully"```  
 ***
 	5. Reset their passwords.
-
  - **Functionality:** the user should be able to reset their passwords.
  - **Route:**/staff/resetPassword
  - **Request :** PUT.
@@ -188,25 +162,18 @@ Example of HR response body
 ``` 
  - **Response body:**  
  - Case 1: if the user does not enter old password, the response sends back the message:
-
 ```"Please enter old password."```
  - Case  2: if the user enters incorrect old password,  the response sends back the message:
-
 ``` "Please enter correct old password"```
 - Case  3: if the user does not enter a new password, the response sends back the message:
-
 ``` "Please enter valid new password."```     
  - Case  4: if the user does not enter password check, the response sends back the message:
-
 ``` "Please enter password check."```     
   - Case  5: if the user enters a different password and password check, the response sends back the message:
-
 ``` "Passwords do not match"```     
   - Case  6: else if all conditions are met, the response sends back the message:
-
     ``` "Password updated successfully."```     
  - Case  7: if there is a problem with the server, the response sends back the message:
-
 ``` "An error occured. Please try again."```                   
   -   **Result in database:**
       - Password of this user id updated.
@@ -219,15 +186,11 @@ Example of HR response body
 - **Request body:** empty
 - **Response body:** 
 - Case 1: if the user is already signed in, response sends back the message:
-
 ```"This user is already signed in"```
-
 - Case  2: if the user signs in successfully, the response sends back the message:
-
 ``` "Succesfully signed in."```
  
   - Case  3: if there is an error in the server, the response sends back the message:
-
 ``` "An error occured. Please try again."```     
  ****
 	7. Sign out.
@@ -238,18 +201,13 @@ Example of HR response body
 - **Request body:** empty
 - **Response body:** 
  - Case 1: if the user is trying to sign out without previously signing in, the response sends back the message:
-
 ```"Cannot sign out without prior signin."```
-
 - Case  2: if the user who is already signed out is trying to sign out again, the response sends back the message:
-
 ``` "This user has already signed out."```
  
 - Case  3: successful sign out, the response sends back the message:
-
     ``` "Succesffuly signed out."``` 
 - Case  4: an error occurred with the server, the response sends back the message:
-
 ``` "An error occured please try again."```   
   -   **Result in database:**
       - A new record is added to the user's attendance with his sign in time and date and sign out time and date.
@@ -262,7 +220,6 @@ Example of HR response body
    
 ***
 	8. View all their attendance records, or they can specify exactly which month to view.
-
  - **Functionality:** the user should be able to view the records of all the days they have ATTENDED, or they can specify exactly which month to view. (I did not display all days since in missing days it was stated that days where the user is absent do not have attendance records)
 - **Route:**/staff/attendanceRecords
 - **Request :** GET.
@@ -276,32 +233,26 @@ Example of HR response body
 ```
 - **Response body:**    
  - Case 1: if the user anters an incorrect month number response sends back the message :
-
 ```"Please enter correct month."```
 - Case  2: if there is currently no attendance records for this user yet, the response sends back the message:
-
 ``` "There are no attendance records to display.""```
 - Case  3: displays available attendance records 
 - **Response Body example:**
-
 ```json
 Date: 2020-12-25
 Attended: true
 Hours: 0
 Minutes: 0
-
 Date: 2020-12-24
 Attended: true
 Hours: 1
 Minutes: 35
-
 Date: 2020-12-22
 Attended: false
 Hours: 0
 Minutes: 0
 ```
  - Example for attendance for a certain month:
-
 ```json
 {
 "attendance": [{
@@ -318,15 +269,11 @@ Minutes: 0
 	9. View if they have missing days.
 	
  - **Functionality:** :the user should be able to view if they have missing days.
-
  - **Route:**/staff/missingDays
-
  - **Request Type:** GET
   - **Request body:** empty
   - **Response body:** 
-
  - Case 1: returns an array of missing days dates (unattended days in this month up to today) or an empty array if there are no missing days.
-
   ```
   [
 "2020-11-11",
@@ -339,13 +286,10 @@ Minutes: 0
 	10 .View if they have missing hours or extra hours.
  
  - **Functionality:** :the user should be able to view if they have missing hours or extra hours.
-
  - **Route:**/staff/missingDays
-
  - **Request Type:** GET
   - **Request body:** empty
   - **Response body:** 
-
      - Case 1: returns missing hours, missing minutes, extra hours and extra minutes spent up to this day.
 ````
 {
@@ -742,7 +686,6 @@ Access denied!
 ```json
 Operation done successfully!
 ```
-
 ```json
 [
 {
@@ -825,7 +768,6 @@ Course not under your department!
 "faculty": "Engineering",
 "academicType": "Teaching Assistant"
 },
-
 {
 "name": "Monica George",
 "email": "monica@gmail.com",
@@ -837,7 +779,6 @@ Course not under your department!
 "faculty": "Engineering",
 "academicType": "Course Instructor"
 },
-
 {
 "name": "Maya Ahmed",
 "email": "maya@gmail.com",
@@ -868,10 +809,8 @@ Course not under your department!
 ```json
 Access Denied!
 ```
-
 ```json
 [
-
 {
 "courseID": "CSEN704",
 "courseName": "Advanced Computer Lab",
@@ -887,7 +826,6 @@ Access Denied!
 "faculty": "Engineering",
 "academicType": "Course Instructor"
 },
-
 {
 "name": "Monica George",
 "email": "monica@gmail.com",
@@ -899,7 +837,6 @@ Access Denied!
 "faculty": "Engineering",
 "academicType": "Course Instructor"
 },
-
 {
 "name": "Maya Ahmed",
 "email": "maya@gmail.com",
@@ -912,7 +849,6 @@ Access Denied!
 "academicType": "Course Instructor"
 }]
 },
-
 {
 "courseID": "CSEN703",
 "courseName": "Software Engineering",
@@ -959,7 +895,6 @@ Access Denied!
 "faculty": "Engineering",
 "academicType": "Teaching Assistant"
 },
-
 {
 "name": "Monica George",
 "email": "monica@gmail.com",
@@ -971,7 +906,6 @@ Access Denied!
 "faculty": "Engineering",
 "academicType": "Course Instructor"
 },
-
 {
 "name": "Maya Ahmed",
 "email": "maya@gmail.com",
@@ -1008,15 +942,12 @@ Access Denied!
 ```json
 Access Denied!
 ```
-
 ```json
 Academic member not found!
 ```
-
 ```json
 Staff member not in your department!
 ```
-
 ```json
 {
 "academicStaffMemberName": "Maria",
@@ -1129,7 +1060,6 @@ Access Denied!
 "reason": "I want to spend time saturday with family"
 }
 ],
-
 "leaveRequests": [
 {
 "requestID": "SickLeave-1",
@@ -1143,7 +1073,6 @@ Access Denied!
 "sickDay": "2020-12-23",
 "reason": "I have a flu."
 },
-
 {
 "requestID": "MaternityLeave-1",
 "requestType": "Maternity Leave",
@@ -1179,19 +1108,15 @@ Access Denied!
 ```json
 Access Denied!
 ```
-
 ```json
 Course does not exist!
 ```
-
 ```json
 Course not under your department!
 ```
-
 ```json
 Course does not have any slots for now!
 ```
-
 ```json
 Course coverage is equal to: 50%
 ```
@@ -1212,7 +1137,6 @@ Course coverage is equal to: 50%
 ```json
 Access Denied!
 ```
-
 ```json
 [
 {
@@ -1255,7 +1179,6 @@ Access Denied!
 ```json
 Access Denied
 ```
-
 ```json
 [
 {
@@ -1267,13 +1190,11 @@ Access Denied
 	"staffName": "Maria Maged",
 	"slotsTaughtbyStaff": []
 	},
-
 	{
 	"staffID": "ac-13",
 	"staffName": "Monica George",
 	"slotsTaughtbyStaff": []
 	},
-
 	{
 	"staffID": "ac-11",
 	"staffName": "Maya Ahmed",
@@ -1289,7 +1210,6 @@ Access Denied
 	}
 ]
 },
-
 {
 "courseID": "CSEN703",
 "courseName": "Software Engineering",
@@ -1313,6 +1233,95 @@ Access Denied
 ```
 ## 4.2 Course Instructor
 ### Any course instructor can do the following:
+	(4) Assign an academic member to an unassigned slots in course(s) he/she is assigned to.
+- Functionality:
+    - The user who is a course instructor should be able to assign an academic member (either a Teaching Assistant or Course Instructor) empty slots in a particular course.
+        - `Note:` the academic member does not have to be assigned to the course because there is no explicit route that can assign Teaching Assistants to a course. Therefore, in this route, a course instructor can be capable of assigning Teaching Assistants to course ***implicitly*** by assigning them free slots.
+- **Route:** /instructor/Assignment
+- **Request type:** POST.
+- **Request body:**
+   - Should be an object with `5 properties`:
+       1. courseid, which is the course id as a string like `CSEN704`.
+       2. day, which is one of the 6 days except Friday.
+       3. number, slot number from 1 to 5.
+       4. slocation, location id as a string like `C7.203`.
+       5. memid, the id of the academic member to be assigned like `ac-1`.
+- **Example request body:**
+```json
+{
+"courseid": "CSEN704",
+"day": "Sunday",
+"number": "5",
+"slocation": "C7.203",
+"memid": "ac-1"
+}
+```
+- **What is supposed to happen:** 
+    1. The academic member would be assigned ***all*** slots that happen on the same day, same location, and same slot number for that course. The only difference is that each slot happens on a different date.
+    2. The slots covered for that course gets incremented.
+    3. If the academic member was not assigned to the course (like in the case of TAs previously mentioned), they will be assigned.
+- **Some problems that may appear:**
+   - If the course does not have any slots on that day, number, location, the response sends back the message `No slots with those details.`
+   - If on some of the slots, the academic member was busy (had a slot on the same exact date, slot number), the response sends back an array of all such slots specifying their dates.
+   - If on some of the slots, there was an academic member already assigned to it, the response sends back an array of all such slots specifying their dates.
+- **Response body:**
+```json
+{msg: "Something went wrong"}
+```
+
+```json
+{msg: "Please fill all the required fields." }
+```
+
+```json
+{msg: "The location you entered does not exist."}
+```
+
+```json
+{msg: "This course id does not exist."}
+```
+
+```json
+{msg: "You are not assigned to this course."}
+```
+
+```json
+{msg: "There is no staff member with that id."}
+```
+
+```json
+{msg: "There is no TA in your department with that id."}
+```
+
+```json
+{msg: "Access denied"}
+```
+
+```json
+{error: "error message"}
+```
+
+```json
+{
+	msg: [
+	{"date": "2021-1-21",
+	"busySlot": true},
+	{"date": "2021-1-22",
+	"busySlot": true}
+	]
+}
+```
+
+```json
+{
+	msg: [
+	{"date": "2021-1-21",
+	"unfreeSlot": true},
+	{"date": "2021-1-22",
+	"unfreeSlot": true}
+	]
+}
+```
  View the course(s) coverage he/she is assigned to:
 o Functionality: views the coverage of all the courses assigned to
 him/her (assuming no specific course will be chosen but instead the
@@ -1454,7 +1463,6 @@ oldcoordinator’s attribute “isCourseCoordinator” will be updated to
 false. Either way the academic member provided would update its 
 attribute of isCourseCoordinator to true. The
 course.course_coordinator would equal the coordinator _id. 
-
 	5(a) Update assignment of academic member in course(s) he/she is assigned to.
 - **Functionality:** the user who is a Course Instructor should be capable of changing an academic member assigned to a particular course he is assigned to as well with another academic member who is not assigned to the course and belongs to the same department as the course.
 - **Route:** /updateAcademicMemberstoCourses
@@ -1538,7 +1546,6 @@ Operation done successfully!
     - The `courses` attribute of each `old academic member` in the `AcademicStaffModel` has the reference to the course removed.
     - The `courses` attribute of each `new academic member` in the `AcademicStaffModel` has the reference to the course added to it.
    - The `academic_staff` attribute of each `course` in the `CourseModel` gets updated with the new reference to the new academic member after the old one has been removed.
-
 ## 4.3 Course Coordinator
 	3(a) Add course slot(s) in his/her course.
 - **Functionality:** the user who is a Course Coordinator should be capable of adding several slots (or one slot) to the schedule of a certain course he is a course coordinator of.  
@@ -1598,19 +1605,15 @@ Operation done successfully!
 ```json
 Access Denied!
 ```
-
 ```json
 Course not found!
 ```
-
 ```json
 You are not a course coordinator for this course!
 ```
-
 ```json
 Operation done successfully!
 ```
-
 ```json
 [
 {
@@ -1736,25 +1739,20 @@ Operation done successfully!
             - This error message indicates that the slot ***after being modified*** already exists in the schedule of other courses, and therefore cannot be assigned to the course in the request body.
        3. `oldSlotDoesNotExistinCourseScedule: true`.
              - This error message that the old slot ***to be modified*** does ***not exist*** in the schedule of the course.
-
 > Note: the second and third messages may appear together in the same error message object.
 - **Example response body:**
 ```json
 Access Denied!
 ```
-
 ```json
 Course not found!
 ```
-
 ```json
 You are not a course coordinator for this course!
 ```
-
 ```json
 Operation done successfully!
 ```
-
 ```json
 [
 {
@@ -1769,7 +1767,6 @@ Operation done successfully!
 	"locationNotFound": true,
 	"locationIDOld": "C7.203"
 },
-
 {
 	"oldSlot": {
 		"date": "2020-15-12",
@@ -1783,7 +1780,6 @@ Operation done successfully!
 	"locationIDOld": "C7.203",
 	"locationIDNew": "C7.205"
 },
-
 {
 	"oldSlot": {
 		"date": "2020-15-12",
@@ -1796,7 +1792,6 @@ Operation done successfully!
 	"locationNotFound": true,
 	"locationIDNew": "C3.201"
 },
-
 {
 	"oldSlot": {
 		"date": "2020-15-12",
@@ -1812,7 +1807,6 @@ Operation done successfully!
 		"CSEN704"
 	]
 },
-
 {
 	"oldSlot": {
 		"date": "2020-15-12",
@@ -1829,7 +1823,6 @@ Operation done successfully!
 	],
 	"oldSlotDoesNotExistinCourseSchedule": true
 },
-
 {
 	"oldSlot": {
 		"date": "2020-15-12",
@@ -1899,19 +1892,15 @@ Operation done successfully!
 ```json
 Access Denied!
 ```
-
 ```json
 Course not found!
 ```
-
 ```json
 You are not a course coordinator for this course!
 ```
-
 ```json
 Operation done successfully!
 ```
-
 ```json
 [
 {
@@ -1936,10 +1925,8 @@ Operation done successfully!
 - **Changes in database:**  
    - The `schedule` attribute of the `course` in the course table has the slots objects specified deleted.
   - The `slots_needed` attribute of the `course` in the course table gets decremented by 1.
-
 ## 4.4 Academic Member
 	1 (a) View their schedule (for the entire semester). Schedule should show teaching activities and replacements if present.
-
 - **Functionality:**
     - The user who is an academic member should be capable of seeing his schedule that has been assigned to him so far (even including the slots whose date has passed and slots who are not in the near future [current week]).
 - **Route:** /academic/viewScheduleAllSemester
@@ -1961,7 +1948,6 @@ Operation done successfully!
 ```json
 You are not an academic member!
 ```
-
 ```json
 {
 "replacementSlots": [
@@ -1987,7 +1973,6 @@ You are not an academic member!
 	"number": 2
 	}
 ],
-
 "normalSlots": [	
 	{
 	"day": "Saturday",
@@ -2034,7 +2019,6 @@ You are not an academic member!
 	"number": 4	
 	}
 ],
-
 "normalSlots": [	
 	{
 	"day": "Saturday",
@@ -2050,95 +2034,66 @@ You are not an academic member!
 	 2 (a)  Send “replacement” request(s).
  
  - **Functionality:** :the user who is any academic member should be capable of sending replacement requests to ask  other academic members teaching the same course as him to teach one of his slots in his/her stead.
-
  - **Route:**/academic/sendReplacementRequest
-
  - **Request Type:** POST
  - **Request body:** user must input
  - 1. slot number (1st,2nd,etc..) 
  - 2. slot date ("2020-12-09)
  - 3. slot location (office/hall id eg. "C7.101")
  -   **Example request body:**
-
-
  -      { 
         "slotNum":"2",
         "slotDate":"2020-12-29",
         "slotLoc":"c7.101" 
         }
 **Response body:**
-
    
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
      ```"HR cannot submit this request.Only academic staff are permitted."```
-
  - Case  2: if the user does not input slot number the response sends back the message:
-
     ``` "Must submit slot number with the request."```
  
-
  - Case  3: if the user does not input slot date the response sends back the message:
-
     ``` "Must submit slot date with the request."```
  
-
  - Case  4: if the user does not input slot date the response sends back the message:
-
     ```"Must submit slot location with the request."```
 >
-
  - Case 4: if the user inputs a slot date that has already passed the response send back the message
-
    ``` "Cannot replace a slot that has already passed"```
 > 
-
  - Case 5: if the user inputs a slot that is not in his schedule the
    response sends back the message
-
     ``` "This slot is not present in your schedule."```
 > 
-
  - Case 6: if after searching the system has not found any other
    academic members teaching this course the response sends back the message
-
    ``` "No other academic staff member who teach this course are available to send a replacement request to."```
 > 
-
  - Case 7: if all other academic members have teaching activities during this slot the response sends back the message
-
    ``` "Requests successfully submitted"```
 > 
-
  - Case 8: else if all input is correct and the system found an
    available academic member to send the request to it sends it and responds with
-
     ``` "Requests successfully submitted"```
-
 **Result in database:**
-
  - Requests are sent to all available academic members teaching the same course and not having teaching activities during this slot. So a number of requests are made and saved into the requests collection with id of the sender, id the receiver , submission date , slot number ,slot date ,slot location and state=pending.
  - All academic members who are sent this request will receive a notification where each member has an array of notifications. So a new string saying ```You received a new replacement request``` will be pushed into their arrays.
  ***
 	2 (b) View sent “replacement” request(s).**
-
  - **Functionality:** any academic member should be able to view replacement requests he sent.
  - **Route:**/academic/sentReplacementRequests
  - **Request type:** GET
  - **Request Body:** no request body needed
  - **Response body:**
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
      ```"HR cannot submit this request. Only academic   staff are permitted."```
      
      Case 2: this user has not sent any replacement requests yet the response sends back the message:
      ```There are no sent requests available to display.``` 
-
       Case 3: replacement requests that the user have sent are displayed
       
-
     - Example for a change day-off request returned
-
    ```json
      Request type: Change Day off
      Sent to head of department: hadeel
@@ -2155,12 +2110,10 @@ You are not an academic member!
  - **Request Body:** no request body needed
  - **Response body:**
  - - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
      ```"HR do not have replacement requests."```
      
      Case 2: this user has not received any replacement requests yet the response sends back the message:
      ```There are no received requests..``` 
-
       Case 3: replacement requests that the user have received are displayed 
 ***
 	3  . Send a “slot linking” request.
@@ -2173,8 +2126,6 @@ You are not an academic member!
  - 3. slot number (1,2,etc..)
  - 4. (OPTIONAL) reason for request
  -   **Example request body:**
-
-
 ```
   { 
 "slotNum":"2",
@@ -2185,38 +2136,26 @@ You are not an academic member!
    ```
    - **Response body:**
    - - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
        ```"HR are not permitted to send slot linking requests.Only academic members are allowed."```
       -  Case 2: if the user does not input slot day the response sends back the message :
-
          ```" Must submit slot day with the request."```
        -  Case 3: if the user does not input slot number the response sends back the message :
-
            ```  "Must submit slot number with the request."```
      -  Case 4: if the user does not input course ID the response sends back the message :
-
          ```"Must submit course ID with the request."```
        -  Case 5: if the user does not input correct slot day format the response sends back the message :
-
           ```"Please enter a day with correct format (eg.Saturday)."```
      -  Case 6: if the user inputs a course ID that is not present in the database the response sends back the message :
-
           ```"No such course exists. Please enter correct course ID."```
       -  Case 7: if the course the user inputted does not have a course coordinator yet so will not be able to send his request since this request should be automatically sent to course coordinator the response sends back the message :
-
           ```"Currently there is not an assigned course coorinator to this course send this request to."```
       -  Case 8: if the user already has teaching activities during the slot he is making a slot linking request for the response sends back the message :
-
           ```"User already has teaching activities during this slot. Cannot send this request."```
       -  Case 9: if the user is sending a slot linking request for a course that he/she does not teach the response sends back the message :
-
           ```"Not permitted to send this request because user does not teach this course."```
       -  Case 10 : else if all input is correct a request is created and saved and response sends back the message :
-
           ```"Request successfully submitted."```
-
 **Result in database:**
-
  - A slot linking request is created with type: "Slot Linking" , id of the sender ,id of the receiver (course coordinator), submission date, course ID, slot number ,slot day, reason (if inputted by user) and state: "Pending". This request is saved into the requests collection.
  - The course coordinator of the course inputted by the user will receive a notification where each member has an array of notifications. So a new string saying ```You received a new slot linking request.``` will be pushed into their arrays.
 ***
@@ -2228,8 +2167,6 @@ You are not an academic member!
  - 1. newDayOff ( eg. "Saturday")
  - 2. (OPTIONAL) reason for request
  -   **Example request body:**
-
-
 ```
   { 
 "newDayOff":"Wednesday"
@@ -2238,34 +2175,24 @@ You are not an academic member!
    ```
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR are not permitted to send this request.Only academic members are allowed."```
   -  Case 2: if the user does not input new day-off the response sends back the message :
-
          "Must submit new day-off with request." 
    -  Case 3: if the user does not input slot number the response sends back the message :
-
       ```     "Please enter a day with correct format.  (eg.Saturday)."```
    
   -  Case 4: if the user inputs his old day-off as the new day-off the response sends back the message :
-
      ```"This day is already your day-off. Please enter a new day."```
     -  Case 5: if the user inputs Friday as the new day-off the response sends back the message :
-
        ```"Friday is already a day off.Please submit a new day.```     
 -  Case 6: if the user inputs a day where has teaching activities as the new day-off the response sends back the message :
-
      ```"Cannot request for a day off on a day with teaching activities."```     
 -  Case 7: if the user is in a department that does not have a head of department yet to send the request to since this request is automatically sent to the head of the department, the response sends back the message :
-
      ```"There is currently no head of this department to send this request to."``` 
 -  Case 8: else if input is correct and all other conditions are met  the response sends back the message :
-
      ```"Request successfully submitted."```      
      
-
      **Result in database:**
-
  - A slot linking request is created with type: "Change Day off" , id of the sender ,id of the receiver (head of the department), submission date, reason (if inputted by user) and state: "Pending". This request is saved into the requests collection.
  - The head of the user's department  will receive a notification where each member has an array of notifications. So a new string saying ```You received a new change day-off request.``` will be pushed into their arrays.
 ***
@@ -2277,40 +2204,26 @@ You are not an academic member!
  - 1. accidentDate( eg. "2020-12-20")
  - 4. (OPTIONAL) reason for request
  -   **Example request body:**
-
-
 ```
   { 
   "accidentDate":"2020-12-23",
   "reason":"compensate please"
-
   }
    ```
-
-
    - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR are not permitted to send leave requests.Only academic members are allowed."```
   -  Case 2: if the user does not input accident date the response sends back the message :
-
          "Must submit accident date with the request." 
    -  Case 3: if the user is in a department that does not have a head of department yet to send the request to since this request is automatically sent to the head of the department, the response sends back the message :
-
       ```     "There is currently no head of this department to send this request to."```
    -  Case 4: if the maximum number of accidental leaves have been already reached, the response sends back the message :
-
       ```     "Cannot submit request.Maximum number of accidental day leaves have been reached."```
    -  Case 5: if the current annual balance is zero, the response sends back the message :
-
       ```"Cannot submit request. Annual leave balance is currently empty."```
      -  Case 6: if the input is correct and all other conditions are met, the response sends back the message :
-
       ```"Request successfully submitted."```    
-
-
    **Result in database:**
-
  - An accidental leave request is created with type: "Accidental Leave" , id of the sender ,id of the receiver (head of the department),accident date, submission date, reason (if inputted by user) and state: "Pending". This request is saved into the requests collection.
  - The head of the user's department  will receive a notification where each member has an array of notifications. So a new string saying ```"You received a new accidental leave request."``` will be pushed into their arrays.  
 ***
@@ -2323,8 +2236,6 @@ You are not an academic member!
  - 2. medicalDoc ( a string that has link for drive for example)
  - 3. (OPTIONAL) reason for request
  -   **Example request body:**
-
-
 ```
   { 
   "sickDay":"2020-12-24",
@@ -2332,29 +2243,19 @@ You are not an academic member!
   "reason":"reason"
   }
    ```
-
-
    - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR are not permitted to send leave requests.Only academic members are allowed."```
   -  Case 2: if the user does not input sick day date the response sends back the message :
-
          "Must submit sick day date with the request." 
    -  Case 3: if the user is in a department that does not have a head of department yet to send the request to since this request is automatically sent to the head of the department, the response sends back the message :
-
       ```     "There is currently no head of this department to send this request to."```
    -  Case 4: if the user does not input medical documents, the response sends back the message :
-
       ```     "Medical documents to prove medical condition must be submitted with the request."```
    -  Case 5: if the input is correct and all other conditions are met, the response sends back the message :
-
       ```"Request successfully submitted."```
 ``    
-
-
    **Result in database:**
-
  - A sick leave request is created with type: "Sick Leave" , id of the sender ,id of the receiver (head of the department),sick day date, submission date, reason (if inputted by user) and state: "Pending". This request is saved into the requests collection.
  - The head of the user's department  will receive a notification where each member has an array of notifications. So a new string saying ```"You received a new sick leave request."``` will be pushed into their arrays.  
  *** 
@@ -2367,37 +2268,25 @@ You are not an academic member!
  - 2. (OPTIONAL) reason for request
  
  -   **Example request body:**
-
-
 ```
   { 
   "maternityDoc":"drive string",
   "reason":"compensate please"
   }
    ```
-
-
    - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR are not permitted to send leave requests.Only academic members are allowed."```
   -  Case 2: if the user making this request is not female, the response sends back the message :
-
          "Only female staff members are eligible to send this request." 
    -  Case 3: if the user is in a department that does not have a head of department yet to send the request to since this request is automatically sent to the head of the department, the response sends back the message :
-
       ```     "There is currently no head of this department to send this request to."```
    -  Case 4: if the user does not input maternity documents, the response sends back the message :
-
       ```     "Documents to prove the maternity condition must be submitted."```
    -  Case 5: if the input is correct and all other conditions are met, the response sends back the message :
-
       ```"Request successfully submitted."```
 ``    
-
-
    **Result in database:**
-
  - A maternity leave request is created with type: "Maternity Leave" , id of the sender ,id of the receiver (head of the department),maternity documents, submission date, reason (if inputted by user) and state: "Pending". This request is saved into the requests collection.
  - The head of the user's department  will receive a notification where each member has an array of notifications. So a new string saying ```"You received a new maternity leave request."``` will be pushed into their arrays.  
 ***
@@ -2410,43 +2299,29 @@ You are not an academic member!
  - 2. reason for request
  
  -   **Example request body:**
-
-
 ```
   { 
   "missedDay":"2020-12-12",
   "reason":"reason"
   }
    ```
-
-
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR are not permitted to send leave requests.Only academic members are allowed."```
  -  Case 2: if the user does not input missed day date, the response sends back the message :
-
         ```"Must submit the missed day date with the request." ```
  -  Case 3: if the user inputs a friday day as the missed day date, the response sends back the message :
-
       ```    "Cannot compensate for Friday.It is already a day off"```
  -  Case 4: if the user inputs his day off as the missed day date, the response sends back the message :
-
       ```     "Cannot compensate for a day off."```
  -  Case 5: if the day the user inputted was one where he attended and was not absent, the response sends back the message :
-
       ```"You already attended this day.Cannot send a compensation request for it."```
  -  Case 6: if the day the user does not input a reason for this request, the response sends back the message :
-
       ```"Must submit a reason for compensation leave request."```
  -  Case 7: if the input is correct and all other conditions are met, the response sends back the message :
-
       ```"Request successfully submitted."```
 ``      
-
-
    **Result in database:**
-
  - A compensation leave request is created with type: "Compensation Leave" , id of the sender ,id of the receiver (head of the department),missed day date, submission date, reason (if inputted by user) and state: "Pending". This request is saved into the requests collection.
  - The head of the user's department  will receive a notification where each member has an array of notifications. So a new string saying ```"You received a new compensation leave request."``` will be pushed into their arrays.  
 ***
@@ -2455,19 +2330,13 @@ You are not an academic member!
  - **Route:**/academic/requestStatus
  - **Request type:** GET
  - **Request body:** empty
-
-
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR do not have any leave requests."```
  -  Case 2: if the user do not have any submitted requests yet, the response sends back the message :
-
         ```"There are no submitted requests to display." ```
  -  Case 3:else if there are submitted requests:
-
      **Example of response body:**
-
     
  ``` json
  Request type: Change Day off
@@ -2502,19 +2371,13 @@ Submission date: Thu Dec 24 2020 22:19:59 GMT+0200 (Eastern European Standard Ti
  - /academic/acceptedReceivedRequests (for received requests)
  - **Request type:** GET
  - **Request body:** empty
-
-
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR do not have any leave requests."```
  -  Case 2: if the user do not have any accepted requests yet, the response sends back the message :
-
        ```"There are no accepted requests to display."```
  -  Case 3:else if there are submitted requests:
-
      **Example of response body:**
-
 ```json
 Request type: Slot Linking
 Sent to course coordinator: marina
@@ -2525,8 +2388,6 @@ Course ID: csen33
 Reason: 
 Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Time)
 ```
-
-
 ***
 	7 (c) View pending requests.
  - **Functionality:** any academic member should be able to view  pending requests.
@@ -2535,19 +2396,13 @@ Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Ti
  - /academic/pendingReceivedRequests (for received requests)
  - **Request type:** GET
  - **Request body:** empty
-
-
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR do not have any leave requests."```
  -  Case 2: if the user do not have any accepted requests yet, the response sends back the message :
-
        ```"There are no pending requests to display."```
  -  Case 3:else if there are submitted requests:
-
      **Example of response body:**
-
 ```json
 Request type: Slot Linking
 Sent to course coordinator: marina
@@ -2566,19 +2421,13 @@ Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Ti
  - /academic/rejectedReceivedRequests (for received requests)
  - **Request type:** GET
  - **Request body:** empty
-
-
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```"HR do not have any leave requests."```
  -  Case 2: if the user do not have any accepted requests yet, the response sends back the message :
-
        ```"There are no rejected requests to display."```
  -  Case 3:else if there are submitted requests:
-
      **Example of response body:**
-
 ```json
 Request type: Slot Linking
 Sent to course coordinator: marina
@@ -2596,23 +2445,16 @@ Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Ti
  - **Request type:** PUT
  - **Request body:** user must input
          - requestID (he can get this ID by viewing his requests)
-
-
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```'You are not an academic member!'```
  -  Case 2: if the user inputs a request ID that does not exist, the response sends back the message :
-
        ```"This request does not exist. Please enter correct request ID"```
  -  Case 3: if the user inputs the ID of a request that was not sent to him , the response sends back the message :
-
        ```This request was not sent to you.Cannot accept or reject.'```
    -  Case 3: if the user inputs a request ID that he has already accepted before, the response sends back the message :
-
        ```"This request has already been accepted before."'```    
      -  Case 4: else :
-
            ```"Request successfully accepted."'```      
 ***
 	8 (b). Reject a replacement request.
@@ -2621,23 +2463,16 @@ Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Ti
  - **Request type:** PUT
  - **Request body:** user must input
          - requestID (he can get this ID by viewing his requests)
-
-
  - **Response body:**  
  - Case 1: if the user is an HR member and not an academic one the response sends back the message :
-
       ```'You are not an academic member!'```
  -  Case 2: if the user inputs a request ID that does not exist, the response sends back the message :
-
        ```"This request does not exist. Please enter correct request ID"```
  -  Case 3: if the user inputs the ID of a request that was not sent to him , the response sends back the message :
-
        ```This request was not sent to you.Cannot accept or reject.'```
    -  Case 3: if the user inputs a request ID that he has already rejected before, the response sends back the message :
-
        ```"This request has already been rejected before."'```    
      -  Case 4: else :
-
            ```"Request successfully rejected."'```    
 ***
 	(9) Cancel a still pending request or a request whose day is yet to come.
@@ -2682,24 +2517,19 @@ Submission date: Thu Dec 24 2020 20:21:37 GMT+0200 (Eastern European Standard Ti
     - `Case 6:` If the request is an annual or replacement request, and the slot date ***was reached or on the current date***, then the response sends backs the message **`Cannot cancel a replacement/annual request whose target day has passed!`** with status **`400`**.\
  &nbsp;
     - `Case 7:` If the request is an annual or replacement request, and the slot date ***has not been reached yet***, then the response sends backs the message **`Request deleted successfully!`** with status **`200`**. 
-
 - **Example response body:**
 ```json
 You are not an academic member!
 ```
-
 ```json
 Request not found!
 ```
-
 ```json
 You are not the one who sent this request!
 ```
-
 ```json
 Cannot cancel a non-pending request!
 ```
-
 ```json
 Request cancelled successfully!
 ```
@@ -2734,11 +2564,9 @@ Request cancelled successfully!
 ```json
 You do not have a replacement request with such details!
 ```
-
 ```json
 Annual Leave request sent to HOD with the details about the academic member who accepted your request: <name>, with id <id>
 ```
-
 ```json
 Annual Leave request sent to HOD with request that has no accept responses.
 ```
