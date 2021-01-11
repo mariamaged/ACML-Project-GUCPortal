@@ -406,7 +406,7 @@ async function  cr(){
    const salt=await bcrypt.genSalt();     
         const hashedPassword=await bcrypt.hash("123456",salt);
         console.log("hashed pass= "+hashedPassword)
-        console.log("h= "+moment("2019-12-21T22:00:00.000Z").format("YYYY-MM-DD"))
+        // console.log("h= "+moment("2021-01-11T22:00:00.000+00:00").format("YYYY-MM-DD"))
         // const r=await request.find({reqType:"Replacement",slotDate:new Date("2021-01-12")})
         // console.log(r)
     //  console.log("2021-01-11T22:00:00.000Z"==moment("2021-01-12").format())

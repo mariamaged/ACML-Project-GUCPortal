@@ -72,9 +72,15 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
         if(moment(slotDate).format('YYYY-MM-DD')<(new moment().format("YYYY-MM-DD"))){
             return res.json("Cannot replace a slot that has already passed.")
         }
-        // if(user.staff_type=="HR"){
-        //     return (res.json({error:"HR cannot make replacement requests"}))
-        // }
+
+        if(!(slotNum>=1 && slotNum<=5))
+        return res.json("Please enter a valid slot number!")
+        
+        const slotLocation=await location.findOne({id:req.body.slotLoc})
+        if(!slotLocation)
+        return res.json("Please enter a valid slot location!")
+
+
         const academicUser=await AcademicStaffModel.findOne({member:req.user.id})
         var check=false
         const slots=academicUser.schedule
@@ -1989,7 +1995,15 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     var check=false;
 
      //check if this slot on this day for this course actually exists
-
+     const currCourse=await Course.findOne({id:req.body.courseID})
+     const courseSchedule=currCourse.schedule
+     var boolSlot=false
+     for(var j=0;j<courseSchedule.length;j++){
+        if(courseSchedule[j].number==slotNum && courseSchedule[j].day==slotDay)
+        boolSlot=true
+     }
+     if(!boolSlot)
+     return res.json("This slot does not exist.Please enter valid slot details.")
 
 
 
@@ -2577,7 +2591,7 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
 
 router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     //enter absent day he wants to compensate for (req.body.missedDay,req.body.compensatedDay, req.body.reason)
-        console.log("in compenstion")
+    console.log("in compenstion")
     //check if user is HR
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
@@ -2588,8 +2602,26 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
         return res.json("Must submit the missed day date with the request.")
     }
     if(!req.body.compensatedDay){
-        return res.json("Must submit the compensated day date with the request.")
+        return res.json("Must submit the compensation day date with the request.")
     }
+    if(req.body.missedDay>=new moment().format("YYYY-MM-DD")){
+        return res.json("Missed day should have a date that has already passed.")
+
+    }
+    if(req.body.compensatedDay>=new moment().format("YYYY-MM-DD")){
+        return res.json("Compensation day should have a date that has already passed.")
+
+    }
+
+        //--------------------------CHECK WITH MARIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    // if(req.body.compensatedDay<req.body.missedDay){
+    //     return res.json("Compensation day should be after missed day!")
+
+    // }
+    if(req.body.compensatedDay==req.body.missedDay){
+        return res.json("Compensation day and missed day cannot have the dame date!")
+    }
+    
 
     //check if he is asking to compensate for a day off or friday
     const day=moment(req.body.missedDay).format('dddd')
@@ -2604,34 +2636,57 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
         return res.json("Cannot compensate for a day off.")
     }
 
-    if(compensationDay=="Friday")
-    return res.json("Cannot compensate on Friday!")
-    if(compensationDay!=day_off)
-    return res.json("Compensation day should be a day off.")
+ 
 
 
-    if(moment(missedDay).format("D")<=10){
-        var prevMonth;
-        var prevYear;
-        var prevDay=11;
-        var currDay=10;
-        const currYear=moment(missedDay).format("Y")
-        const currMonth=moment(missedDay).format("M")
+    //checking that compensation day is in same month as missed day  
+    //month starting from 11 to 10th
+    var currMonth=moment(req.body.missedDay).format("M");
+    var currYear=moment(req.body.missedDay).format("Y");
+    var nextMonth=moment(req.body.missedDay).format("M");
+    var nextYear=moment(req.body.missedDay).format("Y");
+    var currDay=11;
+    var nextDay=10;
+    if(moment(req.body.missedDay).format("D")<=10){
         if(currMonth==1){
-            prevMonth=12
-            prevYear=parseInt(currYear)-1
+            currMonth=12
+            currYear=parseInt(currYear)-1
         }
         else{
-            prevMonth=parseInt(currMonth)-1
-            prevYear=currYear
+            nextMonth=parseInt(currMonth)+1
+            nextYear=currYear
         }
-        const begin=new moment(prevYear+"-"+prevMonth+"-"+prevDay).format("YYYY-MM-DD")
-        const end=new moment(currYear+"-"+currMonth+"-"+currDay).format("YYYY-MM-DD")
+       
+    }
+    else{
+
+        if(currMonth==12){
+            nextMonth=1
+            nextYear=parseInt(currYear)+1
+            console.log("currrrr="+nextYear)
+        }
+        else{
+            nextMonth=parseInt(currMonth)+1
+            console.log("currMonthereeee= "+nextMonth)
+            nextYear=currYear
+        }
+    }
+        
+        console.log("currYear= "+currYear+"\n"+"currMonth= "+currMonth+" currDay= "+currDay)
+        console.log("nextYear= "+nextYear+"\n"+"nextMonth= "+nextMonth+" nextDay= "+nextDay)
+        const end=new moment(nextYear+"-"+nextMonth+"-"+nextDay).format("YYYY-MM-DD")
+        const begin=new moment(currYear+"-"+currMonth+"-"+currDay).format("YYYY-MM-DD")
+        console.log("begin= "+begin)
+        console.log("end= "+end)
         if(!(moment(compensationDay).format("YYYY-MM-DD")>=begin && 
         moment(compensationDay).format("YYYY-MM-DD")<=end))
-        return res.json("Compensation day should be in same month as missed day **a month start fromthe 11th to the 10th")
-    }
-
+        return res.json("Compensation day should be in same month as missed day (*a month start from the 11th to the 10th)")
+    
+////////////////
+        if(compensationDay=="Friday")
+        return res.json("Cannot compensate on Friday!")
+        if(compensationDay!=day_off)
+        return res.json("Compensation day should be a day off.")
    
 
     // //check if he actually attended this day_off    WILL ADD IT TO ACCEPT/REJECT COMPENSATION REQUEST
@@ -3796,6 +3851,10 @@ router.post('/cancelRequest', authenticateToken, async (req, res) => {
 
 router.post('/annualLeave', authenticateToken, async (req, res) => {
     //input is slotDate
+    const staff=await StaffMemberModel.findById(req.user.id)
+    if(staff.staff_type=="HR"){
+        return res.json("HR not permitted to send requests!")
+    }
     console.log("in annual leave")
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
 
@@ -3804,6 +3863,15 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
     const HODAcademicModel = await AcademicStaffModel.findById(currDepartment.HOD);
     const HODStaffModel = await StaffMemberModel.findById(HODAcademicModel.member);
     console.log("hod nameeeeeeeeeeeeeeeeeeeeeeeee= "+HODStaffModel.name)
+
+    if(req.body.slotDate<=new moment().format("YYYY-MM-DD"))
+    return res.json("Must submit a request for a date that is yet to come!")
+    if(moment(req.body.slotDate).format("dddd"))
+    return res.json("Friday is already your day off!")
+    const day_off=userAcademic.day_off
+    if(moment(req.body.slotDate).format("dddd")==day_off)
+    return res.json("This is already your day off!")
+
     //get slotDate and user's schedule to get slots on this day
     const slotDate = req.body.slotDate;
     const userSchedule=userAcademic.schedule
@@ -3939,7 +4007,9 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
     const currRequest=await request.findOne({requestID:req.body.requestID})
     if(!currRequest)
     return res.json("This request does not exist.")
-
+    if(!currRequest.sentTo.equals(req.user.id)) 
+    return res.status(401).send('This request was not sent to you.Cannot accept or reject.');
+   
     const reqType=currRequest.reqType;
     if(currRequest.state!="Pending"){
         return res.json("This request has already been responded to before.")
@@ -3984,15 +4054,12 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
     }
 
     if(reqType=="Change Day off"){
-        if(!currRequest.sentTo.equals(req.user.id)) 
-        return res.status(401).send('This request was not sent to you.Cannot accept or reject.');
-        if(currRequest.state!="Pending"){
-            return res.json("This request has already been responded to before.")
-        }
+        
         const upReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+        const upDayOff=await AcademicStaffModel.findOneAndUpdate({member:currRequest.sentBy},{day_off:currRequest.newDayOff})
         const notification=(await StaffMemberModel.findById(currRequest.sentBy)).notifications
         const notNew=notification
-        notNew[notNew.length]="Your request has been accepted."
+        notNew[notNew.length]="Your Change Day-Off request has been accepted."
         const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
         return res.json("Request successully accepted.")
     }
@@ -4009,51 +4076,133 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
         attDay=currRequest.accidentDate
 
         const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
-        const newAtt=new AttendanceSchema({
+        const newAtt=({
             date:attDay,
-            time:time,
             attended:true,
-            day:day
         })
 
-        const user=await StaffMemberModel.findById(req.user.id)
-         var oldMonthUp=user.time_attended
-        oldMonthUp[oldMonthUp.length-1]=newAtt
-        const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:oldMonthUp})
+        const user=await StaffMemberModel.findById(currRequest.sentBy)
+         var oldMonthUp=user.attendance
+         console.log("this is=============== "+user.name)
+        oldMonthUp[oldMonthUp.length]=newAtt
+        
+        console.log("newwwwwwwwwwww= "+oldMonthUp)
+        // for(var l=0;l<oldMonthUp;l++)
+        // console.log("atttendaceeeeeeeeeeeeeeeeeee= "+oldMonthUp[l])
+        console.log("oldddddddddddddddd= "+moment(oldMonthUp[oldMonthUp.length-1].date).format("YYYY-MM-DD"))
+        
+        const up=await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{attendance:oldMonthUp})
 
         //notify
-        const notification=(await StaffMemberModel.findById(currRequest.sentBy)).notifications
+        const notification=user.notifications
         const notNew=notification
-        notNew[notNew.length]="Your request has been accepted."
+        if(reqType=="Accidental Leave")
+        notNew[notNew.length]="Your Accidental leave request has been accepted!"
+        if(reqType=="Sick Leave")
+        notNew[notNew.length]="Your Sick leave request has been accepted!"
         const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
         return res.json("Request successully accepted.")
                  
     }
 
     if(reqType=="Maternity Leave"){
+        const user=await StaffMemberModel.findById(currRequest.sentBy)
         const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+        console.log("uppppppppppp= "+upAccReq)
         var bool=false;
-        var newAtt=new Array()
-        var k=0
-        const startDate=currRequest.startDate
+        var attendance=user.attendance
+        var newAtt=attendance
+        var k=attendance.length
+        var startDate=currRequest.startDate
         const endDate=currRequest.endDate
-        const startDateYear=moment(currRequest.startDate).format("Y")
+        var startDateYear=moment(currRequest.startDate).format("Y")
         const startDateMonth=moment(currRequest.startDate).format("M")
         var endDay;
+        console.log("st=  "+startDate)
+        console.log("end=  "+endDate)
         
         while(!bool){
-            var newAtt=new AttendanceSchema({
+            console.log("start date= "+startDate)
+            var newAttendance=({
                 date:startDate,
                 attended:true,
-                day:day
             })
-            newAtt[k++]=newAtt
+            newAtt[k++]=newAttendance
             startDate = moment(startDate, "YYYY-MM-DD").add(1, 'days');
-            var check=new_date.isBefore(moment(endDate).format("YYYY-MM-DD"))
+            console.log("new start date= "+moment(startDate).format("YYYY-MM-DD"))
+            console.log("end == "+moment(endDate).format("YYYY-MM-DD"))
+            var check=(moment(startDate).format("YYYY-MM-DD")<=(moment(endDate).format("YYYY-MM-DD")))
+            console.log("checkkkkkkkk= "+check)
             if(!check)
             bool=true
         }
-        const up=await StaffMemberModel.findByIdAndUpdate(req.user.id,{time_attended:newAtt})
+        const up=await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{attendance:newAtt})
+
+          //notify
+          const notification=user.notifications
+          const notNew=notification
+          notNew[notNew.length]="Your Maternity leave request has been accepted!"
+          const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
+          return res.json("Request successully accepted.")
+    }
+
+    if(reqType=="Compensation Leave"){
+        const user=await StaffMemberModel.findById(currRequest.sentBy)
+        const compensatedDay=currRequest.compensatedDay
+        var attendance=user.attendance
+        var newAtt=attendance
+        var bool=false;
+        for (var k=0;k<attendance.length;k++){
+            console.log("attendanceDay= "+moment(attendance[k].date).format("YYYY-MM-DD"))
+            console.log("compensatedDay= "+moment(compensatedDay).format("YYYY-MM-DD"))
+            if(moment(attendance[k].date).format("YYYY-MM-DD")==moment(compensatedDay).format("YYYY-MM-DD")){
+                bool=true;
+                break;
+            }
+             }
+        if(!bool)
+        return res.json("Cannot accept this request because the compensation day was not attended!")
+        
+        const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+        
+        var oldMonthUp=user.attendance
+        var newAttendance=({
+            date:currRequest.missedDay,
+            attended:true,
+        })
+       oldMonthUp[oldMonthUp.length]=newAttendance
+       
+       const up=await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{attendance:oldMonthUp})
+
+       //notify
+       const notification=user.notifications
+       const notNew=notification
+       notNew[notNew.length]="Your Compensation leave request has been accepted!"
+       const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
+       return res.json("Request successully accepted.")
+  // const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+        
+    }
+    if(reqType=="Annual Leave"){
+        const user=await StaffMemberModel.findById(currRequest.sentBy)
+        const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
+        
+        var oldMonthUp=user.attendance
+        var newAttendance=({
+            date:currRequest.slotDate,
+            attended:true,
+        })
+       oldMonthUp[oldMonthUp.length]=newAttendance
+       
+       const up=await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{attendance:oldMonthUp})
+
+       //notify
+       const notification=user.notifications
+       const notNew=notification
+       notNew[notNew.length]="Your Annual leave request has been accepted!"
+       const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
+       return res.json("Request successully accepted.")
+
     }
 
 })
