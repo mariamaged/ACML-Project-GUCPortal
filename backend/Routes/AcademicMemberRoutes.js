@@ -4015,7 +4015,7 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
    
     const reqType=currRequest.reqType;
     if(currRequest.state!="Pending"){
-        return res.status(400).json("This request has already been responded to before.")
+        return res.status(400).json("This request has already been responded to!")
     }
 
     if(reqType=="Replacement"){

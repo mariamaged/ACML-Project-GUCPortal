@@ -22,8 +22,8 @@ class getRequestsForms extends Component{
             <DropdownButton id="dropdown-basic-button" title="Dropdown button" className="reqFormDrop">
             <Dropdown.Item><Link to= {{pathname:'/requestsForms',state:{formType:"Accidental Leave",formTitle:"Accidental Leave Request Form"}}} >Accidental Leave Request</Link></Dropdown.Item>
             <Dropdown.Item><Link to= {{pathname:'/requestsForms',state:{formType:"Annual Leave",formTitle:"Annual Leave Request Form"}}}>Annual Leave Request</Link></Dropdown.Item>
-            <Dropdown.Item><Link to= {{pathname:'/requestsForms',state:{formType:"Compensation Leave",formTitle:"Compensation Request Form"}}}>Compensation Request</Link></Dropdown.Item>
             <Dropdown.Item><Link to= {{pathname:'/requestsForms',state:{formType:"Change Day off",formTitle:"Change Day Off Request Form"}}}>Change Day Off Request</Link></Dropdown.Item>
+            <Dropdown.Item><Link to= {{pathname:'/requestsForms',state:{formType:"Compensation Leave",formTitle:"Compensation Request Form"}}}>Compensation Request</Link></Dropdown.Item>
             <Dropdown.Item><Link to= {{pathname:'/requestsForms',state:{formType:"Maternity Leave",formTitle:"Maternity Leave Request Form"}}}>Maternity Leave Request</Link></Dropdown.Item>
             <Dropdown.Item><Link to= {{pathname:'/requestsForms',state:{formType:"Replacement",formTitle:"Replacement Request Form"}}}>Replacement Request</Link></Dropdown.Item>
             <Dropdown.Item><Link to= {{pathname:'/requestsForms',state:{formType:"Sick Leave",formTitle:"Sick Leave Request Form"}}}>Sick Leave Request</Link></Dropdown.Item>
