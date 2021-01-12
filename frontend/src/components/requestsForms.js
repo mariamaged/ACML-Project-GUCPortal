@@ -42,7 +42,11 @@ class requestsForms extends Component{
           slotDay:"",
           slotLoc:"",
 
-          sickDate:"",
+        
+          slotNum:"",
+          courseID:"",
+
+          sickDay:"",
           medicalDoc:"",
 
           sucessMsg:"",
@@ -107,11 +111,10 @@ class requestsForms extends Component{
             headers: {
                 'x-auth-token':localStorage.getItem('jwtToken')
             },
-            // data: {
-            //     slotNum:,
-            //     slotDate:,
-            //     slotLoc:
-            // },
+            data: {
+               slotDate:this.state.slotDate,
+               reason:this.slot.reason
+            },
           
           }).then(res=>{
             console.log("successfull");
@@ -235,8 +238,9 @@ class requestsForms extends Component{
                 'x-auth-token':localStorage.getItem('jwtToken')
             },
             data: {
-                accidentDate:this.state.sickDate,
-                reason:this.state.accidentalReason
+                sickDay:this.state.sickDay,
+                medicalDoc:this.state.medicalDoc,
+                reason:this.state.reason
             },
           
           }).then(res=>{
@@ -261,8 +265,10 @@ class requestsForms extends Component{
                 'x-auth-token':localStorage.getItem('jwtToken')
             },
             data: {
-                accidentDate:this.state.accidentalDate,
-                reason:this.state.accidentalReason
+                slotDay:this.state.slotDay,
+                slotNum:this.state.slotNum,
+                courseID:this.state.courseID,
+                reason:this.state.reason
             },
           
           }).then(res=>{
@@ -279,7 +285,7 @@ class requestsForms extends Component{
    
     handleReqForm(e,formType,formTitle){
         console.log("check= "+this.state.successMsg)
-        // console.log("missed= "+)
+        console.log("changed= "+e.taget+" = "+e.target.value)
         e.preventDefault();
         const location = {
             pathname: '/requestsForms',
@@ -294,10 +300,16 @@ class requestsForms extends Component{
         this.setState({newDayOff:e.target.value})
         console.log("new day off= "+e.target.value)
     }
+   
     chooseSlotNum=(e)=>{
         e.preventDefault()
         console.log("in choose slot "+e.target.value)
         this.setState({slotNum:e.target.value})
+    }
+    chooseSlotLinkingDay=(e)=>{
+        e.preventDefault()
+        console.log("in choose slot "+e.target.value)
+        this.setState({slotDay:e.target.value})
     }
     render(){
         const g=
@@ -358,16 +370,15 @@ class requestsForms extends Component{
         <label className="col-form-label" htmlFor="annualDate">Day Off Date</label>
         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleChange}/>
 
-        {/* <label className="col-form-label" htmlFor="annualReplacement">Replacement Staff</label>
-        <input type="text" className="form-control" placeholder="Default input" id="annualReplacement" onChange={this.handleChange}/>
-         */}
+        
+        
         <label className="col-form-label" htmlFor="annualReason">Reason</label>
         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
         <Button variant="primary" type="submit">
          Submit
         </Button> 
-        {this.state.annualSuccess && <h6 className="successMsg">Request successfully submitted!</h6> }
-        {this.state.annualWarning!="" && <h6 className="warningMsg">{this.state.annualWarning}</h6>}
+        {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
+        {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
          </form>} 
 
 
@@ -471,11 +482,50 @@ class requestsForms extends Component{
     
     }  
 
+    {this.state.formType=="Slot Linking" &&
+    <form onSubmit={this.onFormSlotLinkingSubmit}>
+         
+         <label className="col-form-label" htmlFor="slotDay">Slot Day</label>
+         <Form.Control as="select" placeholder="Choose a day" required onChange={this.chooseSlotLinkingDay}>
+            <option value="" hidden></option>
+            <option value="Saturday" >Saturday</option>
+            <option value="Sunday" >Sunday</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday" >Tuesday</option>
+            <option value="Wednesday" >Wednesday</option>
+            <option value="6" >Thursday</option>
+            </Form.Control>
+            <br/>
+        
+        <label className="col-form-label" htmlFor="slotNum">Slot Number</label>
+         <Form.Control as="select" placeholder="Choose a slot" required onChange={this.chooseSlotNum}>
+         <option value="" hidden></option>
+            <option value="1" >1</option>
+            <option value="2" >2</option>
+            <option value="3">3</option>
+            <option value="4" >4</option>
+            <option value="5" >5</option>
+            </Form.Control>
+            <br/>
+        
+        <label className="col-form-label" htmlFor="courseID">Course ID</label>
+         <input type="text" className="form-control" placeholder="" id="courseID" required onChange={this.handleChange}/>
+ 
+         <label className="col-form-label" htmlFor="sickReason">Reason</label>
+         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+         <Button variant="primary" type="submit">
+          Submit
+         </Button> 
+         {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
+         {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
+          </form>
+    }
+
     {this.state.formType=="Sick Leave" &&
     <form onSubmit={this.onFormSickSubmit}>
          
-         <label className="col-form-label" htmlFor="sickDate">Sick Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="sickDate" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="sickDay">Sick Day Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="sickDay" required onChange={this.handleChange}/>
          <label className="col-form-label" htmlFor="medicalDoc">Medical Documents</label>
          <input type="text" className="form-control" placeholder="" id="medicalDoc" required onChange={this.handleChange}/>
  
@@ -488,18 +538,6 @@ class requestsForms extends Component{
          {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
           </form>
     }
-    {/* {this.state.formType=="Slot Linking" &&
-    <div className="form-group">
-    <label className="col-form-label" htmlFor="inputDefault">Slot Day</label>
-    <input type="text" className="form-control" placeholder="Default input" id="inputDefault" required/>
-    <label className="col-form-label" htmlFor="inputDefault">Slot Number</label>
-    <input type="text" className="form-control" placeholder="Default input" id="inputDefault" required/>
-    <label className="col-form-label" htmlFor="inputDefault">Course ID</label>
-    <input type="text" className="form-control" placeholder="Default input" id="inputDefault" required/>
-   
-   <label className="col-form-label" htmlFor="inputDefault">Reason</label>
-    <input type="text" className="form-control" placeholder="Default input" id="inputDefault" />   
-    </div>}   */}
 
     </div>
      

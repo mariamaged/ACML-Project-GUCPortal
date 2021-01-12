@@ -1948,45 +1948,45 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
     if(type=="HR"){
-        return res.json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
+        return res.status(401).json({arr:[],warning:"HR cannot submit this request.Only academic staff are permitted."})
     }
     if(!req.body.slotDay){
-        return res.json("Must submit slot day with the request.")
+        return res.status(400).json("Must submit slot day with the request.")
     }
     if(!(req.body.slotDay=="Saturday" || req.body.slotDay=="Sunday"||req.body.slotDay=="Monday"
     ||req.body.slotDay=="Tuesday"||req.body.slotDay=="Wednesday"||req.body.slotDay=="Thursday" || req.body.slotDay=="Thursday")){
-        return res.json("Please enter a day with correct format (eg.Saturday).")
+        return res.status(400).json("Please enter a day with correct format (eg.Saturday).")
     }
 
     if(!req.body.slotNum){
-        return res.json("Must submit slot number with the request.")
+        return res.status(400).json("Must submit slot number with the request.")
     }
     if(!req.body.courseID){
-        return res.json("Must submit course ID with the request.")
+        return res.status(400).json("Must submit course ID with the request.")
     }
     if(!(req.body.slotNum>=1 && req.body.slotNum<=5))
-    return res.json("Please enter correct slot number.")
+    return res.status(400).json("Please enter correct slot number.")
 
     const academic=await AcademicStaffModel.findOne({member:req.user.id})
      //check if this slot day is his day off
      const day_off=academic.day_off
      const slotDayEntered=req.body.slotDay
      if(day_off==slotDayEntered || slotDayEntered=="Friday")
-     return res.json("Cannot make an slot linking request for a day that is your day-off!")
+     return res.status(400).json("Cannot make an slot linking request for a day that is your day-off!")
 
     
 
     const courseName=await Course.findOne({id:req.body.courseID})
     console.log("coursenAME= "+courseName)
     if(!courseName){
-    return res.json("No such course exists. Please enter correct course ID.")
+    return res.status(400).json("No such course exists. Please enter correct course ID.")
     }
     const courseID=courseName.id
     const courseCoordinatorID=courseName.course_coordinator
      const courseCoordinator= await AcademicStaffModel.findById(courseCoordinatorID)
   //  const coordinatorID=courseCoordinator.member
      if(!courseCoordinator){
-         return res.json("Currently there is not an assigned course coorinator to this course send this request to.")
+         return res.status(400).json("Currently there is not an assigned course coorinator to this course send this request to.")
      }
     const coordinatorID=courseCoordinator.member
     //will compare slot timings with user schedule to make sure that he is free during this slot
@@ -2005,7 +2005,7 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
         boolSlot=true
      }
      if(!boolSlot)
-     return res.json("This slot does not exist.Please enter valid slot details.")
+     return res.status(400).json("This slot does not exist.Please enter valid slot details.")
 
 
 
@@ -2049,7 +2049,7 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
         }
     }
     if(teaches==false)
-    return res.json("Not permitted to send this request because user does not teach this course.")
+    return res.status(400).json("Not permitted to send this request because user does not teach this course.")
 
 
 
@@ -2088,7 +2088,7 @@ router.post('/slotLinkingRequest',authenticateToken,async(req,res)=>{
     await newRequest.save()
     }
     catch(err){
-        res.json(err)
+        res.status(400).json(err)
     }
 
     //sending notification to course coordinator
@@ -2386,10 +2386,10 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
     if(type=="HR"){
-        return res.json("HR are not permitted to send leave requests.Only academic members are allowed.")
+        return res.status(401).json("HR are not permitted to send leave requests.Only academic members are allowed.")
     }
     if(!req.body.sickDay){
-        return res.json("Must submit sick day date with the request.")
+        return res.status(400).json("Must submit sick day date with the request.")
     }
     const sickDay=req.body.sickDay
      //getting hod
@@ -2398,37 +2398,37 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
      const departmentRec=await department.findById(departmentID)
      const hodID=departmentRec.HOD
      if(!hodID){
-         return res.json("There is currently no head of this department to send this request to.")
+         return res.status(400).json("There is currently no head of this department to send this request to.")
      }
 
      // ---------------------------------MILESTONE2---------------------------------
-     //check if the sick day is a day where the user didnt actually attend
-     const attendance=staff.attendance
-     if(attendance){
-         console.log("att= "+attendance)
-     for(var i=0;i<attendance.length;i++){
-        console.log("i= "+i)
-        console.log(" "+moment(attendance[i].date).format("YYYY-MM-DD"))
-        if(moment(attendance[i].date).format("YYYY-MM-DD")==req.body.sickDay){
-            // console.log("i= "+i)
-            // console.log(" "+moment(attendance[i]).format("YYYY-MM-DD"))
-            console.log("sickDay= "+req.body.sickDay)
-            return res.json("Cannot make a sick leave request for a day that was attended!")
-        }
-     }
-    }
-     //check if this sick day is his day off
-     const day_off=academic.day_off
-     const sickDayEntered=moment(req.body.sickDay).format("dddd")
-     if(day_off==sickDayEntered || sickDayEntered=="Friday")
-     return res.json("Cannot make a sick leave request for a day that is your day-off!")
-     console.log(moment(req.body.sickDay).format("YYYY-MM-DD"))
-     console.log(new moment().format("YYYY-MM-DD"))
-     if(!(moment(req.body.sickDay).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD")))){
-        console.log("beforeeeeeeeeeeee")
-           return res.status(401).json("You are only allowed to submit a sick leave request for an absence that has happened by maximum 3 days ago!")
+    //  //check if the sick day is a day where the user didnt actually attend
+    //  const attendance=staff.attendance
+    //  if(attendance){
+    //      console.log("att= "+attendance)
+    //  for(var i=0;i<attendance.length;i++){
+    //     console.log("i= "+i)
+    //     console.log(" "+moment(attendance[i].date).format("YYYY-MM-DD"))
+    //     if(moment(attendance[i].date).format("YYYY-MM-DD")==req.body.sickDay){
+    //         // console.log("i= "+i)
+    //         // console.log(" "+moment(attendance[i]).format("YYYY-MM-DD"))
+    //         console.log("sickDay= "+req.body.sickDay)
+    //         return res.status(400).json("Cannot make a sick leave request for a day that was attended!")
+    //     }
+    //  }
+    // }
+    //  //check if this sick day is his day off
+    //  const day_off=academic.day_off
+    //  const sickDayEntered=moment(req.body.sickDay).format("dddd")
+    //  if(day_off==sickDayEntered || sickDayEntered=="Friday")
+    //  return res.status(400).json("Cannot make a sick leave request for a day that is your day-off!")
+    // //  console.log(moment(req.body.sickDay).format("YYYY-MM-DD"))
+    // //  console.log(new moment().format("YYYY-MM-DD"))
+    //  if(!(moment(req.body.sickDay).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD")))){
+    //     console.log("beforeeeeeeeeeeee")
+    //        return res.status(400).json("You are only allowed to submit a sick leave request for an absence that has happened by maximum 3 days ago!")
    
-       }
+    //    }
 
     //getting all days allowed to send request which is 3 days from today
     var diff3=moment().subtract(3, "days").format("YYYY-MM-DD");
@@ -2442,11 +2442,38 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
    if(sickDay==diff0 ||sickDay==diff1 || sickDay==diff2 ||sickDay==diff3 ){
        //no medical documents submitted
         if(!req.body.medicalDoc){
-            return res.json("Medical documents to prove medical condition must be submitted with the request.")
+            return res.status(400).json("Medical documents to prove medical condition must be submitted with the request.")
         }
 
         //medical documents submitted
         else{
+ //check if the sick day is a day where the user didnt actually attend
+ const attendance=staff.attendance
+ if(attendance){
+     console.log("att= "+attendance)
+ for(var i=0;i<attendance.length;i++){
+    console.log("i= "+i)
+    console.log(" "+moment(attendance[i].date).format("YYYY-MM-DD"))
+    if(moment(attendance[i].date).format("YYYY-MM-DD")==req.body.sickDay){
+        console.log("sickDay= "+req.body.sickDay)
+        return res.status(400).json("Cannot make a sick leave request for a day that was attended!")
+    }
+ }
+}
+ //check if this sick day is his day off
+ const day_off=academic.day_off
+ const sickDayEntered=moment(req.body.sickDay).format("dddd")
+ if(day_off==sickDayEntered || sickDayEntered=="Friday")
+ return res.status(400).json("Cannot make a sick leave request for a day that is your day-off!")
+
+ if(!(moment(req.body.sickDay).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD")))){
+    console.log("beforeeeeeeeeeeee")
+       return res.status(400).json("You are only allowed to submit a sick leave request for an absence that has happened by maximum 3 days ago!")
+
+   }
+
+
+
    
     const hodAcademic=await AcademicStaffModel.findById(hodID)
     
@@ -2483,7 +2510,7 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
         res.json("Request successfully submitted.")
         }
         catch(err){
-            res.json(err)
+            res.status(400).json(err)
         }
 
 
@@ -2499,10 +2526,11 @@ router.post('/sickLeave',authenticateToken,async(req,res)=>{
 
    //request sent after 3 days deadline has passed
    else if(moment(req.body.sickDay).format("YYYY-MM-DD")<moment().format("YYYY-MM-DD")){
-       return res.json("Deadline for sending sick leave request has been exceeded.Cannot send request!")
+        console.log("late sickkkkkkkkkkkkkk")
+       return res.status(400).json("Deadline for sending sick leave request has been exceeded.Cannot send request!")
    }
-   else if(moment(req.body.sickDay).format("YYYY-MM-DD")>moment().format("YYYY-MM-DD")){
-    return res.json("Sick day leave request must be submitted by a maximum of 3 days after sick day date.")
+   else if(moment(req.body.sickDay).format("YYYY-MM-DD")>new moment().format("YYYY-MM-DD")){
+    return res.status(400).json("Sick day leave request must be submitted by a maximum of 3 days after sick day date.")
 }
 
 
