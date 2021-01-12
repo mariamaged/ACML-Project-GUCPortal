@@ -19,20 +19,40 @@ class requestsForms extends Component{
         formType:"",
         formTitle:"",
         fields:[],
-        accidentalWarning:"",
+        warningMsg:"",
         accidentalDate:"",
         accidentalReason:"",
-        accidentalSuccess:false,
+        successMsg:false,
         annualReason:"",
         annualSlotDate:"",
         annualSlotNum:"",
         annualSlotLoc:"",
         annualWarning:"",
-        annualSucces:""
+        annualSucces:"",
+        comepensationReason:"",
+         missedDate:"",
+         annualReason:"",
+         annualDate:"",
+         newDayOff:"",
+         changeReason:"",
+          maternityDoc:"",
+          maternityReason:"",
+          StartDate:"",
+          EndDate:"",
+          slotDate:"",
+          slotDay:"",
+          slotLoc:"",
+          slotReason:"",
+          sickDate:"",
+          medicalDoc:"",
+          sickReason:"",
+          sucessMsg:"",
+          warningMsg:"",
+          reason:""
     }
     componentDidMount(props){
         console.log("here in reqForms")
-        console.log("success at start? "+this.state.accidentalSuccess)
+        console.log("success at start? "+this.state.successMsg)
         console.log("this.state.reqType= "+this.props.location.state.formType)
              const temp=this.props.location.state.formType;
              const tempTitle=this.props.location.state.formTitle;
@@ -44,7 +64,7 @@ class requestsForms extends Component{
         console.log("submitted")
         console.log("name entered")
     }
-    handleAccidentalChange=(e)=>{
+    handleChange=(e)=>{
         console.log("e.target.value= "+e.target.value)
         this.setState({
             [e.target.id]:e.target.value
@@ -54,7 +74,7 @@ class requestsForms extends Component{
         console.log("working")
     }
     onFormAccidentalSubmit = e => {
-        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
         console.log("accidental submitted")
         axios.request({
@@ -65,21 +85,21 @@ class requestsForms extends Component{
             },
             data: {
                 accidentDate:this.state.accidentalDate,
-                reason:this.state.accidentalReason
+                reason:this.state.reason
             },
           
           }).then(res=>{
             console.log("successfull");
-            this.setState({accidentalSuccess:true});
+            this.setState({successMsg:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
-            this.setState({accidentalWarning:error.response.data});
+            this.setState({warningMsg:error.response.data});
             })
     }
     onFormAnnualSubmit = e => {
-        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("accidental submitted")
+        console.log("annual req submitted")
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/annualLeave',
@@ -94,17 +114,17 @@ class requestsForms extends Component{
           
           }).then(res=>{
             console.log("successfull");
-            this.setState({accidentalSuccess:true});
+            this.setState({successMsg:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
-            this.setState({accidentalWarning:error.response.data});
+            this.setState({warningMsg:error.response.data});
             })
     }
 
     onFormChangeSubmit = e => {
-        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("accidental submitted")
+        console.log("change req submitted")
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/changeDayOff',
@@ -112,23 +132,23 @@ class requestsForms extends Component{
                 'x-auth-token':localStorage.getItem('jwtToken')
             },
             data: {
-                accidentDate:this.state.accidentalDate,
-                reason:this.state.accidentalReason
+                newDayOff:this.state.newDayOff,
+                reason:this.state.reason
             },
           
           }).then(res=>{
             console.log("successfull");
-            this.setState({accidentalSuccess:true});
+            this.setState({successMsg:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
-            this.setState({accidentalWarning:error.response.data});
+            this.setState({warningMsg:error.response.data});
             })
     }
 
     onFormCompensationSubmit = e => {
-        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("accidental submitted")
+        console.log("comepnsation req submitted")
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/compensationLeave',
@@ -142,16 +162,16 @@ class requestsForms extends Component{
           
           }).then(res=>{
             console.log("successfull");
-            this.setState({accidentalSuccess:true});
+            this.setState({successMsg:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
-            this.setState({accidentalWarning:error.response.data});
+            this.setState({warningMsg:error.response.data});
             })
     }
     onFormMaternitySubmit = e => {
-        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("accidental submitted")
+        console.log("maternity req submitted")
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/compensationLeave',
@@ -165,18 +185,18 @@ class requestsForms extends Component{
           
           }).then(res=>{
             console.log("successfull");
-            this.setState({accidentalSuccess:true});
+            this.setState({successMsg:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
-            this.setState({accidentalWarning:error.response.data});
+            this.setState({warningMsg:error.response.data});
             })
     }
 
 
     onFormReplacementSubmit = e => {
-        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("accidental submitted")
+        console.log("replacement req submitted")
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/sendReplacementRequest',
@@ -190,17 +210,17 @@ class requestsForms extends Component{
           
           }).then(res=>{
             console.log("successfull");
-            this.setState({accidentalSuccess:true});
+            this.setState({successMsg:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
-            this.setState({accidentalWarning:error.response.data});
+            this.setState({warningMsg:error.response.data});
             })
     }
     
     onFormSickSubmit = e => {
-        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("accidental submitted")
+        console.log("sick req submitted")
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/sickLeave',
@@ -214,19 +234,19 @@ class requestsForms extends Component{
           
           }).then(res=>{
             console.log("successfull");
-            this.setState({accidentalSuccess:true});
+            this.setState({successMsg:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
-            this.setState({accidentalWarning:error.response.data});
+            this.setState({warningMsg:error.response.data});
             })
     }
    
     
   
     onFormSlotLinkingSubmit = e => {
-        this.setState({accidentalWarning:"",accidentalSuccess:false})
+        this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("accidental submitted")
+        console.log("slot linking req submitted")
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/slotLinkingRequest',
@@ -240,10 +260,10 @@ class requestsForms extends Component{
           
           }).then(res=>{
             console.log("successfull");
-            this.setState({accidentalSuccess:true});
+            this.setState({successMsg:true});
         }).catch(error=>{
             console.log("cancel error= "+error.response.data)
-            this.setState({accidentalWarning:error.response.data});
+            this.setState({warningMsg:error.response.data});
             })
     }
 
@@ -251,7 +271,7 @@ class requestsForms extends Component{
 
    
     handleReqForm(e,formType,formTitle){
-        console.log("check= "+this.state.accidentalSuccess)
+        console.log("check= "+this.state.successMsg)
         e.preventDefault();
         const location = {
             pathname: '/requestsForms',
@@ -259,6 +279,12 @@ class requestsForms extends Component{
           }
         history.push(location)
         window.location.reload();
+    }
+    chooseDay=(e)=>{
+        e.preventDefault()
+        console.log("in here choose day= "+e.target.value)
+        this.setState({newDayOff:e.target.value})
+        console.log("new day off= "+e.target.value)
     }
     render(){
         const g=
@@ -286,14 +312,14 @@ class requestsForms extends Component{
          
         <label className="col-form-label" htmlFor="accidentalDate">Accident Date</label>
         <input type="date" className="form-control" 
-        placeholder="YYYY-MM-DD" id="accidentalDate" required onChange={this.handleAccidentalChange}/>
+        placeholder="YYYY-MM-DD" id="accidentalDate" required onChange={this.handleChange}/>
         <label className="col-form-label" htmlFor="accidentalReason">Reason</label>
-        <input type="text" className="form-control" placeholder="Default input" id="accidentalReason" onChange={this.handleAccidentalChange}/>
+        <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
         <Button variant="primary" type="submit">
          Submit
         </Button> 
-        {this.state.accidentalSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
-        {this.state.accidentalWarning!="" && <h6 className="accidentalWarning">{this.state.accidentalWarning}</h6>}
+        {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
+        {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
          </form>}
 
         {/* /* <Form onSubmit={this.onFormAccidentalSubmit}>
@@ -317,37 +343,19 @@ class requestsForms extends Component{
      <form onSubmit={this.onFormAnnualSubmit}>
          
         <label className="col-form-label" htmlFor="annualDate">Day Off Date</label>
-        <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
+        <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleChange}/>
 
         {/* <label className="col-form-label" htmlFor="annualReplacement">Replacement Staff</label>
-        <input type="text" className="form-control" placeholder="Default input" id="annualReplacement" onChange={this.handleAnnualChange}/>
+        <input type="text" className="form-control" placeholder="Default input" id="annualReplacement" onChange={this.handleChange}/>
          */}
         <label className="col-form-label" htmlFor="annualReason">Reason</label>
-        <input type="text" className="form-control" placeholder="Default input" id="annualReason" onChange={this.handleAnnualChange}/>
+        <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
         <Button variant="primary" type="submit">
          Submit
         </Button> 
-        {this.state.annualSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
-        {this.state.annualWarning!="" && <h6 className="accidentalWarning">{this.state.annualWarning}</h6>}
-         </form>}
-
-        {/* /* {<Form onSubmit={this.onFormSubmit}>
-            <Form.Group controlId="formBasicEmail">
-                <Form.Label>Day Off Date</Form.Label>
-                <Form.Control type="date" placeholder="YYYY-MM-DD" required/>
-            </Form.Group>
-            <Form.Group controlId="formBasicEmail">
-                <Form.Label>Replacement Staff</Form.Label>
-                <Form.Control type="text" placeholder="Enter name"/>
-            </Form.Group>
-            <Form.Group controlId="formBasicPassword">
-                <Form.Label>Reason</Form.Label>
-                <Form.Control type="text" placeholder="reason"/>
-            </Form.Group>
-            <Button variant="primary" type="submit">
-                Submit
-            </Button>
-            </Form> }*/}
+        {this.state.annualSuccess && <h6 className="successMsg">Request successfully submitted!</h6> }
+        {this.state.annualWarning!="" && <h6 className="warningMsg">{this.state.annualWarning}</h6>}
+         </form>} 
 
 
    
@@ -355,18 +363,18 @@ class requestsForms extends Component{
     {this.state.formType=="Compensation Leave" &&
     <form onSubmit={this.onFormCompensationSubmit}>
          
-         <label className="col-form-label" htmlFor="annualDate">Missed Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
-         <label className="col-form-label" htmlFor="annualDate">Compensation Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="missedDate">Missed Day Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="missedDate" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="compensationDate">Compensation Day Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="comepensationReason" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="annualReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="annualReason" onChange={this.handleAnnualChange}/>
-         <Button variant="primary" type="submit">
+         <label className="col-form-label" htmlFor="compensationReason">Reason</label>
+         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+         <Button variant="primary" type="submit"> 
           Submit
          </Button> 
-         {this.state.annualSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
-         {this.state.annualWarning!="" && <h6 className="accidentalWarning">{this.state.annualWarning}</h6>}
+         {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
+         {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
           </form>
     }
 
@@ -374,16 +382,46 @@ class requestsForms extends Component{
     {this.state.formType=="Change Day off" &&
     <form onSubmit={this.onFormChangeSubmit}>
          
-         <label className="col-form-label" htmlFor="annualDate">New Day-Off</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="newDayOff">New Day-Off</label>
+            {/* <ul class="list-group">
+            <li class="list-group-item">Saturday</li>
+            <li class="list-group-item">Sunday</li>
+            <li class="list-group-item ">Monday</li>
+            <li class="list-group-item">Tuesday</li>
+            <li class="list-group-item">Wednesday</li>
+            <li class="list-group-item">Thuesday</li>
+            </ul> */}
+            
+            <Form.Control as="select" placeholder="Choose a day" onChange={this.chooseDay}>
+            <option value="Saturday" >Saturday</option>
+            <option value="Sunday" >Sunday</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday" >Tuesday</option>
+            <option value="Wednesday" >Wednesday</option>
+            <option value="6" >Thursday</option>
+            </Form.Control>
+            <br/>
+
+            {/* <Dropdown>
+            <Dropdown.Toggle variant="success" id="dropdown-basic">
+                Dropdown Button
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+                <Dropdown.Item onClick={this.changeDay}>Saturday</Dropdown.Item>
+                <Dropdown.Item onClick={this.changeDay}>Sunday</Dropdown.Item>
+                <Dropdown.Item onClick={this.changeDay}>Monday</Dropdown.Item>
+            </Dropdown.Menu>
+            </Dropdown> */}
+         {/* <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="newDayOff" required onChange={this.handleChange}/> */}
     
-         <label className="col-form-label" htmlFor="annualReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="annualReason" onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="changeReason">Reason</label>
+         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 
-         {this.state.annualSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
-         {this.state.annualWarning!="" && <h6 className="accidentalWarning">{this.state.annualWarning}</h6>}
+         {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
+         {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
           </form>
     
     }    
@@ -392,60 +430,60 @@ class requestsForms extends Component{
     
     <form onSubmit={this.onFormMaternitySubmit}>
          
-         <label className="col-form-label" htmlFor="annualDate">Start Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
-         <label className="col-form-label" htmlFor="annualDate">End Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
-         <label className="col-form-label" htmlFor="annualDate">Maternity Documents</label>
-         <input type="text" className="form-control" placeholder="" id="annualDate" required onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="startDate">Start Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="startDate" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="endDate">End Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="endDate" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="maternityDoc">Maternity Documents</label>
+         <input type="text" className="form-control" placeholder="" id="maternityDoc" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="annualReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="annualReason" onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="maternityReason">Reason</label>
+         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 
-         {this.state.annualSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
-         {this.state.annualWarning!="" && <h6 className="accidentalWarning">{this.state.annualWarning}</h6>}
-          </form>
+         {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
+         {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
+         </form>
     } 
 
     
     {this.state.formType=="Replacement" &&
     <form onSubmit={this.onFormReplacementSubmit}>
          
-         <label className="col-form-label" htmlFor="annualDate">Slot Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
-         <label className="col-form-label" htmlFor="annualDate">Slot Day</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
-         <label className="col-form-label" htmlFor="annualDate">Slot Location</label>
-         <input type="text" className="form-control" placeholder="" id="annualDate" required onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="slotDate">Slot Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="slotDate" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="slotDay">Slot Day</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="slotDay" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="slotLoc">Slot Location</label>
+         <input type="text" className="form-control" placeholder="" id="slotLoc" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="annualReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="annualReason" onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="slotReason">Reason</label>
+         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 
-         {this.state.annualSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
-         {this.state.annualWarning!="" && <h6 className="accidentalWarning">{this.state.annualWarning}</h6>}
-          </form>
+         {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
+         {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
+         </form>
     
     }  
 
     {this.state.formType=="Sick Leave" &&
     <form onSubmit={this.onFormSickSubmit}>
          
-         <label className="col-form-label" htmlFor="annualDate">Sick Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleAnnualChange}/>
-         <label className="col-form-label" htmlFor="annualDate">Medical Documents</label>
-         <input type="text" className="form-control" placeholder="" id="annualDate" required onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="sickDate">Sick Day Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="sickDate" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="medicalDoc">Medical Documents</label>
+         <input type="text" className="form-control" placeholder="" id="medicalDoc" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="annualReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="annualReason" onChange={this.handleAnnualChange}/>
+         <label className="col-form-label" htmlFor="sickReason">Reason</label>
+         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 
-         {this.state.annualSuccess && <h6 className="accidentalSuccess">Request successfully submitted!</h6> }
-         {this.state.annualWarning!="" && <h6 className="accidentalWarning">{this.state.annualWarning}</h6>}
+         {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
+         {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
           </form>
     }
     {/* {this.state.formType=="Slot Linking" &&

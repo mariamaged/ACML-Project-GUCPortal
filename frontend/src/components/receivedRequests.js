@@ -94,7 +94,7 @@ class ViewReceivedRequests extends Component{
         //         })
         // }
         handleStateClick(e,value){
-            this.setState({Warning:""})
+            this.setState({Warning:"",RejectionReason:""})
             e.preventDefault();
             if(value=="All"){
                return this.setState({stateBool:false,reqState:"All",cancelWarning:""})
@@ -111,7 +111,7 @@ class ViewReceivedRequests extends Component{
 
         }
         handleReceivedTypeClick(e,value){
-            this.setState({Warning:""})
+            this.setState({Warning:"",RejectionReason:""})
             console.log("in handle received");
            
             e.preventDefault();
@@ -185,7 +185,7 @@ class ViewReceivedRequests extends Component{
               
               }).then(res=>{
                 console.log("successfull rejection");
-
+                this.setState({RejectionReason:""})
                 const location = {
                     pathname: '/receivedRequests',
                     state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle}
@@ -200,7 +200,7 @@ class ViewReceivedRequests extends Component{
                 })
         }
         onAcceptRequest(e,value){
-            this.setState({Warning:""})
+            this.setState({Warning:"",RejectionReason:""})
             e.preventDefault()
             console.log("reqID= "+value)
             axios.request({

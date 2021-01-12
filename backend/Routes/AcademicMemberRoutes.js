@@ -2121,16 +2121,16 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
     const schedule=academic.schedule
     const day_off=academic.day_off
     if(day_off==req.body.newDayOff){
-        return res.json("This day is already your day-off. Please enter a new day.")
+        return res.status(400).json("This day is already your day-off! Please enter a new day.")
     }
 
     if(req.body.newDayOff=="Friday"){
-        return res.json("Friday is already a day off.Please submit a new day.")
+        return res.status(400).json("Friday is already a day off!Please submit a new day.")
     }
     for(var i=0;i<schedule.length;i++){
         const slotDay=schedule[i].day
         if(slotDay==req.body.newDayOff){
-            return res.json("Cannot request for a day off on a day with teaching activities.")
+            return res.status(400).json("Cannot request for a day off on a day with teaching activities!")
         }
     }
      //getting department of this user to get head of department to send request to
@@ -2138,7 +2138,7 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
      const departmentName=await department.findById(departmentID)
      const hodID=departmentName.HOD
      if(!hodID){
-         return res.json("There is currently no head of this department to send this request to.")
+         return res.json("There is currently no head of this department to send this request to!")
      }
      const hodAcademic=await AcademicStaffModel.findById(hodID)
     
@@ -2172,7 +2172,7 @@ router.post('/changeDayOff',authenticateToken,async(req,res)=>{
         submission_date:new moment().format("YYYY-MM-DD")
     })
     try{
-     res.json("Request successfully submitted.")
+     res.json("Request successfully submitted!")
     await newRequest.save()
     }
     catch(err){
@@ -2269,10 +2269,10 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
     if(type=="HR"){
-        return res.json("HR are not permitted to send leave requests.Only academic members are allowed.")
+        return res.status(401).json("HR are not permitted to send leave requests.Only academic members are allowed.")
     }
     if(!req.body.accidentDate){
-        return res.json("Must submit accident date with the request.")
+        return res.status(400).json("Must submit accident date with the request.")
     }
 
      //check if the accident day is a day where the user didnt actually attend
@@ -2286,7 +2286,7 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
             // console.log("i= "+i)
             // console.log(" "+moment(attendance[i]).format("YYYY-MM-DD"))
             console.log("sickDay= "+req.body.accidentDate)
-            return res.json("Cannot make an accidental leave request for a day that was attended!")
+            return res.status(400).json("Cannot make an accidental leave request for a day that was attended!")
         }
      }
     }
@@ -2296,10 +2296,10 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
      const day_off=academic.day_off
      const accidentDateEntered=moment(req.body.accidentDate).format("dddd")
      if(day_off==accidentDateEntered || accidentDateEntered=="Friday")
-     return res.json("Cannot make an accidental leave request for a day that is your day-off!")
+     return res.status(400).json("Cannot make an accidental leave request for a day that is your day-off!")
 
      if(moment(req.body.accidentDate).format("YYYY-MM-DD")>new moment().format("YYYY-MM-DD"))
-     return res.json("Cannot submit an accidental leave request for an accident that has not already happened!")
+     return res.status(400).json("Cannot submit an accidental leave request for an accident that has not already happened!")
 
 
 
@@ -2327,7 +2327,7 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     }
     if(!(moment(req.body.accidentDate).format("YYYY-MM-DD")<(new moment().format("YYYY-MM-DD")))){
      console.log("beforeeeeeeeeeeee")
-        return res.status(401).json("Must only submit requests for accidents that already happened!")
+        return res.status(400).json("Must only submit requests for accidents that already happened!")
 
     }
     //make request
@@ -2365,10 +2365,10 @@ router.post('/accidentalLeave',authenticateToken,async(req,res)=>{
     })
     try{
     await newRequest.save()
-    res.json("Request successfully submitted.")
+    res.status(200).json("Request successfully submitted.")
     }
     catch(err){
-        res.json(err)
+        res.status(400).json(err)
     }
     
     //update annual and accidental leave balance of user after acceptance!!

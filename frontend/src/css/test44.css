@@ -158,10 +158,22 @@ top:2vw;
   top:3vw;
 
 }
+.warningMsg{
+  color:rgb(180, 16, 16);
+  font-size:1.2vw !important;
+  position:relative;
+  top:3vw;
+}
 .accidentalSuccess{
   color:rgb(9, 88, 65);
   font-size:1.2vw !important;
   position:relative;
   top:3vw;
 
+}
+.successMsg{
+  color:rgb(9, 88, 65);
+  font-size:1.2vw !important;
+  position:relative;
+  top:3vw;
 }
