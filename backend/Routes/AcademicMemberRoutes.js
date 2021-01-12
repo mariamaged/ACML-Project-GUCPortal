@@ -55,32 +55,32 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
         const user=await StaffMemberModel.findById(req.user.id)
         const staff_type=user.staff_type
         if(staff_type=="HR"){
-            return res.json("HR cannot submit this request.Only academic staff are permitted.")
+            return res.status(401).json("HR cannot submit this request.Only academic staff are permitted.")
         }
         const slotNum=req.body.slotNum
         const slotDate=req.body.slotDate
         const slotLoc=req.body.slotLoc
         if(!slotNum){
-            return res.json("Must submit slot number with the request.")
+            return res.status(400).json("Must submit slot number with the request.")
         }
         if(!slotDate){
-            return res.json("Must submit slot date with the request.")
+            return res.status(400).json("Must submit slot date with the request.")
         }
         if(!slotLoc){
-            return res.json("Must submit slot location with the request.")
+            return res.status(400).json("Must submit slot location with the request.")
         }
         var checkFin=false;
         const id=req.user.id
         if(moment(slotDate).format('YYYY-MM-DD')<(new moment().format("YYYY-MM-DD"))){
-            return res.json("Cannot replace a slot that has already passed.")
+            return res.status(400).json("Cannot replace a slot that has already passed.")
         }
 
         if(!(slotNum>=1 && slotNum<=5))
-        return res.json("Please enter a valid slot number!")
+        return res.status(400).json("Please enter a valid slot number!")
         
         const slotLocation=await location.findOne({id:req.body.slotLoc})
         if(!slotLocation)
-        return res.json("Please enter a valid slot location!")
+        return res.status(400).json("Please enter a valid slot location!")
 
 
         const academicUser=await AcademicStaffModel.findOne({member:req.user.id})
@@ -111,7 +111,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
 
         }
         if(check==false)
-        return res.send("This slot is not present in your schedule.")
+        return res.status(400).send("This slot is not present in your schedule.")
 
         //will loop on all slots of each member that teaches this course 
         //to make sure that they are free during this replacement slot
@@ -119,7 +119,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
         // console.log(course.id)
 
         if(courseAcademic.length==1){
-            return res.json("No other academic staff member who teach this course are available to send a replacement request to.")
+            return res.status(400).json("No other academic staff member who teach this course are available to send a replacement request to.")
         }
 
         //looping on staff giving the course of replacement slot
@@ -209,7 +209,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
                 }
                 catch(err){
                     console.log("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-                   return res.json("Cannot save new request")
+                   return res.status(400).json("Cannot save new request")
                 }
             }
 
@@ -217,7 +217,7 @@ router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
         if(checkFin)
         return  res.json({success:"Requests successfully submitted"})
         else
-      return res.json({error:"Could not find any eligible candidate to replace with"})
+      return res.status(400).json({error:"Could not find any eligible candidate to replace with"})
         
 })
 router.get('/submittedRequest',authenticateToken,async(req,res)=>{
@@ -2513,34 +2513,34 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
     const user=await StaffMemberModel.findById(req.user.id)
     const type=user.staff_type
     if(type=="HR"){
-        return res.json("HR are not permitted to send leave requests.Only academic members are allowed.")
+        return res.status(401).json("HR are not permitted to send leave requests.Only academic members are allowed.")
     }
     
        // const user=await StaffMemberModel.findById(req.user.id)
         const gender=user.gender
         if(gender!="Female"){
-            return res.json("Only female staff members are eligible to send this request.")
+            return res.status(401).json("Only female staff members are eligible to send this request.")
         }
         if(!req.body.maternityDoc){
-            return res.json("Documents to prove the maternity condition must be submitted.")
+            return res.status(400).json("Documents to prove the maternity condition must be submitted.")
         }
         if(!(req.body.startDate)){
-            return res.json("Must input start date!")
+            return res.status(400).json("Must input start date!")
         }
         if(!(req.body.endDate)){
-            return res.json("Must input end date!")
+            return res.status(400).json("Must input end date!")
         }
         if(req.body.startDate<=(new moment().format("YYYY-MM-DD")))
-        return res.json("Start date must be a date after current day.")
+        return res.status(400).json("Start date must be a date after current day.")
         if(req.body.endDate<=req.body.startDate)
-        return res.json("End date must be a date after start date.")
+        return res.status(400).json("End date must be a date after start date.")
 
         const academic=await AcademicStaffModel.findOne({member:req.user.id})
         const departmentID=academic.department
         const departmentRec=await department.findById(departmentID)
         const hodID=departmentRec.HOD
         if(!hodID){
-            return res.json("There is currently no head of this department to send this request to.")
+            return res.status(400).json("There is currently no head of this department to send this request to.")
         }
         const hodAcademic=await AcademicStaffModel.findById(hodID)
         const maternityDoc=req.body.maternityDoc
@@ -2578,7 +2578,7 @@ router.post('/maternityLeave',authenticateToken,async(req,res)=>{
         res.json("Request successfully submitted.")
         }
         catch(err){
-            res.json(err)
+            res.status(400).json(err)
             // console.log(err)
         }
 
@@ -2598,22 +2598,24 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
     const type=staff.staff_type
     if(type=="HR"){
-        return res.json("HR are not permitted to send leave requests.Only academic members are allowed.")
+        return res.status(400).json("HR are not permitted to send leave requests.Only academic members are allowed.")
     }
     if(!req.body.missedDay){
-        return res.json("Must submit the missed day date with the request.")
+        return res.status(400).json("Must submit the missed day date with the request.")
     }
     if(!req.body.compensatedDay){
-        return res.json("Must submit the compensation day date with the request.")
+        return res.status(400).json("Must submit the compensation day date with the request.")
     }
     if(req.body.missedDay>=new moment().format("YYYY-MM-DD")){
-        return res.json("Missed day should have a date that has already passed.")
+        return res.status(400).json("Missed day should have a date that has already passed.")
 
     }
     if(req.body.compensatedDay>=new moment().format("YYYY-MM-DD")){
-        return res.json("Compensation day should have a date that has already passed.")
+        return res.status(400).json("Compensation day should have a date that has already passed.")
 
     }
+    console.log("missedDay= "+req.body.missedDay)
+    console.log("compensation day"+req.body.compensatedDay)
 
         //--------------------------CHECK WITH MARIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     // if(req.body.compensatedDay<req.body.missedDay){
@@ -2621,7 +2623,7 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
 
     // }
     if(req.body.compensatedDay==req.body.missedDay){
-        return res.json("Compensation day and missed day cannot have the dame date!")
+        return res.status(400).json("Compensation day and missed day cannot have the dame date!")
     }
     
 
@@ -2632,10 +2634,10 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     // console.log("aca=" +academic)
     const day_off=academic.day_off
     if(day=="Friday"){
-        return res.json("Cannot compensate for Friday.It is already a day off")
+        return res.status(400).json("Cannot compensate for Friday.It is already a day off")
     }
     if(day==day_off){
-        return res.json("Cannot compensate for a day off.")
+        return res.status(400).json("Cannot compensate for a day off.")
     }
 
  
@@ -2680,15 +2682,21 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
         const begin=new moment(currYear+"-"+currMonth+"-"+currDay).format("YYYY-MM-DD")
         console.log("begin= "+begin)
         console.log("end= "+end)
-        if(!(moment(compensationDay).format("YYYY-MM-DD")>=begin && 
-        moment(compensationDay).format("YYYY-MM-DD")<=end))
-        return res.json("Compensation day should be in same month as missed day (*a month start from the 11th to the 10th)")
+        // const check=moment(compensationDay).isBetween(moment(begin).format("YYYY-MM-DD"), moment(end).format("YYYY-MM-DD"));
+        const check1=moment(begin).isSameOrBefore(moment(req.body.compensatedDay))
+        const check2=moment(req.body.compensatedDay).isSameOrBefore(moment(end))
+        console.log("for c2= "+moment(req.body.compensatedDay)+" "+moment(end))
+        const check3=!(check1 && check2)
+        console.log("c1= "+check1+" C2= "+check2+" c3= "+check3)
+        if(!(moment(req.body.compensatedDay).format("YYYY-MM-DD")>=begin && 
+        moment(req.body.compensatedDay).format("YYYY-MM-DD")<=end))
+        return res.status(400).json("Compensation day should be in same month as missed day (*a month start from the 11th to the 10th)")
     
 ////////////////
         if(compensationDay=="Friday")
-        return res.json("Cannot compensate on Friday!")
+        return res.status(400).json("Cannot compensate on Friday!")
         if(compensationDay!=day_off)
-        return res.json("Compensation day should be a day off.")
+        return res.status(400).json("Compensation day should be a day off.")
    
 
     // //check if he actually attended this day_off    WILL ADD IT TO ACCEPT/REJECT COMPENSATION REQUEST
@@ -2709,7 +2717,7 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     var check=false
     for(var i=0;i<userAttendance.length;i++){
             if(moment(userAttendance[i].date).format("YYYY-MM-DD")==moment(missedDay).format("YYYY-MM-DD")){
-                return res.json("You already attended this day.Cannot send a compensation request for it.")
+                return res.status(400).json("You already attended this day.Cannot send a compensation request for it.")
             }
     }
 
@@ -2717,12 +2725,12 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
      if(academic.day_off!=moment(req.body.compensatedDay).format("dddd")){
          console.log("offfffff= "+academic.day_off)
          console.log("comp offfffffffffffff= "+moment(req.body.compensatedDay).format("dddd"))
-        return res.json("This compensation day is not on your day off.")
+        return res.status(400).json("This compensation day is not on your day off.")
     }
 
     const reason=req.body.reason
     if(!reason)
-    return res.json("Must submit a reason for compensation leave request.")
+    return res.status(400).json("Must submit a reason for compensation leave request.")
 
      //create request
     //  const academic=await AcademicStaffModel.findOne({member:req.user.id})
@@ -2760,7 +2768,7 @@ router.post('/compensationLeave',authenticateToken,async(req,res)=>{
     })
     try{
     await newRequest.save()
-    res.json("Request successfully submitted.")
+    res.status(200).json("Request successfully submitted.")
     }
     catch(err){
         res.json(err)

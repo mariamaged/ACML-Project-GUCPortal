@@ -19,39 +19,39 @@ class requestsForms extends Component{
         formType:"",
         formTitle:"",
         fields:[],
-        warningMsg:"",
+
         accidentalDate:"",
-        accidentalReason:"",
-        successMsg:false,
         annualReason:"",
         annualSlotDate:"",
         annualSlotNum:"",
         annualSlotLoc:"",
-        annualWarning:"",
-        annualSucces:"",
-        comepensationReason:"",
-         missedDate:"",
+
+         missedDay:"",
+         compensatedDay:"",
+
          annualReason:"",
          annualDate:"",
+
          newDayOff:"",
-         changeReason:"",
+
           maternityDoc:"",
-          maternityReason:"",
-          StartDate:"",
-          EndDate:"",
+          startDate:"",
+          endDate:"",
+
           slotDate:"",
           slotDay:"",
           slotLoc:"",
-          slotReason:"",
+
           sickDate:"",
           medicalDoc:"",
-          sickReason:"",
+
           sucessMsg:"",
           warningMsg:"",
           reason:""
     }
     componentDidMount(props){
         console.log("here in reqForms")
+        console.log("at start reason= "+this.state.reason+" success= "+this.state.successMsg+" failure= "+this.state.warningMsg)
         console.log("success at start? "+this.state.successMsg)
         console.log("this.state.reqType= "+this.props.location.state.formType)
              const temp=this.props.location.state.formType;
@@ -66,6 +66,7 @@ class requestsForms extends Component{
     }
     handleChange=(e)=>{
         console.log("e.target.value= "+e.target.value)
+        console.log("compensatedDay= "+this.state.compensatedDay)
         this.setState({
             [e.target.id]:e.target.value
         })
@@ -148,7 +149,8 @@ class requestsForms extends Component{
     onFormCompensationSubmit = e => {
         this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("comepnsation req submitted")
+        console.log("comepnsation req submitted missedDAY=  "+this.state.missedDay+" compensated= "+this.state.compensatedDay)
+        
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/compensationLeave',
@@ -156,8 +158,9 @@ class requestsForms extends Component{
                 'x-auth-token':localStorage.getItem('jwtToken')
             },
             data: {
-                accidentDate:this.state.accidentalDate,
-                reason:this.state.accidentalReason
+                missedDay:this.state.missedDay,
+                compensatedDay:this.state.compensatedDay,
+                reason:this.state.reason
             },
           
           }).then(res=>{
@@ -174,13 +177,15 @@ class requestsForms extends Component{
         console.log("maternity req submitted")
         axios.request({
             method: 'POST',
-            url: 'http://localhost:5000/academic/compensationLeave',
+            url: 'http://localhost:5000/academic/maternityLeave',
             headers: {
                 'x-auth-token':localStorage.getItem('jwtToken')
             },
             data: {
-                accidentDate:this.state.accidentalDate,
-                reason:this.state.accidentalReason
+                startDate:this.state.startDate,
+                endDate:this.state.endDate,
+                maternityDoc:this.state.maternityDoc,
+                reason:this.state.reason
             },
           
           }).then(res=>{
@@ -204,8 +209,10 @@ class requestsForms extends Component{
                 'x-auth-token':localStorage.getItem('jwtToken')
             },
             data: {
-                accidentDate:this.state.accidentalDate,
-                reason:this.state.accidentalReason
+                slotNum:this.state.slotNum,
+                slotDate:this.state.slotDate,
+                slotLoc:this.state.slotLoc,
+                reason:this.state.reason
             },
           
           }).then(res=>{
@@ -272,6 +279,7 @@ class requestsForms extends Component{
    
     handleReqForm(e,formType,formTitle){
         console.log("check= "+this.state.successMsg)
+        // console.log("missed= "+)
         e.preventDefault();
         const location = {
             pathname: '/requestsForms',
@@ -285,6 +293,11 @@ class requestsForms extends Component{
         console.log("in here choose day= "+e.target.value)
         this.setState({newDayOff:e.target.value})
         console.log("new day off= "+e.target.value)
+    }
+    chooseSlotNum=(e)=>{
+        e.preventDefault()
+        console.log("in choose slot "+e.target.value)
+        this.setState({slotNum:e.target.value})
     }
     render(){
         const g=
@@ -363,13 +376,13 @@ class requestsForms extends Component{
     {this.state.formType=="Compensation Leave" &&
     <form onSubmit={this.onFormCompensationSubmit}>
          
-         <label className="col-form-label" htmlFor="missedDate">Missed Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="missedDate" required onChange={this.handleChange}/>
-         <label className="col-form-label" htmlFor="compensationDate">Compensation Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="comepensationReason" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="missedDay">Missed Day Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="missedDay" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="compensatedDay">Compensation Day Date</label>
+         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="compensatedDay" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="compensationReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="reason">Reason</label>
+         <input type="text" className="form-control" placeholder="Default input" id="reason" required onChange={this.handleChange}/>
          <Button variant="primary" type="submit"> 
           Submit
          </Button> 
@@ -382,17 +395,9 @@ class requestsForms extends Component{
     {this.state.formType=="Change Day off" &&
     <form onSubmit={this.onFormChangeSubmit}>
          
-         <label className="col-form-label" htmlFor="newDayOff">New Day-Off</label>
-            {/* <ul class="list-group">
-            <li class="list-group-item">Saturday</li>
-            <li class="list-group-item">Sunday</li>
-            <li class="list-group-item ">Monday</li>
-            <li class="list-group-item">Tuesday</li>
-            <li class="list-group-item">Wednesday</li>
-            <li class="list-group-item">Thuesday</li>
-            </ul> */}
-            
+         <label className="col-form-label" htmlFor="newDayOff">New Day-Off</label>  
             <Form.Control as="select" placeholder="Choose a day" onChange={this.chooseDay}>
+            <option value="" hidden></option>
             <option value="Saturday" >Saturday</option>
             <option value="Sunday" >Sunday</option>
             <option value="Monday">Monday</option>
@@ -402,19 +407,6 @@ class requestsForms extends Component{
             </Form.Control>
             <br/>
 
-            {/* <Dropdown>
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-                Dropdown Button
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-                <Dropdown.Item onClick={this.changeDay}>Saturday</Dropdown.Item>
-                <Dropdown.Item onClick={this.changeDay}>Sunday</Dropdown.Item>
-                <Dropdown.Item onClick={this.changeDay}>Monday</Dropdown.Item>
-            </Dropdown.Menu>
-            </Dropdown> */}
-         {/* <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="newDayOff" required onChange={this.handleChange}/> */}
-    
          <label className="col-form-label" htmlFor="changeReason">Reason</label>
          <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
@@ -453,8 +445,18 @@ class requestsForms extends Component{
          
          <label className="col-form-label" htmlFor="slotDate">Slot Date</label>
          <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="slotDate" required onChange={this.handleChange}/>
-         <label className="col-form-label" htmlFor="slotDay">Slot Day</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="slotDay" required onChange={this.handleChange}/>
+         <label className="col-form-label" htmlFor="slotNum">Slot Number</label>
+        
+         <Form.Control as="select" placeholder="Choose a slot"  onChange={this.chooseSlotNum}>
+         <option value="" hidden></option>
+            <option value="1" >1</option>
+            <option value="2" >2</option>
+            <option value="3">3</option>
+            <option value="4" >4</option>
+            <option value="5" >5</option>
+            </Form.Control>
+            <br/>
+         {/* <input type="number" min="1" max="5" className="form-control" placeholder="" id="slotNum" required onChange={this.handleChange}/> */}
          <label className="col-form-label" htmlFor="slotLoc">Slot Location</label>
          <input type="text" className="form-control" placeholder="" id="slotLoc" required onChange={this.handleChange}/>
  
