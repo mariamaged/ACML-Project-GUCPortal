@@ -404,8 +404,8 @@ class ViewSubmittedRequests extends Component{
                     {this.state.reqType=="Compensation Leave"  &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
 
 
-                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
-                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
+                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Maternity</Button></Dropdown.Item >}
+                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Maternity</Button></Dropdown.Item >}
                     {this.state.reqType!="Replacement" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
                     {this.state.reqType=="Replacement" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
                     
@@ -673,8 +673,8 @@ class ViewSubmittedRequests extends Component{
                     {this.state.reqType=="Compensation Leave"  &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
 
 
-                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
-                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
+                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Maternity</Button></Dropdown.Item >}
+                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Maternity Leave")}>Maternity</Button></Dropdown.Item >}
                     {this.state.reqType!="Replacement" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
                     {this.state.reqType=="Replacement" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
                     

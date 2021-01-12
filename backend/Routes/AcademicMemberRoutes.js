@@ -29,7 +29,9 @@ function authenticateToken(req,res,next){
      //const token= req.headers.token
      console.log("in authenticate")
      const token=req.header('x-auth-token');
+     if(token)
      console.log(token)
+     
     //  console.log("token= "+token)
     //const token=req.header('x-auth-token');
     // const authHeader=req.headers['Authorization']
@@ -3997,6 +3999,7 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
 });
 
 router.put('/acceptRequest',authenticateToken,async(req,res)=>{
+    console.log("in accept request")
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
     if(!userAcademic) 
     return res.status(401).send('You are not an academic member!');
@@ -4012,7 +4015,7 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
    
     const reqType=currRequest.reqType;
     if(currRequest.state!="Pending"){
-        return res.json("This request has already been responded to before.")
+        return res.status(400).json("This request has already been responded to before.")
     }
 
     if(reqType=="Replacement"){
@@ -4161,7 +4164,7 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
             }
              }
         if(!bool)
-        return res.json("Cannot accept this request because the compensation day was not attended!")
+        return res.status(400).json("Cannot accept this request because the compensation day was not attended!")
         
         const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Accepted"})
         
@@ -4204,10 +4207,10 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
            var replacementSlotDate=currRequest.slotDate
            var replacementSlotNum=acceptedReplacement[s].slotNum
            var replacementSlotLoc=acceptedReplacement[s].slotLoc
-           const slotLoc=await Location.findOne({id=replacementSlotLoc})
+           const slotLoc=await Location.findOne({id:replacementSlotLoc})
            const slotLocID=slotLoc._ID
             const slotDay=moment(currRequest.slotDate).format("dddd")
-            const courseID;
+            var courseID;
 
             //get course id by getting it from schedule of person who sent the replacement request
             const sender=await AcademicStaffModel.findOne({member:currRequest.sentBy})
@@ -4238,8 +4241,13 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
        const notification=user.notifications
        const notNew=notification
        notNew[notNew.length]="Your Annual leave request has been accepted!"
+       try{
        const staffReplacement= await StaffMemberModel.findByIdAndUpdate(currRequest.sentBy,{notifications:notNew})
        return res.json("Request successully accepted.")
+       }
+       catch(err){
+           console.log(err)
+       }
 
     }
 
@@ -4279,6 +4287,7 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
 })
 
 router.post('/rejectRequest',authenticateToken,async(req,res)=>{
+    console.log("in reject request")
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
     if(!userAcademic) 
     return res.status(401).send('You are not an academic member!');
@@ -4288,13 +4297,15 @@ router.post('/rejectRequest',authenticateToken,async(req,res)=>{
     }
     const currRequest=await request.findOne({requestID:req.body.requestID})
     const reqType=currRequest.reqType
+    if(currRequest.state!="Pneding")
+    return res.status(400).json("This request has already been responded to!")
     if(!currRequest)
     return res.json("This request does not exist.")
 
     if(req.body.reason)
-    const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Rejected",RejectionReason:req.body.reason})
+    var upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Rejected",RejectionReason:req.body.reason})
     else
-    const upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Rejected"})
+    var upAccReq=await request.findOneAndUpdate({requestID:req.body.requestID},{state:"Rejected"})
 
     const user=await StaffMemberModel.findById(currRequest.sentBy)
     const notification=user.notifications

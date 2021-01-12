@@ -11,6 +11,9 @@ import history from '../history';
 import {Link,NavLink} from 'react-router-dom'
 import  { Redirect } from 'react-router-dom'
 import { CheckCircle, CheckCircleFill,XCircle, XCircleFill } from 'react-bootstrap-icons';
+import InputGroup from 'react-bootstrap/InputGroup'
+import Form from 'react-bootstrap/Form'
+// import { FormControl } from '@material-ui/core
 // import Button from 'react-bootstrap/Button'
 
 class ViewReceivedRequests extends Component{
@@ -21,14 +24,15 @@ class ViewReceivedRequests extends Component{
         stateRequests:[],
         stateBool:false
         ,warning:"",
-        cancelWarning:"",
-        cancelSuccess:"",
-        reqState:"",
+        reqState:"All",
         reqType:"",
-        reqTitle:""
+        reqTitle:"",
+        RejectionReason:"",
+        Warning:""
     }
     componentDidMount(props){
-    console.log("in maternity view "+localStorage.getItem('jwtToken'))
+    console.log("in maternity view "+ this.props.location.state.reqType)
+    
         axios.get('http://localhost:5000/academic/receivedRequest',
         {
             headers:{
@@ -56,46 +60,41 @@ class ViewReceivedRequests extends Component{
 
         }).catch(console.log("error"))
     }
-        handleAcceptClick(e,value){
-            e.preventDefault();
-            console.log("in cancel btn clicked")
-            console.log("token "+localStorage.getItem('jwtToken'))
+        // handleAcceptClick(e,value){
+        //     e.preventDefault();
+        //     console.log("in cancel btn clicked")
+        //     console.log("token "+localStorage.getItem('jwtToken'))
           
-            axios.request({
-                method: 'POST',
-                url: 'http://localhost:5000/academic/acceptRequest',
-                headers: {
-                    'x-auth-token':localStorage.getItem('jwtToken')
-                },
-                data: {
-                    requestID: value
-                },
+        //     axios.request({
+        //         method: 'POST',
+        //         url: 'http://localhost:5000/academic/acceptRequest',
+        //         headers: {
+        //             'x-auth-token':localStorage.getItem('jwtToken')
+        //         },
+        //         data: {
+        //             requestID: value
+        //         },
               
-              }).then(res=>{
-                console.log("successfull");
-                const location = {
-                    pathname: '/receivedRequests',
-                    state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle}
-                  }
+        //       }).then(res=>{
+        //         console.log("successfull");
+        //         const location = {
+        //             pathname: '/receivedRequests',
+        //             state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle}
+        //           }
                   
-                //   <Link to={location}/>
-                //   <Redirect to={location}/>
-                 history.push(location)
-                //   history.replace(location)
-                window.location.reload();
-                // console.log('state= '+this.state.reqType+" title= "+this.state.reqTitle)
-                // if(true){
-                //     console.log("true")
-                // return(<Redirect to={{pathname: "/submittedRequests",state: { reqType: this.state.reqType,reqTitle:this.state.reqTitle }}}/>)
-                // }
-                // this.setState({cancelSuccess:res.data});
+        //         //   <Link to={location}/>
+        //         //   <Redirect to={location}/>
+        //          history.push(location)
+        //         //   history.replace(location)
+        //         window.location.reload();
     
-            }).catch(error=>{
-                console.log("cancel error= "+error.response.data)
-                this.setState({cancelWarning:error.response.data});
-                })
-        }
+        //     }).catch(error=>{
+        //         console.log("cancel error= "+error.response.data)
+        //         this.setState({cancelWarning:error.response.data});
+        //         })
+        // }
         handleStateClick(e,value){
+            this.setState({Warning:""})
             e.preventDefault();
             if(value=="All"){
                return this.setState({stateBool:false,reqState:"All",cancelWarning:""})
@@ -112,7 +111,9 @@ class ViewReceivedRequests extends Component{
 
         }
         handleReceivedTypeClick(e,value){
+            this.setState({Warning:""})
             console.log("in handle received");
+           
             e.preventDefault();
             // if(value=="Maternity"){
             //    return this.setState({reqType:"Maternity"})
@@ -156,31 +157,106 @@ class ViewReceivedRequests extends Component{
                     state: { reqType: value,reqTitle: typeTitle}
                   }
                 history.push(location)
+                console.log("this.state.reqType= "+this.state.reqType)
                 // var reqs=this.state.stateRequests
             }
 
 
         }
+        handleRejectionReason=(e)=>{
+            console.log("rejection reason")
+            console.log(e.target.value)
+            this.setState({RejectionReason:e.target.value})
+        }
+        onRejectRequest(e,value){
+            this.setState({Warning:""})
+            e.preventDefault()
+            console.log("reqID= "+value)
+            axios.request({
+                method: 'POST',
+                url: 'http://localhost:5000/academic/rejectRequest',
+                headers: {
+                    'x-auth-token':localStorage.getItem('jwtToken')
+                },
+                data: {
+                    requestID: value,
+                    rejectionReason:this.state.RejectionReason
+                },
+              
+              }).then(res=>{
+                console.log("successfull rejection");
+
+                const location = {
+                    pathname: '/receivedRequests',
+                    state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle}
+                  }
+                  
+                 history.push(location)
+                window.location.reload();
+    
+            }).catch(error=>{
+                console.log("reject error= "+error.response.data)
+                this.setState({Warning:error.response.data});
+                })
+        }
+        onAcceptRequest(e,value){
+            this.setState({Warning:""})
+            e.preventDefault()
+            console.log("reqID= "+value)
+            axios.request({
+                method: 'PUT',
+                url: 'http://localhost:5000/academic/acceptRequest',
+                headers: {
+                    'x-auth-token':localStorage.getItem('jwtToken')
+                },
+                data: {
+                    requestID: value
+                },
+              
+              }).then(res=>{
+                console.log("successfully accepted");
+
+                const location = {
+                    pathname: '/receivedRequests',
+                    state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle}
+                  }
+                  
+                 history.push(location)
+                window.location.reload();
+    
+            }).catch(error=>{
+                console.log("reject error= "+error.response.data)
+                this.setState({Warning:error.response.data});
+                })
+        }
         renderMaternityRequest=(request, index)=> {
-            console.log("submissiondate= "+request.submission_date+
-            "\n"+"maternityDoc= "+request.maternityDoc+
-            "\n"+"reason= "+request.reason+
-            "\n"+"state= "+request.state)
+            // console.log("submissiondate= "+request.submission_date+
+            // "\n"+"maternityDoc= "+request.maternityDoc+
+            // "\n"+"reason= "+request.reason+
+            // "\n"+"state= "+request.state)
             return (
                 
                 <tr key={request.requestID} className="reqTr">
-                <td className="reqTd" >{request.counter}</td>
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.maternityDoc}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
-
                 <td className="reqTd">
-               <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <InputGroup className="mb-3">
+                    <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+                    {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
+        <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+
+                    </Form>
+                </InputGroup>
+                </td> 
+                <td className="reqTd">
+               <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
                </Button>{"  "}
               
-              <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
+              <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
               <XCircleFill color="darkred" className="cancelBtn" size={19} />
               </Button>
 
@@ -197,16 +273,30 @@ class ViewReceivedRequests extends Component{
                 "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                    <td className="reqTd" >{request.counter}</td>
+                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+                    {/* <td className="reqTd" >{request.counter}</td> */}
                     <td className="reqTd">{request.submission_date}</td>
                     <td className="reqTd">{request.sickDay}</td>
                     <td className="reqTd">{request.reason}</td>
+
                     <td className="reqTd">{request.state}</td>
                     <td className="reqTd">
-                    <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
-               <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
-                  </td>
+                      <InputGroup className="mb-3">
+                    <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    </Form>
+                    </InputGroup>
+                    </td>
+
+                    <td className="reqTd">
+                    
+                    <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+               <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
+               </Button>{"  "}
+              
+              <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
+              <XCircleFill color="darkred" className="cancelBtn" size={19} />
+              </Button> </td>
     
                     </tr>
                     
@@ -221,9 +311,9 @@ class ViewReceivedRequests extends Component{
                     "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} className="reqTr" className='clickable-row' >
                 
-                <td className="reqTd" >{request.counter}</td>
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.slotDate}</td>
                 <td className="reqTd">{request.slotNum}</td>
@@ -231,32 +321,54 @@ class ViewReceivedRequests extends Component{
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
                 <td className="reqTd">
-                <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
-               <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
-              </td>
+                      <InputGroup className="mb-3">
+                    <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    </Form>
+                    </InputGroup>
+                    </td>
+                <td className="reqTd">
+                <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+               <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
+               </Button>{"  "}
+              
+              <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
+              <XCircleFill color="darkred" className="cancelBtn" size={19} />
+              </Button></td>
 
                 </tr>
                 
             )
             } 
             renderCompensationRequest=(request, index)=> {
-                console.log("submissiondate= "+request.submission_date+
+                console.log("compesantopn= "+request.submission_date+
                     "\n"+"missedDAY= "+request.missedDay+
                     "\n"+"reason= "+request.reason+
                     "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                    <tr key={request.requestID} className="reqTr" className='clickable-row' >
                     
-                    <td className="reqTd" >{request.counter}</td>
+                    {/* <td className="reqTd" >{request.counter}</td> */}
                      <td className="reqTd">{request.submission_date}</td>
                     <td className="reqTd">{request.missedDay}</td>
                     <td className="reqTd">{request.reason}</td>
                     <td className="reqTd">{request.state}</td>
                     <td className="reqTd">
-                    <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
-               <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
-                  </td>
+                      <InputGroup className="mb-3">
+                    <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    </Form>
+                    </InputGroup>
+                    </td>
+                    <td className="reqTd">
+                    <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+               <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
+               </Button>{"  "}
+              
+              <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
+              <XCircleFill color="darkred" className="cancelBtn" size={19} />
+              </Button></td>
     
                     </tr>
                     
@@ -264,23 +376,34 @@ class ViewReceivedRequests extends Component{
                 } 
                 
         renderChangeDayOffRequest=(request, index)=> {
-            console.log("submissiondate= "+request.submission_date+
+            console.log("CHANGEDAY= "+request.submission_date+
                 "\n"+"missedDAY= "+request.missedDay+
                 "\n"+"reason= "+request.reason+
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} className="reqTr" className='clickable-row' >
                 
-                <td className="reqTd" >{request.counter}</td>
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTdSick">{request.newDayOff}</td>
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
                 <td className="reqTd">
-                <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
-               <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
-                </td>
+                      <InputGroup className="mb-3">
+                    <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    </Form>
+                    </InputGroup>
+                    </td>
+                <td className="reqTd">
+                <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+               <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
+               </Button>{"  "}
+              
+              <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
+              <XCircleFill color="darkred" className="cancelBtn" size={19} />
+              </Button></td>
 
                 </tr>
                 
@@ -288,13 +411,13 @@ class ViewReceivedRequests extends Component{
             }
         renderSlotLinkingRequest=(request, index)=> {
             console.log("submissiondate= "+request.submission_date+
-                "\n"+"missedDAY= "+request.missedDay+
+                "\n"+"missedDAY= "+request.slotDay+
                 "\n"+"reason= "+request.reason+
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                <td className="reqTd" >{request.counter}</td>
+                <tr key={request.requestID} className="reqTr" className='clickable-row' >
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.slotDay}</td>
                 <td className="reqTd">{request.slotNum}</td>
@@ -302,30 +425,52 @@ class ViewReceivedRequests extends Component{
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
                 <td className="reqTd">
-                <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
-               <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
-                </td>
+                      <InputGroup className="mb-3">
+                    <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    </Form>
+                    </InputGroup>
+                    </td>
+                <td className="reqTd">
+                <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+               <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
+               </Button>{"  "}
+              
+              <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
+              <XCircleFill color="darkred" className="cancelBtn" size={19} />
+              </Button></td>
                 </tr>
                 
             )
             }
             renderAccidentalRequest=(request, index)=> {
                 console.log("submissiondate= "+request.submission_date+
-                    "\n"+"missedDAY= "+request.missedDay+
+                    "\n"+"accident= "+request.accidentDate+
                     "\n"+"reason= "+request.reason+
                     "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                    <td className="reqTd" >{request.counter}</td>
+                    <tr key={request.requestID} className="reqTr" className='clickable-row' >
+                    {/* <td className="reqTd" >{request.counter}</td> */}
                     <td className="reqTd">{request.submission_date}</td>
-                    <td className="reqTd">{request.accidentDay}</td>
+                    <td className="reqTd">{request.accidentDate}</td>
                     <td className="reqTd">{request.reason}</td>
                     <td className="reqTd">{request.state}</td>
                     <td className="reqTd">
-                    <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
-               <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
+                      <InputGroup className="mb-3">
+                    <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    </Form>
+                    </InputGroup>
                     </td>
+                    <td className="reqTd">
+                    <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+               <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
+               </Button>{"  "}
+              
+              <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
+              <XCircleFill color="darkred" className="cancelBtn" size={19} />
+              </Button> </td>
                     </tr>
                     
                 )
@@ -337,8 +482,8 @@ class ViewReceivedRequests extends Component{
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
-                <td className="reqTd" >{request.counter}</td>
+                <tr key={request.requestID} className="reqTr" className='clickable-row' >
+                {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
                 <td className="reqTd">{request.slotNum}</td>
                 <td className="reqTd">{request.slotDate}</td>
@@ -346,9 +491,20 @@ class ViewReceivedRequests extends Component{
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
                 <td className="reqTd">
-                <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
-               <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
-                </td>
+                      <InputGroup className="mb-3">
+                    <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    </Form>
+                    </InputGroup>
+                    </td>
+                <td className="reqTd">
+                <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+               <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
+               </Button>{"  "}
+              
+              <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
+              <XCircleFill color="darkred" className="cancelBtn" size={19} />
+              </Button> </td>
                 </tr>
                 
             )
@@ -393,8 +549,8 @@ class ViewReceivedRequests extends Component{
                     {this.state.reqType=="Compensation Leave"  &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
 
 
-                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
-                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
+                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Maternity Leave")}>Maternity</Button></Dropdown.Item >}
+                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Maternity Leave")}>Maternity</Button></Dropdown.Item >}
                     {this.state.reqType!="Replacement" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
                     {this.state.reqType=="Replacement" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
                     
@@ -433,15 +589,16 @@ class ViewReceivedRequests extends Component{
              {this.state.reqType=="Maternity Leave" &&  
               <div className=" containMaternityTable">
 
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
+                {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Documents</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    <th className="reqTh">Rejection Reason</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -457,15 +614,16 @@ class ViewReceivedRequests extends Component{
                 {this.state.reqType=="Sick Leave" &&  
               <div className=" containMaternityTable">
 
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
+              {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
+              <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                 <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Sick Day</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    <th className="reqTh">Rejection Reason</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -479,17 +637,18 @@ class ViewReceivedRequests extends Component{
 
                 {this.state.reqType=="Replacement" &&
                 <div className=" containMaternityTable  ">
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
+                {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Slot Date</th>
                     <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Slot Location</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    <th className="reqTh">Rejection Reason</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -503,15 +662,16 @@ class ViewReceivedRequests extends Component{
 
                 {this.state.reqType=="Compensation Leave" &&
                 <div className=" containMaternityTable  ">
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
+                {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                 <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Missed Day</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    <th className="reqTh">Rejection Reason</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -524,15 +684,16 @@ class ViewReceivedRequests extends Component{
 
                 {this.state.reqType=="Change Day off" &&
                 <div className=" containMaternityTable ">
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
+                {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                 <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">New Day-Off</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    <th className="reqTh">Rejection Reason</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -543,17 +704,18 @@ class ViewReceivedRequests extends Component{
                 </div>}
 
                 {this.state.reqType=="Slot Linking" &&<div className=" containMaternityTable  ">
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
+                {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Slot Day</th>
                     <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Course ID</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    <th className="reqTh">Rejection Reason</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -565,15 +727,16 @@ class ViewReceivedRequests extends Component{
                 </div>}
 
                 {this.state.reqType=="Accidental Leave" && <div className=" containMaternityTable  ">
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
+                {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Accident Date</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    <th className="reqTh">Rejection Reason</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -588,17 +751,18 @@ class ViewReceivedRequests extends Component{
                 /* ,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                     slotLoc:sent[i].slotLoc, replacementStaff:repl, */
                 <div className=" containMaternityTable">
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
+                {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
                 <thead className="reqHead">
                     <tr className="reqTr">
-                    <th className="reqTh">#</th>
+                    {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
                     <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Slot Date</th>
                     <th className="reqTh">Replacement Staff</th>
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
+                    <th className="reqTh">Rejection Reason</th>
                     <th className="reqTh">Action</th>
                     </tr>
                 </thead>
@@ -634,23 +798,29 @@ class ViewReceivedRequests extends Component{
                       <Dropdown as={ButtonGroup} className="buttons2" >
                 <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
                     <Dropdown.Menu className="super-colors">
-                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
-                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Maternity Leave")}>Materity</Button></Dropdown.Item >}
-                    {this.state.reqType!="Sick Leave" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >}
-                    {this.state.reqType=="Sick Leave" && <Dropdown.Item  active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >}
-                    {this.state.reqType!="Replacement" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
-                    {this.state.reqType=="Replacement" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
-                    {this.state.reqType!="Compensation Leave"  &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
-                    {this.state.reqType=="Compensation Leave"  &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
                     {this.state.reqType!="Accidental Leave" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Accidental Leave")}>Accidental Leave</Button></Dropdown.Item >}
                     {this.state.reqType=="Accidental Leave" &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Accidental Leave")}>Accidental Leave</Button></Dropdown.Item >}
                     {this.state.reqType!="Annual Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Annual Leave")}>Annual Leave</Button></Dropdown.Item >}
                     {this.state.reqType=="Annual Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Annual Leave")}>Annual Leave</Button></Dropdown.Item >}
+
+
                     {this.state.reqType!="Change Day Off" &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >}
                     {this.state.reqType=="Change Day Off" &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >}
+                    {this.state.reqType!="Compensation Leave"  &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
+                    {this.state.reqType=="Compensation Leave"  &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
+
+
+                    {this.state.reqType!="Maternity Leave" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Maternity Leave")}>Maternity</Button></Dropdown.Item >}
+                    {this.state.reqType=="Maternity Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Maternity Leave")}>Maternity</Button></Dropdown.Item >}
+                    {this.state.reqType!="Replacement" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
+                    {this.state.reqType=="Replacement" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Replacement")}>Replacement</Button></Dropdown.Item >}
+                    
+                    {this.state.reqType!="Sick Leave" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >}
+                    {this.state.reqType=="Sick Leave" && <Dropdown.Item  active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Sick Leave")}>Sick</Button></Dropdown.Item >}
+                   
                     {this.state.reqType!="Slot Linking" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Slot Linking")}>Slot Linking</Button></Dropdown.Item >}
                     {this.state.reqType=="Slot Linking" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Slot Linking")}>Slot Linking</Button></Dropdown.Item >}
-                    </Dropdown.Menu>
+                   </Dropdown.Menu>
                 </Dropdown>{' '} 
 
                     <Dropdown as={ButtonGroup} className="buttons1">
@@ -674,7 +844,7 @@ class ViewReceivedRequests extends Component{
                
               
                 </div>    
-                <div class="alert alert-primary" role="alert" >
+                <div className="alert alert-primary" role="alert" >
                No requests yet!
                 </div>  
 
