@@ -8,7 +8,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 
 // CSS and images
-import './HODNavbar.css';
+import './cardcss.css';
 
 class AllCoursesCoverage extends Component {
     state = {
@@ -38,7 +38,7 @@ class AllCoursesCoverage extends Component {
                 <div class="card border-secondary mb-3" key={course.courseID}>
                     <div class="card-header">{course.courseID}</div>
                     <div class="card-body">
-                        {course.courseCoverage && <h4 class="card-title" style={{ color: "#4d4d4d" }}>Course Coverage: {course.courseCoverage}</h4>}
+                        {course.courseCoverage.toString() && <h4 class="card-title" style={{ color: "#4d4d4d" }}>Course Coverage: {course.courseCoverage}</h4>}
                         {course.courseDoesNotHaveSlotsAssigned && <h4 class="card-title" style={{ color: "#4d4d4d" }}>Course does not have slots assigned.</h4>}
                     </div>
                 </div>)

@@ -8,36 +8,35 @@ import React, { Component } from 'react'
 import { Link, NavLink } from 'react-router-dom';
 import axios from 'axios';
 
-import './HODNavbar.css';
 class InstructorNavbar extends Component {
     state = {
-        isHOD: false,
-        departmentName: null
+        isCourseCoordinator: false,
+        courses: []
     }
 
     componentDidMount() {
-        console.log(localStorage.getItem("auth-token"));
-        axios.get('http://localhost:5000/HOD/isHOD', {
+        axios.get('http://localhost:5000/CourseCoordinator/isCourseCoordinator', {
             headers: {
                 'x-auth-token': localStorage.getItem("auth-token")
             }
-        })
+    })
             .then(response => {
-                this.setState({ isHOD: response.data.isHOD, departmentName: response.data.departmentName });
+                if(response.data.courses) this.setState({ isCourseCoordinator: response.data.isCourseCoordinator, courses: response.data.courses });
+                else this.setState({ isCourseCoordinator: response.data.isCourseCoordinator});
                 console.log(this.state);
             })
 
             .catch(error => {
-                console.log('Error in determining whether the user is an HOD or not.');
+                console.log('Error in determining whether the user is a course coordinator or not.');
                 console.log(error);
             });
     }
     render() {
         return (
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-                <NavLink to='/instructor'><a class="navbar-brand">Instructor</a>
-                    {this.state.isHOD &&
-                        <a class="navbar-brand" style={{fontSize: "0.8em"}}>Head of {this.state.departmentName}</a>}
+                <NavLink to='/instructor'><a class="navbar-brand">Teaching Assistant</a>
+                    {this.state.isCourseCoordinator &&
+                        <a class="navbar-brand" style={{fontSize: "0.8em"}}>Course Coordinator of {this.state.courses.toString()}</a>}
                 </NavLink>
 
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,9 +45,9 @@ class InstructorNavbar extends Component {
 
                 <div class="collapse navbar-collapse" id="navbarColor01">
                     <ul class="navbar-nav mr-auto">
-                        {this.state.isHOD &&
+                        {this.state.isCourseCoordinator &&
                             <NavLink to='/instructor/hod'><li class="nav-item">
-                                <a class="nav-link" >My Department</a>
+                                <a class="nav-link" >My Courses</a>
                             </li></NavLink>}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Courses</a>

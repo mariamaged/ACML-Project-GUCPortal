@@ -1233,6 +1233,234 @@ Access Denied
 ```
 ## 4.2 Course Instructor
 ### Any course instructor can do the following:
+	2 (a) View the slots’ assignment of all courses he/she is assigned to.
+- **Functionality:** 
+    - The user who is a course instructor should be able to view, for **`each course he is assigned to`**, a detailed analysis of the slots assigned to each of the academic members assigned to the course.
+    -  Even if one of the academic member assigned to a course has not been assigned any slots yet, it can be seen that his slots array is empty.
+- **Route:** /instructor/slotsAssignment
+- **Request:** GET.
+- **Request body:** empty.
+-  **Response body:**
+    - `Case 1: (normal case with status 200):` Should be an object with property **msg** that has an array of objects with ***3 properties*** where each object represents details about one course.
+       - courseID: the id of the course as a `string`, like `CSEN704`.
+       - courseName: the name of the course as a `string`, like `Advanced Computer Lab`.
+       - oneCourseTeachingAssignment: an array of objects representing the teaching assignments.\
+       &nbsp;
+       - Properties under oneCourseTeachingAssignment:
+           - staffID: id of the academic member as a `string` like `ac-11`.
+           - staffName: name of the academic member as a `string`, like `Maria`.
+           - slotsTaughtbyStaff: an array of objects representing the respective slots that the academic member teaches.\
+      &nbsp;
+      - Properties under slotsTaughtbyStaff:
+           - number: number of the slot from the 5 slots.
+           - day: one of the week days.
+           - date: in the form of `YYYY-MM-DD`.
+           - location: id of the location as a `string` like `C7.203`.
+           - isReplaced: boolean indicating whether this slot is the original slot or replaced by an annual leave request.
+   - `Case 2:` If the user is not a course instructor, and is therefore not authorized to issue this action, the response sends back the message **`Access Denied!`** with status **`401`**.
+   - `Case 3:` If there is a server error, the response sends back the error message with status **`500`**.
+   - `Case 4:` If the token does not belong to any staff member, or academic member in the database, the response sends back the message `Something went wrong` with status **`400`**.
+- **Example response body:**
+```json
+{msg: 'Access Denied'}
+```
+```json
+{msg: 'Something went wrong'}
+```
+```json
+{error: err.message}
+```
+
+```json
+{
+msg: [
+{
+"courseID": "CSEN704",
+"courseName": "Advanced Computer Lab",
+"oneCourseTeachingAssignment": [
+	{
+	"staffID": "ac-12",
+	"staffName": "Maria Maged",
+	"slotsTaughtbyStaff": []
+	},
+	{
+	"staffID": "ac-13",
+	"staffName": "Monica George",
+	"slotsTaughtbyStaff": []
+	},
+	{
+	"staffID": "ac-11",
+	"staffName": "Maya Ahmed",
+	"slotsTaughtbyStaff": [
+		{	
+		"date": "2020-12-15",
+		"day": "Tuesday",
+		"number": 4,
+		"location": "C7.203",
+		"isReplaced": false
+		}
+	]
+	}
+]
+},
+{
+"courseID": "CSEN703",
+"courseName": "Software Engineering",
+"oneCourseTeachingAssignment": [
+	{
+	"staffID": "ac-12",
+	"staffName": "Maria Maged",
+	"slotsTaughtbyStaff": [	
+		{
+		"date": "2020-12-15",
+		"day": "Tuesday",
+		"number": 2,
+		"location": "C7.203",
+		"isReplaced": false	
+		}	
+	]
+	}
+]
+}
+]
+}
+```
+***
+	2 (b) View the slots’ assignment of a particular course he/she is assigned to.
+- Functionality:
+    - The user who is a course instructor should be able to view, for **`a particular course he is assigned to`**, a detailed analysis of the slots assigned to each of the academic members assigned to the course.
+    -  Even if one of the academic member assigned to a course has not been assigned any slots yet, it can be seen that his slots array is empty.
+- **Route:** /instructor/slotsAssignment/:courseID
+- **Request:** GET.
+- **Request body:** empty.
+- **Response body:**
+   - `Case 1 (normal case with status 200):` 
+     - Should be an object with property **msg** which is assigned an object where the object has ***three properties***:
+        1. courseID --> the id of the course as a `String` like `CSEN704`.
+        2. courseName --> the name of the course as a string like `Advanced Computer Lab`.
+        3. oneCourseTeachingAssignment --> an ***array*** of teaching assignment objects for each individual academic member assigned to that course.\
+        &nbsp;
+         - Properties under oneCourseTeachingAssignment:
+           - staffID: id of the academic member as a `string` like `ac-11`.
+           - staffName: name of the academic member as a `string`, like `Maria`.
+           - slotsTaughtbyStaff: an array of objects representing the respective slots that the academic member teaches.\
+      &nbsp;
+        - Properties under slotsTaughtbyStaff:
+           - number: number of the slot from the 5 slots.
+           - day: one of the week days.
+           - date: in the form of `YYYY-MM-DD`.
+           - location: id of the location as a `string` like `C7.203`.
+           - isReplaced: boolean indicating whether this slot is the original slot or replaced by an annual leave request.
+   - `Case 2:` If the user is not a course instructor and therefore not authorized to issue this action, the response sends back the message `Access Denied` with status **`401`**.
+   - `Case 3:` If there is a server error, the response sends back the error message with status **`500`**.
+   - `Case 4:` If the token does not belong to any staff member, or academic member in the database, the response sends back the message `Something went wrong` with status **`400`**.
+   - `Case 5:` If the course does not exist, the response sends the message `Course does not exist!` with status **`400`**.
+   - `Case 6:` If the course instructor is not assigned to this course, the response sends back the message `You are not assigned to this course!` with status **`403`**.
+- **Example response body:**
+```json
+{error: err.message}
+```
+
+```json
+{msg: 'Access denied'}
+```
+
+```json
+{msg: 'Something went wrong'}
+```
+
+```json
+{msg: 'Course does not exist!'}
+```
+
+```json
+{msg: 'You are not assigned to this course!'}
+```
+
+```json
+{
+"msg": {
+	"courseID": "CSEN704",
+	"courseName": "Advanced Computer Lab",
+	"oneCourseTeachingAssignment": [
+		{
+			"staffID": "ac-1",
+			"staffName": "Maya Ahmed",
+			"slotsTaughtbyStaff": [
+				{
+				"date": "2021-01-17",
+				"day": "Sunday",
+				"number": 5,
+				"location": "C7.203",
+				"isReplaced": false
+				},
+
+				{
+				"date": "2021-01-24",
+				"day": "Sunday",
+				"number": 5,
+				"location": "C7.203",
+				"isReplaced": false
+				}]
+},
+
+			{
+			"staffID": "ac-2",
+			"staffName": "Maria Maged",
+			"slotsTaughtbyStaff": [
+				{
+					"date": "2021-01-18",
+					"day": "Monday",
+					"number": 4,
+					"location": "C7.203",
+					"isReplaced": false
+				},
+
+				{
+				"date": "2021-01-19",
+				"day": "Tuesday",
+				"number": 3,
+				"location": "C7.203",
+				"isReplaced": false
+				},
+
+				{
+				"date": "2021-01-20",
+				"day": "Wednesday",
+				"number": 2,
+				"location": "C7.203",
+				"isReplaced": false
+				},
+
+				{
+				"date": "2021-01-25",
+				"day": "Monday",
+				"number": 4,
+				"location": "C7.203",
+				"isReplaced": false
+				},
+
+				{
+				"date": "2021-01-26",
+				"day": "Tuesday",
+				"number": 3,
+				"location": "C7.203",
+				"isReplaced": false
+				}]
+
+	},
+
+				{
+				"staffID": "ac-3",		
+				"staffName": "Monica George",
+				"slotsTaughtbyStaff": []
+				}
+
+	]
+}
+}
+```
+***
 	(4) Assign an academic member to an unassigned slots in course(s) he/she is assigned to.
 - Functionality:
     - The user who is a course instructor should be able to assign an academic member (either a Teaching Assistant or Course Instructor) empty slots in a particular course.
@@ -1266,6 +1494,10 @@ Access Denied
    - If on some of the slots, there was an academic member already assigned to it, the response sends back an array of all such slots specifying their dates.
 - **Response body:**
 ```json
+{error: err.message}
+```
+
+```json
 {msg: "Something went wrong"}
 ```
 
@@ -1295,10 +1527,6 @@ Access Denied
 
 ```json
 {msg: "Access denied"}
-```
-
-```json
-{error: "error message"}
 ```
 
 ```json

@@ -1,6 +1,7 @@
 // Our Components
 import Login from './components/Login.js';
-import InstructorNavbar from './components/HOD/InstructorNavbar.js';
+import InstructorNavbar from './components/Navbars/InstructorNavbar.js';
+import TeachingAssistantNavbar from './components/Navbars/TeachingAssistantNavbar.js';
 import StaffContainer from './components/HOD/StaffContainer.js';
 import DepartmentStaff from './components/HOD/DepartmentStaff.js';
 import SingleCourseStaff from './components/HOD/SingleCourseStaff.js';
@@ -16,6 +17,7 @@ import CourseTeachingAssignment from './components/HOD/CourseTeachingAssignment.
 import InstructorAllCoursesCoverage from './components/CourseInstructor/AllCoursesCoverage.js';
 import InstructorOneCourseCoverage from './components/CourseInstructor/OneCourseCoverage.js';
 
+import Schedule from './components/Academic/ScheduleOptions.js';
 // React Components
 
 // React
@@ -34,6 +36,8 @@ const App = () => {
       <div className="App">
         <Route exact path="/" component={Login} />
         <Route path='/instructor' component={InstructorNavbar} />
+        <Route path='/assistant' component={TeachingAssistantNavbar} />
+        <Route path='/instructor/schedule' component={Schedule} />
         <Route path='/instructor/hod' component={StaffContainer} />
         <Route path='/instructor/hodDepartmentStaff' component={DepartmentStaff} />
         <Route path='/instructor/hodCourseStaff' render={(props) => (

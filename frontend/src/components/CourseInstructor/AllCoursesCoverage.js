@@ -8,7 +8,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 
 // CSS and images
-import '../HOD/HODNavbar.css';
+import '../HOD/cardcss.css';
 
 class AllCoursesCoverage extends Component {
     state = {

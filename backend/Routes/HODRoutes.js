@@ -26,6 +26,8 @@ function authenticateToken(req, res, next) {
     next();
 }
 
+// Routes
+// To check that logged academic member is a HOD.
 router.get('/isHod', authenticateToken, async (req, res) => {
     const academicMember = await AcademicStaffModel.findOne({ member: req.user.id });
     if (!academicMember) return res.status(400).send('Academic member does not exist!');

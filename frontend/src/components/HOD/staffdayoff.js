@@ -5,7 +5,7 @@ import Loading from './loading.js';
 import React from 'react'
 // Reacter Router and axios
 // CSS and images
-import './HODNavbar.css';
+import './cardcss.css';
 
 const staffdayoff = ({ members, role }) => {
     const departmentStaffList = members.length ? (members.map(staff => {

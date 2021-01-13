@@ -2,14 +2,11 @@ const express = require("express");
 const router = express.Router();
 const AcademicStaff = require("../Models/AcademicStaffModel.js");
 const StaffMember = require("../Models/StaffMemberModel.js");
-const StaffMemberModel = require("../Models/StaffMemberModel.js");
 const location = require("../Models/LocationModel.js");
-const HR = require("../Models/HRModel.js");
-const faculty = require("../Models/FacultyModel");
 const department = require("../Models/DepartmentModel");
 const course = require("../Models/CourseModel");
 const jwt = require("jsonwebtoken");
-const SlotSchema = require("../Models/SlotSchema.js");
+const moment = require('moment');
 
 function authenticateToken(req, res, next) {
   const token = req.header("x-auth-token");
@@ -54,28 +51,89 @@ router.get("/coursecoverage", authenticateToken, async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
-//slots assignment
+//------------------------------------------------------------2--------------------------------------------------
+// 2 (a) slots assignment for all courses assigned to the course instructor
 router.get(
-  "/slotsAssignmentpersemester",
+  "/slotsAssignment",
   authenticateToken,
   async (req, res) => {
     try {
-      const instr = await StaffMember.findOne({ _id: req.user.id });
-      if (instr == null) res.status(400).json({ msg: "Something went wrong" });
+      const instr = await StaffMember.findOne({ "_id": req.user.id });
+      if (!instr) res.status(400).json({ msg: "Something went wrong" });
+
       else {
-        const inst = await AcademicStaff.findOne({ member: instr._id });
-        if (inst == null) res.status(400).json({ msg: "Something went wrong" });
+        const inst = await AcademicStaff.findOne({ member: req.user.id });
+        if (!inst) res.status(400).json({ msg: "Something went wrong" });
+
         else {
           if (inst.type == "Course Instructor") {
-            const courses = inst.courses;
-            var assignments = [courses.length];
-            for (var i = 0; i < courses.length; i++) {
-              var c = await course.findOne({ _id: courses[i] });
-              assignments[i] = { "course id": c.id, schedule: c.schedule };
+            const coursesInst = inst.courses;
+            const courses = [];
+            for (var i = 0; i < coursesInst.length; i++) {
+              const oneCourse = await course.findOne({ "_id": coursesInst[i] });
+              courses.push(oneCourse);
             }
-            res.send(assignments);
-          } else res.status(400).json({ msg: "Access denied" });
+            // Has objectID of academic staff and his respective slots.
+            const returnArray = [];
+            Array.prototype.forEach.call(courses, (course) => {
+              const academic_staff = course.academic_staff;
+              const oneCourseTeachingAssignment = [];
+
+              academic_staff.forEach((oneStaff) => {
+                const slotsTaughtbyStaff = course.schedule.filter((slot) => {
+                  if (slot.academic_member_id) return oneStaff.equals(slot.academic_member_id)
+                });
+
+                for (let j = 0; j < slotsTaughtbyStaff.length; j++) {
+                  const oldSlot = slotsTaughtbyStaff[j];
+                  const newSlot = {
+                    date: moment(oldSlot.date).format('YYYY-MM-DD'),
+                    day: oldSlot.day,
+                    number: oldSlot.number,
+                    location: oldSlot.location,
+                    isReplaced: oldSlot.isReplaced
+                  };
+
+                  slotsTaughtbyStaff[j] = newSlot;
+                }
+                const teachingAssignment = {
+                  staffID: oneStaff,
+                  staffName: oneStaff,
+                  slotsTaughtbyStaff: slotsTaughtbyStaff
+                }
+                oneCourseTeachingAssignment.push(teachingAssignment);
+              });
+
+              const oneCourse = {
+                courseID: course.id,
+                courseName: course.name,
+                oneCourseTeachingAssignment: oneCourseTeachingAssignment
+              }
+
+              returnArray.push(oneCourse);
+            }
+            );
+
+            // Change ObjectIDs with real ids.
+            for (let index = 0; index < returnArray.length; index++) {
+              for (let i = 0; i < returnArray[index].oneCourseTeachingAssignment.length; i++) {
+                const staffID = returnArray[index].oneCourseTeachingAssignment[i].staffID;
+                const academicStaff = await AcademicStaff.findOne({ "_id": staffID });
+                const staff = await StaffMember.findOne({ "_id": academicStaff.member });
+                returnArray[index].oneCourseTeachingAssignment[i].staffID = staff.id;
+                returnArray[index].oneCourseTeachingAssignment[i].staffName = staff.name;
+
+                for (let j = 0; j < returnArray[index].oneCourseTeachingAssignment[i].slotsTaughtbyStaff.length; j++) {
+                  const oldSlot = returnArray[index].oneCourseTeachingAssignment[i].slotsTaughtbyStaff[j];
+                  const slotlocation = await location.findOne({ "_id": oldSlot.location });
+                  oldSlot.location = slotlocation.id;
+                  returnArray[index].oneCourseTeachingAssignment[i].slotsTaughtbyStaff[j] = oldSlot;
+                }
+              }
+            }
+
+            return res.status(200).json({ msg: returnArray });
+          } else res.status(401).json({ msg: "Access denied" });
         }
       }
     } catch (err) {
@@ -84,50 +142,77 @@ router.get(
   }
 );
 
-//slots assignment
-router.get("/slotsAssignmentperweek", authenticateToken, async (req, res) => {
+// 2 (b) slots assignment for a particular course assigned to the course instructor.
+router.get("/slotsAssignment/:courseID", authenticateToken, async (req, res) => {
   try {
-    const instr = await StaffMember.findOne({ id: req.user.id });
-    if (instr == null) res.status(400).json({ msg: "Something went wrong" });
+    const instr = await StaffMember.findOne({ "_id": req.user.id });
+    if (!instr) res.status(400).json({ msg: "Something went wrong" });
+
     else {
       const inst = await AcademicStaff.findOne({ member: instr._id });
-      if (inst == null) res.status(400).json({ msg: "Something went wrong" });
+      if (!inst) res.status(400).json({ msg: "Something went wrong" });
+
       else {
         if (inst.type == "Course Instructor") {
-          const courses = inst.courses;
-          var assignments = [courses.length];
-          for (var i = 0; i < courses.length; i++) {
-            var c = await course.findOne({ _id: courses[i] });
-            var week = [];
-            for (var j = 0; j < c.schedule.length; j++) {
-              var slot = c.schedule[j];
-              var flag = false;
-              for (let i = 1; i < 8; i++) {
-                const diff = moment().add(i, "days").format("YYYY-MM-DD");
-                if (
-                  moment(slot.date).format("YYYY-MM-DD").toString() ==
-                  diff.toString()
-                ) {
-                  flag = true;
-                  break;
-                }
-              }
-              if (flag) {
-                var loc = await location.findOne({ _id: slot.location });
-                const returnedSlot = {
-                  day: slot.day,
-                  locationID: loc.id,
-                  courseID: c.id,
-                  date: moment(slot.date).format("YYYY-MM-DD"),
-                  number: slot.number,
-                };
-                week.push(returnedSlot);
-              }
+          const courseID = req.params.courseID;
+          const c = await course.findOne({ id: courseID });
+          if (!c) return res.status(400).json({ msg: 'Course does not exist!' });
+          const courseAssigned = inst.courses.some(singleCourse => { return singleCourse.equals(c._id) });
+          if (!courseAssigned) return res.status(403).json({ msg: 'You are not assigned to this course!' });
+
+          // Has objectID of academic staff and his respective slots.
+          const academic_staff = c.academic_staff;
+          const oneCourseTeachingAssignment = [];
+
+          academic_staff.forEach((oneStaff) => {
+            const slotsTaughtbyStaff = c.schedule.filter((slot) => {
+              if (slot.academic_member_id) return oneStaff.equals(slot.academic_member_id)
+            });
+
+            for (let j = 0; j < slotsTaughtbyStaff.length; j++) {
+              const oldSlot = slotsTaughtbyStaff[j];
+              const newSlot = {
+                date: moment(oldSlot.date).format('YYYY-MM-DD'),
+                day: oldSlot.day,
+                number: oldSlot.number,
+                location: oldSlot.location,
+                isReplaced: oldSlot.isReplaced
+              };
+
+              slotsTaughtbyStaff[j] = newSlot;
             }
-            assignments[i] = { "course id": c.id, "slots assignment": week };
+            const teachingAssignment = {
+              staffID: oneStaff,
+              staffName: oneStaff,
+              slotsTaughtbyStaff: slotsTaughtbyStaff
+            }
+            oneCourseTeachingAssignment.push(teachingAssignment);
+          });
+
+          const oneCourse = {
+            courseID: c.id,
+            courseName: c.name,
+            oneCourseTeachingAssignment: oneCourseTeachingAssignment
           }
-          return res.status(200).json(assignments);
-        } else res.status(400).json({ msg: "Access denied" });
+
+          // Change ObjectIDs with real ids.
+          for (let i = 0; i < oneCourse.oneCourseTeachingAssignment.length; i++) {
+            const staffID = oneCourse.oneCourseTeachingAssignment[i].staffID;
+            const academicStaff = await AcademicStaff.findOne({ "_id": staffID });
+            const staff = await StaffMember.findOne({ "_id": academicStaff.member });
+            oneCourse.oneCourseTeachingAssignment[i].staffID = staff.id;
+            oneCourse.oneCourseTeachingAssignment[i].staffName = staff.name;
+
+            for (let j = 0; j < oneCourse.oneCourseTeachingAssignment[i].slotsTaughtbyStaff.length; j++) {
+              const oldSlot = oneCourse.oneCourseTeachingAssignment[i].slotsTaughtbyStaff[j];
+              const oneLocation = await location.findById(oldSlot.location);
+              oldSlot.location = oneLocation.id;
+              oneCourse.oneCourseTeachingAssignment[i].slotsTaughtbyStaff[j] = oldSlot;
+            }
+          }
+
+          return res.status(200).json({ msg: oneCourse });
+        } else res.status(401).json({ msg: "Access denied" });
       }
     }
   } catch (err) {
@@ -187,7 +272,6 @@ router.get("/staffperdepartment", authenticateToken, async (req, res) => {
 });
 
 //staffpercourse
-//they have to enter a course,no?
 router.get("/staffpercourse", authenticateToken, async (req, res) => {
   try {
     const instr = await StaffMember.findOne({ _id: req.user.id });
@@ -275,10 +359,10 @@ router.get("/staffpercourse", authenticateToken, async (req, res) => {
   }
 });
 
-//assigntounassignedSlot
+// 4- assigntounassignedSlot
 router.route("/Assignment").post(authenticateToken, async (req, res) => {
   try {
-    const instr = await StaffMember.findOne({ _id: req.user.id });
+    const instr = await StaffMember.findOne({ "_id": req.user.id });
     if (!instr) res.status(400).json({ msg: "Something went wrong." });
 
     else {
@@ -339,7 +423,7 @@ router.route("/Assignment").post(authenticateToken, async (req, res) => {
                       thecourse.schedule.forEach(slot => {
                         if (slot.day == day && slot.number == number && slot.location.equals(loc._id)) {
 
-                          const busySlot = {date: moment(slot.date).format('YYYY-MM-DD')};
+                          const busySlot = { date: moment(slot.date).format('YYYY-MM-DD') };
                           var free = true;
                           for (var i = 0; i < mem.schedule.length; i++) {
                             if (
@@ -370,9 +454,9 @@ router.route("/Assignment").post(authenticateToken, async (req, res) => {
                                 location: slot.location
                               };
                               mem.schedule.push(newSlot);
-                              if(!duplicate) {
-                                  thecourse.academic_staff.push(mem._id);
-                                  mem.courses.push(thecourse._id);
+                              if (!duplicate) {
+                                thecourse.academic_staff.push(mem._id);
+                                mem.courses.push(thecourse._id);
                               }
                             }
                             else {
@@ -389,10 +473,10 @@ router.route("/Assignment").post(authenticateToken, async (req, res) => {
 
                       await thecourse.save();
                       await mem.save();
-                      const correctSlots = thecourse.schedule.filter(slot => {return slot.day == day && slot.number == number && slot.location.equals(loc._id)});
-                      if(correctSlots.length == 0) res.status(400).json({msg: "No slots with those details."});
-                      else if(busySlots.length != 0) res.status(400).json({msg: busySlots});
-                      else res.status(200).send("Operation successful!");
+                      const correctSlots = thecourse.schedule.filter(slot => { return slot.day == day && slot.number == number && slot.location.equals(loc._id) });
+                      if (correctSlots.length == 0) res.status(400).json({ msg: "No slots with those details." });
+                      else if (busySlots.length != 0) res.status(400).json({ msg: busySlots });
+                      else res.status(200).send({ msg: "Operation successful!" });
                     }
                   }
                 }

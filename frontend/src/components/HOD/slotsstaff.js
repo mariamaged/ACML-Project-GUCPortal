@@ -11,7 +11,7 @@ import React from 'react';
 
 // Reacter Router and axios
 // CSS and images
-import './HODNavbar.css';
+import './cardcss.css';
 
 const slotsstaff = ({ members }) => {
     const listItems = members.length ? (members.map(staff => {
@@ -22,7 +22,7 @@ const slotsstaff = ({ members }) => {
 
     const tabItems = members.length ? (members.map(staff => {
         return (<Tab.Pane eventKey={staff.staffID} key={staff.staffID}>
-            <SlotsTable slots={staff.slotsTaughtbyStaff}/>
+            <SlotsTable slots={staff.slotsTaughtbyStaff} isReplaced="undefined" courseIDExists={false} academicMemberIDExists={false}/>
         </Tab.Pane>);
     })) : (<div />);
 

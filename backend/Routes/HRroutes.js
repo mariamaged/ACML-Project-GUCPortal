@@ -178,10 +178,10 @@ router.route('Location').post(authenticateToken,async(req,res)=>{
 router.route('/Faculty').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
-    res.status(401).send('Access Denied');
-    else{
+        //const st=await StaffMember.findOne({"id":req.user.id});
+        //if(st.staff_type=="HR")
+    //res.status(401).send('Access Denied');
+    //else{
     const{name}=req.body;
     if(!name) res.status(400).json({msg:"please enter the faculty name"});
     else{
@@ -191,7 +191,7 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
     toAdd=new faculty({name});
     await toAdd.save();}
     res.json(toAdd);
-    console.log(toAdd);}}}
+    console.log(toAdd);}}//}
     catch(err){
         res.status(500).json({msg:{error:err.message}});
     }
@@ -259,10 +259,10 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
 router.route('/department').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
-    res.status(401).send('Access Denied');
-    else{
+        //const st=await StaffMember.findOne({"id":req.user.id});
+        //if(st.staff_type=="HR")
+    //res.status(401).send('Access Denied');
+    //else{
      const{name,facultyname,hod}=req.body;
      //HOD could be null as in not yet assigned
      if(!name || !facultyname) res.status(400).json({msg:"Please fill the fields correctly"});
@@ -280,7 +280,7 @@ router.route('/department').post(authenticateToken,async(req,res)=>{
          console.log(toAdd);
         }
        }
-    }}
+    }//}
     }catch(err){
         res.status(500).json({error:err.message});
     }
