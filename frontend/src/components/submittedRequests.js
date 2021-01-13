@@ -171,9 +171,11 @@ class ViewSubmittedRequests extends Component{
             "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="table-dark">
+                <tr key={request.requestID} >
                 {/* <td className="reqTd" >{request.counter}</td> */}
                 <td >{request.submission_date}</td>
+                <td >{request.startDate}</td>
+                <td >{request.endDate}</td>
                 <td >{request.maternityDoc}</td>
                 <td >{request.reason}</td>    
                 <td >{request.state}</td>
@@ -196,15 +198,16 @@ class ViewSubmittedRequests extends Component{
                 "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                    <tr key={request.requestID} >
                     {/* <td className="reqTd" >{request.counter}</td> */}
-                    <td className="reqTd">{request.submission_date}</td>
-                    <td className="reqTd">{request.sickDay}</td>
-                    <td className="reqTd">{request.reason}</td>
-                    <td className="reqTd">{request.state}</td>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                    <td >{request.submission_date}</td>
+                    <td >{request.sickDay}</td>
+                    <td >{request.reason}</td>
+                    <td >{request.state}</td>
+                    {this.state.reqState!="Accepted" &&
+                     this.state.reqState!="Pending"&& <td >{request.RejectionReason}</td>}
                     
-                    <td className="reqTd">
+                    <td >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
                   </td>
@@ -222,18 +225,19 @@ class ViewSubmittedRequests extends Component{
                     "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} >
                 
                 {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.slotDate}</td>
-                <td className="reqTd">{request.slotNum}</td>
-                <td className="reqTd">{request.slotLoc}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                <td >{request.submission_date}</td>
+                <td >{request.slotDate}</td>
+                <td >{request.slotNum}</td>
+                <td>{request.slotLoc}</td>
+                <td >{request.reason}</td>
+                <td >{request.state}</td>
+                {this.state.reqState!="Accepted" &&
+                 this.state.reqState!="Pending"&& <td >{request.RejectionReason}</td>}
                 
-                <td className="reqTd">
+                <td >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
               </td>
@@ -249,16 +253,17 @@ class ViewSubmittedRequests extends Component{
                     "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                    <tr key={request.requestID} >
                     
                     {/* <td className="reqTd" >{request.counter}</td> */}
-                     <td className="reqTd">{request.submission_date}</td>
-                    <td className="reqTd">{request.missedDay}</td>
-                    <td className="reqTd">{request.compensatedDay}</td>
-                    <td className="reqTd">{request.reason}</td>
-                    <td className="reqTd">{request.state}</td>
-                     {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
-                    <td className="reqTd">
+                     <td >{request.submission_date}</td>
+                    <td >{request.missedDay}</td>
+                    <td >{request.compensatedDay}</td>
+                    <td >{request.reason}</td>
+                    <td >{request.state}</td>
+                     {this.state.reqState!="Accepted" &&
+                      this.state.reqState!="Pending"&& <td >{request.RejectionReason}</td>}
+                    <td >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
                   </td>
@@ -275,16 +280,17 @@ class ViewSubmittedRequests extends Component{
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} >
                 
                 {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTdSick">{request.newDayOff}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                <td >{request.submission_date}</td>
+                <td >{request.newDayOff}</td>
+                <td >{request.reason}</td>
+                <td >{request.state}</td>
+                {this.state.reqState!="Accepted" && 
+                this.state.reqState!="Pending"&& <td >{request.RejectionReason}</td>}
                 
-                <td className="reqTd">
+                <td >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
                 </td>
@@ -300,17 +306,18 @@ class ViewSubmittedRequests extends Component{
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} >
                 {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.slotDay}</td>
-                <td className="reqTd">{request.slotNum}</td>
-                <td className="reqTd">{request.courseID}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                <td >{request.submission_date}</td>
+                <td >{request.slotDay}</td>
+                <td >{request.slotNum}</td>
+                <td >{request.courseID}</td>
+                <td >{request.reason}</td>
+                <td >{request.state}</td>
+                {this.state.reqState!="Accepted" && 
+                this.state.reqState!="Pending"&& <td >{request.RejectionReason}</td>}
                 
-                <td className="reqTd">
+                <td >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
                 </td>
@@ -325,15 +332,16 @@ class ViewSubmittedRequests extends Component{
                     "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                    <tr key={request.requestID} >
                     {/* <td className="reqTd" >{request.counter}</td> */}
-                    <td className="reqTd">{request.submission_date}</td>
-                    <td className="reqTd">{request.accidentDate}</td>
-                    <td className="reqTd">{request.reason}</td>
-                    <td className="reqTd">{request.state}</td>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                    <td >{request.submission_date}</td>
+                    <td >{request.accidentDate}</td>
+                    <td >{request.reason}</td>
+                    <td >{request.state}</td>
+                    {this.state.reqState!="Accepted" && 
+                    this.state.reqState!="Pending"&& <td >{request.RejectionReason}</td>}
                     
-                    <td className="reqTd">
+                    <td >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
                     </td>
@@ -348,10 +356,10 @@ class ViewSubmittedRequests extends Component{
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
+                <tr key={request.requestID} >
                 {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.slotDate}</td>
+                <td >{request.submission_date}</td>
+                <td >{request.slotDate}</td>
                <tr>
                <td >82</td>
                 <td>85</td>
@@ -360,11 +368,12 @@ class ViewSubmittedRequests extends Component{
                    <td>77</td>
                     <td>81</td> </tr> 
 
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                <td >{request.reason}</td>
+                <td >{request.state}</td>
+                {this.state.reqState!="Accepted" &&
+                 this.state.reqState!="Pending"&& <td >{request.RejectionReason}</td>}
                 
-                <td className="reqTd">
+                <td >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
                 </td>
@@ -456,11 +465,16 @@ class ViewSubmittedRequests extends Component{
                 
                 <table class="table table-hover  header-fixed">
                     <thead>
-                        <tr>
-                        <th scope="row">Type</th>
-                        <th scope="row">Column heading</th>
-                        <th scope="row">Column heading</th>
-                        <th scope="row">Column heading</th>
+                        <tr class="table-light">
+                        <th scope="row">Submission Date</th>
+                        <th scope="row">Start Date</th>
+                        <th scope="row">End Date</th>
+                        <th scope="row">Documents</th>
+                        <th scope="row">State</th>
+                        {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& 
+                        <th scope="row">Rejection Reason</th>}
+          
+                        <th scope="row">Action</th>
                         </tr>
                     </thead>
                     <tbody>{reqs.map(this.renderMaternityRequest)}</tbody>
@@ -468,26 +482,6 @@ class ViewSubmittedRequests extends Component{
                 
                 
                 
-                { /* <div class="row">
-    <table class="table table-fixed">
-      <thead>
-        <tr>
-          <th class="col-xs-5">Submission Date</th>
-          <th class="col-xs-5">Start Date</th>
-          <th class="col-xs-5">End Date</th>
-          <th class="col-xs-5">Documents</th>
-          <th class="col-xs-5">State</th>
-          {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="col-xs-5">Rejection Reason</th>}
-                    
-          <th class="col-xs-5">Action</th>
-          {/* <th class="col-xs-5">Username</th> }
-                </tr>
-            </thead>
-            <tbody>
-                          {reqs.map(this.renderMaternityRequest)}
-                                    </tbody>
-                </table>
-            </div>  */}
 
             </div>
             
@@ -498,23 +492,24 @@ class ViewSubmittedRequests extends Component{
               <div className=" containMaternityTable">
 
                 {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Sick Day</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Sick Day</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&&
+                     <th scope="row">Rejection Reason</th>}
                     
-                    <th className="reqTh">Action</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderSickRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div>
                 }
@@ -522,25 +517,25 @@ class ViewSubmittedRequests extends Component{
                 {this.state.reqType=="Replacement" &&
                 <div className=" containMaternityTable  ">
                 {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Slot Date</th>
-                    <th className="reqTh">Slot Number</th>
-                    <th className="reqTh">Slot Location</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Slot Date</th>
+                    <th scope="row">Slot Number</th>
+                    <th scope="row">Slot Location</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th scope="row">Rejection Reason</th>}
                     
-                    <th className="reqTh">Action</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderReplacementRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div> 
                 }
@@ -548,90 +543,90 @@ class ViewSubmittedRequests extends Component{
                 {this.state.reqType=="Compensation Leave" &&
                 <div className=" containMaternityTable  ">
                 {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Missed Day</th>
-                    <th className="reqTh">Compensation Day</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                   {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
-                    <th className="reqTh">Action</th>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Missed Day</th>
+                    <th scope="row">Compensation Day</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                   {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th scope="row">Rejection Reason</th>}
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderCompensationRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div> }
 
                 {this.state.reqType=="Change Day off" &&
                 <div className=" containMaternityTable ">
                 {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">New Day-Off</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">New Day-Off</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th scope="row">Rejection Reason</th>}
                     
-                    <th className="reqTh">Action</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderChangeDayOffRequest)}
                 </tbody>
-                </Table>
+                </table>
                 </div>}
 
                 {this.state.reqType=="Slot Linking" &&<div className=" containMaternityTable  ">
                 {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Slot Day</th>
-                    <th className="reqTh">Slot Number</th>
-                    <th className="reqTh">Course ID</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Slot Day</th>
+                    <th scope="row">Slot Number</th>
+                    <th scope="row">Course ID</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th scope="row">Rejection Reason</th>}
                     
-                    <th className="reqTh">Action</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderSlotLinkingRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div>}
 
                 {this.state.reqType=="Accidental Leave" && <div className=" containMaternityTable  ">
                 {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Accident Date</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
-                    <th className="reqTh">Action</th>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Accident Date</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th scope="row">Rejection Reason</th>}
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderAccidentalRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div>}
 
@@ -640,13 +635,13 @@ class ViewSubmittedRequests extends Component{
                     slotLoc:sent[i].slotLoc, replacementStaff:repl, */
                 <div className=" containMaternityTable">
                 {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Slot Date</th>
-                    {/* <th className="reqTh">Replacement Staff</th> */}
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Slot Date</th>
+                    {/* <th scope="row">Replacement Staff</th> */}
                     {/*  <th colspan="2">65</th>  */}
                     <tr>  <th colspan="10">Replacement Staff</th>
                      {/* <th colspan="2">20</th>
@@ -661,17 +656,17 @@ class ViewSubmittedRequests extends Component{
                      <th>Replacement</th> <th>Slot</th>
                      </tr>
 
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th scope="row">Rejection Reason</th>}
                     
-                    <th className="reqTh">Action</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderAnnualRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div>}
                     

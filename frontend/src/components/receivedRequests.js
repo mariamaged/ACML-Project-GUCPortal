@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
 import '../css/test44.css'
-// import '../css/bootstrap.min.css'
+import '../css/bootstrap.min.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
@@ -231,19 +231,17 @@ class ViewReceivedRequests extends Component{
                 })
         }
         renderMaternityRequest=(request, index)=> {
-            // console.log("submissiondate= "+request.submission_date+
-            // "\n"+"maternityDoc= "+request.maternityDoc+
-            // "\n"+"reason= "+request.reason+
-            // "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr">
-                {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.maternityDoc}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                <td className="reqTd">
+                <tr key={request.requestID} >
+                {/* <td   >{request.counter}</td> */}
+                <td>{request.submission_date}</td>
+                <td>{request.startDate}</td>
+                <td>{request.endDate}</td>
+                <td>{request.maternityDoc}</td>
+                <td>{request.reason}</td>
+                <td>{request.state}</td>
+                <td>
                 <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
@@ -252,7 +250,7 @@ class ViewReceivedRequests extends Component{
                     </Form>
                 </InputGroup>
                 </td> 
-                <td className="reqTd">
+                <td  >
                <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
                </Button>{"  "}
@@ -274,14 +272,14 @@ class ViewReceivedRequests extends Component{
                 "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
-                    {/* <td className="reqTd" >{request.counter}</td> */}
-                    <td className="reqTd">{request.submission_date}</td>
-                    <td className="reqTd">{request.sickDay}</td>
-                    <td className="reqTd">{request.reason}</td>
+                    <tr key={request.requestID}  className='clickable-row' onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+                    {/* <td   >{request.counter}</td> */}
+                    <td  >{request.submission_date}</td>
+                    <td  >{request.sickDay}</td>
+                    <td  >{request.reason}</td>
 
-                    <td className="reqTd">{request.state}</td>
-                    <td className="reqTd">
+                    <td  >{request.state}</td>
+                    <td  >
                       <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
@@ -289,7 +287,7 @@ class ViewReceivedRequests extends Component{
                     </InputGroup>
                     </td>
 
-                    <td className="reqTd">
+                    <td  >
                     
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -312,23 +310,23 @@ class ViewReceivedRequests extends Component{
                     "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' >
+                <tr key={request.requestID}  className='clickable-row' >
                 
-                {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.slotDate}</td>
-                <td className="reqTd">{request.slotNum}</td>
-                <td className="reqTd">{request.slotLoc}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                <td className="reqTd">
+                {/* <td   >{request.counter}</td> */}
+                <td  >{request.submission_date}</td>
+                <td  >{request.slotDate}</td>
+                <td  >{request.slotNum}</td>
+                <td  >{request.slotLoc}</td>
+                <td  >{request.reason}</td>
+                <td  >{request.state}</td>
+                <td  >
                       <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
                     </InputGroup>
                     </td>
-                <td className="reqTd">
+                <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
                </Button>{"  "}
@@ -348,21 +346,21 @@ class ViewReceivedRequests extends Component{
                     "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' >
+                    <tr key={request.requestID}  className='clickable-row' >
                     
-                    {/* <td className="reqTd" >{request.counter}</td> */}
-                     <td className="reqTd">{request.submission_date}</td>
-                    <td className="reqTd">{request.missedDay}</td>
-                    <td className="reqTd">{request.reason}</td>
-                    <td className="reqTd">{request.state}</td>
-                    <td className="reqTd">
+                    {/* <td   >{request.counter}</td> */}
+                     <td  >{request.submission_date}</td>
+                    <td  >{request.missedDay}</td>
+                    <td  >{request.reason}</td>
+                    <td  >{request.state}</td>
+                    <td  >
                       <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
                     </InputGroup>
                     </td>
-                    <td className="reqTd">
+                    <td  >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
                </Button>{"  "}
@@ -383,21 +381,21 @@ class ViewReceivedRequests extends Component{
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' >
+                <tr key={request.requestID}  className='clickable-row' >
                 
-                {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
+                {/* <td   >{request.counter}</td> */}
+                <td  >{request.submission_date}</td>
                 <td className="reqTdSick">{request.newDayOff}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                <td className="reqTd">
+                <td  >{request.reason}</td>
+                <td  >{request.state}</td>
+                <td  >
                       <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
                     </InputGroup>
                     </td>
-                <td className="reqTd">
+                <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
                </Button>{"  "}
@@ -417,22 +415,22 @@ class ViewReceivedRequests extends Component{
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' >
-                {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.slotDay}</td>
-                <td className="reqTd">{request.slotNum}</td>
-                <td className="reqTd">{request.courseID}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                <td className="reqTd">
+                <tr key={request.requestID}  className='clickable-row' >
+                {/* <td   >{request.counter}</td> */}
+                <td  >{request.submission_date}</td>
+                <td  >{request.slotDay}</td>
+                <td  >{request.slotNum}</td>
+                <td  >{request.courseID}</td>
+                <td  >{request.reason}</td>
+                <td  >{request.state}</td>
+                <td  >
                       <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
                     </InputGroup>
                     </td>
-                <td className="reqTd">
+                <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
                </Button>{"  "}
@@ -451,20 +449,20 @@ class ViewReceivedRequests extends Component{
                     "\n"+"state= "+request.state)
                 return (
                     
-                    <tr key={request.requestID} className="reqTr" className='clickable-row' >
-                    {/* <td className="reqTd" >{request.counter}</td> */}
-                    <td className="reqTd">{request.submission_date}</td>
-                    <td className="reqTd">{request.accidentDate}</td>
-                    <td className="reqTd">{request.reason}</td>
-                    <td className="reqTd">{request.state}</td>
-                    <td className="reqTd">
+                    <tr key={request.requestID}  className='clickable-row' >
+                    {/* <td   >{request.counter}</td> */}
+                    <td  >{request.submission_date}</td>
+                    <td  >{request.accidentDate}</td>
+                    <td  >{request.reason}</td>
+                    <td  >{request.state}</td>
+                    <td  >
                       <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
                     </InputGroup>
                     </td>
-                    <td className="reqTd">
+                    <td  >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
                </Button>{"  "}
@@ -483,22 +481,22 @@ class ViewReceivedRequests extends Component{
                 "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr" className='clickable-row' >
-                {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.slotNum}</td>
-                <td className="reqTd">{request.slotDate}</td>
-                <td className="reqTd">{request.replacementStaff}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
-                <td className="reqTd">
+                <tr key={request.requestID}  className='clickable-row' >
+                {/* <td   >{request.counter}</td> */}
+                <td  >{request.submission_date}</td>
+                <td  >{request.slotNum}</td>
+                <td  >{request.slotDate}</td>
+                <td  >{request.replacementStaff}</td>
+                <td  >{request.reason}</td>
+                <td  >{request.state}</td>
+                <td  >
                       <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
                     </InputGroup>
                     </td>
-                <td className="reqTd">
+                <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
                </Button>{"  "}
@@ -591,22 +589,22 @@ class ViewReceivedRequests extends Component{
               <div className=" containMaternityTable">
 
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Documents</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Rejection Reason</th>
-                    <th className="reqTh">Action</th>
-                    </tr>
-                </thead>
-                <tbody className="reqBody">
-                {reqs.map(this.renderMaternityRequest)}
-                </tbody>
-                </Table>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                        <tr class="table-light">
+                        <th scope="row">Submission Date</th>
+                        <th scope="row">Start Date</th>
+                        <th scope="row">End Date</th>
+                        <th scope="row">Documents</th>
+                        <th scope="row">Reason</th>
+                        <th scope="row">State</th>
+                        <th scope="row">Rejection Reason</th>
+          
+                        <th scope="row">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>{reqs.map(this.renderMaternityRequest)}</tbody>
+                    </table>
                 {/* </span> */}
                 </div>
                 }
@@ -616,22 +614,21 @@ class ViewReceivedRequests extends Component{
               <div className=" containMaternityTable">
 
               {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
-              <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Sick Day</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Rejection Reason</th>
-                    <th className="reqTh">Action</th>
-                    </tr>
-                </thead>
-                <tbody className="reqBody">
-                {reqs.map(this.renderSickRequest)}
-                </tbody>
-                </Table>
+              <table class="table table-hover  header-fixed">
+                    <thead>
+                        <tr class="table-light">
+                        <th scope="row">Submission Date</th>
+                        <th scope="row">Start Date</th>
+                        <th scope="row">End Date</th>
+                        <th scope="row">Documents</th>
+                        <th scope="row">State</th>
+                        <th scope="row">Rejection Reason</th>
+          
+                        <th scope="row">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>{reqs.map(this.renderMaternityRequest)}</tbody>
+                    </table>
                 {/* </span> */}
                 </div>
                 }
@@ -639,24 +636,24 @@ class ViewReceivedRequests extends Component{
                 {this.state.reqType=="Replacement" &&
                 <div className=" containMaternityTable  ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Slot Date</th>
-                    <th className="reqTh">Slot Number</th>
-                    <th className="reqTh">Slot Location</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Rejection Reason</th>
-                    <th className="reqTh">Action</th>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Slot Date</th>
+                    <th scope="row">Slot Number</th>
+                    <th scope="row">Slot Location</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    <th scope="row">Rejection Reason</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderReplacementRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div> 
                 }
@@ -664,87 +661,88 @@ class ViewReceivedRequests extends Component{
                 {this.state.reqType=="Compensation Leave" &&
                 <div className=" containMaternityTable  ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Missed Day</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Rejection Reason</th>
-                    <th className="reqTh">Action</th>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Missed Day</th>
+                    <th scope="row">Compensation Day</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    <th scope="row">Rejection Reason</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderCompensationRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div> }
 
                 {this.state.reqType=="Change Day off" &&
                 <div className=" containMaternityTable ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">New Day-Off</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Rejection Reason</th>
-                    <th className="reqTh">Action</th>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">New Day-Off</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    <th scope="row">Rejection Reason</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderChangeDayOffRequest)}
                 </tbody>
-                </Table>
+                </table>
                 </div>}
 
                 {this.state.reqType=="Slot Linking" &&<div className=" containMaternityTable  ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Slot Day</th>
-                    <th className="reqTh">Slot Number</th>
-                    <th className="reqTh">Course ID</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Rejection Reason</th>
-                    <th className="reqTh">Action</th>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Slot Day</th>
+                    <th scope="row">Slot Number</th>
+                    <th scope="row">Course ID</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    <th scope="row">Rejection Reason</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderSlotLinkingRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div>}
 
                 {this.state.reqType=="Accidental Leave" && <div className=" containMaternityTable  ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Accident Date</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Rejection Reason</th>
-                    <th className="reqTh">Action</th>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Accident Date</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    <th scope="row">Rejection Reason</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderAccidentalRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div>}
 
@@ -753,24 +751,37 @@ class ViewReceivedRequests extends Component{
                     slotLoc:sent[i].slotLoc, replacementStaff:repl, */
                 <div className=" containMaternityTable">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Slot Number</th>
-                    <th className="reqTh">Slot Date</th>
-                    <th className="reqTh">Replacement Staff</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Rejection Reason</th>
-                    <th className="reqTh">Action</th>
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr className="table-light">
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Slot Date</th>
+                    {/* <th scope="row">Replacement Staff</th> */}
+                    {/*  <th colspan="2">65</th>  */}
+                    <tr>  <th colspan="10">Replacement Staff</th>
+                     {/* <th colspan="2">20</th>
+                     <th colspan="2">20</th>
+                     <th colspan="2">20</th>  */}
+                     </tr> 
+                     <tr> 
+                     <th>Replacement</th> <th>Slot</th>
+                     <th>Replacement</th> <th>Slot</th>
+                     <th>Replacement</th> <th>Slot</th>
+                     <th>Replacement</th> <th>Slot</th> 
+                     <th>Replacement</th> <th>Slot</th>
+                     </tr>
+
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    <th scope="row">Rejection Reason</th>
+                    <th scope="row">Action</th>
                     </tr>
                 </thead>
-                <tbody className="reqBody">
+                <tbody  >
                 {reqs.map(this.renderAnnualRequest)}
                 </tbody>
-                </Table>
+                </table>
                 {/* </span> */}
                 </div>}
                     

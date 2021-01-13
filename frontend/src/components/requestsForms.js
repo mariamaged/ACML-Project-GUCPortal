@@ -4,6 +4,7 @@ import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
 // import '../css/test44.css'
 import '../css/bootstrap.min.css'
+import '../css/forms.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
@@ -54,7 +55,7 @@ class requestsForms extends Component{
           reason:""
     }
     componentDidMount(props){
-        console.log("here in reqForms")
+        console.log("here in reqForms title="+this.props.location.state.formTitle+"   = "+this.props.location.state.formType)
         console.log("at start reason= "+this.state.reason+" success= "+this.state.successMsg+" failure= "+this.state.warningMsg)
         console.log("success at start? "+this.state.successMsg)
         console.log("this.state.reqType= "+this.props.location.state.formType)
@@ -284,8 +285,9 @@ class requestsForms extends Component{
 
    
     handleReqForm(e,formType,formTitle){
+        e.preventDefault();
         console.log("check= "+this.state.successMsg)
-        console.log("changed= "+e.taget+" = "+e.target.value)
+        console.log("changed= "+e.taget+" = "+formTitle)
         e.preventDefault();
         const location = {
             pathname: '/requestsForms',
@@ -313,8 +315,8 @@ class requestsForms extends Component{
     }
     render(){
         const g=
-        <div>
-        {/* <div><h3>{this.formTitle}</h3></div> */}
+        <div className="divAll">
+        <div><h3 class="formTitle">{this.state.formTitle}</h3></div>
         <div className="reqForm">
             {/* <span className="maternityH">{this.formTitle}</span> */}
             <DropdownButton id="dropdown-basic-button" title="Dropdown button" className="reqFormDrop">
@@ -430,22 +432,20 @@ class requestsForms extends Component{
     }    
 
     {this.state.formType=="Maternity Leave" &&
-     <div>
-    <div class="form-group">
-  <fieldset>
-    <label class="control-label" for="readOnlyInput">Readonly input</label>
-    <input class="form-control" id="readOnlyInput" type="text" placeholder="Readonly input here..." readonly=""/>
-  </fieldset>
+     
+         /* <div>
+     <div class="form-group">
+    <label class="col-form-label" for="inputDefault">Default input</label>
+    <input type="date" class="form-control" placeholder="Default input" id="inputDefault"/>
+    </div>
+    
+<div class="form-group has-success">
+  <label class="form-control-label" for="inputValid">Valid input</label>
+  <input type="text" value="correct value" class="form-control is-valid" id="inputValid"/>
+  <div class="valid-feedback">Success! You've done it.</div>
 </div>
-
-<div class="form-group">
-  <fieldset>
-    <label class="control-label" for="readOnlyInput">Readonly input</label>
-    <input class="form-control" id="readOnlyInput" type="text" placeholder="Readonly input here..." readonly=""/>
-  </fieldset>
-</div>
-</div> 
-   /* <form onSubmit={this.onFormMaternitySubmit}>
+</div> */
+    <form onSubmit={this.onFormMaternitySubmit}>
          
          <label className="col-form-label" htmlFor="startDate">Start Date</label>
          <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="startDate" required onChange={this.handleChange}/>
@@ -461,7 +461,7 @@ class requestsForms extends Component{
          </Button> 
          {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
          {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
-         </form>*/
+         </form>
     } 
 
     

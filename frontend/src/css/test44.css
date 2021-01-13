@@ -34,8 +34,14 @@
 .containMaternityTable {
   max-height:300px !important;
   overflow-y: scroll;
+  width:70vw !important;
  
  
+}
+.btn-group{
+  position:relative;
+  top:4vw;
+  right:34vw;
 }
 
 
