@@ -2,7 +2,7 @@ import React,{Component} from 'react'
 import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
-import '../css/test44.css'
+import '../css/test444.css'
 // import '../css/bootstrap.min.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
@@ -85,14 +85,14 @@ class ViewMaternityRequests extends Component{
         renderRequest=(request, index)=> {
             return (
                 
-                <tr key={request.requestID} className="reqTr">
-                <td className="reqTd" >{request.counter}</td>
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.maternityDoc}</td>
-                <td className="reqTd">{request.reason}</td>
-                <td className="reqTd">{request.state}</td>
+                <tr key={request.requestID} className="">
+                <td className="col-xs-5" >{request.counter}</td>
+                <td className="col-xs-5">{request.submission_date}</td>
+                <td className="col-xs-5">{request.maternityDoc}</td>
+                <td className="col-xs-5">{request.reason}</td>
+                <td className="col-xs-5">{request.state}</td>
 
-                <td className="reqTd">
+                <td className="col-xs-5">
                <Button variant="outline-light" size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
                 </td>
@@ -162,30 +162,28 @@ class ViewMaternityRequests extends Component{
 
                 
 
-                <div className=" containMaternityTable  ">
-                {/* <span id="spanSurrounder"> */}
-
-                {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    <th className="reqTh">#</th>
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Documents</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    <th className="reqTh">Action</th>
-                    </tr>
-                </thead>
-                <tbody className="reqBody">
-                {reqs.map(this.renderRequest)}
-                </tbody>
-                </Table>
-                {/* </span> */}
-                </div>
-
-                
-                </div>
+                <div class="container">
+  <div class="row">
+    <table class="table table-fixed">
+      <thead>
+        <tr>
+          <th class="col-xs-5">Id</th>
+          <th class="col-xs-5">Name</th>
+          <th class="col-xs-5">Username</th>
+          <th class="col-xs-5">Username</th>
+          <th class="col-xs-5">Username</th>
+          <th class="col-xs-5">Username</th>
+          <th class="col-xs-5">Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                          {reqs.map(this.renderRequest)}
+                                    </tbody>
+                </table>
+            </div>
+            </div>
+         
+            </div>
                         
             
               )

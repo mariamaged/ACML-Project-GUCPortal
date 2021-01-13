@@ -249,9 +249,9 @@ router.get('/submittedRequest',authenticateToken,async(req,res)=>{
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
             if (sent[i].replacementStaff)
-             repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
+             var repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
              
-            if(reqType=="Annual"){
+            if(reqType=="Annual Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
                     slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")
@@ -279,7 +279,7 @@ router.get('/submittedRequest',authenticateToken,async(req,res)=>{
                     ,RejectionReason:sent[i].RejectionReason}
                     arr[k++]= reqNew
 
-                    console.log("reqNewAccidenta= "+reqNew.accidentDate)
+                    // console.log("reqNewAccidenta= "+reqNew.accidentDate)
     
             }
             if(reqType=="Sick Leave"){
@@ -357,9 +357,9 @@ router.get('/receivedRequest',authenticateToken,async(req,res)=>{
             // const academicMember=await StaffMemberModel.findById(academicMemberID)
             // const coordinatorName=coordinator.name
             if (sent[i].replacementStaff)
-             repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
+            var repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
              
-            if(reqType=="Annual"){
+            if(reqType=="Annual Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
                     slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
@@ -3893,7 +3893,7 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
     if(staff.staff_type=="HR"){
         return res.json("HR not permitted to send requests!")
     }
-    console.log("in annual leave")
+    console.log("in annual leave"+req.body.slotDate)
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
 
     const currDepartment = await department.findById(userAcademic.department);
@@ -3902,13 +3902,20 @@ router.post('/annualLeave', authenticateToken, async (req, res) => {
     const HODStaffModel = await StaffMemberModel.findById(HODAcademicModel.member);
     console.log("hod nameeeeeeeeeeeeeeeeeeeeeeeee= "+HODStaffModel.name)
 
-    if(req.body.slotDate<=new moment().format("YYYY-MM-DD"))
-    return res.json("Must submit a request for a date that is yet to come!")
-    if(moment(req.body.slotDate).format("dddd"))
-    return res.json("Friday is already your day off!")
+    if(req.body.slotDate<=new moment().format("YYYY-MM-DD")){
+        console.log("slotDte= "+req.body.slotDate)
+    return res.status(400).json("Must submit a request for a date that is yet to come!")
+    }
+    if(moment(req.body.slotDate).format("dddd")=="Friday")
+    return res.status(400).json("Friday is already your day off!")
     const day_off=userAcademic.day_off
     if(moment(req.body.slotDate).format("dddd")==day_off)
-    return res.json("This is already your day off!")
+    return res.status(400).json("This is already your day off!")
+
+    if(req.body.slotDate<new moment().format("YYYY-MM-DD")){
+       
+    return res.status(400).json("Day Off must be a date that is yet to come!")
+    }
 
     //get slotDate and user's schedule to get slots on this day
     const slotDate = req.body.slotDate;
@@ -4351,5 +4358,18 @@ router.post('/rejectRequest',authenticateToken,async(req,res)=>{
     return res.json("Request successully rejected.")
 
 })
+
+router.get('/newNotifications',authenticateToken,async(req,res)=>{
+    const userNotifications=(await StaffMemberModel.findById(req.user.id)).notifications
+
+    const upOld=await StaffMemberModel.findByIdAndUpdate(req.user.id,{oldNotifications:userNotifications,notifications:[]})
+    return res.status(200).json(userNotifications)
+})
+router.get('/allNotifications',authenticateToken,async(req,res)=>{
+    const userNotifications=(await StaffMemberModel.findById(req.user.id)).notifications
+
+    return res.status(200).json(userNotifications)
+})
+
 
 module.exports=router;

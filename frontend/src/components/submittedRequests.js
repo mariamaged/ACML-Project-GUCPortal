@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
 import '../css/test44.css'
+import '../css/bootstrap.min.css'
 // import '../css/bootstrap.min.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
@@ -118,6 +119,7 @@ class ViewSubmittedRequests extends Component{
             //    return this.setState({reqType:"Maternity"})
             //     console.log("all= "+this.state.requests)
             // }
+            console.log("value= "+value)
             if(this.state.unFilteredRequests.length>0){
                const type=this.state.unFilteredRequests.filter(request=>{
                    return request.reqType==value
@@ -169,16 +171,16 @@ class ViewSubmittedRequests extends Component{
             "\n"+"state= "+request.state)
             return (
                 
-                <tr key={request.requestID} className="reqTr">
+                <tr key={request.requestID} className="table-dark">
                 {/* <td className="reqTd" >{request.counter}</td> */}
-                <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.maternityDoc}</td>
-                <td className="reqTd">{request.reason}</td>    
-                <td className="reqTd">{request.state}</td>
-                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
+                <td >{request.submission_date}</td>
+                <td >{request.maternityDoc}</td>
+                <td >{request.reason}</td>    
+                <td >{request.state}</td>
+                {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td >{request.RejectionReason}</td>}
                 
 
-                <td className="reqTd">
+                <td>
                <Button  size="sm" className="cancelButton" onClick={(e)=>this.handleClick(e,request.requestID)}>
                <XCircleFill color="darkred" className="cancelBtn" size={15} /></Button>
                 </td>
@@ -349,9 +351,15 @@ class ViewSubmittedRequests extends Component{
                 <tr key={request.requestID} className="reqTr" className='clickable-row' onClick={(e)=>this.handleClick(e,request.requestID)}>
                 {/* <td className="reqTd" >{request.counter}</td> */}
                 <td className="reqTd">{request.submission_date}</td>
-                <td className="reqTd">{request.slotNum}</td>
                 <td className="reqTd">{request.slotDate}</td>
-                <td className="reqTd">{request.replacementStaff}</td>
+               <tr>
+               <td >82</td>
+                <td>85</td>
+                 <td>78</td>
+                  <td>82</td>
+                   <td>77</td>
+                    <td>81</td> </tr> 
+
                 <td className="reqTd">{request.reason}</td>
                 <td className="reqTd">{request.state}</td>
                 {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <td className="reqTd">{request.RejectionReason}</td>}
@@ -445,25 +453,44 @@ class ViewSubmittedRequests extends Component{
               <div className=" containMaternityTable">
 
                 {this.state.cancelWarning!="" && <h5 class="cancelWarning">{this.state.cancelWarning}</h5>}
-                <Table striped bordered variant="dark" hover size="sm" className="reqTable " >
-                <thead className="reqHead">
-                    <tr className="reqTr">
-                    {/* <th className="reqTh">#</th> */}
-                    <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Documents</th>
-                    <th className="reqTh">Reason</th>
-                    <th className="reqTh">State</th>
-                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}
+                
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                        <tr>
+                        <th scope="row">Type</th>
+                        <th scope="row">Column heading</th>
+                        <th scope="row">Column heading</th>
+                        <th scope="row">Column heading</th>
+                        </tr>
+                    </thead>
+                    <tbody>{reqs.map(this.renderMaternityRequest)}</tbody>
+                    </table>
+                
+                
+                
+                { /* <div class="row">
+    <table class="table table-fixed">
+      <thead>
+        <tr>
+          <th class="col-xs-5">Submission Date</th>
+          <th class="col-xs-5">Start Date</th>
+          <th class="col-xs-5">End Date</th>
+          <th class="col-xs-5">Documents</th>
+          <th class="col-xs-5">State</th>
+          {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="col-xs-5">Rejection Reason</th>}
                     
-                    <th className="reqTh">Action</th>
-                    </tr>
-                </thead>
-                <tbody className="reqBody">
-                {reqs.map(this.renderMaternityRequest)}
-                </tbody>
-                </Table>
-                {/* </span> */}
-                </div>
+          <th class="col-xs-5">Action</th>
+          {/* <th class="col-xs-5">Username</th> }
+                </tr>
+            </thead>
+            <tbody>
+                          {reqs.map(this.renderMaternityRequest)}
+                                    </tbody>
+                </table>
+            </div>  */}
+
+            </div>
+            
                 }
 
 
@@ -608,7 +635,7 @@ class ViewSubmittedRequests extends Component{
                 {/* </span> */}
                 </div>}
 
-                {this.state.reqType=="Annual"&&
+                {this.state.reqType=="Annual Leave"&&
                 /* ,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                     slotLoc:sent[i].slotLoc, replacementStaff:repl, */
                 <div className=" containMaternityTable">
@@ -618,9 +645,22 @@ class ViewSubmittedRequests extends Component{
                     <tr className="reqTr">
                     {/* <th className="reqTh">#</th> */}
                     <th className="reqTh">Submission Date</th>
-                    <th className="reqTh">Slot Number</th>
                     <th className="reqTh">Slot Date</th>
-                    <th className="reqTh">Replacement Staff</th>
+                    {/* <th className="reqTh">Replacement Staff</th> */}
+                    {/*  <th colspan="2">65</th>  */}
+                    <tr>  <th colspan="10">Replacement Staff</th>
+                     {/* <th colspan="2">20</th>
+                     <th colspan="2">20</th>
+                     <th colspan="2">20</th>  */}
+                     </tr> 
+                     <tr> 
+                     <th>Replacement</th> <th>Slot</th>
+                     <th>Replacement</th> <th>Slot</th>
+                     <th>Replacement</th> <th>Slot</th>
+                     <th>Replacement</th> <th>Slot</th> 
+                     <th>Replacement</th> <th>Slot</th>
+                     </tr>
+
                     <th className="reqTh">Reason</th>
                     <th className="reqTh">State</th>
                     {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th className="reqTh">Rejection Reason</th>}

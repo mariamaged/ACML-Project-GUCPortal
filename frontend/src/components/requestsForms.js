@@ -2,8 +2,8 @@ import React,{Component} from 'react'
 import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
-import '../css/test44.css'
-// import '../css/bootstrap.min.css'
+// import '../css/test44.css'
+import '../css/bootstrap.min.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
@@ -104,7 +104,7 @@ class requestsForms extends Component{
     onFormAnnualSubmit = e => {
         this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("annual req submitted")
+        console.log("annual req submitted= "+this.state.slotDate)
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/annualLeave',
@@ -113,7 +113,7 @@ class requestsForms extends Component{
             },
             data: {
                slotDate:this.state.slotDate,
-               reason:this.slot.reason
+               reason:this.state.reason
             },
           
           }).then(res=>{
@@ -257,7 +257,7 @@ class requestsForms extends Component{
     onFormSlotLinkingSubmit = e => {
         this.setState({warningMsg:"",successMsg:false})
         e.preventDefault();
-        console.log("slot linking req submitted")
+        console.log("slot linking req submitted= "+this.state.slotDate)
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/slotLinkingRequest',
@@ -367,8 +367,8 @@ class requestsForms extends Component{
      {this.state.formType=="Annual Leave" && 
      <form onSubmit={this.onFormAnnualSubmit}>
          
-        <label className="col-form-label" htmlFor="annualDate">Day Off Date</label>
-        <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="annualDate" required onChange={this.handleChange}/>
+        <label className="col-form-label" htmlFor="slotDate">Day Off Date</label>
+        <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="slotDate" required onChange={this.handleChange}/>
 
         
         
@@ -430,8 +430,22 @@ class requestsForms extends Component{
     }    
 
     {this.state.formType=="Maternity Leave" &&
-    
-    <form onSubmit={this.onFormMaternitySubmit}>
+     <div>
+    <div class="form-group">
+  <fieldset>
+    <label class="control-label" for="readOnlyInput">Readonly input</label>
+    <input class="form-control" id="readOnlyInput" type="text" placeholder="Readonly input here..." readonly=""/>
+  </fieldset>
+</div>
+
+<div class="form-group">
+  <fieldset>
+    <label class="control-label" for="readOnlyInput">Readonly input</label>
+    <input class="form-control" id="readOnlyInput" type="text" placeholder="Readonly input here..." readonly=""/>
+  </fieldset>
+</div>
+</div> 
+   /* <form onSubmit={this.onFormMaternitySubmit}>
          
          <label className="col-form-label" htmlFor="startDate">Start Date</label>
          <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="startDate" required onChange={this.handleChange}/>
@@ -447,7 +461,7 @@ class requestsForms extends Component{
          </Button> 
          {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
          {this.state.warningMsg!="" && <h6 className="warningMsg">{this.state.warningMsg}</h6>}
-         </form>
+         </form>*/
     } 
 
     

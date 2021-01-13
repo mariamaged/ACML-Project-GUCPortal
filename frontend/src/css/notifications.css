@@ -1,0 +1,11 @@
+.notifyBtn{
+    background: none !important;
+    border: 5px solid transparent !important;
+}
+
+.notNum{
+    position: absolute;
+  left: 5vw !important;
+  top:1.6vw !important;
+  color: crimson;
+}

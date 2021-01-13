@@ -5,7 +5,6 @@
    color:rgb(0, 0, 0) !important;
    margin-top: 2vw;
    text-align: center !important;
- 
 }
 
 .reqTd{
@@ -176,4 +175,36 @@ top:2vw;
   font-size:1.2vw !important;
   position:relative;
   top:3vw;
+}
+
+.pickBtn{
+  text-align: center !important;
+}
+
+.table-fixed {
+  background-color: #fbfbfb;
+  width: 100%;
+}
+.table-fixed tbody {
+  height: 200px;
+  overflow-y: auto;
+  width: 100%;
+}
+.table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
+  display: block;
+}
+.table-fixed tbody td {
+  float: left;
+}
+.table-fixed thead tr th {
+  background-color:#159bd0;
+  border-color:#0881b1;
+  float: left;
+  color:#fff;
+}
+.read_article{
+text-align:center;
+}
+.table-fixed td{
+  width:5vw;
 }

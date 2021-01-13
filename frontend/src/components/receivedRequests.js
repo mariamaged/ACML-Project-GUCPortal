@@ -28,7 +28,8 @@ class ViewReceivedRequests extends Component{
         reqType:"",
         reqTitle:"",
         RejectionReason:"",
-        Warning:""
+        Warning:"",
+        acceptedReplacement:[]
     }
     componentDidMount(props){
     console.log("in maternity view "+ this.props.location.state.reqType)

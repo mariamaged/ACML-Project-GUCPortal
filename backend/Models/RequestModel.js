@@ -31,7 +31,9 @@ const RequestSchema = mongoose.Schema({
     slotNum: {type: Number},
     slotLoc: {type: String},
     replacementStaff: {type: ObjectID, ref: 'StaffMemberModel'},
-    //milestone2
+    //--------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------
+    //-------------------------------- MILETONE 2----------------------------------------
     acceptedReplacement:[acceptedReplacementSchema],
 
     // for Slot Linking
