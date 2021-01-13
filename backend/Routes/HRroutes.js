@@ -9,6 +9,7 @@ const faculty=require('../Models/FacultyModel');
 const department=require('../Models/DepartmentModel');
 const course=require('../Models/CourseModel');
 const jwt=require('jsonwebtoken');
+const Attendance=require('../Models/AttendanceSchema');
 
 
 async function authenticateToken(req, res, next) {
@@ -456,13 +457,13 @@ router.route('/course').post(authenticateToken,async(req,res)=>{
 })
 //updating
 // authenticateToken,
-.put(async (req,res)=>{
+.put(authenticateToken,async (req,res)=>{
     try{
         //to authorize
-    //     const st=await StaffMember.findOne({"_id":req.user.id});
-    //     if(st.staff_type!="HR")
-    // res.status(401).send({msg:'Access Denied'});
-    // else{
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
+    res.status(401).send({msg:'Access Denied'});
+    else{
         //academic staff is a list of staff members ids
        const{oldid,id,name,departmentname,slotsneeded,slotscovered,schedule}=req.body;
        if(!oldid||!id||!name||!departmentname) res.status(401).json({msg:"please fill all the fields"});
@@ -489,7 +490,7 @@ router.route('/course').post(authenticateToken,async(req,res)=>{
                    res.status(401).json({msg:"a course with this new id already exists"});
                }
            }
-       }//}
+       }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -499,13 +500,13 @@ router.route('/course').post(authenticateToken,async(req,res)=>{
 //when academic staff add lel table/delete/update
 const bcrypt=require('bcrypt');
 // authenticateToken,
-router.route('/staffmember').post(async(req,res)=>{
+router.route('/staffmember').post(authenticateToken,async(req,res)=>{
     try{
         //to authorize
-        //const st=await StaffMember.findOne({"_id":req.user.id});
-    //     if(st.staff_type!="HR")
-    // res.status(401).send('Access Denied');
-    // else{
+        const st=await StaffMember.findOne({"_id":req.user.id});
+        if(st.staff_type!="HR")
+    res.status(401).send('Access Denied');
+    else{
        const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname}=req.body;
        if(!email||!salary||!officelocation|| !gender||!type||!name) res.status(400).json({msg:"please fill all the fields"});
        else{
@@ -572,7 +573,7 @@ router.route('/staffmember').post(async(req,res)=>{
              res.send({msg:message});
            }
            else res.status(400).json({msg:"this email is already registered"})
-       }//}
+    }}
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -697,14 +698,14 @@ router.route('/updatesalary').put(authenticateToken,async(req,res)=>{
         res.status(500).json({error:err.message});
     }
 })
-// 
-router.route('/attendance/:id').get(authenticateToken,async(req,res)=>{
+// authenticateToken,
+router.route('/attendance/:id').get(async(req,res)=>{
     try{
     //to authorize
-     const st=await StaffMember.findOne({"_id":req.user.id});
-     if(st.staff_type!="HR")
-      res.status(401).send({msg:'Access Denied'});
-      else{
+    //  const st=await StaffMember.findOne({"_id":req.user.id});
+    //  if(st.staff_type!="HR")
+    //   res.status(401).send({msg:'Access Denied'});
+    //   else{
      const id=req.params.id;
     if(!id) res.status(401).json({msg:"please insert the id of the member you need the attendance records of"});
     else{
@@ -712,7 +713,7 @@ router.route('/attendance/:id').get(authenticateToken,async(req,res)=>{
         if(mem==null){ res.status(401).json({msg:"there is no user with this id"}); console.log(id);}
         else
             res.send(mem.attendance);
-    }}}
+    }}//}
     catch(err){res.status(500).json({error:err.message});}
 })
 
@@ -860,14 +861,15 @@ function compareAsc( a, b ) {
 
 
 const moment=require('moment');
-// 
-router.get('/viewMissingdays',authenticateToken,async(req,res)=>{
+const e = require('express');
+// ,authenticateToken
+router.get('/viewMissingdays',async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"_id":req.user.id});
-        if(st.staff_type!="HR")
-    res.status(401).send('Access Denied');
-    else{
+    //     const st=await StaffMember.findOne({"_id":req.user.id});
+    //     if(st.staff_type!="HR")
+    // res.status(401).send('Access Denied');
+    // else{
         var dateMonth=moment().format("M")
         const dateYear=moment().format("Y")
       const dateDay=moment().format("D")
@@ -877,10 +879,10 @@ router.get('/viewMissingdays',authenticateToken,async(req,res)=>{
          for(var a=0;a<staff.length;a++){
             const user=staff[a];
                     var day=""
-                    if(user.staff_type=="HR")
-                     day=(await HR.findOne({"member":user._id})).day_off
+                    if(user.staff_type=="HR"){
+                     day=(await HR.findOne({"member":user._id})).day_off}
                     else
-                   day=(await AcademicStaffModel.findOne({"member":user._id})).day_off
+                   day=(await AcademicStaff.findOne({"member":user._id})).day_off
             
                     const userAttendance=user.attendance
                     var userDays=new Array()
@@ -1107,7 +1109,7 @@ router.get('/viewMissingdays',authenticateToken,async(req,res)=>{
          }
             
             return res.json(members);  
-        }
+       // }
     }catch(err){
         res.status(500).json({error:err.message});
     }
@@ -1151,8 +1153,7 @@ function compare( a, b ) {
     }
 }
 
-
-// 
+// ,authenticateToken
 router.put('/addrecord',authenticateToken,async(req,res)=>{
     try{
         //to authorize
@@ -1160,99 +1161,229 @@ router.put('/addrecord',authenticateToken,async(req,res)=>{
         if(st.staff_type!="HR")
     res.status(401).send({msg:'Access Denied'});
     else{
-       const{userid,thedate,signintime,signouttime}=req.body;
-       if(!userid || !thedate) res.status(401).json({msg:"please fill the required fields"});
+       var{userid,thedate,day,signintime,signouttime}=req.body;
+       if(!userid || !thedate || !day) res.status(401).json({msg:"please fill the required fields"});
        else{
            if(userid==st.id)
               res.status(401).json({msg:"Sorry, Cannot add record to yourself"});
            else{
             if(!signintime && !signouttime) res.status(401).json({msg:"please insert the record to add"});
             else{
+                if(signintime>=signouttime) res.status(401).json({msg:"Your data is incorrect"});
+                else{
                var index=0;
                const person=await StaffMember.findOne({"id":userid});
                if(person==null) res.status(401).json({msg:"The user id you entered is incorrect"});
                else{
-               if(signintime){
-                   if(signintime>="07:00") {
-                   for(var i=0;i<person.attendance.length;i++){
-                        //to add sorted   
-                        if(moment(person.attendance[i].date).format("DD/MM/YYY")==thedate){
-                            index=i;
-                            if(person.attendance[i].signins.length==0) person.attendance[i].signins.push(signintime);
-                           for(var j=0;j<person.attendance[i].signins.length;j++){
-                               if(person.attendance[i].signins[j]>signintime){ 
-                                var temp2=signintime;
-                                for(var k=j;k<person.attendance[i].signins.length;k++){
-                                    var temp=person.attendance[i].signins[k];
-                                    person.attendance[i].signins[k]=temp2;
-                                    temp2=temp;
-                                 }
-                                break;
-                               }
-                               else{
-                                   if(j==person.attendance[i].signins.length-1){person.attendance[i].signins.push(signintime);break;}
-                               }
-                           }
-                            break;
-                        }
-                   }
-               }}
-
+                   if(person.staff_type=='HR') var h= await HR.findOne({"member":person._id});
+                   else var h=await AcademicStaff.findOne({"member":person._id});
+                    if(h==null) res.status(400).json({msg:"Something went wrong"});
+                    else{
+                        if(h.day_off==day) res.status(400).json({msg:"Cannot add a record on the member's day off"});
+                        else{
+                            if(signintime.length==4) signintime='0'+signintime;
+                            if(signouttime.length==4) signouttime='0'+signouttime;
+                            // thedate.substring(6,10)+"-0"+thedate.charAt(3)+"-"+thedate.substring(0,2);
+                            console.log(thedate);                            
+                            // if(thedate.charAt(4)=='/') thedate=thedate.substring(6,10)+"-"+thedate.substring(3,5)+"-"+thedate.substring(0,2);
+                            // else thedate= thedate.substring(6,10)+"-"+thedate.substring(3,5)+"-"+thedate.substring(0,2);
+                            // thedate.substring(6)+"-"+thedate.substring(3,5)+"-"+thedate.substring(0,2);
+                            //no attendance record
+                            if(person.attendance.length==0){
+                                if(signintime && signouttime){
+                                    var flag=true;
+                                    var hours=0;
+                                    var minutes=0;
+                                   if(signintime>="07:00"){
+                                       if(signouttime<="19:00"){
+                                           hours=Number.parseInt(signouttime.substring(0,2))-Number.parseInt(signintime.substring(0,2));
+                                           minutes= Number.parseInt(signouttime.substring(3,5))-Number.parseInt(signintime.substring(3,5));
+                                           if(minutes<0){
+                                               if(hours>0){
+                                                  hours-=1;
+                                                  minutes=(60+minutes);
+                                               }else flag=false; 
+                                           }
+                                   if(flag){   
+                                       //console.log(thedate);
+                                   var newattendance= {date:thedate,day:day,dayOffBool:false,attended:true,signedIn:true,signedOut:true,signins:[signintime],signouts:[signouttime],hours:hours,minutes:minutes};}
+                                else {res.status(400).json({msg:"Cannot add a record in which the signin time is after the signout time"}); return;}}
+                                else var newattendance= {date:thedate,day:day,dayOffBool:false,attended:true,signedIn:true,signins:[signintime]};}
+                                else if(signouttime<="19:00")
+                                        var newattendance= {date:thedate,day:day,dayOffBool:false,attended:true,signedIn:true,signedOut:true,signouts:[signouttime]};
+                                }else if(signintime){
+                                    if(signintime>="07:00")
+                                    var newattendance= {date:thedate,day:day,dayOffBool:false,attended:true,signedIn:true,signedOut:true,signins:[signintime]};
+                                }else{
+                                    if(signouttime<="19:00")
+                                    var newattendance= {date:thedate,day:day,dayOffBool:false,attended:true,signedIn:true,signedOut:true,signouts:[signouttime]};
+                                }
+                                console.log("haypush bayen");
+                                person.attendance.push(newattendance);
+                                await person.save();
+                                res.send({msg:"done"});
+                            }
+                        else{
+                            var datefound=false;
+                            if(signintime){
+                                if(signintime>="07:00") {
+                                    for(var i=0;i<person.attendance.length;i++){
+                                       //to add sorted   
+                                       if(moment(person.attendance[i].date).format("YYYY-MM-DD")==thedate){
+                                        datefound=true;
+                                        index=i;
+                                       if(person.attendance[i].signins.length==0) person.attendance[i].signins.push(signintime);
+                                       else{
+                                        for(var j=0;j<person.attendance[i].signins.length;j++){
+                                            if(person.attendance[i].signins[j]>signintime){
+                                                //var temp2=signintime;
+                                                // for(var k=j;k<person.attendance[i].signins.length;k++){
+                                                //     var temp=person.attendance[i].signins[k];
+                                                //     person.attendance[i].signins[k]=temp2;
+                                                //     console.log(person.attendance[i].signins[k]+" and k:" +k);
+                                                //     temp2=temp;
+                                                    //await person.save();
+                                                    var newsignins=[];
+                                                    var f=true;
+                                                    for(var k=0;k<person.attendance[i].signins.length;k++){
+                                                        if(k==j && f) {newsignins.push(signintime); k--; f=false;}
+                                                        else newsignins.push(person.attendance[i].signins[k]);
+                                                    }
+                                                    person.attendance[i].signins=newsignins;
+                                                    await person.save();
+                                                    break;
+                                                }
+                                                // await person.save();
+                                                // person.attendance[i].signins.push(temp2);
+                                                // await person.save();
+                                                 
+                                            else{
+                                                if(j==person.attendance[i].signins.length-1 &&  person.attendance[i].signins[j]!=signintime){person.attendance[i].signins.push(signintime);break;}
+                                            }
+                                        }
+                                        await person.save();
+                                        break;
+                                       }
+                                    }
+                                    }
+                                }
+                                else {res.status(401).json({msg:"No sign in records are counted before 7 am"}); return;}
+                            }
+                                 
+                        
                if(signouttime){
                    if(signouttime<="19:00"){
                 var index=0;
                 for(var i=0;i<person.attendance.length;i++){
                      //to add sorted   
-                     if(person.attendance[i].date==thedate){
+                     console.log(signouttime);
+                     if(moment(person.attendance[i].date).format("YYYY-MM-DD")==thedate){
+                         datefound=true;
+                         index=i;
                         if(person.attendance[i].signouts.length==0)person.attendance[i].signouts.push(signouttime);
                         for(var j=0;j<person.attendance[i].signouts.length;j++){
                             if(person.attendance[i].signouts[j]>signouttime){ 
-                             var temp2=signouttime;
-                             for(var k=j;k<person.attendance[i].signouts.length;k++){
-                                 var temp=person.attendance[i].signouts[k];
-                                 person.attendance[i].signouts[k]=temp2;
-                                 temp2=temp;
-                              }
-                             break;
+                                var newsignouts=[];
+                                var f=true;
+                                for(var k=0;k<person.attendance[i].signouts.length;k++){
+                                    if(k==j && f) {newsignouts.push(signouttime); k--; f=false;}
+                                    else newsignouts.push(person.attendance[i].signouts[k]);
+                                }
+                                console.log("bala2eeh 3ady");
+                                person.attendance[i].signouts=newsignouts;
+                                await person.save();
+                                break;
+                             //var temp2=signouttime;
+                            //  for(var k=j;k<person.attendance[i].signouts.length;k++){
+                            //      var temp=person.attendance[i].signouts[k];
+                            //      person.attendance[i].signouts[k]=temp2;
+                            //      temp2=temp;
+                            //      await person.save();
+                            //   }
+                            //   person.attendance[i].signouts.push(temp2);
+                            //   await person.save();
+                            //  break;
                             }
                             else{
-                                if(j==person.attendance[i].signouts.length-1){person.attendance[i].signouts.push(signouttime);break;}
+                                if(j==person.attendance[i].signouts.length-1 && person.attendance[i].signouts[j]!=signouttime){person.attendance[i].signouts.push(signouttime); await person.save();break;}
+    
                             }
                         }
+                        await person.save();
                          break;
                      }
                 }
+            }else {res.status(401).json({msg:"No sign in records are counted before 7 am"}); return;}
+        }
+
+        if(!datefound){
+            index=person.attendance.length;
+            if(signintime && signouttime){
+                if(signintime>="07:00"){
+                    if(signouttime<="19:00"){
+                       person.attendance.push({date:thedate,day:day, dayOffBool:false,attended:true,signedIn:true,signedOut:true,signins:[signintime],signouts:[signouttime]});
+                    }else{
+                        person.attendance.push({date:thedate,day:day, dayOffBool:false,signedIn:true,signins:[signintime]});
+                    }
+                }else{
+                    if(signouttime<="19:00"){
+                        person.attendance.push({date:thedate,day:day, dayOffBool:false,signedOut:true,signouts:[signouttime]});
+                     }else{ res.status(400).json({msg:"Both records are incorrect"}); return;}
+                }
+            }else if(signintime){
+                    if(signintime>="07:00"){
+                        person.attendance.push({date:thedate,day:day, dayOffBool:false,signedIn:true,signins:[signintime]});
+                    }else{ res.status(400).json({msg:"Cannot insert a sign in record before 7:00 am"}); return;}
+            }else{
+                if(signouttime<="19:00"){
+                    person.attendance.push({date:thedate,day:day, dayOffBool:false,signedOut:true,signouts:[signouttime]});
+                 }else{ res.status(400).json({msg:"Cannot insert a sign out record after 7:00 pm"}); return;} 
             }
         }
 
-            if(person.attendance.length>0){
             //hours should be calculated again here
             var min=0;
             if(person.attendance[index].signins.length<person.attendance[index].signouts.length) min=person.attendance[index].signins.length;
             else min=person.attendance[index].signouts.length;
             var hours=0;
+            var minutes=0;
             var j=0;
             for(var i=0;i<min;i++){
                 if(person.attendance[index].signouts[i]>person.attendance[index].signins[j]){
-                     hours+=(Number.parseInt(person.attendance[index].signouts[i].substring(0,2))-Number.parseInt(person.attendance[index].signins[j].substring(2)))+((Number.parseInt(person.attendance[index].signouts[i].substring(3,5))-Number.parseInt(person.attendance[index].signins[j].substring(3,5)))/60);
+                    if(j>0 && i>0 && person.attendance[index].signins[j]<person.attendance[index].signouts[i-1]){i--; j++;}
+                    else{
+                     var hour= Number.parseInt(person.attendance[index].signouts[i].substring(0,2))-Number.parseInt(person.attendance[index].signins[j].substring(0,2));
+                     var minute=Number.parseInt(person.attendance[index].signouts[i].substring(3,5))-Number.parseInt(person.attendance[index].signins[j].substring(3,5));
+                     if(minute<0){
+                         hours--;
+                         minutes=60+minutes;
+                     }
+                     hours+=hour;
+                     minutes+=minute;
+                     if(minutes>=60){
+                        hours+=Math.floor(minutes/60);
+                        minutes=minutes%60;
+                     }
                      j++;
-                } 
+                     console.log(hours);
+                     console.log(minutes);
+                } }
             }
-             person.attendance[i].hours=hours;
-             
-            await person.save();}
+             person.attendance[index].hours=hours;
+             person.attendance[index].minutes=minutes;
+            await person.save(); 
             res.send({msg:"done"});
-           
+        }
+        }
+    }
 
 
-
-
+     
         }
 
         }
-           
            }   
-       }}
+       }}}
     }catch(err){
         res.status(500).json({error:err.message});
     }

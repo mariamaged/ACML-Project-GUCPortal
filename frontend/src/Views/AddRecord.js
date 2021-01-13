@@ -15,6 +15,18 @@ function AddRecord() {
            </div>
 
            <div className="form-group">
+          <label>Day:</label>
+            <select className="form-control" id="exampleSelect1" required>
+                <option>Saturday</option>
+                <option>Sunday</option>
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+            </select>
+        </div>
+
+           <div className="form-group">
             <label className="col-form-label">Sign in time:</label>
             <input type="time" min="1" className="form-control" placeholder="Default input" id="inputDefault2"></input>
            </div>
@@ -28,7 +40,8 @@ function AddRecord() {
          var thedate = document.getElementById("inputDefault1").value;
          var signintime = document.getElementById("inputDefault2").value+"";
          var signouttime = document.getElementById("inputDefault3").value+"";
-         axios.put('http://localhost:5000/HR/addrecord',{userid:userid,thedate:thedate,signintime:signintime,signouttime:signouttime},{headers:{"auth-token":localStorage.getItem('auth-token')}},
+         var day= document.getElementById("exampleSelect1").value;
+         axios.put('http://localhost:5000/HR/addrecord',{day:day,userid:userid,thedate:thedate,signintime:signintime,signouttime:signouttime},{headers:{"auth-token":localStorage.getItem('auth-token')}},
         ).then(async(response)=>{
             console.log("fel thennnnn");
                alert(response.data.msg);}
