@@ -10,7 +10,7 @@ function DeleteLocation() {
           <button type="button" className="btn btn-primary" onClick={()=>{var id = document.getElementById("inputDefault0").value; 
          axios.delete('http://localhost:5000/HR/Location',{headers:{"auth-token":localStorage.getItem('auth-token')},data:{id:id}},
          ).then(async(response)=>{
-                alert("done");}
+                alert(response.data.msg);}
           ).catch((error) => {
               console.log(localStorage);
              if (error.response) {

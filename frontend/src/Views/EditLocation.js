@@ -32,7 +32,7 @@ function EditLocation() {
          var type=document.getElementById("exampleSelect1").value;
          axios.put('http://localhost:5000/HR/Location',{oldid:oldid,id:id,type:type,maximum_capacity:maximum_capacity},{headers:{"auth-token":localStorage.getItem('auth-token')},data:{id:id}},
          ).then(async(response)=>{
-                alert("done");}
+                alert(response.data.msg);}
           ).catch((error) => {
               console.log(localStorage);
              if (error.response) {

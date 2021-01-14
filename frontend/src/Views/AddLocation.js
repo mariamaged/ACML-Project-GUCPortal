@@ -31,7 +31,7 @@ function AddLocation() {
          axios.post('http://localhost:5000/HR/Location',{id:id,type:type,maximum_capacity:maximum_capacity},{headers:{"auth-token":localStorage.getItem('auth-token')}},
         ).then(async(response)=>{
             console.log("fel thennnnn");
-               alert("done");}
+               alert(response.data.msg);}
          ).catch((error) => {
              console.log("fel catchhhh");
             if (error.response) {

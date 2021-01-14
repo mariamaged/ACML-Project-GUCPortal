@@ -12,7 +12,7 @@ function DeleteDepartment() {
            <button type="button" className="btn btn-primary" onClick={()=>{var name = document.getElementById("inputDefault0").value; 
          axios.delete('http://localhost:5000/HR/department',{headers:{"auth-token":localStorage.getItem('auth-token')},data:{name:name}},
          ).then(async(response)=>{
-                alert("done");}
+                alert(response.data.msg);}
           ).catch((error) => {
               console.log(localStorage);
              if (error.response) {

@@ -67,7 +67,7 @@ router.route('/Location').post(authenticateToken,async(req,res)=>{
             else{
               toAdd= new location({id,type,maximum_capacity,current_capacity:0});
               await toAdd.save();
-              res.send({toAdd});
+              res.send({msg:"Done"});
               console.log(toAdd);   
         }
     }
@@ -79,6 +79,7 @@ router.route('/Location').post(authenticateToken,async(req,res)=>{
 })
 
 //deleting
+// authenticateToken,
 .delete(authenticateToken,async (req,res)=>{
     try{
         const st=await StaffMember.findOne({"_id":req.user.id});
@@ -89,30 +90,34 @@ router.route('/Location').post(authenticateToken,async(req,res)=>{
     if(!id) res.status(400).send({msg:"please enter the id of the location to be deleted"});
     else{ 
      const loc=await location.findOne({"id":id});
-     if(loc== null) res.send("this location does not exist");
+     if(loc== null) res.send({msg:"this location does not exist"});
      else{
-     if(loc.type=="Office"){       
+     if(loc.type=="Office" && loc.current_capacity>0){       
          const staff=await StaffMember.find({"office":loc._id})
-         for(var i=0;i<staff.length;i++){
-             staff.office=null;
-         }
-        await staff[i].save();
+        //  for(var i=0;i<staff.length;i++){
+        //      staff[i].office=null;
+        //      await staff[i].save();
+        //  }
+        res.status(400).json({msg:"Cannot delete an office with cuurent capacity greater than 0"});
+        return;
      }
      else {
         const staff= await AcademicStaff.find();
         for(var i=0;i<staff.length;i++){
             for(var j=0;j<staff[i].schedule.length;j++){
                 if(staff[i].schedule[j].location==loc._id){
-                    staff[i].schedule[j].location=null;
-                    j--;
+                    res.status(400).json({msg:"There are already slots in this location"});
+                    return;
+                    //staff[i].schedule[j].location=null;
+                   // j--;
                 }
                
             }
-            await staff[i].save();
+            //await staff[i].save();
         }
      }
         await location.deleteOne({"id":id});
-        res.status(200).send({message:"done"});
+        res.status(200).send({msg:"done"});
          
      }
      }}
@@ -127,7 +132,7 @@ router.route('/Location').post(authenticateToken,async(req,res)=>{
     try{
         const st=await StaffMember.findOne({"_id":req.user.id});
         if(st.staff_type!="HR")
-        res.status(401).send('Access Denied');
+        res.status(401).send({msg:'Access Denied'});
         else{ 
         const{oldid,id,type,maximum_capacity}=req.body;
         if(!oldid||!id||!type||!maximum_capacity) res.status(400).json({msg:"please fill all the fields for the location to be updated successfully"});
@@ -183,7 +188,7 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
         //to authorize
         const st=await StaffMember.findOne({"_id":req.user.id});
         if(st.staff_type!="HR")
-    res.status(401).send('Access Denied');
+    res.status(401).send({msg:'Access Denied'});
     else{
     const{name}=req.body;
     if(!name) res.status(400).json({msg:"please enter the faculty name"});
@@ -206,13 +211,13 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
         //to authorize
         const st=await StaffMember.findOne({"_id":req.user.id});
         if(st.staff_type!="HR")
-        res.status(401).send('Access Denied');
+        res.status(401).send({msg:'Access Denied'});
         else{
         const{name}=req.body;
         if(!name) res.status(400).json({msg:"Please insert the name of the faculty you want to delete."});
         else{
             const fac=await faculty.findOne({"name":name});
-            if(fac==null) res.send("this faculty does not exist");
+            if(fac==null) res.send({msg:"this faculty does not exist"});
             else{
             const s=await AcademicStaff.find({"faculty":fac._id});
             console.log(s);
@@ -228,7 +233,7 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
             }    
             await department.deleteMany({"faculty":fac._id});
             await faculty.deleteOne({"name":name});
-            res.send("Done");
+            res.send({msg:"Done"});
             }
         }}
     }catch(err){
@@ -249,7 +254,7 @@ router.route('/Faculty').post(authenticateToken,async(req,res)=>{
         else{
             const ob= await faculty.findOne({"name":oldname});
             const obnew=await faculty.findOne({"name":name});
-            if( (obnew==null || name==oldname)&& ob!=null ) {ob.name=name; await ob.save();res.send("done");}
+            if( (obnew==null || name==oldname)&& ob!=null ) {ob.name=name; await ob.save();res.send({msg:"done"});}
             else res.status(400).json({msg:"please enter correct data"});
         }}
     }catch(err){
@@ -264,7 +269,7 @@ router.route('/department').post(authenticateToken,async(req,res)=>{
         //to authorize
         const st=await StaffMember.findOne({"_id":req.user.id});
         if(st.staff_type!="HR")
-          res.status(401).send('Access Denied');
+          res.status(401).send({msg:'Access Denied'});
         else{
           const{name,facultyname,hod}=req.body;
           //HOD could be null as in not yet assigned
@@ -307,7 +312,7 @@ router.route('/department').post(authenticateToken,async(req,res)=>{
         //to authorize
         const st=await StaffMember.findOne({"_id":req.user.id});
         if(st.staff_type!="HR")
-          res.status(401).send('Access Denied');
+          res.status(401).send({msg:'Access Denied'});
         else{
         const{name}=req.body;
         if(!name) res.status(400).json({msg:"Please insert the name of the department you want to delete."});
@@ -322,7 +327,7 @@ router.route('/department').post(authenticateToken,async(req,res)=>{
             }
             await AcademicStaff.deleteMany({"department":dep._id});
             await department.deleteOne({"name":name});
-            res.send("done");
+            res.send({msg:"done"});
             }
         }}
     }catch(err){

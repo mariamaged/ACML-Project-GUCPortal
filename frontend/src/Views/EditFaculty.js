@@ -17,7 +17,7 @@ function EditFaculty() {
         var name = document.getElementById("inputDefault1").value;
         axios.put('http://localhost:5000/HR/Faculty',{oldname:oldname,name:name},{headers:{"auth-token":localStorage.getItem('auth-token')}},
         ).then(async(response)=>{
-               alert("done");}
+               alert(response.data.msg);}
          ).catch((error) => {
              console.log(localStorage);
             if (error.response) {
