@@ -548,7 +548,7 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                             
                              dep=await department.findOne({"name":departmentname});
                              fac=await faculty.findOne({"name":facultyname});
-                            if(dep==null||fac==null) message="the data you entered is incorrect"+facultyname+"   ,"+departmentname;
+                            if(dep==null||fac==null||dep.faculty!=fac._id) message="the data you entered is incorrect";
                             else flag=true;
                      }}
                      console.log("ablo aho");
