@@ -220,50 +220,43 @@ router.get("/slotsAssignment/:courseID", authenticateToken, async (req, res) => 
   }
 });
 
-//staff per department
+//------------------------------------------------------------3--------------------------------------------------
+// 3 (a) Staff per department
+
 router.get("/staffperdepartment", authenticateToken, async (req, res) => {
   try {
     const instr = await StaffMember.findOne({ _id: req.user.id });
-    //make sure instr is not null elawl
-    if (instr == null) res.status(400).json({ msg: "something went wrong" });
+    if (!instr) res.status(400).json({ msg: "Something went wrong" });
     else {
       const inst = await AcademicStaff.findOne({ member: instr._id });
-
-      //for testing
-      //  const instr=await StaffMember.findOne({"id":"ac-1"});
-      // const inst=await AcademicStaff.findOne({"member":instr._id});
-      //end
-      if (inst == null) res.status(400).json({ msg: "Something went wrong" });
+      if (!inst) res.status(400).json({ msg: "Something went wrong" });
       else {
         if (inst.type == "Course Instructor") {
-          //for testing only
-          // const departmentname=req.body.departmentname;
-          // if(!departmentname) res.status(400).json({msg:"please enter the department name"});
-          //   const dep= await department.findOne({"name":departmentname});
           const departmentid = inst.department;
           const dep = await department.findOne({ _id: departmentid });
-          if (dep == null)
-            res.status(400).json({ msg: "the department name is incorrect" });
+          if (!dep)
+            res.status(400).json({ msg: "The department name is incorrect" });
           else {
             const staff = await AcademicStaff.find({ department: dep._id });
             var s = [];
             for (var i = 0; i < staff.length; i++) {
-              if (String(staff[i].member) != String(instr._id)) {
-                var n = await StaffMember.findOne({ _id: staff[i].member });
-                var off = await location.findOne({ _id: n.office });
-                if (off != null) off = off.id;
-                s.push({
-                  name: n.name,
-                  id: n.id,
-                  dayoff: staff[i].day_off,
-                  type: staff[i].type,
-                  office: off,
-                });
-              }
+              var n = await StaffMember.findOne({ _id: staff[i].member });
+              var off = await location.findOne({ _id: n.office });
+              if (!off) off = off.id;
+              s.push({
+                name: n.name,
+                id: n.id,
+                gender: n.gender,
+                email: n.email,
+                salary: n.salary,
+                office: off,
+                dayoff: staff[i].day_off,
+                type: staff[i].type,
+              });
             }
-            res.send(s);
+            res.status(200).json({ msg: s });
           }
-        } else res.status(400).json({ msg: "Access denied" });
+        } else res.status(401).json({ msg: "Access denied" });
       }
     }
   } catch (err) {
@@ -271,38 +264,46 @@ router.get("/staffperdepartment", authenticateToken, async (req, res) => {
   }
 });
 
-//staffpercourse
+// 3 (b) Staff Per Course
 router.get("/staffpercourse", authenticateToken, async (req, res) => {
   try {
     const instr = await StaffMember.findOne({ _id: req.user.id });
-    //make sure instr is not null elawl
-    if (instr == null) res.status(400).json({ msg: "something went wrong" });
+    if (!instr) res.status(400).json({ msg: "something went wrong" });
+
     else {
       const inst = await AcademicStaff.findOne({ member: instr._id });
+      if (!inst) res.status(400).json({ msg: "Something went wrong" });
 
-      //for testing
-      //    const instr=await StaffMember.findOne({"id":"ac-1"});
-      //    const inst=await AcademicStaff.findOne({"member":instr._id});
-      // end
-      if (inst == null) res.status(400).json({ msg: "Something went wrong" });
       else {
         if (inst.type == "Course Instructor") {
           const courseid = req.body.Scourse;
+
           if (!courseid) {
             const courses = inst.courses;
-            const staff = [courses.length];
+            const staff = Array(courses.length);
+
             for (var i = 0; i < courses.length; i++) {
               var c = await course.findOne({ _id: courses[i] });
-              var staffmembers = [c.academic_staff.length];
+              var staffmembers = Array(c.academic_staff.length);
+
               for (var j = 0; j < c.academic_staff.length; j++) {
-                var staffmem = await AcademicStaff.findOne({
-                  _id: c.academic_staff[j],
+                var academicmem = await AcademicStaff.findOne({
+                  _id: c.academic_staff[j]
                 });
+                var staffmem = await StaffMember.findOne({
+                  _id: academicmem.member
+                })
+                
+                var office = await location.findOne({_id: staffmem.office});
                 staffmembers[j] = {
                   name: staffmem.name,
                   id: staffmem.id,
+                  gender: staffmem.gender,
                   email: staffmem.email,
-                  office: staffmem.office,
+                  salary: staffmem.salary,
+                  office: staffmem.office
+                  day_off: 
+                  type:
                 };
               }
               staff[i] = {
@@ -351,7 +352,7 @@ router.get("/staffpercourse", authenticateToken, async (req, res) => {
                   .json({ msg: "you are not assigned to this course" });
             }
           }
-        } else res.status(400).json({ msg: "Access denied" });
+        } else res.status(401).json({ msg: "Access denied" });
       }
     }
   } catch (err) {

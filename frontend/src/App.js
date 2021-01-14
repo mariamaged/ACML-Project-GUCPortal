@@ -46,15 +46,16 @@ const App = () => {
 
       {token ? (
         <div className="App">
+        
           {/*Navbars*/}
           <Route path='/instructor' component={InstructorNavbar} />
           <Route path='/assistant' component={TeachingAssistantNavbar} />
-          <Route path='/hr' component={TeachingAssistantNavbar} />
+          <Route path='/hr' component={} />
 
           {/*Homepages*/}
           <Route path='/instructor/homepage' component={Toast} />
 
-          {/*HOD*/}
+          {/*Course Instructor Navbar*/}
           <Route path='/instructor/hod' component={StaffContainer} />
           <Route path='/instructor/hodDepartmentStaff' component={DepartmentStaff} />
           <Route path='/instructor/hodCourseStaff' render={(props) => (
@@ -88,7 +89,6 @@ const App = () => {
             <Route path='/instructor/hodteachingAssignment/:courseID' component={CourseTeachingAssignment} />
           </Switch>
 
-          {/*Course Instructor*/}
           <Route path='/instructor/instructorCoursesCoverage' render={(props) => (
             <Search {...props} placeholder="Course ID" roleID="5" />
           )} />
@@ -107,15 +107,15 @@ const App = () => {
             <Route path='/instructor/instructorTeachingAssignment/:courseID' component={InstructorTeachingAssignment} />
           </Switch>
 
-          <Route path='/assistant/postCourseSlots' component={PostCourseSlots} />
-
-          {/*Course Coordinator*/}
-          {/*Academic*/}
           <Route path='/instructor/schedule' component={Schedule} />
 
-          {/*Staff*/}
+          {/*Teaching Assistant Navbar*/}
+          <Route path='/assistant/postCourseSlots' component={PostCourseSlots} />
 
-          {/*HR*/}
+
+          {/*HR Navbar */}
+
+          {/*Toast Component*/}
           <ToastContainer
             position="bottom-left"
             autoClose={2000}

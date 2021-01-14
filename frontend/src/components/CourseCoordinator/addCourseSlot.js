@@ -28,6 +28,7 @@ class addCourseSlot extends Component {
         this.setState({ number: e.target.innerHTML })
         console.log(e.target);
         console.log(this.state);
+        
         // Get the container element
         var btnContainer = document.getElementById("buttons");
 
@@ -72,7 +73,7 @@ class addCourseSlot extends Component {
 
                     <Col md="auto">
                         <h4 class="card-title" style={{ color: "#4d4d4d" }} > Date: </h4>
-                        <DatePicker selected={this.state.date} onChange={this.handleChange} name="date" />
+                        <DatePicker selected={this.state.date} onChange={this.handleChange} name="date" value={this.state.date}/>
                     </Col>
                 </Row>
             </Container>
