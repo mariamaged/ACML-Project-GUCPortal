@@ -295,6 +295,7 @@ router.route('/department').post(authenticateToken,async(req,res)=>{
                          else if(headac.type!="Course Instructor") res.status(401).send({msg:"this academic Member is not an Instructor"});
                               else{ toAdd=new department({"name":name,"faculty":fid._id,"HOD":headac._id});
                               headac.department=toAdd._id;
+                              headac.isHOD=true;
                               await headac.save();
                 } 
                 }
@@ -363,7 +364,8 @@ router.route('/department').post(authenticateToken,async(req,res)=>{
                 else if(hac.type!="Course Instructor") messge="there is no Course instruvtor with this id.";
                      else if(hac.isHOD) messge="this Instructor is already head of another department.";
                           else if(hac.department==ob._id){
-                               hod1=hac._id;}
+                               hod1=hac._id;
+                               }
                                else messge="This instructor does not belong to this department.";}
              }
              const obnew=await department.findOne({"name":name});
