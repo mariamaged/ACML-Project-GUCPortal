@@ -98,7 +98,7 @@ router.route('/Location').post(authenticateToken,async(req,res)=>{
         //      staff[i].office=null;
         //      await staff[i].save();
         //  }
-        res.status(400).json({msg:"Cannot delete an office with cuurent capacity greater than 0"});
+        res.status(400).json({msg:"Cannot delete an office with current capacity greater than 0"});
         return;
      }
      else {
@@ -128,7 +128,7 @@ router.route('/Location').post(authenticateToken,async(req,res)=>{
 
 //updating 
 // authenticateToken,
-.put(async(req,res)=>{
+.put( authenticateToken,async(req,res)=>{
     try{
         const st=await StaffMember.findOne({"_id":req.user.id});
         if(st.staff_type!="HR")
@@ -144,22 +144,24 @@ router.route('/Location').post(authenticateToken,async(req,res)=>{
              res.status(400).json({msg:"Cannot update the current capacity of this location it is already exceeding the new maximum capacity."});
             else{
              if(Obid.type!=type){   
-               if(Obid.type=="Office"){
-                const staff=await StaffMember.find({"office":Obid._id});
-                for(var i=0;i< staff.length;i++){
-                    staff[i].office=null;
-                   await staff[i].save();
-                }
-            
+               if(Obid.type=="Office" && Obid.current_capacity>0){
+                // const staff=await StaffMember.find({"office":Obid._id});
+                // for(var i=0;i< staff.length;i++){
+                //     staff[i].office=null;
+                //    await staff[i].save();
+                // }
+                   res.status(400).json({msg:"Cannot change the type of an office with current capacity greater than 0"});
+                   return;
                }
                else{
                    const staff=await AcademicStaff.find();
                    for(var i=0;i<staff.length;i++){
                        for(var j=0;j<staff[i].schedule.length;j++){
                            if(staff[i].schedule[j].location==Obid._id)
-                              staff[i].schedule[j].location=null;
+                           res.status(400).json({msg:"There are already slots in this location."});
+                           return;
                        }
-                       await staff[i].save();
+                      
                    }
                }
                 Obid.type=type;
@@ -170,7 +172,7 @@ router.route('/Location').post(authenticateToken,async(req,res)=>{
              Obid.id=id;
              Obid.maximum_capacity=maximum_capacity;
              await Obid.save();
-             res.status(400).send({msg:"done"});  }
+             res.send({msg:"done"});  }
              else res.status(400).json({msg:"the new id already exists"})
              
               }
