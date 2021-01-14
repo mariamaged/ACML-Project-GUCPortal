@@ -1550,6 +1550,68 @@ msg: [
 	]
 }
 ```
+***
+	(6) Remove an assigned academic member in course(s) he/she is assigned to.
+- **Functionality:**
+   - The user who is a course instructor should be able to remove an academic member from courses they are assigned to.
+- **Route:** /instructor/removeAssignedAcademic
+- **Request type:** DELETE.
+- **Request body:** Should be an object with two properties:
+     1. courseID, which is a `string` like `CSEN704`.
+     2. academicMemberID, which is a `string` like `ac-1`.
+- **Example request body:**
+```json
+{
+	"courseID": "CSEN704",
+	"academicMemberID": "ac-1"
+}
+```
+- **Response body:**
+   - Reflects wither errors or that the operations was successful.
+- **Changes in the database:**
+   - The courses array in the academic member model should have the reference to the course deleted.
+   - The academic_staff array in the course model should have the reference to the academic member deleted.
+   - All of the slots that were assigned to that academic member in the course model schedule array get deleted.
+   - All of the slots that were assigned to that academic member in the academic member model schedule arrays get deleted.
+   - The slots_covered gets decremented by how much slots were deleted by removing that academic member.
+- **Example response body:**
+```json
+{ msg: 'Please fill all required fields!' }
+```
+
+```json
+{ msg: "Something went wrong" }
+```
+
+```json
+{ msg: 'The course does not exist' }
+```
+
+```json
+{ msg: 'There is no staff member with this id' }
+```
+
+```json
+{ msg: 'The staff member is not an academic member' }
+```
+
+```json
+{ msg: 'You are not assigned to this course' }
+```
+
+```json
+{ msg: 'The academic member you want to remove is not assigned to this course' }
+```
+
+```json
+{ msg: 'Access Denied' }
+```
+
+```json
+{ msg: 'Operation successful' }
+```
+
+***
  View the course(s) coverage he/she is assigned to:
 o Functionality: views the coverage of all the courses assigned to
 him/her (assuming no specific course will be chosen but instead the

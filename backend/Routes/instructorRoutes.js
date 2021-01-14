@@ -287,51 +287,57 @@ router.get("/staffpercourse", authenticateToken, async (req, res) => {
               var staffmembers = Array(c.academic_staff.length);
 
               for (var j = 0; j < c.academic_staff.length; j++) {
-                var academicmem = await AcademicStaff.findOne({
-                  _id: c.academic_staff[j]
-                });
-                var staffmem = await StaffMember.findOne({
-                  _id: academicmem.member
-                })
-                
-                var office = await location.findOne({_id: staffmem.office});
-                staffmembers[j] = {
-                  name: staffmem.name,
-                  id: staffmem.id,
-                  gender: staffmem.gender,
-                  email: staffmem.email,
-                  salary: staffmem.salary,
-                  office: staffmem.office
-                  day_off: 
-                  type:
-                };
+                if (!c.academic_staff[j].equals(inst._id)) {
+                  var academicmem = await AcademicStaff.findOne({
+                    _id: c.academic_staff[j]
+                  });
+                  var staffmem = await StaffMember.findOne({
+                    _id: academicmem.member
+                  })
+
+                  var office = await location.findOne({ _id: staffmem.office });
+
+                  staffmembers[j] = {
+                    name: staffmem.name,
+                    id: staffmem.id,
+                    gender: staffmem.gender,
+                    email: staffmem.email,
+                    salary: staffmem.salary,
+                    office: office.id,
+                    day_off: academicmem.day_off,
+                    type: academicmem.type
+                  };
+                }
               }
+
               staff[i] = {
                 "course name": c.name,
                 "course id": c.id,
                 "staff members": staffmembers,
               };
             }
-            res.send(staff);
-          } else {
+            res.status(200).json({ msg: staff });
+          }
+
+          else {
             const courses = inst.courses;
             const thecourse = await course.findOne({ id: courseid });
-            if (thecourse == null)
+            if (!thecourse)
               res
                 .status(400)
-                .json({ msg: "the course id you entered is incorrect" });
+                .json({ msg: "The course id you entered is incorrect" });
             else {
               var assigned = false;
               for (var i = 0; i < courses.length; i++) {
-                if (courses[i] == (await thecourse)._id) {
+                if (courses[i].equals(thecourse._id)) {
                   assigned = true;
                   break;
                 }
               }
               if (assigned) {
-                var staffmembers = [thecourse.academic_staff.length];
+                var staffmembers = Array(thecourse.academic_staff.length);
                 for (var j = 0; j < thecourse.academic_staff.length; j++) {
-                  if (String(thecourse.academic_staff[i]) != String(inst._id)) {
+                  if (!thecourse.academic_staff[j].equals(inst._id)) {
                     var staffmem = await AcademicStaff.findOne({
                       _id: thecourse.academic_staff[j],
                     });
@@ -345,11 +351,12 @@ router.get("/staffpercourse", authenticateToken, async (req, res) => {
                     };
                   }
                 }
-                res.send(staffmembers);
-              } else
+                res.status(200).json({ msg: staffmembers });
+              }
+              else
                 res
                   .status(400)
-                  .json({ msg: "you are not assigned to this course" });
+                  .json({ msg: "You are not assigned to this course" });
             }
           }
         } else res.status(401).json({ msg: "Access denied" });
@@ -360,7 +367,7 @@ router.get("/staffpercourse", authenticateToken, async (req, res) => {
   }
 });
 
-// 4- assigntounassignedSlot
+// 4- Assigned to an unassigned slot.
 router.route("/Assignment").post(authenticateToken, async (req, res) => {
   try {
     const instr = await StaffMember.findOne({ "_id": req.user.id });
@@ -490,6 +497,78 @@ router.route("/Assignment").post(authenticateToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// 6- Remove an academic member in courses he is assigned.
+router.delete('/removeAssignedAcademic', authenticateToken, async (req, res) => {
+  const { courseID, academicMemberID } = req.body;
+  if (!courseID || !academicMemberID) return res.status(400).json({ msg: 'Please fill all required fields!' });
+
+  const instr = await StaffMember.findOne({ _id: req.user.id });
+  if (!instr) return res.status(400).json({ msg: "Something went wrong" });
+
+  const inst = await AcademicStaff.findOne({ member: req.user.id });
+  if (!inst) return res.status(400).json({ msg: "Something went wrong" });
+
+  const thecourse = await course.findOne({ id: courseID });
+  if (!thecourse) return res.status(400).json({ msg: 'The course does not exist' });
+
+  const removedStaffMember = await StaffMember.findOne({ id: academicMemberID });
+  if (!removedStaffMember) return res.status(400).json({ msg: 'There is no staff member with this id' });
+
+  const removedAcademicMember = await AcademicStaff.findOne({ member: removedStaffMember._id });
+  if (!removedAcademicMember) return res.status(400).json({ msg: 'The staff member is not an academic member' });
+
+  if (inst.type == 'Course Instructor') {
+    var assigned = false;
+    const coursesAssigned = inst.courses;
+    for (var i = 0; i < coursesAssigned.length; i++) {
+      if (coursesAssigned[i].equals(thecourse._id)) {
+        assigned = true;
+        break;
+      }
+    }
+
+    if (!assigned) return res.status(403).json({ msg: 'You are not assigned to this course' });
+
+    var removedAssigned = false;
+    var position = -1;
+
+    for (var i = 0; i < thecourse.academic_staff.length; i++) {
+      if (thecourse.academic_staff[i].equals(removedAcademicMember._id)) {
+        position = i;
+        removedAssigned = true;
+        break;
+      }
+    }
+    if (!removedAssigned) return res.status(400).json({ msg: 'The academic member you want to remove is not assigned to this course' });
+
+    thecourse.academic_staff.splice(position, 1);
+    const withoutRemoved = thecourse.schedule.filter((slot) => {
+      if (slot.academic_member_id) return !slot.academic_member_id.equals(removedAcademicMember._id)
+    });
+    const slotsRemovedNum = thecourse.slots_covered - withoutRemoved.length;
+    thecourse.slots_covered -= slotsRemovedNum;
+    thecourse.schedule = withoutRemoved;
+    await thecourse.save();
+
+    for (var i = 0; i < removedAcademicMember.courses.length; i++) {
+      if (removedAcademicMember.courses[i].equals(thecourse._id)) {
+        position = i;
+        break;
+      }
+    }
+
+    removedAcademicMember.courses.splice(position, 1);
+    const withoutRemovedCourses = removedAcademicMember.schedule.filter((slot) => {
+      if (slot.course) return !slot.course.equals(thecourse._id)
+    });
+    removedAcademicMember.schedule = withoutRemovedCourses;
+    await removedAcademicMember.save();
+
+    return res.status(200).json({ msg: 'Operation successful' });
+  }
+  else return res.status(401).json({ msg: 'Access Denied' });
 });
 
 //assign course coordinator
