@@ -1,6 +1,6 @@
 // Our Components
 import Staff from './staff.js';
-import Warning from './warning.js';
+import Warning from '../Other/warning.js';
 
 // React Components
 // React

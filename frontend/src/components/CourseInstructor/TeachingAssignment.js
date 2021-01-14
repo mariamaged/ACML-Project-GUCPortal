@@ -1,6 +1,7 @@
 // Our Components
 import Loading from '../Other/loading.js';
-import SlotsStaff from './slotsstaff.js';
+import SlotsStaff from '../HOD/slotsstaff.js';
+
 // React Components
 // React
 import React, { Component } from 'react'
@@ -17,18 +18,18 @@ class TeachingAssignment extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5000/HOD/teachingAssignmentAllCourses', {
+        axios.get('http://localhost:5000/instructor/slotsAssignment', {
             headers: {
                 'x-auth-token': localStorage.getItem("auth-token")
             }
         })
             .then(response => {
-                this.setState({ teachingAssignment: response.data });
+                this.setState({ teachingAssignment: response.data.msg });
                 console.log(response.data);
                 console.log(this.state);
             })
             .catch(error => {
-                console.log('Error with getting teaching assignment for all courses under the HOD department.');
+                console.log('Error with getting teaching assignment for all courses that the course instructor is assigned to.');
                 console.log(error);
             });
     }
@@ -44,7 +45,7 @@ class TeachingAssignment extends Component {
                     </div>
                 </div>)
         })) :
-            (<Loading role="the teaching assignment of all courses under your department."/>);
+            (<Loading role="the teaching assignment of all courses you are assigned."/>);
     
         return (
             <div className='container'>

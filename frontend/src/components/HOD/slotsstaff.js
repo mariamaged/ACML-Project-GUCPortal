@@ -1,5 +1,5 @@
 // Our Components
-import SlotsTable from './slotstable.js';
+import SlotsTable from '../Other/slotstable.js';
 // React Components
 import Tab from 'react-bootstrap/Tab';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -11,7 +11,7 @@ import React from 'react';
 
 // Reacter Router and axios
 // CSS and images
-import './cardcss.css';
+import '../../css/cardcss.css';
 
 const slotsstaff = ({ members }) => {
     const listItems = members.length ? (members.map(staff => {

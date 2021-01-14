@@ -1,5 +1,5 @@
 // Our Components
-import Warning from './warning.js';
+import Warning from '../Other/warning.js';
 // React Components
 // React
 import React, { Component } from 'react'
@@ -8,7 +8,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 
 // CSS and images
-import './cardcss.css';
+import '../../css/cardcss.css';
 
 class OneCourseCoverage extends Component {
     state = {

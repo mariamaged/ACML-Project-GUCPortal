@@ -1,6 +1,6 @@
 // Our Components
 import StaffDayOff from './staffdayoff.js';
-import Warning from './warning.js';
+import Warning from '../Other/warning.js';
 
 // React Components
 // React

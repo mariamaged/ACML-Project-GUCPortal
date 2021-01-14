@@ -1,12 +1,14 @@
 // Our Components
 // React Components
-
+import { MdNotificationsActive } from 'react-icons/md';
 // React
 import React, { Component } from 'react'
 
 // Reacter Router and axios
 import { Link, NavLink } from 'react-router-dom';
 import axios from 'axios';
+
+// CSS and images.
 
 class InstructorNavbar extends Component {
     state = {
@@ -49,16 +51,19 @@ class InstructorNavbar extends Component {
                             <NavLink to='/instructor/hod'><li class="nav-item">
                                 <a class="nav-link" >My Department</a>
                             </li></NavLink>}
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Courses</a>
                             <div class="dropdown-menu">
-                                <NavLink to='/instructor/instructorCoursesCoverage'><a class="dropdown-item">Courses Coverage</a></NavLink>
-                                <a class="dropdown-item">Another action</a>
+                                <NavLink to='/instructor/instructorCoursesCoverage/all'><a class="dropdown-item"> Coverage of assigned courses</a></NavLink>
+                                <NavLink to='/instructor/instructorTeachingAssignment'><a class="dropdown-item">Teaching assignments of assigned courses</a></NavLink>
+                                <NavLink to='/instructor/instructorTeachingAssignment'><a class="dropdown-item">Teaching assignments of assigned courses</a></NavLink>
                                 <a class="dropdown-item">Something else here</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item">Separated link</a>
                             </div>
                         </li>
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Staff</a>
                             <div class="dropdown-menu">
@@ -69,6 +74,7 @@ class InstructorNavbar extends Component {
                                 <a class="dropdown-item">Separated link</a>
                             </div>
                         </li>
+
                         <NavLink to='/instructor/schedule'><li class="nav-item">
                             <a class="nav-link" >Schedule</a>
                         </li></NavLink>
@@ -95,6 +101,10 @@ class InstructorNavbar extends Component {
                                 <a class="dropdown-item">Separated link</a>
                             </div>
                         </li>
+
+                        <NavLink to='/instructor/schedule'><li class="nav-item">
+                            <MdNotificationsActive/>
+                        </li></NavLink>
                     </ul>
                 </div>
             </nav >

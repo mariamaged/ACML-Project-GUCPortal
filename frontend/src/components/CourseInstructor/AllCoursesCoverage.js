@@ -1,5 +1,5 @@
 // Our Components
-import Loading from '../HOD/loading.js';
+import Loading from '../Other/loading.js';
 // React Components
 // React
 import React, { Component } from 'react'
@@ -8,7 +8,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 
 // CSS and images
-import '../HOD/cardcss.css';
+import '../../css/cardcss.css';
 
 class AllCoursesCoverage extends Component {
     state = {

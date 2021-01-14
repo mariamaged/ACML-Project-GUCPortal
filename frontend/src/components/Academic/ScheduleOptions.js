@@ -1,12 +1,12 @@
 // Our Components
-import SlotsTable from '../HOD/slotstable.js';
+import SlotsTable from '../Other/slotstable.js';
 // React Components
 // React
 import React, { Component } from 'react';
 
 // Reacter Router and axios
 // CSS and images
-import '../HOD/cardcss.css';
+import '../../css/cardcss.css';
 import axios from 'axios';
 
 class scheduleoptions extends Component {
@@ -49,7 +49,7 @@ class scheduleoptions extends Component {
     }
     render() {
         return (
-            <div>
+            <div className="container">
                 <br />
                 <br />
                 <ul class="nav nav-tabs">

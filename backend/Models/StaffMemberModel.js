@@ -29,7 +29,8 @@ const StaffMemberSchema = mongoose.Schema({
     lastUpdatedAnnual: {type: Date},
     accidentalDaysLeft: {type:Number},
     attendCompensationDay: {type:Boolean},
-    notifications: [{type: String, default: []}]
+    notifications: [{type: String, default: []}],
+    oldNotifications: [{type: String, default: []}]
 },
 
 {

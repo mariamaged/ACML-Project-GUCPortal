@@ -22,13 +22,6 @@ function authenticateToken(req, res, next) {
     if (!token) {
         return res.sendStatus(401).status('Access deined please log in first.')
     }
-    // const verified= jwt.verify(token, process.env.TOKEN_SECRET)
-    // if(!verified){
-    //     return res.json("Token is unauthorized.")
-    // }
-    // req.user=verified
-    // console.log("in auth "+req.user)
-    // next();
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
         req.user = verified
@@ -39,6 +32,29 @@ function authenticateToken(req, res, next) {
     }
 }
 module.exports = authenticateToken
+
+router.get('/newNotifications', authenticateToken, async (req, res) => {
+    const user = await StaffMemberModel.findById(req.user.id);
+
+    if (user.notifications.length >= 1) {
+        const notification = user.notifications[0];
+        user.oldNotifications.push(user.notifications[0]);
+        user.notifications.splice(0, 1);
+        await user.save();
+        return res.status(200).send(notification);
+    }
+    else
+        return res.status(400).send("No new Notifications");
+});
+
+router.get('/allNotifications', authenticateToken, async (req, res) => {
+    const oldNotifications = (await StaffMemberModel.findById(req.user.id)).oldNotifications;
+    const newNotifications = (await StaffMemberModel.findById(req.user.id)).notifications;
+    const allNotifications = newNotifications.concat(oldNotifications);
+    return res.status(200).json(allNotifications);
+})
+
+
 //login
 router.post("/login", async (req, res, next) => {
     console.log("here in login");

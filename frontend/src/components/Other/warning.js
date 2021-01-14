@@ -5,7 +5,7 @@ import React from 'react';
 
 // Reacter Router and axios
 // CSS and images.
-import './warning.css';
+import '../../css/warning.css';
 
 const warning = ({ warning }) => {
     return (

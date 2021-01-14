@@ -1,11 +1,11 @@
 // Our Components
-import Loading from './loading.js';
+import Loading from '../Other/loading.js';
 // React Components
 // React
 import React from 'react'
 // Reacter Router and axios
 // CSS and images
-import './cardcss.css';
+import '../../css/cardcss.css';
 
 const staffdayoff = ({ members, role }) => {
     const departmentStaffList = members.length ? (members.map(staff => {

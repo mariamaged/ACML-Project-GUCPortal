@@ -1,5 +1,5 @@
 // Our Components
-import Warning from './warning.js';
+import Warning from '../Other/warning.js';
 import SlotsStaff from './slotsstaff.js';
 
 // React Components
@@ -10,7 +10,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 
 // CSS and images
-import './cardcss.css';
+import '../../css/cardcss.css';
 
 class CourseTeachingAssignment extends Component {
     state = {

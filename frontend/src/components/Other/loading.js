@@ -6,7 +6,7 @@ import React from 'react';
 
 // Reacter Router and axios
 // CSS and images.
-import './loading.css';
+import '../../css/loading.css';
 import GUC from '../../GUC.png';
 
 const loading = ({ role }) => {
