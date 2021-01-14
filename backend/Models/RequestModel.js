@@ -7,7 +7,8 @@ const CounterModel = require('./CounterModel.js');
 const acceptedReplacementSchema=mongoose.Schema({
       replacementID:{type: ObjectID, ref: 'StaffMemberModel'},
       slotNum:{type:Number},
-      slotLoc:{type:String}
+      slotLoc:{type:String},
+      
       // courseID:{type: ObjectID, ref: 'CourseModel', required: true}
 })
 

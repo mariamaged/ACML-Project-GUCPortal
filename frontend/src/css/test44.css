@@ -48,7 +48,8 @@
 .containMaternityTable::-webkit-scrollbar {
   width:0.5vw !important;
   border-radius:1vw ;
-  background:#3d544e !important;
+  background:#869e98 !important;
+  height: 0.5vw !important; 
 }
 
 
@@ -213,4 +214,28 @@ text-align:center;
 }
 .table-fixed td{
   width:5vw;
+}
+
+.spanCol{
+  width:15vw !important;
+}
+.repStaff{
+  text-align:center !important;
+}
+
+.annualTable{
+  width:90% !important;
+  overflow-x: scroll !important;
+}
+
+.table{
+ color: #212529db !important;
+}
+
+.rej{
+  width:108% !important;
+  position:relative;
+  top:1vw !important;
+  /* padding: 0rem !important; */
+
 }

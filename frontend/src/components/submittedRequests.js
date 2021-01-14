@@ -13,6 +13,7 @@ import {Link,NavLink} from 'react-router-dom'
 import  { Redirect } from 'react-router-dom'
 import { CheckCircle, XCircle, XCircleFill } from 'react-bootstrap-icons';
 // import Button from 'react-bootstrap/Button'
+import Loading from './loading.js'
 
 class ViewSubmittedRequests extends Component{
     
@@ -26,7 +27,8 @@ class ViewSubmittedRequests extends Component{
         cancelSuccess:"",
         reqState:"All",
         reqType:"",
-        reqTitle:""
+        reqTitle:"",
+        loadingBool:true
     }
     componentDidMount(props){
     console.log("in maternity view "+localStorage.getItem('jwtToken'))
@@ -41,7 +43,7 @@ class ViewSubmittedRequests extends Component{
              console.log("this.state.reqType= "+this.props.location.state.reqType)
              const temp=this.props.location.state.reqType;
              const tempTitle=this.props.location.state.reqTitle;
-             this.setState({reqType:temp,reqTitle:tempTitle});
+             this.setState({reqType:temp,reqTitle:tempTitle,loadingBool:false});
              
             const maternity=res.data.arr.filter(request=>{
                 return request.reqType==this.state.reqType;
@@ -124,7 +126,8 @@ class ViewSubmittedRequests extends Component{
                const type=this.state.unFilteredRequests.filter(request=>{
                    return request.reqType==value
                })
-               console.log("type= "+type)
+               for(var i=0;i<type.length;i++)
+               console.log("type= "+type[i].reqType)
                var typeTitle="";
                if(value=="Sick Leave")
                typeTitle="Sick Leave Requests"
@@ -151,7 +154,7 @@ class ViewSubmittedRequests extends Component{
                typeTitle="Compensation Requests"
 
 
-                this.setState({reqType:value,reqTitle:typeTitle,requests:type,reqState:"All",cancelWarning:""})
+                this.setState({reqType:value,reqTitle:typeTitle,stateBool:false,requests:type,reqState:"All",cancelWarning:""})
                console.log("this.state.reqType alooooooo"+value)
                
                 const location = {
@@ -168,7 +171,9 @@ class ViewSubmittedRequests extends Component{
             console.log("submissiondate= "+request.submission_date+
             "\n"+"maternityDoc= "+request.maternityDoc+
             "\n"+"reason= "+request.reason+
-            "\n"+"state= "+request.state)
+            "\n"+"state= "+request.state+
+            "\n"+"startDte= "+request.startDate
+            +"\n"+"endDate= "+request.endDate)
             return (
                 
                 <tr key={request.requestID} >
@@ -202,6 +207,7 @@ class ViewSubmittedRequests extends Component{
                     {/* <td className="reqTd" >{request.counter}</td> */}
                     <td >{request.submission_date}</td>
                     <td >{request.sickDay}</td>
+                    <td >{request.medicalDoc}</td>
                     <td >{request.reason}</td>
                     <td >{request.state}</td>
                     {this.state.reqState!="Accepted" &&
@@ -249,6 +255,7 @@ class ViewSubmittedRequests extends Component{
             renderCompensationRequest=(request, index)=> {
                 console.log("submissiondate= "+request.submission_date+
                     "\n"+"missedDAY= "+request.missedDay+
+                    +"\n"+"missedDAY= "+request.compensatedDay+
                     "\n"+"reason= "+request.reason+
                     "\n"+"state= "+request.state)
                 return (
@@ -360,13 +367,95 @@ class ViewSubmittedRequests extends Component{
                 {/* <td className="reqTd" >{request.counter}</td> */}
                 <td >{request.submission_date}</td>
                 <td >{request.slotDate}</td>
-               <tr>
-               <td >82</td>
-                <td>85</td>
-                 <td>78</td>
-                  <td>82</td>
-                   <td>77</td>
-                    <td>81</td> </tr> 
+                {request.acceptedReplacement.length==0 &&
+                    <tr>
+                    <td  className="spanCol"></td>
+                    <td className="spanCol"></td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                }
+
+               
+                  {request.acceptedReplacement.length==1 &&
+                    <tr>
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+             
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                  
+                }
+                {request.acceptedReplacement.length==2 &&
+                    <tr>
+                    <td className="spanCol">{request.acceptedReplacement[0].realReplacementID}</td>
+                    <td className="spanCol">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td className="spanCol">{request.acceptedReplacement[1].realReplacementID}</td>
+                    <td className="spanCol">{request.acceptedReplacement[1].realSlotNum}</td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                }
+                {request.acceptedReplacement.length==3 &&
+                    <tr>
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realSlotNum}</td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                }
+                {request.acceptedReplacement.length==4 &&
+                    <tr>
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[3].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[3].realSlotNum}</td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                }
+                {request.acceptedReplacement.length==5 &&
+                    <tr>
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[3].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[3].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[4].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[4].realSlotNum}</td>
+                    </tr>
+                }
+                    
 
                 <td >{request.reason}</td>
                 <td >{request.state}</td>
@@ -498,6 +587,7 @@ class ViewSubmittedRequests extends Component{
                     {/* <th scope="row">#</th> */}
                     <th scope="row">Submission Date</th>
                     <th scope="row">Sick Day</th>
+                    <th scope="row">Documents</th>
                     <th scope="row">Reason</th>
                     <th scope="row">State</th>
                     {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&&
@@ -630,6 +720,10 @@ class ViewSubmittedRequests extends Component{
                 {/* </span> */}
                 </div>}
 
+
+                
+                
+
                 {this.state.reqType=="Annual Leave"&&
                 /* ,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                     slotLoc:sent[i].slotLoc, replacementStaff:repl, */
@@ -649,11 +743,11 @@ class ViewSubmittedRequests extends Component{
                      <th colspan="2">20</th>  */}
                      </tr> 
                      <tr> 
-                     <th>Replacement</th> <th>Slot</th>
-                     <th>Replacement</th> <th>Slot</th>
-                     <th>Replacement</th> <th>Slot</th>
-                     <th>Replacement</th> <th>Slot</th> 
-                     <th>Replacement</th> <th>Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
                      </tr>
 
                     <th scope="row">Reason</th>
@@ -689,7 +783,7 @@ class ViewSubmittedRequests extends Component{
         <div className="center">
         {/* <h3>{this.state.reqTitle}</h3> */}
        {/* <h4> No requests yet</h4> */}
-
+       {this.state.loadingBool==false && 
        <div className="containDrop c2">
             <span className="noReq"><h3>{this.state.reqTitle}</h3></span>
                       <Dropdown as={ButtonGroup} className="buttons2" >
@@ -739,12 +833,19 @@ class ViewSubmittedRequests extends Component{
                     
                     </Dropdown.Menu>
                 </Dropdown>
-               
-              
-                </div>    
+                </div>    }
+
+                {this.state.loadingBool==false && 
                 <div class="alert alert-primary" role="alert" >
                 No requests yet!
+                </div> 
+            }
+
+            {this.state.loadingBool===true &&
+                <div  >
+               <Loading/>
                 </div>  
+                }
 
         </div>
         )

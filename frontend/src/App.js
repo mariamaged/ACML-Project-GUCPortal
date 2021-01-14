@@ -2,12 +2,13 @@ import logo from './logo.svg';
 // import './App.css';
 import ViewRequests from './components/ViewRequests'
 import Login from './components/Login.js'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {BrowserRouter,Router,Route,Switch} from 'react-router-dom'
 
 import SubmittedRequests from './components/submittedRequests'
 import ReceivedRequests from './components/receivedRequests'
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {BrowserRouter,Router,Route,Switch} from 'react-router-dom'
+
 
 import history from './history';
 import getRequest from './components/getRequest'

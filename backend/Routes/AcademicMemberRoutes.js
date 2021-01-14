@@ -1,3 +1,4 @@
+const mongoose=require('mongoose')
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt=require('bcrypt');
@@ -24,7 +25,12 @@ const acceptedReplacementSchema=require('../Models/RequestModel').acceptedReplac
 // const AttendanceSchema=StaffMemberModel.attendanceSchema
 // const monthlyHoursSchema=StaffMemberModel.monthlyHoursSchema
 
-
+const acceptedRealReplacementSchema=mongoose.Schema({
+    realReplacementID:{type: String},
+    realSlotNum:{type:Number},
+    
+    // courseID:{type: ObjectID, ref: 'CourseModel', required: true}
+})
 function authenticateToken(req,res,next){
      //const token= req.headers.token
      console.log("in authenticate")
@@ -252,10 +258,19 @@ router.get('/submittedRequest',authenticateToken,async(req,res)=>{
              var repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
              
             if(reqType=="Annual Leave"){
+                var rep=new Array()
+                var a=0
+                for(var k=0;k<sent[i].acceptedReplacement.length;k++){
+                    
+                    console.log("iddddddddddddd= "+sent[i].acceptedReplacement[k].replacementID)
+                    const repID=(await StaffMemberModel.findById(sent[i].acceptedReplacement[k].replacementID)).id
+                    console.log("repIDDDDDDDDDDDDDDD="+repID)
+                    rep[a++]={ realReplacementID:repID,realSlotNum:sent[i].acceptedReplacement[k].slotNum}
+                }
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
                     slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")
-                    ,RejectionReason:sent[i].RejectionReason}
+                    ,RejectionReason:sent[i].RejectionReason,acceptedReplacement:rep}
                     arr[k++]= reqNew
             }
             if(reqType=="Replacement"){
@@ -295,7 +310,9 @@ router.get('/submittedRequest',authenticateToken,async(req,res)=>{
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,maternityDoc:sent[i].maternityDoc,
                     reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD"),
-                    RejectionReason:sent[i].RejectionReason}
+                    RejectionReason:sent[i].RejectionReason,startDate:moment(sent[i].startDate).format("YYYY-MM-DD"),
+                    endDate:moment(sent[i].endDate).format("YYYY-MM-DD")
+                }
                     arr[k++]= reqNew
             }
             if(reqType=="Compensation Leave"){
@@ -360,9 +377,21 @@ router.get('/receivedRequest',authenticateToken,async(req,res)=>{
             var repl=(await StaffMemberModel.findById(sent[i].replacementStaff)).id
              
             if(reqType=="Annual Leave"){
+                var rep=new Array()
+                var a=0
+                console.log("lengthhhhhhhhhh= "+sent[i].acceptedReplacement.length)
+                console.log("reqIDDDDDDDDDDDDDDDDDDDD= "+sent[i].requestID)
+                for(var k=0;k<sent[i].acceptedReplacement.length;k++){
+                    
+                    console.log("iddddddddddddd= "+sent[i].acceptedReplacement[k].replacementID)
+                    const repID=(await StaffMemberModel.findById(sent[i].acceptedReplacement[k].replacementID)).id
+                    console.log("repIDDDDDDDDDDDDDDD="+repID)
+                    rep[a++]={ realReplacementID:repID,realSlotNum:sent[i].acceptedReplacement[k].slotNum}
+                }
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,slotNum:sent[i].slotNum,slotDate:moment(sent[i].slotDate).format("YYYY-MM-DD"),
-                    slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    slotLoc:sent[i].slotLoc, replacementStaff:repl,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD"),
+                    acceptedReplacement:rep}
                     arr[k++]= reqNew
             }
             if(reqType=="Replacement"){
@@ -395,7 +424,9 @@ router.get('/receivedRequest',authenticateToken,async(req,res)=>{
             if(reqType=="Maternity Leave"){
                 const reqNew={counter:k+1,requestID:sent[i].requestID,reqType:sent[i].reqType,
                     sentTo:hodName,state:sent[i].state,maternityDoc:sent[i].maternityDoc,
-                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")}
+                    reason:sent[i].reason,submission_date:moment(sent[i].submission_date).format("YYYY-MM-DD")
+                    ,startDate:moment(sent[i].startDate).format("YYYY-MM-DD"),
+                    endDate:moment(sent[i].endDate).format("YYYY-MM-DD")}
                     arr[k++]= reqNew
             }
             if(reqType=="Compensation Leave"){

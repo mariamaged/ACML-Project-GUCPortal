@@ -13,6 +13,8 @@ import  { Redirect } from 'react-router-dom'
 import { CheckCircle, CheckCircleFill,XCircle, XCircleFill } from 'react-bootstrap-icons';
 import InputGroup from 'react-bootstrap/InputGroup'
 import Form from 'react-bootstrap/Form'
+import Loading from './loading.js'
+
 // import { FormControl } from '@material-ui/core
 // import Button from 'react-bootstrap/Button'
 
@@ -29,7 +31,8 @@ class ViewReceivedRequests extends Component{
         reqTitle:"",
         RejectionReason:"",
         Warning:"",
-        acceptedReplacement:[]
+        acceptedReplacement:[],
+        loadingBool:true
     }
     componentDidMount(props){
     console.log("in maternity view "+ this.props.location.state.reqType)
@@ -44,7 +47,7 @@ class ViewReceivedRequests extends Component{
              console.log("this.state.reqType= "+this.props.location.state.reqType)
              const temp=this.props.location.state.reqType;
              const tempTitle=this.props.location.state.reqTitle;
-             this.setState({reqType:temp,reqTitle:tempTitle});
+             this.setState({reqType:temp,reqTitle:tempTitle,loadingBool:false});
              
             const maternity=res.data.arr.filter(request=>{
                 return request.reqType==this.state.reqType;
@@ -52,7 +55,7 @@ class ViewReceivedRequests extends Component{
             console.log("curr req= "+maternity)
             this.setState({unFilteredRequests:res.data.arr,
                 warning:res.data.warning,stateBool:false
-            ,reqType:this.state.reqType,reqTitle:this.state.reqTitle,requests:maternity})
+            ,reqType:this.state.reqType,reqTitle:this.state.reqTitle,requests:maternity,loadingBool:false})
 
             console.log("new state= "+this.state.requests.reqType)
             console.log("new state= "+this.state.warning)
@@ -151,7 +154,7 @@ class ViewReceivedRequests extends Component{
                typeTitle="Compensation Requests"
 
 
-                this.setState({reqType:value,reqTitle:typeTitle,requests:type,reqState:"All",cancelWarning:""})
+                this.setState({reqType:value,reqTitle:typeTitle,stateBool:false,requests:type,reqState:"All",cancelWarning:""})
                console.log("this.state.reqType alooooooo"+this.state.reqType)
                 const location = {
                     pathname: '/receivedRequests',
@@ -231,6 +234,8 @@ class ViewReceivedRequests extends Component{
                 })
         }
         renderMaternityRequest=(request, index)=> {
+            console.log("s= "+request.startDate+
+            "\n"+"e= "+request.endDate)
             return (
                 
                 <tr key={request.requestID} >
@@ -241,15 +246,20 @@ class ViewReceivedRequests extends Component{
                 <td>{request.maternityDoc}</td>
                 <td>{request.reason}</td>
                 <td>{request.state}</td>
-                <td>
-                <InputGroup className="mb-3">
+                
+              {request.state=="Pending" &&  
+              <td>
+              <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
                     {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
-        <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
-
+        <input type="text"  className="form-control rej" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
                 </InputGroup>
-                </td> 
+                </td> }
+
+                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+
+
                 <td  >
                <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -276,16 +286,21 @@ class ViewReceivedRequests extends Component{
                     {/* <td   >{request.counter}</td> */}
                     <td  >{request.submission_date}</td>
                     <td  >{request.sickDay}</td>
+                    <td  >{request.medicalDoc}</td>
                     <td  >{request.reason}</td>
 
                     <td  >{request.state}</td>
-                    <td  >
-                      <InputGroup className="mb-3">
+                    {request.state=="Pending" &&  
+              <td>
+              <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
-                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
+        <input type="text" className="form-control rej" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
-                    </InputGroup>
-                    </td>
+                </InputGroup>
+                </td> }
+
+                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
 
                     <td  >
                     
@@ -319,13 +334,17 @@ class ViewReceivedRequests extends Component{
                 <td  >{request.slotLoc}</td>
                 <td  >{request.reason}</td>
                 <td  >{request.state}</td>
-                <td  >
-                      <InputGroup className="mb-3">
+                {request.state=="Pending" &&  
+              <td>
+              <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
-                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
+        <input type="text" className="form-control rej" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
-                    </InputGroup>
-                    </td>
+                </InputGroup>
+                </td> }
+
+                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
                 <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -351,15 +370,20 @@ class ViewReceivedRequests extends Component{
                     {/* <td   >{request.counter}</td> */}
                      <td  >{request.submission_date}</td>
                     <td  >{request.missedDay}</td>
+                    <td  >{request.compensatedDay}</td>
                     <td  >{request.reason}</td>
                     <td  >{request.state}</td>
-                    <td  >
-                      <InputGroup className="mb-3">
+                    {request.state=="Pending" &&  
+              <td>
+              <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
-                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
+        <input type="text" className="form-control rej" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
-                    </InputGroup>
-                    </td>
+                </InputGroup>
+                </td> }
+
+                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
                     <td  >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -385,16 +409,20 @@ class ViewReceivedRequests extends Component{
                 
                 {/* <td   >{request.counter}</td> */}
                 <td  >{request.submission_date}</td>
-                <td className="reqTdSick">{request.newDayOff}</td>
+                <td >{request.newDayOff}</td>
                 <td  >{request.reason}</td>
                 <td  >{request.state}</td>
-                <td  >
-                      <InputGroup className="mb-3">
+                {request.state=="Pending" &&  
+              <td>
+              <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
-                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
+        <input type="text" className="form-control rej" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
-                    </InputGroup>
-                    </td>
+                </InputGroup>
+                </td> }
+
+                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
                 <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -423,13 +451,17 @@ class ViewReceivedRequests extends Component{
                 <td  >{request.courseID}</td>
                 <td  >{request.reason}</td>
                 <td  >{request.state}</td>
-                <td  >
-                      <InputGroup className="mb-3">
+                {request.state=="Pending" &&  
+              <td>
+              <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
-                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
+        <input type="text" className="form-control rej" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
-                    </InputGroup>
-                    </td>
+                </InputGroup>
+                </td> }
+
+                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
                 <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -455,13 +487,17 @@ class ViewReceivedRequests extends Component{
                     <td  >{request.accidentDate}</td>
                     <td  >{request.reason}</td>
                     <td  >{request.state}</td>
-                    <td  >
-                      <InputGroup className="mb-3">
+                    {request.state=="Pending" &&  
+              <td>
+              <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
-                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
+        <input type="text" className="form-control rej" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
-                    </InputGroup>
-                    </td>
+                </InputGroup>
+                </td> }
+
+                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
                     <td  >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -474,28 +510,140 @@ class ViewReceivedRequests extends Component{
                     
                 )
                 }
+                // renderReplacement=(replacementStaff,index)=>{
+                //     return(
+                //        <div>
+                //         <td>{replacementStaff.replacementID}</td>
+                //         <td>{replacementStaff.slotNum}</td>
+                //         </div>
+                //     )
+                // }
                 renderAnnualRequest=(request, index)=> {
             console.log("submissiondate= "+request.submission_date+
                 "\n"+"missedDAY= "+request.missedDay+
                 "\n"+"reason= "+request.reason+
-                "\n"+"state= "+request.state)
+                "\n"+"state= "+request.state+
+                "\n"+"reqID= "+request.requestID+
+                "\n"+"acceptedRepl0= "+request.acceptedReplacement.length)
             return (
                 
                 <tr key={request.requestID}  className='clickable-row' >
                 {/* <td   >{request.counter}</td> */}
                 <td  >{request.submission_date}</td>
-                <td  >{request.slotNum}</td>
                 <td  >{request.slotDate}</td>
-                <td  >{request.replacementStaff}</td>
+
+                {/* {request.acceptedReplacement.length>0 &&
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+                }
+                {request.acceptedReplacement.length>0 &&
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                  
+                } */}
+              
+                {request.acceptedReplacement.length==0 &&
+                    <tr>
+                    <td  className="spanCol"></td>
+                    <td className="spanCol"></td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                }
+
+               
+                  {request.acceptedReplacement.length==1 &&
+                    <tr>
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+             
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                  
+                }
+                {request.acceptedReplacement.length==2 &&
+                    <tr>
+                    <td className="spanCol">{request.acceptedReplacement[0].realReplacementID}</td>
+                    <td className="spanCol">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td className="spanCol">{request.acceptedReplacement[1].realReplacementID}</td>
+                    <td className="spanCol">{request.acceptedReplacement[1].realSlotNum}</td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                }
+                {request.acceptedReplacement.length==3 &&
+                    <tr>
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realSlotNum}</td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                }
+                {request.acceptedReplacement.length==4 &&
+                    <tr>
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[3].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[3].realSlotNum}</td>
+                    <td className="spanCol"></td>
+                    <td  className="spanCol"></td>
+                    </tr>
+                }
+                {request.acceptedReplacement.length==5 &&
+                    <tr>
+                    <td colspan="1">{request.acceptedReplacement[0].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[0].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[1].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[2].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[3].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[3].realSlotNum}</td>
+                    <td colspan="1">{request.acceptedReplacement[4].realReplacementID}</td>
+                    <td colspan="1">{request.acceptedReplacement[4].realSlotNum}</td>
+                    </tr>
+                }
+                    
+                
+                
                 <td  >{request.reason}</td>
                 <td  >{request.state}</td>
-                <td  >
-                      <InputGroup className="mb-3">
+                {request.state=="Pending" &&  
+              <td>
+              <InputGroup className="mb-3">
                     <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
-                    <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+                    {/* <label className="col-form-label" htmlFor="RejectionReason">Day Off Date</label> */}
+        <input type="text" className="form-control rej" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
                     </Form>
-                    </InputGroup>
-                    </td>
+                </InputGroup>
+                </td> }
+
+                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
                 <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -509,7 +657,41 @@ class ViewReceivedRequests extends Component{
             )
             }              
                         
-                
+            // renderSlotLinkingRequest=(request, index)=> {
+            //     console.log("submissiondate= "+request.submission_date+
+            //         "\n"+"missedDAY= "+request.missedDay+
+            //         "\n"+"reason= "+request.reason+
+            //         "\n"+"state= "+request.state)
+            //     return (
+                    
+            //         <tr key={request.requestID} >
+            //         {/* <td className="reqTd" >{request.counter}</td> */}
+            //         <td >{request.submission_date}</td>
+            //         <td >{request.slotDay}</td>
+            //         <td >{request.slotNum}</td>
+            //         <td >{request.courseID}</td>
+            //         <td >{request.reason}</td>
+            //         <td >{request.state}</td>
+            //         <td  >
+            //         <InputGroup className="mb-3">
+            //         <Form onSubmit={(e)=>this.onRejectRequest(e,request.requestID)}>
+            //         <input type="text" className="form-control" placeholder="" id="RejectionReason" onChange={this.handleRejectionReason}/>
+            //         </Form>
+            //         </InputGroup>
+            //         </td>
+                    
+            //         <td  >
+            //     <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
+            //    <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
+            //    </Button>{"  "}
+              
+            //   <Button  size="sm" className="cancelButton" onClick={(e)=>this.onRejectRequest(e,request.requestID)}>
+            //   <XCircleFill color="darkred" className="cancelBtn" size={19} />
+            //   </Button> </td>
+            //     </tr>
+                    
+            //     )
+            //     }
     render(){
         var reqs=[];
         if(!this.state.stateBool){
@@ -598,7 +780,8 @@ class ViewReceivedRequests extends Component{
                         <th scope="row">Documents</th>
                         <th scope="row">Reason</th>
                         <th scope="row">State</th>
-                        <th scope="row">Rejection Reason</th>
+                        {this.state.reqState!="Accepted"&&
+                         <th scope="row">Rejection Reason</th>}
           
                         <th scope="row">Action</th>
                         </tr>
@@ -618,27 +801,51 @@ class ViewReceivedRequests extends Component{
                     <thead>
                         <tr class="table-light">
                         <th scope="row">Submission Date</th>
-                        <th scope="row">Start Date</th>
-                        <th scope="row">End Date</th>
-                        <th scope="row">Documents</th>
-                        <th scope="row">State</th>
-                        <th scope="row">Rejection Reason</th>
-          
+                    <th scope="row">Sick Day</th>
+                    <th scope="row">Documents</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                        {this.state.reqState!="Accepted"&&
+                         <th scope="row">Rejection Reason</th>}
+                    
                         <th scope="row">Action</th>
                         </tr>
                     </thead>
-                    <tbody>{reqs.map(this.renderMaternityRequest)}</tbody>
+                    <tbody>{reqs.map(this.renderSickRequest)}</tbody>
                     </table>
                 {/* </span> */}
                 </div>
                 }
+                {this.state.reqType=="Slot Linking" &&<div className=" containMaternityTable  ">
+                {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
+                <table class="table table-hover  header-fixed">
+                    <thead>
+                    <tr >
+                    {/* <th scope="row">#</th> */}
+                    <th scope="row">Submission Date</th>
+                    <th scope="row">Slot Day</th>
+                    <th scope="row">Slot Number</th>
+                    <th scope="row">Course ID</th>
+                    <th scope="row">Reason</th>
+                    <th scope="row">State</th>
+                    {this.state.reqState!="Accepted"&&
+                         <th scope="row">Rejection Reason</th>}
+                    <th scope="row">Action</th>
+                    </tr>
+                </thead>
+                <tbody  >
+                {reqs.map(this.renderSlotLinkingRequest)}
+                </tbody>
+                </table>
+                {/* </span> */}
+                </div>}
 
                 {this.state.reqType=="Replacement" &&
                 <div className=" containMaternityTable  ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <table class="table table-hover  header-fixed">
                     <thead>
-                    <tr className="table-light">
+                    <tr >
                     {/* <th scope="row">#</th> */}
                     <th scope="row">Submission Date</th>
                     <th scope="row">Slot Date</th>
@@ -646,7 +853,8 @@ class ViewReceivedRequests extends Component{
                     <th scope="row">Slot Location</th>
                     <th scope="row">Reason</th>
                     <th scope="row">State</th>
-                    <th scope="row">Rejection Reason</th>
+                    {this.state.reqState!="Accepted"&&
+                         <th scope="row">Rejection Reason</th>}
                     <th scope="row">Action</th>
                     </tr>
                 </thead>
@@ -663,15 +871,16 @@ class ViewReceivedRequests extends Component{
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <table class="table table-hover  header-fixed">
                     <thead>
-                <tr className="table-light">
+                <tr >
                     {/* <th scope="row">#</th> */}
                     <th scope="row">Submission Date</th>
                     <th scope="row">Missed Day</th>
                     <th scope="row">Compensation Day</th>
                     <th scope="row">Reason</th>
                     <th scope="row">State</th>
-                    <th scope="row">Rejection Reason</th>
-                    <th scope="row">Action</th>
+                    {this.state.reqState!="Accepted"&&
+                         <th scope="row">Rejection Reason</th>}
+                         <th scope="row">Action</th>
                     </tr>
                 </thead>
                 <tbody  >
@@ -686,14 +895,15 @@ class ViewReceivedRequests extends Component{
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <table class="table table-hover  header-fixed">
                     <thead>
-                <tr className="table-light">
+                <tr >
                     {/* <th scope="row">#</th> */}
                     <th scope="row">Submission Date</th>
                     <th scope="row">New Day-Off</th>
                     <th scope="row">Reason</th>
                     <th scope="row">State</th>
-                    <th scope="row">Rejection Reason</th>
-                    <th scope="row">Action</th>
+                    {this.state.reqState!="Accepted"&&
+                         <th scope="row">Rejection Reason</th>}
+                         <th scope="row">Action</th>
                     </tr>
                 </thead>
                 <tbody  >
@@ -701,20 +911,19 @@ class ViewReceivedRequests extends Component{
                 </tbody>
                 </table>
                 </div>}
-
+{/* 
                 {this.state.reqType=="Slot Linking" &&<div className=" containMaternityTable  ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <table class="table table-hover  header-fixed">
                     <thead>
-                    <tr className="table-light">
-                    {/* <th scope="row">#</th> */}
+                    <tr >
                     <th scope="row">Submission Date</th>
                     <th scope="row">Slot Day</th>
                     <th scope="row">Slot Number</th>
                     <th scope="row">Course ID</th>
                     <th scope="row">Reason</th>
                     <th scope="row">State</th>
-                    <th scope="row">Rejection Reason</th>
+                    {this.state.reqState!="Accepted" && this.state.reqState!="Pending"&& <th scope="row">Rejection Reason</th>}
                     <th scope="row">Action</th>
                     </tr>
                 </thead>
@@ -722,20 +931,20 @@ class ViewReceivedRequests extends Component{
                 {reqs.map(this.renderSlotLinkingRequest)}
                 </tbody>
                 </table>
-                {/* </span> */}
-                </div>}
+                </div>} */}
 
                 {this.state.reqType=="Accidental Leave" && <div className=" containMaternityTable  ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <table class="table table-hover  header-fixed">
                     <thead>
-                    <tr className="table-light">
+                    <tr >
                     {/* <th scope="row">#</th> */}
                     <th scope="row">Submission Date</th>
                     <th scope="row">Accident Date</th>
                     <th scope="row">Reason</th>
                     <th scope="row">State</th>
-                    <th scope="row">Rejection Reason</th>
+                    {this.state.reqState!="Accepted"&&
+                         <th scope="row">Rejection Reason</th>}
                     <th scope="row">Action</th>
                     </tr>
                 </thead>
@@ -746,35 +955,35 @@ class ViewReceivedRequests extends Component{
                 {/* </span> */}
                 </div>}
 
-                {this.state.reqType=="Annual"&&
+                {this.state.reqType=="Annual Leave"&&
                 /* ,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                     slotLoc:sent[i].slotLoc, replacementStaff:repl, */
-                <div className=" containMaternityTable">
+                <div className=" containMaternityTable annualTable">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <table class="table table-hover  header-fixed">
                     <thead>
-                    <tr className="table-light">
+                    <tr >
                     {/* <th scope="row">#</th> */}
                     <th scope="row">Submission Date</th>
                     <th scope="row">Slot Date</th>
                     {/* <th scope="row">Replacement Staff</th> */}
                     {/*  <th colspan="2">65</th>  */}
-                    <tr>  <th colspan="10">Replacement Staff</th>
-                     {/* <th colspan="2">20</th>
-                     <th colspan="2">20</th>
-                     <th colspan="2">20</th>  */}
+                    <tr> 
+                     <th colspan="10" className="repStaff">Replacement Staff</th>
+                    
                      </tr> 
                      <tr> 
-                     <th>Replacement</th> <th>Slot</th>
-                     <th>Replacement</th> <th>Slot</th>
-                     <th>Replacement</th> <th>Slot</th>
-                     <th>Replacement</th> <th>Slot</th> 
-                     <th>Replacement</th> <th>Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
+                     <th colspan="1">Replacement</th> <th colspan="1">Slot</th>
                      </tr>
 
                     <th scope="row">Reason</th>
                     <th scope="row">State</th>
-                    <th scope="row">Rejection Reason</th>
+                    {this.state.reqState!="Accepted"&&
+                    <th scope="row">Rejection Reason</th>}
                     <th scope="row">Action</th>
                     </tr>
                 </thead>
@@ -804,8 +1013,8 @@ class ViewReceivedRequests extends Component{
         <div className="center">
         {/* <h3>{this.state.reqTitle}</h3> */}
        {/* <h4> No requests yet</h4> */}
-
-       <div className="containDrop c2">
+       {this.state.loadingBool==false && 
+       <div className="containDrop">
             <span className="noReq"><h3>{this.state.reqTitle}</h3></span>
                       <Dropdown as={ButtonGroup} className="buttons2" >
                 <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
@@ -853,12 +1062,18 @@ class ViewReceivedRequests extends Component{
                     
                     </Dropdown.Menu>
                 </Dropdown>
-               
-              
-                </div>    
+                </div>
+                }
+                {this.state.loadingBool==false &&
                 <div className="alert alert-primary" role="alert" >
                No requests yet!
                 </div>  
+                }
+                {this.state.loadingBool===true &&
+                <div  >
+               <Loading/>
+                </div>  
+                }
 
         </div>
         )

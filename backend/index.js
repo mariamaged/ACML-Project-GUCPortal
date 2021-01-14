@@ -411,8 +411,8 @@ async function  cr(){
         // const check=one<two
         // console.log(check)
         console.log("h= "+moment("2021-01-19T00:00:00.000+00:00").format("YYYY-MM-DD"))
-        const ann=await request.find({reqType: 'Annual Leave',sentBy:"5fe5a6b1e6bee81f985e560f"})
-        console.log("ann= "+ann)
+        // const ann=await request.find({reqType: 'Annual Leave',sentTo:"5fe4327566d23941b83c45bb"})
+        // console.log("ann= "+ann[0].acceptedReplacement[0])
         // const r=await request.find({reqType:"Replacement",slotDate:new Date("2021-01-12")})--
         // console.log(r)
     //  console.log("2021-01-11T22:00:00.000Z"==moment("2021-01-12").format())

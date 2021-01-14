@@ -1,3 +1,5 @@
+
+  
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt=require('bcrypt');
@@ -11,7 +13,6 @@ const Course=require('../Models/CourseModel.js')
 const location=require('../Models/LocationModel.js')
 const department=require('../Models/DepartmentModel.js')
 const faculty=require('../Models/FacultyModel.js')
-
 const AttendanceSchema=StaffMemberModel.attendanceSchema
 const monthlyHoursSchema=StaffMemberModel.monthlyHoursSchema
 var moment = require('moment');
@@ -64,8 +65,7 @@ router.post('/login',async(req,res,next)=>{
             
             const isMatched=await bcrypt.compare(password,existingUser.password);       //comparing password entered text with password of the user we got from the database            
             if( isMatched===false){
-                // return res.status(400).json({error:"Please enter correct password."});
-                return res.status(400).send("Please enter correct password.");
+                 return res.status(400).json({error:"Please enter correct password."});
              }
              
              else if(existingUser.staff_type=="HR"){
@@ -381,14 +381,14 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 check=true;
                 idx=i;
               
-                // newSigninsTemp=attendance[i].signins
+                newSigninsTemp=attendance[i].signins
                console.log("------------------------------------="+attendance[i])
                //console.log("000000000000000000000000000000000000="+newSignins)
-            //    newSigninsTemp[attendance[i].signins.length]=SignInTime
-            // //    console.log("1111111111111111111111111111111111111="+newSignins[0])
-            // //    console.log("2222222222222222222222222222222222222="+newSignins[1])
-            //    newSignins=newSigninsTemp
-            //     console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
+               newSigninsTemp[attendance[i].signins.length]=SignInTime
+            //    console.log("1111111111111111111111111111111111111="+newSignins[0])
+            //    console.log("2222222222222222222222222222222222222="+newSignins[1])
+               newSignins=newSigninsTemp
+                console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newSignins)
                 //const signins=
                 
             }
@@ -400,7 +400,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
         //found today's record will update it then insert it into attendance array
         if(check===true){
             // console.log("SIGNINSSSSSSSSSSS INSIDEEEEE=" +signins)
-            const newAtt={
+            const newAtt=new AttendanceSchema({
                 date:date,
                 time:time,
                 hours:hours,
@@ -412,8 +412,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_calculated_signOut:last_signIn,
                 day:day,
                 dayOffBool:dayOffBool,
-                // signins:newSignins
-            }
+                signins:newSignins
+            })
             console.log("SIGNINNNNNNNNNNNNNNNNNNNNNNN= "+newAtt)
             attArr[idx]=newAtt
             
@@ -446,7 +446,7 @@ router.put('/signin',authenticateToken,async(req,res)=>{
            var dayOffBool=false
         //    console.log("at 2nd"+signins)
            console.log("dayofBool at signin= "+dayOffBool)
-            const newAttendance={
+            const newAttendance=new AttendanceSchema({
                 date:newSignInDate,
                 time,
                 hours,
@@ -458,8 +458,8 @@ router.put('/signin',authenticateToken,async(req,res)=>{
                 last_signOut,
                 day,
                 dayOffBool:dayOffBool,
-                // signins:[SignInTime]
-            }
+                signins:[SignInTime]
+            })
             console.log("SignIn= "+SignIn)
             console.log("newAttendance "+newAttendance)
             //enter new record to already existing attendance array
@@ -682,26 +682,8 @@ router.put('/signout',authenticateToken,async(req,res)=>{
             const user= await StaffMemberModel.findById(req.user.id)
             /////////////////////////////////////////////////////////////////////////////
            //we can signout so get extra and missing hours and minutes and add them
-            var currMonth=new moment().format("M")
-            var currYear=new moment().format("Y")
-
-            //new MILESTONE2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            const currDay=new moment().format("D")
-            if(currDay<=10){
-                if((parseInt(currMonth))==1){
-                    currMonth=12
-                    currYear=parseInt(currYear)-1;
-                    console.log("currYear= "+currYear)
-                }
-                else{
-                    currMonth=parseInt(currMonth)-1;
-                    console.log("currMonth= "+currMonth)
-                }
-
-            }
-
-
-
+            const currMonth=new moment().format("M")
+            const currYear=new moment().format("Y")
             var c=false;
             var newMonthlyArr=new Array()
 
@@ -733,14 +715,14 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                        // console.log("extras= "+finEM+" "+finEH)
 
                         //new monthlyTime with updated hours and minutes
-                        const newMonthly={
+                        const newMonthly=new monthlyHoursSchema({
                             num:user.time_attended[l].num
                            ,yearNum:currYear
                             ,extraHours:finEH
                             ,extraMinutes:finEM
                              ,missingHours:finMH
                              ,missingMinutes:finMM
-                        }
+                        })
                         //adding updated month to array
                         c=true
                         newMonthlyArr[l]=newMonthly
@@ -757,14 +739,14 @@ router.put('/signout',authenticateToken,async(req,res)=>{
         
             //didn't find record for this month or any records at all should add new record
             if(c==false || user.time_attended.length==0){
-                const newMonthly= {
+                const newMonthly=new monthlyHoursSchema({
                     num:parseInt(currMonth)
                     ,yearNum:parseInt(currYear)
                     ,extraHours:extraHrs
                     ,extraMinutes:extraMin
                      ,missingHours:missingHrs
                      ,missingMinutes:missingMin
-                }
+                })
                 //if month array is empty simply add this new record
                 if(user.time_attended.length==0){
                     console.log("newMonthly= "+newMonthly)
@@ -785,7 +767,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
 
             //updating attendance to enter signed out date
             ///////////////////////////////////////////////////////////////////////////////////
-            const newAtt={
+            const newAtt=new AttendanceSchema({
                 date:date,
                 time:time,
                 attended:true,
@@ -797,7 +779,7 @@ router.put('/signout',authenticateToken,async(req,res)=>{
                 last_signIn:last_signIn,
                 last_signOut:SignOut,
                 day:day
-            }
+            })
             console.log("signout down= "+moment(SignOut).format("HH:mm"))
             attArr[idx]=newAtt
             try{
@@ -846,7 +828,6 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
         if(user.attendance.length>0){
            
             for(var i=0;i<user.attendance.length;i++){
-                console.log("attendance")
                 const currDay=user.attendance[i]
                 if(month ){
                      const dateMonth=moment(currDay.date).format("M")
@@ -868,7 +849,6 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
             if(arr.length==0)
             return res.json("There are no attendance records to display.")
             else{
-                //to display records before today only
                 var check=false
                 for(var k=0;k<arr.length;k++){
                     if(moment(arr[k].date).format("YYYY-MM-DD")<=new moment().format("YYYY-MM-DD")){
@@ -883,8 +863,6 @@ router.get('/attendanceRecords',authenticateToken,async(req,res)=>{
                     check=true
                     }
                 }
-
-                //if no records to show before today
                 if(check==false){
                     return res.json("There are no attendance records to display.")
                 }
@@ -1191,20 +1169,8 @@ router.get('/missingDays',authenticateToken,async(req,res)=>{
 router.get('/missingHours',authenticateToken,async(req,res)=>{
         const user=await StaffMemberModel.findById(req.user.id)
         const monthly=user.time_attended
-        var month=new moment().format('M')
-        var year=new moment().format('Y')
-        const day=new moment().format('D')
-
-        //new Milestone2!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if(day<=10){
-            if(month==1){
-                month=12
-                year=Integer.parseInt(year)-1
-            }
-            else
-            month=Integer.parseInt(month)-1
-        }
-
+        const month=new moment().format('M')
+        const year=new moment().format('Y')
         var check=false;
         if(user.time_attended.length>0){
             for(var i=0;i<monthly.length;i++){
@@ -1217,12 +1183,6 @@ router.get('/missingHours',authenticateToken,async(req,res)=>{
             }
         }  
       else {
-            // if(day>=11){
-            
-            // }
-            // else if(day<=10){
-
-            // }
             
             const newMonthly=new monthlyHoursSchema({
                 num:month,
@@ -1293,6 +1253,91 @@ function calculateHrs(dateMonth,day_off){
      console.log("inside "+hours+' m='+minutes)
      return {hours,minutes}
 }
+// router.post('/sendReplacementRequest',authenticateToken,async(req,res)=>{
+//     console.log("in replacment")
+//     const user=await StaffMemberModel.findById(req.user.id)
+//     const slotNum=req.body.slotNum
+//     const slotDate=req.body.slotDate
+//     const slotLoc=req.body.slotLoc
+//     //const repID=req.body.id
+//     if(moment(slotDate).isBefore(new moment())){
 
+//     }
+//     if(user.staff_type=="HR"){
+//         return (res.json({error:"HR cannot make replacement requests"}))
+//     }
+//     const academicUser=await AcademicStaffModel.findOne({member:req.user.id})
+//     var check=false
+//     const slots=cademicUser.schedule
+//     var course=''
+//     var courseID=""
+//     if(moment(slotDate).isBefore(new moment())){
+//         return res.json("Cannot replace a slot that has already passed")
+//     }
+
+
+//     //check if slot user is wanting to replace is available in his schedule
+//     for(var i=0;i<slots.length;i++){
+//         const locID=slots[i].location
+//         const loc=await location.findById(locID).id
+//         const date=slots[i].date
+//         const number=slots[i].number
+//         if(loc==slotLoc && slotNum==number &&moment(date).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
+//             check=true
+//             course=(await Course.findById(slots[i].course))
+//              courseID=course.id
+//         }
+
+//     }
+//     if(check==false)
+//     return res.send("This slot is not present in your schedule")
+
+//     //will loop on all slots of each member that teaches this course 
+//     //to make sure that they are free during this replacement slot
+//     const courseAcademic=course.academic_staff
+//     //looping on staff giving the course of replacement slot
+//     for(var j=0;j<courseAcademic.length;j++){
+//         const replacement=await AcademicStaffModel.findById(courseAcademic[j])
+//         const replacementSchedule=replacement.schedule
+//         var check2=false;
+//         //looping on schedule of each member
+//         for(var k=0;k<replacementSchedule.length;k++){
+//         const currLocID=replacementSchedule[i].location
+//         const currLoc=await location.findById(currLocID).id
+//         const currDate=replacementSchedule[i].date
+//         const currNumber=replacementSchedule[i].number
+//         //if finding same slot
+//         if(currLoc==slotLoc && currNumber==number &&moment(currDate).format("YYYY-MM-DD")==moment(slotDate).format("YYYY-MM-DD")){
+//                 check2=true
+//         }
+//         }
+//         //if no such slot is found create a request for this member
+//         if(check2==false){
+//             var req=new request({
+//                 reqType:"Replacement",
+//                 slotDate:slotDate,
+//                 slotNum:slotNum,
+//                 slotLoc:slotLoc,
+//                 sentTo:replacement.member,
+//                 state:"Pending",
+//                 submission_date:new moment()
+//             })
+//           await req.save()
+//         }
+//     }
+    
+// })
 
 module.exports=router;
+
+// console.log(new moment("2020-01-01").format("M"))
+// const x=new moment("2020-01-01").format("M")
+// const check=(x==1)
+// console.log(check)
+// async  function z(){
+// const c=await StaffMemberModel.findById("5fdc24861418851510805d28")
+// const g=c.time_attended[0]
+// console.log("her "+g.minutes)
+// }z()
+
+
