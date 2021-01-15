@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const LocationSchema = mongoose.Schema({
     id: {type: String, required: true, unique: true},
-    type: {type: String, enum: ['Tutorial Room', 'Office', 'Lecture Hall','Lab'], required: true},
+    type: {type: String, enum: ['Tutorial Room', 'Office', 'Lecture Hall'], required: true},
     maximum_capacity: {type: Number, required: true},
     current_capacity: {type: Number, default: 0}
 },
