@@ -17,8 +17,8 @@ import Form from 'react-bootstrap/Form'
 class requestsForms extends Component{
 
     state={
-        formType:"",
-        formTitle:"",
+        formType:"Accidental Leave",
+        formTitle:"Accidental Leave",
         fields:[],
 
         accidentalDate:"",
@@ -54,13 +54,13 @@ class requestsForms extends Component{
           warningMsg:"",
           reason:""
     }
-    componentDidMount(props){
-        console.log("here in reqForms title="+this.props.location.state.formTitle+"   = "+this.props.location.state.formType)
-        console.log("at start reason= "+this.state.reason+" success= "+this.state.successMsg+" failure= "+this.state.warningMsg)
+    componentDidMount(){
+        // console.log("here in reqForms title="+this.props.location.state.formTitle+"   = "+this.props.location.state.formType)
+        // console.log("at start reason= "+this.state.reason+" success= "+this.state.successMsg+" failure= "+this.state.warningMsg)
         console.log("success at start? "+this.state.successMsg)
-        console.log("this.state.reqType= "+this.props.location.state.formType)
-             const temp=this.props.location.state.formType;
-             const tempTitle=this.props.location.state.formTitle;
+        // console.log("this.state.reqType= "+this.props.location.state.formType)
+             const temp=this.state.formType;
+             const tempTitle=this.state.formTitle;
              this.setState({formType:temp,formTitle:tempTitle});
     }
 
@@ -337,12 +337,12 @@ class requestsForms extends Component{
        
          <form onSubmit={this.onFormAccidentalSubmit}>
          
-        <label className="col-form-label" htmlFor="accidentalDate">Accident Date</label>
-        <input type="date" className="form-control" 
+        <label className="col-form-label labelForm" htmlFor="accidentalDate">Accident Date</label>
+        <input type="date" className=" form-control formTest" 
         placeholder="YYYY-MM-DD" id="accidentalDate" required onChange={this.handleChange}/>
-        <label className="col-form-label" htmlFor="accidentalReason">Reason</label>
-        <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
-        <Button variant="primary" type="submit">
+        <label className="col-form-label labelForm" htmlFor="accidentalReason">Reason</label>
+        <input type="text" className=" form-control formTest" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+        <Button variant="primary" type="submit" className="submitForm">
          Submit
         </Button> 
         {this.state.successMsg && <h6 className="successMsg">Request successfully submitted!</h6> }
@@ -369,13 +369,13 @@ class requestsForms extends Component{
      {this.state.formType=="Annual Leave" && 
      <form onSubmit={this.onFormAnnualSubmit}>
          
-        <label className="col-form-label" htmlFor="slotDate">Day Off Date</label>
-        <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="slotDate" required onChange={this.handleChange}/>
+        <label className="col-form-label labelForm" htmlFor="slotDate">Day Off Date</label>
+        <input type="date" className=" form-control formTest" placeholder="YYYY-MM-DD" id="slotDate" required onChange={this.handleChange}/>
 
         
         
-        <label className="col-form-label" htmlFor="annualReason">Reason</label>
-        <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+        <label className="col-form-label labelForm" htmlFor="annualReason">Reason</label>
+        <input type="text" className=" form-control formTest" placeholder="Default input" id="reason" onChange={this.handleChange}/>
         <Button variant="primary" type="submit">
          Submit
         </Button> 
@@ -389,13 +389,13 @@ class requestsForms extends Component{
     {this.state.formType=="Compensation Leave" &&
     <form onSubmit={this.onFormCompensationSubmit}>
          
-         <label className="col-form-label" htmlFor="missedDay">Missed Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="missedDay" required onChange={this.handleChange}/>
-         <label className="col-form-label" htmlFor="compensatedDay">Compensation Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="compensatedDay" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="missedDay">Missed Day Date</label>
+         <input type="date" className=" form-control formTest" placeholder="YYYY-MM-DD" id="missedDay" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="compensatedDay">Compensation Day Date</label>
+         <input type="date" className=" form-control formTest" placeholder="YYYY-MM-DD" id="compensatedDay" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="reason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="reason" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="reason">Reason</label>
+         <input type="text" className=" form-control formTest" placeholder="Default input" id="reason" required onChange={this.handleChange}/>
          <Button variant="primary" type="submit"> 
           Submit
          </Button> 
@@ -408,7 +408,7 @@ class requestsForms extends Component{
     {this.state.formType=="Change Day off" &&
     <form onSubmit={this.onFormChangeSubmit}>
          
-         <label className="col-form-label" htmlFor="newDayOff">New Day-Off</label>  
+         <label className="col-form-label labelForm" htmlFor="newDayOff">New Day-Off</label>  
             <Form.Control as="select" placeholder="Choose a day" onChange={this.chooseDay}>
             <option value="" hidden></option>
             <option value="Saturday" >Saturday</option>
@@ -420,8 +420,8 @@ class requestsForms extends Component{
             </Form.Control>
             <br/>
 
-         <label className="col-form-label" htmlFor="changeReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="changeReason">Reason</label>
+         <input type="text" className=" form-control formTest" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 
@@ -435,27 +435,27 @@ class requestsForms extends Component{
      
          /* <div>
      <div class="form-group">
-    <label class="col-form-label" for="inputDefault">Default input</label>
-    <input type="date" class="form-control" placeholder="Default input" id="inputDefault"/>
+    <label class="col-form-label labelForm" for="inputDefault">Default input</label>
+    <input type="date" class=" form-control formTest" placeholder="Default input" id="inputDefault"/>
     </div>
     
 <div class="form-group has-success">
-  <label class="form-control-label" for="inputValid">Valid input</label>
-  <input type="text" value="correct value" class="form-control is-valid" id="inputValid"/>
+  <label class=" form-control formTest-label" for="inputValid">Valid input</label>
+  <input type="text" value="correct value" class=" form-control formTest is-valid" id="inputValid"/>
   <div class="valid-feedback">Success! You've done it.</div>
 </div>
 </div> */
     <form onSubmit={this.onFormMaternitySubmit}>
          
-         <label className="col-form-label" htmlFor="startDate">Start Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="startDate" required onChange={this.handleChange}/>
-         <label className="col-form-label" htmlFor="endDate">End Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="endDate" required onChange={this.handleChange}/>
-         <label className="col-form-label" htmlFor="maternityDoc">Maternity Documents</label>
-         <input type="text" className="form-control" placeholder="" id="maternityDoc" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="startDate">Start Date</label>
+         <input type="date" className=" form-control formTest " placeholder="YYYY-MM-DD" id="startDate" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="endDate">End Date</label>
+         <input type="date" className=" form-control formTest" placeholder="YYYY-MM-DD" id="endDate" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="maternityDoc">Maternity Documents</label>
+         <input type="text" className=" form-control formTest" placeholder="" id="maternityDoc" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="maternityReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="maternityReason">Reason</label>
+         <input type="text" className=" form-control formTest" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 
@@ -468,9 +468,9 @@ class requestsForms extends Component{
     {this.state.formType=="Replacement" &&
     <form onSubmit={this.onFormReplacementSubmit}>
          
-         <label className="col-form-label" htmlFor="slotDate">Slot Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="slotDate" required onChange={this.handleChange}/>
-         <label className="col-form-label" htmlFor="slotNum">Slot Number</label>
+         <label className="col-form-label labelForm" htmlFor="slotDate">Slot Date</label>
+         <input type="date" className=" form-control formTest" placeholder="YYYY-MM-DD" id="slotDate" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="slotNum">Slot Number</label>
         
          <Form.Control as="select" placeholder="Choose a slot"  onChange={this.chooseSlotNum}>
          <option value="" hidden></option>
@@ -481,12 +481,12 @@ class requestsForms extends Component{
             <option value="5" >5</option>
             </Form.Control>
             <br/>
-         {/* <input type="number" min="1" max="5" className="form-control" placeholder="" id="slotNum" required onChange={this.handleChange}/> */}
-         <label className="col-form-label" htmlFor="slotLoc">Slot Location</label>
-         <input type="text" className="form-control" placeholder="" id="slotLoc" required onChange={this.handleChange}/>
+         {/* <input type="number" min="1" max="5" className=" form-control formTest" placeholder="" id="slotNum" required onChange={this.handleChange}/> */}
+         <label className="col-form-label labelForm" htmlFor="slotLoc">Slot Location</label>
+         <input type="text" className=" form-control formTest" placeholder="" id="slotLoc" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="slotReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="slotReason">Reason</label>
+         <input type="text" className=" form-control formTest" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 
@@ -499,7 +499,7 @@ class requestsForms extends Component{
     {this.state.formType=="Slot Linking" &&
     <form onSubmit={this.onFormSlotLinkingSubmit}>
          
-         <label className="col-form-label" htmlFor="slotDay">Slot Day</label>
+         <label className="col-form-label labelForm" htmlFor="slotDay">Slot Day</label>
          <Form.Control as="select" placeholder="Choose a day" required onChange={this.chooseSlotLinkingDay}>
             <option value="" hidden></option>
             <option value="Saturday" >Saturday</option>
@@ -511,7 +511,7 @@ class requestsForms extends Component{
             </Form.Control>
             <br/>
         
-        <label className="col-form-label" htmlFor="slotNum">Slot Number</label>
+        <label className="col-form-label labelForm" htmlFor="slotNum">Slot Number</label>
          <Form.Control as="select" placeholder="Choose a slot" required onChange={this.chooseSlotNum}>
          <option value="" hidden></option>
             <option value="1" >1</option>
@@ -522,11 +522,11 @@ class requestsForms extends Component{
             </Form.Control>
             <br/>
         
-        <label className="col-form-label" htmlFor="courseID">Course ID</label>
-         <input type="text" className="form-control" placeholder="" id="courseID" required onChange={this.handleChange}/>
+        <label className="col-form-label labelForm" htmlFor="courseID">Course ID</label>
+         <input type="text" className=" form-control formTest" placeholder="" id="courseID" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="sickReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="sickReason">Reason</label>
+         <input type="text" className=" form-control formTest" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 
@@ -538,13 +538,13 @@ class requestsForms extends Component{
     {this.state.formType=="Sick Leave" &&
     <form onSubmit={this.onFormSickSubmit}>
          
-         <label className="col-form-label" htmlFor="sickDay">Sick Day Date</label>
-         <input type="date" className="form-control" placeholder="YYYY-MM-DD" id="sickDay" required onChange={this.handleChange}/>
-         <label className="col-form-label" htmlFor="medicalDoc">Medical Documents</label>
-         <input type="text" className="form-control" placeholder="" id="medicalDoc" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="sickDay">Sick Day Date</label>
+         <input type="date" className=" form-control formTest" placeholder="YYYY-MM-DD" id="sickDay" required onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="medicalDoc">Medical Documents</label>
+         <input type="text" className=" form-control formTest" placeholder="" id="medicalDoc" required onChange={this.handleChange}/>
  
-         <label className="col-form-label" htmlFor="sickReason">Reason</label>
-         <input type="text" className="form-control" placeholder="Default input" id="reason" onChange={this.handleChange}/>
+         <label className="col-form-label labelForm" htmlFor="sickReason">Reason</label>
+         <input type="text" className=" form-control formTest" placeholder="Default input" id="reason" onChange={this.handleChange}/>
          <Button variant="primary" type="submit">
           Submit
          </Button> 

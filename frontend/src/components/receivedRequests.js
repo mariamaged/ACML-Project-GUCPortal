@@ -733,10 +733,11 @@ class ViewReceivedRequests extends Component{
 
                 <div className="containAll">
                 {/* <h4>{this.state.Warning}</h4> */}
-            
+                <a className="maternityH">{this.state.reqTitle}</a>
+                  {/* <div className="tests"> */}
             
             <div className="containDrop">
-            {this.state.reqType!="Annual Leave" &&  <a className="maternityH">{this.state.reqTitle}</a>}
+           
             {this.state.reqType=="Maternity Leave" &&
             <Dropdown as={ButtonGroup} className="buttons2">
                     <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
@@ -840,7 +841,7 @@ class ViewReceivedRequests extends Component{
             }
             {this.state.reqType=="Annual Leave" &&
             <div >
-            <span className="maternityH">{this.state.reqTitle}</span>
+            
             <div className="controlCrazy">
             <Dropdown as={ButtonGroup} className="buttonsChange2">
                     <Dropdown.Toggle id="dropdown-custom-3" className="pickBtnAnnual" >State</Dropdown.Toggle>
@@ -954,7 +955,7 @@ class ViewReceivedRequests extends Component{
                     </Dropdown.Menu>
                 </Dropdown> */} 
                
-              
+                {/* </div> */}
                 </div>      
 
                 
@@ -1150,7 +1151,7 @@ class ViewReceivedRequests extends Component{
                 {this.state.reqType=="Annual Leave"&&
                 /* ,slotNum:sent[i].slotNum,slotDate:sent[i].slotDate,
                     slotLoc:sent[i].slotLoc, replacementStaff:repl, */
-                <div className=" containMaternityTable annualTable">
+                <div className=" containMaternityTable ">
                 {this.state.Warning!="" && <h5 className="cancelWarning">{this.state.Warning}</h5>}
                 <table class="table table-hover  header-fixed">
                     <thead>
@@ -1205,8 +1206,8 @@ class ViewReceivedRequests extends Component{
         <div className="center">
         {/* <h3>{this.state.reqTitle}</h3> */}
        {/* <h4> No requests yet</h4> */}
-       {this.state.loadingBool==false && 
-       <div className="containDropDown">
+       {' '} {this.state.loadingBool==false && 
+       <div className="dropFinal">
             <span className="noReq"><h3>{this.state.reqTitle}</h3></span>
                 
             <Dropdown as={ButtonGroup} className="buttons2Down">
@@ -1258,9 +1259,10 @@ class ViewReceivedRequests extends Component{
 
                 </div>
                 }
+                {' '}
                 {this.state.loadingBool==false &&
-                <div className="all">
-                <div className="war alert-primary alert" role="alert" >
+               <div className="all">
+                <div id="noalert" className="war alert-primary alert" role="alert" >
                No requests yet!
                 </div>  
                 </div>

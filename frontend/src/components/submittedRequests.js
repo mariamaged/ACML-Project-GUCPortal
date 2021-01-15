@@ -490,10 +490,10 @@ class ViewSubmittedRequests extends Component{
 
                 <div className="containAll">
                 
-            
+             <a className="maternityH">{this.state.reqTitle}</a>
             
                 <div className="containDrop">
-            {this.state.reqType!="Annual Leave" &&  <a className="maternityH">{this.state.reqTitle}</a>}
+            
             {this.state.reqType=="Maternity Leave" &&
             <Dropdown as={ButtonGroup} className="buttons2">
                     <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
@@ -597,7 +597,6 @@ class ViewSubmittedRequests extends Component{
             }
             {this.state.reqType=="Annual Leave" &&
             <div >
-            <span className="maternityH">{this.state.reqTitle}</span>
             <div className="controlCrazy">
             <Dropdown as={ButtonGroup} className="buttonsChange2">
                     <Dropdown.Toggle id="dropdown-custom-3" className="pickBtnAnnual" >State</Dropdown.Toggle>
@@ -975,8 +974,8 @@ class ViewSubmittedRequests extends Component{
                     
                     
                     </Dropdown.Menu>
-                </Dropdown>
-                      <Dropdown as={ButtonGroup} className="buttons1" >
+                </Dropdown>{'   '}
+                {'   '} <Dropdown as={ButtonGroup} className="buttons1" >
                 <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn">Request Type</Dropdown.Toggle>
                     <Dropdown.Menu className="super-colors">
              
@@ -1004,12 +1003,14 @@ class ViewSubmittedRequests extends Component{
                     {this.state.reqType=="Slot Linking" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleTypeClick(e,"Slot Linking")}>Slot Linking</Button></Dropdown.Item >}
                     </Dropdown.Menu>
                 </Dropdown>{' '} 
-
+            
                 </div>    }
-
+                
                 {this.state.loadingBool==false && 
+                    <div className="all">
                 <div class="alert alert-primary" role="alert" >
                 No requests yet!
+                </div>
                 </div> 
             }
 

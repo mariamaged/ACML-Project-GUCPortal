@@ -1,324 +1,8 @@
-
-.reqTable{
-  width:83vw !important;
-  /* background-color: #78c2ad !important; */
-  background-color: rgb(217 228 224)!important;
-   color:rgb(0, 0, 0) !important;
-   margin-top: 2vw;
-   text-align: center !important;
-}
-
-.reqTd{
-  width:5vw;
-  color:rgb(0, 0, 0) !important;
-  font-weight:500 !important;
-
-}
-.reqTdRes{
-  color:rgb(0, 0, 0) !important;
-  font-weight:500 !important;
-}
-.reqTh{
-  text-align: center !important;
-  font-weight:650 !important;
-  
-}
-.containAll{
-  /* width:80vw; */
-  
-}
-.buttonResponse3{
-  color:darkgreen !important;
-  size:0.5vw !important;
-
-}
-.containMaternityTable {
-  max-height:300px !important;
-  overflow-y: scroll;
-  width:97vw !important;
- 
- 
-}
-.btn-group{
-  position:relative;
-  top:4vw;
-  right:34vw;
-}
-
-
-.containMaternityTable::-webkit-scrollbar {
-  width:0.5vw !important;
-  border-radius:1vw ;
-  background:#869e98 !important;
-  height: 0.5vw !important; 
-}
-
-
-
- .containDrop{
-  /* max-height:15% !important; */
-  /* max-width:25% !important; */
-  display:flex;
-  flex-direction: row;
-
-
-} 
 .maternityH{
-  position:relative;
-  bottom:1vw;
-}
-.btn-group{
-   size:'sm';
-   max-height: 5% !important;
-  
+font-size:2vw!important;
+color:rgba(0, 0, 0, 0.801)!important;
 }
 
-.btn{
-font-size:0.8 rem !important;
-border:1px solid #7050ff!important;
-border-radius: 0.5rem !important;
-max-height: 3vw !important;
-position:relative;
-top:2vw;
-}
-/* .pickBtn{
-  background-color: #4aa48a !important;
-} */
-.re{
-  background-color: red !important;
-}
-
-.buttons1{
-  margin-left: 1.5vw;
-  height:2.3vw !important;
-  position:relative;
-  top:4vw !important;
-}
-.containDropDown{
-  display:flex;
-  flex-direction: row;
-  position:relative;
-  top:8vw !important;
-}
-/* .noReqAlert{
-  position:relative;
-  top:1vw !important;
-} */
- .buttons2{
-  /* position:relative;
-  bottom:1.2vw;*/
-  margin-left: 40vw;
-  height:3vw !important;
-} 
-.btn{
-  padding-top: 0rem !important;
-  padding-bottom: 0.05rem !important;
-}
-.dropdown-menu >  a:hover {
-  background-image: none;
-  background-color: rgb(218, 211, 211);
-}
-.acceptButton{
-  /* width:3vw !important; */
-}
-.dropdown-menu{
-  width:auto;
-  height:auto;
-}
-
-
-.buttons1Down{
-  margin-left: 1.5vw;
-  height:2.3vw !important;
-  position:relative;
-  top:4vw !important;
-  padding-top: 0rem;
-  padding-right: 0rem;
-}
-.buttons2Down{
-  margin-left: 40vw;
-  height:2.5vw !important;position:relative;
-  padding:0.08rem;
-  padding-top: 0rem;
-  padding-right: 0rem;
-  /* bottom:1vw !important; */
-
-}
-
-.alert-primary{
-  color:black !important;
-  background-color: rgb(179 165 165) !important;
-  position:relative !important;
-  top:10vw !important;
- 
-}
-.all{
-  position:relative !important;
-  top:10vw !important;
-  width:50% !important;
-}
-.alert{
-  position:relative !important;
-  top:15vw !important;
-  width:50% !important;
-}
-/* .war {
-  position:relative;
-  top:20vw !important;
-  left:2vw !important;
-} */
-.buttonsSick2{
-  margin-left: 44vw;
-  height:2.3vw !important;
-}
- .buttonsComp2{
-  margin-left: 38.5vw;
-  height:2.3vw !important;
-} 
-.buttonsChange2{
-  margin-left: 36.9vw;
-  height:2.3vw !important;
-}
-.buttonsAccidental2{
-  margin-left: 35.6vw;
-  height:2.3vw !important;
-}  
-/* .pickBtnAnnual{
-  position:relative;
-  top:5vw !important;
-}*/
-.buttonsAnnual2{
-  text-align: center !important;
-  margin-left: 10vw !important;
-  height:2vw !important;
-  position:relative;
-  top:1vw !important;
-}  
-.pickBtnAnnual{
-  /* height:2vw!important; */
-}
-.btn{
-  text-align:center !important;
-  /* padding:0.05rem !important; */
-}
-.maternityH2{
-  color:#05081fe6;
-  position:relative;
-  top:-1vw !important;
-  font-size: 3vw !important;
-  /* display:flex;
-  flex-direction: row; */
-}
-/* .buttonsAnnual1{
-  position:relative;
-
-  margin-left: 2vw;
-  /* top:2vw !important; 
-}  */
-/* .annualTable{
-  position:relative;
-  top:2vw !important;
-} */
-.pickBtnAnnual{
-  height:2.2vw !important;
-    position:relative !important;
-    left:4vw !important;
- /* top:0vw !important; */
- margin-left: 20vw !important;
-} 
-.controlCrazy{
-  position:relative !important;
-    left:0vw !important;
-    top:-4.5vw!important;
-}
-.btn{
-  height:2.3vw !important;
-}
-.pickBtnAnnual2{
-    height:vw !important;
-  /* position:relative;
-  top:3vw !important; */
-}
-
-
-
-.maternityH{
-  color:#05081fe6;
-  font-size: 3vw;
-}
-
-.containAll{
-  position:relative;
-  top:7vw;
-  left:1vw;
-}
-
-.reqTitle{
-  position:relative;
-  top:9vw !important;
-  left:2vw;
-}
-.noReq{
-  position:relative;
-  top:10vw !important;
-}
-
-.cancelButton{
-  border:1px solid transparent!important;
-  position:relative !important;
-  top:0vw !important;
-  background-color:transparent !important;
-  border: transparent !important;
-  /* box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6) !important; */
-}
-.cancelWarning{
-  color:rgb(180, 16, 16);
-  font-size:1.2vw !important;
-}
-
-.acceptButton{
-  border:1px solid transparent!important;
-  position:relative !important;
-  top:0vw !important;
-}
-
-.noReq{
-  position:reative !important;
-  top:2vw !important;
-  left:2vw !important;
-}
-
- .alert{
-  position:relative !important;
-  top:5vw !important;
-  left:2vw !important;
-  width:60% !important;
-} 
-.c2{
-  position:relative !important;
-  top:3vw !important;
-}
-
-.reqForm{
-  display:flex;
-  flex-direction: row;
-  position:relative !important;
-  left:2vw !important;
-  top:2vw !important;
-}
-
-
-.reqFormDrop{
-  margin-left: 60vw !important;
-}
-
-.accidentalWarning{
-  color:rgb(180, 16, 16);
-  font-size:1.2vw !important;
-  position:relative;
-  top:3vw;
-
-}
 .warningMsg{
   color:rgb(180, 16, 16);
   font-size:1vw !important;
@@ -338,65 +22,58 @@ top:2vw;
   position:relative;
   top:3vw;
 }
-
-.an{
-  text-align: center !important;
-}
-
-.table-fixed {
-  background-color: #fbfbfb;
-  width: 100%;
-}
-.table-fixed tbody {
-  height: 200px;
-  overflow-y: auto;
-  width: 100%;
-}
-.table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
-  display: block;
-}
-.table-fixed tbody td {
-  float: left;
-}
-.table-fixed thead tr th {
-  background-color:#159bd0;
-  border-color:#0881b1;
-  float: left;
-  color:#fff;
-}
-.read_article{
-text-align:center;
-}
-.table-fixed td{
-  width:5vw;
-}
-
-.spanCol{
-  width:15vw !important;
-}
-.repStaff{
-  text-align:center !important;
-}
-
-.annualTable{
-  width:95% !important;
-  overflow-x: scroll !important;
-}
-.dropdown-custom-3{
-  position: relative;
-  top:2vw!important;
-}
-.table{
- color: #212529db !important;
-}
-
-.rej{
-  width:108% !important;
+.containMaternityTable{
+  /* width:0.5vw !important; */
+  /* border-radius:1vw ; */
+  /* background:#869e98 !important; */
+  /* height: 0.5vw !important;  */
   position:relative;
-  top:1vw !important;
-  /* padding: 0rem !important; */
-
+  top:3vw!important;
+  max-height:300px !important;
+  overflow-y: scroll;
+  width:97vw !important;
 }
-.form-control{
-  width:108% !important;
+.containMaternityTable::-webkit-scrollbar {
+  width:0.5vw !important;
+  border-radius:1vw ;
+  background:#869e98 !important;
+  height: 0.5vw !important;
+  color:black!important; 
+  font: weight 200!important;
+}
+.containMaternityTable td {
+  color:black!important; 
+  font-weight :600!important;
+}
+.containMaternityTable thead{
+  text-align:center!important;
+  color:rgba(0, 0, 0, 0.781)!important; 
+  /* font-weight: 400!important; */
+}
+.cancelWarning{
+  color:rgb(180, 16, 16);
+  font-size:1.2vw !important;
+}
+.dropdown-menu >  a:hover {
+  background-image: none;
+  background-color: rgb(218, 211, 211);
+}
+.cancelButton{
+  border:1px solid transparent!important;
+  position:relative !important;
+  top:0vw !important;
+  background-color:transparent !important;
+  border: transparent !important;
+  /* box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6) !important; */
+}
+.all {
+  position:relative;
+  top:5vw !important;
+  left:2vw !important;
+  width:50% !important;
+} 
+.dropFinal{
+  position:relative;
+  top:3vw !important;
+  left:2vw !important;
 }
