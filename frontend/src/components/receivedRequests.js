@@ -194,8 +194,10 @@ class ViewReceivedRequests extends Component{
             this.setState({RejectionReason:e.target.value})
         }
         onRejectRequest(e,value){
-            this.setState({Warning:""})
+           
             e.preventDefault()
+            // this.setState({Warning:""})
+            console.log("in reject")
             console.log("reqID= "+value)
             axios.request({
                 method: 'POST',
@@ -213,7 +215,7 @@ class ViewReceivedRequests extends Component{
                 this.setState({RejectionReason:""})
                 const location = {
                     pathname: '/receivedRequests',
-                    state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle}
+                    state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle,Warning:""}
                   }
                   
                  history.push(location)
@@ -225,7 +227,7 @@ class ViewReceivedRequests extends Component{
                 })
         }
         onAcceptRequest(e,value){
-            this.setState({Warning:"",RejectionReason:""})
+            this.setState({RejectionReason:""})
             e.preventDefault()
             console.log("reqID= "+value)
             axios.request({
@@ -243,7 +245,7 @@ class ViewReceivedRequests extends Component{
 
                 const location = {
                     pathname: '/receivedRequests',
-                    state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle}
+                    state: { reqType: this.state.reqType,reqTitle: this.state.reqTitle,Warning:""}
                   }
                   
                  history.push(location)
@@ -278,7 +280,7 @@ class ViewReceivedRequests extends Component{
                 </InputGroup>
                 </td> }
 
-                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+                                {request.state!="Pending" && this.state.reqState!="Accepted" && <td>{request.RejectionReason}</td>}
 
 
                 <td  >
@@ -321,7 +323,7 @@ class ViewReceivedRequests extends Component{
                 </InputGroup>
                 </td> }
 
-                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+                                {request.state!="Pending" && this.state.reqState!="Accepted" && <td>{request.RejectionReason}</td>}
 
                     <td  >
                     
@@ -365,7 +367,7 @@ class ViewReceivedRequests extends Component{
                 </InputGroup>
                 </td> }
 
-                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+                                {request.state!="Pending" && this.state.reqState!="Accepted" && <td>{request.RejectionReason}</td>}
                 <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -404,7 +406,7 @@ class ViewReceivedRequests extends Component{
                 </InputGroup>
                 </td> }
 
-                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+                                {request.state!="Pending" && this.state.reqState!="Accepted" && <td>{request.RejectionReason}</td>}
                     <td  >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -443,7 +445,7 @@ class ViewReceivedRequests extends Component{
                 </InputGroup>
                 </td> }
 
-                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+                                {request.state!="Pending" && this.state.reqState!="Accepted" && <td>{request.RejectionReason}</td>}
                 <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -482,7 +484,7 @@ class ViewReceivedRequests extends Component{
                 </InputGroup>
                 </td> }
 
-                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+                                {request.state!="Pending" && this.state.reqState!="Accepted" && <td>{request.RejectionReason}</td>}
                 <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -518,7 +520,7 @@ class ViewReceivedRequests extends Component{
                 </InputGroup>
                 </td> }
 
-                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+                                {request.state!="Pending" && this.state.reqState!="Accepted" && <td>{request.RejectionReason}</td>}
                     <td  >
                     <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -664,7 +666,7 @@ class ViewReceivedRequests extends Component{
                 </InputGroup>
                 </td> }
 
-                {request.state!="Pending" && <td>{request.RejectionReason}</td>}
+                {request.state!="Pending" && this.state.reqState!="Accepted" && <td>{request.RejectionReason}</td>}
                 <td  >
                 <Button  size="sm" className="cancelButton" onClick={(e)=>this.onAcceptRequest(e,request.requestID)}>
                <CheckCircleFill color="darkred" className="cancelBtn" size={19} />
@@ -730,7 +732,7 @@ class ViewReceivedRequests extends Component{
             return(
 
                 <div className="containAll">
-                
+                <h4>{this.state.Warning}</h4>
             
             
             <div className="containDrop">

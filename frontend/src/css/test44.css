@@ -262,7 +262,7 @@ top:2vw;
 }
 .cancelWarning{
   color:rgb(180, 16, 16);
-  font-size:large !important;
+  font-size:1.2vw !important;
 }
 
 .acceptButton{
@@ -310,7 +310,7 @@ top:2vw;
 }
 .warningMsg{
   color:rgb(180, 16, 16);
-  font-size:1.2vw !important;
+  font-size:1vw !important;
   position:relative;
   top:3vw;
 }
@@ -323,7 +323,7 @@ top:2vw;
 }
 .successMsg{
   color:rgb(9, 88, 65);
-  font-size:1.2vw !important;
+  font-size:1vw !important;
   position:relative;
   top:3vw;
 }

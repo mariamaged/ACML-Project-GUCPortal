@@ -4363,6 +4363,7 @@ router.put('/acceptRequest',authenticateToken,async(req,res)=>{
 router.post('/rejectRequest',authenticateToken,async(req,res)=>{
     console.log("in reject request")
     const userAcademic = await AcademicStaffModel.findOne({member: req.user.id});
+    console.log("idddddddddddddddd= "+req.body.requestID)
     if(!userAcademic) 
     return res.status(401).send('You are not an academic member!');
 
@@ -4371,7 +4372,8 @@ router.post('/rejectRequest',authenticateToken,async(req,res)=>{
     }
     const currRequest=await request.findOne({requestID:req.body.requestID})
     const reqType=currRequest.reqType
-    if(currRequest.state!="Pneding")
+    console.log("state= "+currRequest.state)
+    if(currRequest.state!="Pending")
     return res.status(400).json("This request has already been responded to!")
     if(!currRequest)
     return res.json("This request does not exist.")
