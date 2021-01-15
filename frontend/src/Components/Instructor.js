@@ -4,6 +4,9 @@ import UpdateProfile from "./StaffMember/UpdateProfile";
 import Attendance from "./StaffMember/Attendance";
 import axios from "axios";
 import Logout from "./Logout";
+import Notifications from "./Notifications";
+import Homepage from './Homepage';
+
 
 
 class Instructor extends React.Component{
@@ -56,6 +59,7 @@ class Instructor extends React.Component{
        }).then(res=>{
            alert("Password changed successfully");
            this.setState({newMember:false});
+           localStorage.setItem("newMember",false);
        })  .catch((error) => {
         if(error.response){
           console.log(error.response);
@@ -72,7 +76,7 @@ class Instructor extends React.Component{
         if(!localStorage.getItem("auth-token")){
             this.props.history.push('/');
         }
-        if(localStorage.getItem("role")!="Course Instructo"){
+        if(localStorage.getItem("role")!="Course Instructor"){
             this.props.history.push('/');
         }
      
@@ -81,8 +85,8 @@ class Instructor extends React.Component{
           <div>
               
               {this.state.newMember==="true"?this.passwordReset():this.routes()}
-            
-                
+              
+               <ViewProfile/>
              
           </div>
         )

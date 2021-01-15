@@ -5,6 +5,8 @@ import Attendance from "./StaffMember/Attendance";
 import axios from "axios";
 import Logout from "./Logout";
 
+import Notifications from "./Notifications"
+import Homepage from "./Homepage";
 
 class Assisant extends React.Component{
     state={
@@ -56,6 +58,7 @@ class Assisant extends React.Component{
        }).then(res=>{
            alert("Password changed successfully");
            this.setState({newMember:false});
+           localStorage.setItem("newMember",false);
        })  .catch((error) => {
         if(error.response){
           console.log(error.response);
@@ -81,7 +84,7 @@ class Assisant extends React.Component{
           <div>
               
               {this.state.newMember==="true"?this.passwordReset():this.routes()}
-            
+              <Notifications/>
                 
              
           </div>

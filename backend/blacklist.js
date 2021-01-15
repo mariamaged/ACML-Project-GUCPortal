@@ -4,7 +4,7 @@ function addToken(t){
     console.log(blacklist);
 }
 function getTokens(){
-    console.log(blacklist);
+    console.log("BLACKLIST:"+blacklist);
     return blacklist
 }
 

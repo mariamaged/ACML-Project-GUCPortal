@@ -37,6 +37,27 @@ async function authenticateToken(req, res, next) {
   }
 }
 module.exports = authenticateToken;
+
+
+router.get('/allNotifications', authenticateToken, async (req, res) => {
+  try{
+    const user= await StaffMemberModel.findById(req.user.id);
+    if(!user){
+      res.status(400).send({msg:"User not found"});
+      return;
+    }
+   const all=user.oldNotifications.concat(user.notifications);
+   console.log(all);
+   res.status(200).send(all);
+   return;
+
+  }catch(error){
+    res.status(500).send({msg:error.message});
+    return;
+  }
+})
+
+
 //login
 router.post("/login", async (req, res, next) => {
   console.log("here in login");
@@ -201,7 +222,7 @@ router.get("/profile", authenticateToken, async (req, res) => {
     else locName = loc.id;
 
     res.send({
-      dayOff: staff.day_off,
+     
       salary: staff.salary,
       gender: staff.gender,
       name: staff.name,
@@ -210,7 +231,7 @@ router.get("/profile", authenticateToken, async (req, res) => {
       // salary:staff.salary,
       office: (await location.findById(staff.office)).id,
       staff_type: staff.staff_type,
-      day_off: academic.day_off,
+      dayOff: academic.day_off,
       department: depName,
       faculty: facName,
       //courses:arr,

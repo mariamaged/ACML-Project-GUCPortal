@@ -3,6 +3,7 @@ import ViewProfile from "./StaffMember/ViewProfile";
 import UpdateProfile from "./StaffMember/UpdateProfile";
 import Attendance from "./StaffMember/Attendance";
 import axios from "axios";
+import Notifications from "./Notifications";
 
 import Logout from "./Logout";
 
@@ -57,6 +58,7 @@ class HR extends React.Component{
        }).then(res=>{
            alert("Password changed successfully");
            this.setState({newMember:false});
+           localStorage.setItem("newMember",false);
        })  .catch((error) => {
         if(error.response){
           console.log(error.response);
@@ -82,6 +84,7 @@ class HR extends React.Component{
           <div>
               
               {this.state.newMember==="true"?this.passwordReset():this.routes()}
+             
             
                 
              

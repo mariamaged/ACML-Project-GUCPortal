@@ -23,15 +23,16 @@ class ViewProfile extends React.Component {
       this.setState({deduction:this.state.deduction+1})
       this.setState({days:res.data.length})
       console.log(res.data);
-    }).catch(err=>{
-      if(err.response){
-        console.log(err.response)
-        alert(console.log(err.response.data.msg));
+    })  .catch((error) => {
+      if(error.response){
+        console.log(error.response);
+        alert(error.response.data.msg);
       }else{
-        console.log(err);
-        alert(err.message);
+        console.log(error);
+        alert("ERROR OCCURED:\n" + error.message);
       }
-    });
+     
+    })
     axios.get("http://localhost:5000/staff/missingHours",{
       headers:{
         "auth-token":localStorage.getItem("auth-token")
@@ -43,15 +44,16 @@ class ViewProfile extends React.Component {
       this.setState({minutes:missing-extra});
 
       console.log(res.data);
-    }).catch(err=>{
-      if(err.response){
-        console.log(err.response)
-        alert(console.log(err.response.data.msg));
+    })  .catch((error) => {
+      if(error.response){
+        console.log(error.response);
+        alert(error.response.data.msg);
       }else{
-        console.log(err);
-        alert(err.message);
+        console.log(error);
+        alert("ERROR OCCURED:\n" + error.message);
       }
-    });
+     
+    })
 
   }
   componentDidMount() {
@@ -73,19 +75,28 @@ class ViewProfile extends React.Component {
         console.log(this.state.user);
       })
       .catch((error) => {
-        console.error(error.response);
-        alert(error.response.data);
-      });
+        if(error.response){
+          console.log(error.response);
+          alert(error.response.data.msg);
+        }else{
+          console.log(error);
+          alert("ERROR OCCURED:\n" + error.message);
+        }
+       
+      })
      this.getDeduction();
   }
 
 
   displayDeduction=()=>{
     let dedDays=this.state.days*(this.state.user.salary/60);
+   
     if(this.state.minutes>0){
-      let dedMins=this.state.minutes*(this.state.salary/180*60)
+     
+      let dedMins=this.state.minutes*(this.state.user.salary/(180*60))
+   
       return(
-        <h5>{dedDays+dedMins}</h5>
+        <h5>{(dedDays+dedMins)}</h5>
       )
     }
     return(
