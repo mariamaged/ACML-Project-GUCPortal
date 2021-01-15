@@ -56,7 +56,7 @@ class InstructorNavbar extends Component {
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Courses</a>
                             <div class="dropdown-menu">
                                 <NavLink to='/instructor/instructorCoursesCoverage/all'><a class="dropdown-item"> Coverage of assigned courses</a></NavLink>
-                                <NavLink to='/instructor/instructorTeachingAssignment'><a class="dropdown-item">Teaching assignments of assigned courses</a></NavLink>
+                                <NavLink to='/instructor/instructorTeachingAssignment/all'><a class="dropdown-item">Teaching assignments of assigned courses</a></NavLink>
                                 <NavLink to='/instructor/assignCourseCoordinator'><a class="dropdown-item">Assign Course Coordinator</a></NavLink>
                                 <NavLink to='/instructor/assignMember'><a class="dropdown-item">Assign academic member to course</a></NavLink>
                                 <NavLink to='/instructor/deleteMemberAssignment'><a class="dropdown-item">Delete academic member assignment from course</a></NavLink>
