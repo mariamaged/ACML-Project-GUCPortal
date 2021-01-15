@@ -2,8 +2,9 @@ import React,{Component} from 'react'
 import axios from 'axios'
 import { Button, Table } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
-import '../css/test44.css'
+
 import '../css/bootstrap.min.css'
+import '../css/test44.css'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 // import Dropdown from 'react-bootstrap/Dropdown'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
@@ -32,7 +33,8 @@ class ViewReceivedRequests extends Component{
         RejectionReason:"",
         Warning:"",
         acceptedReplacement:[],
-        loadingBool:true
+        loadingBool:true,
+        dropname:""
     }
     componentDidMount(props){
     console.log("in maternity view "+ this.props.location.state.reqType)
@@ -55,7 +57,8 @@ class ViewReceivedRequests extends Component{
             console.log("curr req= "+maternity)
             this.setState({unFilteredRequests:res.data.arr,
                 warning:res.data.warning,stateBool:false
-            ,reqType:this.state.reqType,reqTitle:this.state.reqTitle,requests:maternity,loadingBool:false})
+            ,reqType:this.state.reqType,reqTitle:this.state.reqTitle,
+            requests:maternity,loadingBool:false})
 
             console.log("new state= "+this.state.requests.reqType)
             console.log("new state= "+this.state.warning)
@@ -129,32 +132,50 @@ class ViewReceivedRequests extends Component{
                })
                console.log("type= "+type)
                var typeTitle="";
-               if(value=="Sick Leave")
+               var dropName=""
+               if(value=="Sick Leave"){
                typeTitle="Sick Leave Requests"
+                dropName="si"
+               }
 
-               if(value=="Maternity Leave")
+               if(value=="Maternity Leave"){
                typeTitle="Maternity Leave Requests"
+               dropName="ma"
+               }
 
-               if(value=="Accidental Leave")
+               if(value=="Accidental Leave"){
                typeTitle="Accidental Leave Requests"
+               dropName="ac"
+               }
 
-               if(value=="Annual Leave")
+               if(value=="Annual Leave"){
                typeTitle="Annual Leave Requests"
+               dropName="an"
+               }
 
-               if(value=="Slot Linking")
+               if(value=="Slot Linking"){
                typeTitle="Slot Linking Requests"
+               dropName="sl"
+               }    
 
-               if(value=="Change Day off")
+               if(value=="Change Day off"){
                typeTitle="Change Day Off Requests"
+               dropName="ch"
+               }
 
-               if(value=="Replacement")
+               if(value=="Replacement"){
                typeTitle="Replacement Requests"
+               dropName="re"
+               }
 
-               if(value=="Compensation Leave")
+               if(value=="Compensation Leave"){
                typeTitle="Compensation Requests"
+               dropName="co"
+               }
 
 
-                this.setState({reqType:value,reqTitle:typeTitle,stateBool:false,requests:type,reqState:"All",cancelWarning:""})
+                this.setState({reqType:value,reqTitle:typeTitle,stateBool:false,
+                    requests:type,reqState:"All",cancelWarning:"",dropName:dropName})
                console.log("this.state.reqType alooooooo"+this.state.reqType)
                 const location = {
                     pathname: '/receivedRequests',
@@ -713,9 +734,136 @@ class ViewReceivedRequests extends Component{
             
             
             <div className="containDrop">
-            <span className="maternityH">{this.state.reqTitle}</span>
-                      <Dropdown as={ButtonGroup}className="buttons2" >
-                <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
+            {this.state.reqType!="Annual Leave" &&  <a className="maternityH">{this.state.reqTitle}</a>}
+            {this.state.reqType=="Maternity Leave" &&
+            <Dropdown as={ButtonGroup} className="buttons2">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
+            }
+
+            {this.state.reqType=="Sick Leave" &&
+            <Dropdown as={ButtonGroup} className="buttonsSick2">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
+            }
+            {this.state.reqType=="Compensation Leave" &&
+            <Dropdown as={ButtonGroup} className="buttonsComp2">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
+            }
+            {this.state.reqType=="Accidental Leave" &&
+            <Dropdown as={ButtonGroup} className="buttonsAccidental2">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
+            }
+            {this.state.reqType=="Change Day off" &&
+            <Dropdown as={ButtonGroup} className="buttonsChange2">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
+            }
+            {this.state.reqType=="Annual Leave" &&
+            <div >
+            <span className="maternityH2">{this.state.reqTitle}</span>
+            <Dropdown as={ButtonGroup} className="buttonsAnnual2">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtnAnnual" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
+                </div>
+                
+            }
+
+
+                    {' '}  <Dropdown as={ButtonGroup} className="buttons1" >
+                <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn">Request Type</Dropdown.Toggle>
                     <Dropdown.Menu className="super-colors">
                     
                     {this.state.reqType!="Accidental Leave" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Accidental Leave")}>Accidental Leave</Button></Dropdown.Item >}
@@ -724,8 +872,8 @@ class ViewReceivedRequests extends Component{
                     {this.state.reqType=="Annual Leave" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Annual Leave")}>Annual Leave</Button></Dropdown.Item >}
 
 
-                    {this.state.reqType!="Change Day Off" &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >}
-                    {this.state.reqType=="Change Day Off" &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >}
+                    {this.state.reqType!="Change Day off" &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >}
+                    {this.state.reqType=="Change Day off" &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Change Day off")}>Change Day Off</Button></Dropdown.Item >}
                     {this.state.reqType!="Compensation Leave"  &&<Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
                     {this.state.reqType=="Compensation Leave"  &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Compensation Leave")}>Compensation</Button></Dropdown.Item >}
 
@@ -743,13 +891,13 @@ class ViewReceivedRequests extends Component{
                     </Dropdown.Menu>
                 </Dropdown>{' '} 
 
-                    <Dropdown as={ButtonGroup} className="buttons1">
+                    {/* <Dropdown as={ButtonGroup} className="buttons1">
                     <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
                     {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
              
                   
-                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {/* {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
                     {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
                     {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
                     {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
@@ -760,7 +908,7 @@ class ViewReceivedRequests extends Component{
                     
                     
                     </Dropdown.Menu>
-                </Dropdown>
+                </Dropdown> */} 
                
               
                 </div>      
@@ -1014,10 +1162,30 @@ class ViewReceivedRequests extends Component{
         {/* <h3>{this.state.reqTitle}</h3> */}
        {/* <h4> No requests yet</h4> */}
        {this.state.loadingBool==false && 
-       <div className="containDrop">
+       <div className="containDropDown">
             <span className="noReq"><h3>{this.state.reqTitle}</h3></span>
-                      <Dropdown as={ButtonGroup} className="buttons2" >
-                <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn">Request Type</Dropdown.Toggle>
+                
+            <Dropdown as={ButtonGroup} className="buttons2Down">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtnDown" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
+
+                      <Dropdown as={ButtonGroup} className="buttons1Down" >
+                <Dropdown.Toggle id="dropdown-custom-1" className="pickBtnDown">Request Type</Dropdown.Toggle>
                     <Dropdown.Menu className="super-colors">
                     {this.state.reqType!="Accidental Leave" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Accidental Leave")}>Accidental Leave</Button></Dropdown.Item >}
                     {this.state.reqType=="Accidental Leave" &&<Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Accidental Leave")}>Accidental Leave</Button></Dropdown.Item >}
@@ -1042,30 +1210,12 @@ class ViewReceivedRequests extends Component{
                     {this.state.reqType!="Slot Linking" &&  <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Slot Linking")}>Slot Linking</Button></Dropdown.Item >}
                     {this.state.reqType=="Slot Linking" &&  <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleReceivedTypeClick(e,"Slot Linking")}>Slot Linking</Button></Dropdown.Item >}
                    </Dropdown.Menu>
-                </Dropdown>{' '} 
+                </Dropdown> {' '}
 
-                    <Dropdown as={ButtonGroup} className="buttons1">
-                    <Dropdown.Toggle id="dropdown-custom-1" className="pickBtn" >State</Dropdown.Toggle>
-                    <Dropdown.Menu className="drop1">
-                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
-             
-                  
-                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
-                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
-                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
-                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
-                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
-                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
-                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
-                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
-                    
-                    
-                    </Dropdown.Menu>
-                </Dropdown>
                 </div>
                 }
                 {this.state.loadingBool==false &&
-                <div className="alert alert-primary" role="alert" >
+                <div className="alert noReqAlert" role="alert" >
                No requests yet!
                 </div>  
                 }

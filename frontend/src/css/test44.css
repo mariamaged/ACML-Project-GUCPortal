@@ -1,5 +1,6 @@
+
 .reqTable{
-  width:80vw !important;
+  width:83vw !important;
   /* background-color: #78c2ad !important; */
   background-color: rgb(217 228 224)!important;
    color:rgb(0, 0, 0) !important;
@@ -34,7 +35,7 @@
 .containMaternityTable {
   max-height:300px !important;
   overflow-y: scroll;
-  width:70vw !important;
+  width:97vw !important;
  
  
 }
@@ -59,10 +60,13 @@
   /* max-width:25% !important; */
   display:flex;
   flex-direction: row;
- 
+
 
 } 
-
+.maternityH{
+  position:relative;
+  bottom:1vw;
+}
 .btn-group{
    size:'sm';
    max-height: 5% !important;
@@ -77,18 +81,103 @@ max-height: 3vw !important;
 position:relative;
 top:2vw;
 }
-.pickBtn{
+/* .pickBtn{
   background-color: #4aa48a !important;
-}
-
-
-.buttons2{
-  margin-left: 37vw;
+} */
+.re{
+  background-color: red !important;
 }
 
 .buttons1{
   margin-left: 1.5vw;
+  height:2.3vw !important;
+  position:relative;
+  top:4vw !important;
 }
+.containDropDown{
+  display:flex;
+  flex-direction: row;
+  position:relative;
+  top:7vw !important;
+}
+/* .noReqAlert{
+  position:relative;
+  top:1vw !important;
+} */
+ .buttons2{
+  /* position:relative;
+  bottom:1.2vw;*/
+  margin-left: 40vw;
+  height:2.3vw !important;
+} 
+
+.buttons1Down{
+  margin-left: 1.5vw;
+  height:2.3vw !important;
+  position:relative;
+  top:4vw !important;
+}
+.buttons2Down{
+  margin-left: 40vw;
+  height:2.3vw !important;
+}
+
+.buttonsSick2{
+  margin-left: 44vw;
+  height:2.3vw !important;
+}
+ .buttonsComp2{
+  margin-left: 38.5vw;
+  height:2.3vw !important;
+} 
+.buttonsChange2{
+  margin-left: 36.9vw;
+  height:2.3vw !important;
+}
+.buttonsAccidental2{
+  margin-left: 35.6vw;
+  height:2.3vw !important;
+}  
+.buttonsAnnual2{
+  text-align: center !important;
+  margin-left: 90vw;
+  height:2vw !important;
+  position:relative;
+  top:0.3vw !important;
+} 
+.btn{
+  text-align:center !important;
+  /* padding:0.05rem !important; */
+}
+.maternityH2{
+  position:relative;
+  top:-1vw !important;
+  font-size: 2vw !important;
+  display:flex;
+  flex-direction: row;
+}
+/* .buttonsAnnual1{
+  position:relative;
+
+  margin-left: 2vw;
+  /* top:2vw !important; 
+}  */
+.annualTable{
+  position:relative;
+  top:2vw !important;
+}
+.pickBtnAnnual{
+  height:2.2vw !important;
+  position:relative;
+  top:2.8vw !important;
+}
+.pickBtnAnnual2{
+    height:4vw !important;
+  /* position:relative;
+  top:3vw !important; */
+}
+
+
 
 .maternityH{
   font-size: 3vw;
@@ -153,6 +242,7 @@ top:2vw;
   top:2vw !important;
 }
 
+
 .reqFormDrop{
   margin-left: 60vw !important;
 }
@@ -184,7 +274,7 @@ top:2vw;
   top:3vw;
 }
 
-.pickBtn{
+.an{
   text-align: center !important;
 }
 
@@ -238,4 +328,7 @@ text-align:center;
   top:1vw !important;
   /* padding: 0rem !important; */
 
+}
+.form-control{
+  width:108% !important;
 }
