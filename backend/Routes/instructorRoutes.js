@@ -687,7 +687,7 @@ router.put("/assigncoordinator", authenticateToken, async (req, res) => {
   try {
     const instr = await StaffMember.findOne({ _id: req.user.id });
     //make sure instr is not null elawl
-    if (instr == null) res.status(400).json({ msg: "something went wrong" });
+    if (instr == null) res.status(400).send({ msg: "something went wrong finding Staff account" });
     else {
       const inst = await AcademicStaff.findOne({ member: instr._id });
 
@@ -695,24 +695,28 @@ router.put("/assigncoordinator", authenticateToken, async (req, res) => {
       //    const instr=await StaffMember.findOne({"id":"ac-1"});
       //    const inst=await AcademicStaff.findOne({"member":instr._id});
       // end
-      if (inst == null) res.status(400).json({ msg: "Something went wrong" });
+      if (inst == null) res.status(400).send({ msg: "Something went wrong finding academic account" });
       else {
-        if (inst.type == "Course Instructor") {
+        if (inst.type === "Course Instructor") {
           const { courseid, coordinatorid } = req.body;
           if (!courseid || !coordinatorid)
-            res.status(400).json({ msg: "please fill all the fields" });
+            res.status(400).send({ msg: "please fill all the fields" });
           else {
             const thecourse = await course.findOne({ id: courseid });
-            if (thecourse == null)
+            if (thecourse == null){
               res
                 .status(400)
-                .json({ msg: "the course id you entered is incorrect" });
+                .send({ msg: "the course id you entered is incorrect" });
+                return;
+            }
             else {
               const thec = await StaffMember.findOne({ id: coordinatorid });
-              if (thec == null)
+              if (thec == null){
                 res
                   .status(400)
-                  .json({ msg: "the coordinator id you entered is incorrect" });
+                  .send({ msg: "the coordinator id you entered is incorrect" });
+                  return;
+              }
               else {
                 const thecoordinator = await AcademicStaff.findOne({
                   member: thec._id,
@@ -721,15 +725,17 @@ router.put("/assigncoordinator", authenticateToken, async (req, res) => {
                   thecoordinator == null ||
                   thecoordinator.type != "Teaching Assistant"
                 )
-                  res.status(400).json({
-                    msg: "the coordinator id you entered is incorrect",
-                  });
+                  res
+                    .status(400)
+                    .send({
+                      msg: "the coordinator id you entered is incorrect",
+                    });
                 else {
                   //make sure it's his/her course
                   var assigned = false;
                   const courses = await inst.courses;
                   for (var i = 0; i < courses.length; i++) {
-                    if (thecourse._id == courses[i]) {
+                    if (thecourse._id.toString() === courses[i].toString()) {
                       assigned = true;
                       break;
                     }
@@ -739,13 +745,13 @@ router.put("/assigncoordinator", authenticateToken, async (req, res) => {
                     var coassigned = false;
                     const cocourses = thecoordinator.courses;
                     for (var i = 0; i < cocourses.length; i++) {
-                      if (String(thecourse._id) == String(cocourses[i])) {
+                      if (thecourse._id.toString() === cocourses[i].toString()) {
                         coassigned = true;
                         break;
                       }
                     }
                     if (coassigned) {
-                      if (thecourse.course_coordinator != null) {
+                      if (thecourse.course_coordinator !== null) {
                         const oldcoordinater = await AcademicStaff.findOne({
                           _id: thecourse.course_coordinator,
                         });
@@ -756,25 +762,94 @@ router.put("/assigncoordinator", authenticateToken, async (req, res) => {
                       thecoordinator.isCourseCoordinator = true;
                       await thecoordinator.save();
                       await thecourse.save();
-                      res.send("done");
+                      res.send({msg:"Assignment Successful"});
                     } else
-                      res.status(400).json({
-                        msg:
-                          "the staffmember you entered is not assigned to this course",
-                      });
+                      res
+                        .status(400)
+                        .send({
+                          msg:
+                            "the staffmember you entered is not assigned to this course",
+                        });
                   } else
                     res
                       .status(400)
-                      .json({ msg: "your not assigned to this course." });
+                      .send({ msg: "your not assigned to this course." });
                 }
               }
             }
           }
-        } else res.status(400).json({ msg: "Access denied" });
+        } else res.status(400).send({ msg: "Access denied" });
       }
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).send({ error: err.message });
   }
 });
+
+// ADDED ROUTES FOR FRONT-END DISPLAY # MARK
+router.get("/getcoursestaff", authenticateToken, async (req, res) => {
+  const cid = req.query.cid;
+  console.log(cid);
+  try {
+    const st = await StaffMember.findOne({ _id: req.user.id });
+    if (!st) {
+      console.log(" NO STAFF FOUND ");
+      res.status(400).send({ msg: "NO STAFF MEMBER FOUND WITH THAT ID" });
+      return;
+    }
+    if (!cid) {
+      res.status(400).send({ msg: "Course ID Missing!" });
+      return;
+    }
+    const curCor={
+      name:"",
+      id:""
+    }
+    const cor = await course.findOne({ id: cid });
+    console.log(cor.course_coordinator);
+    const x=await AcademicStaff.findOne({_id:cor.course_coordinator});
+    console.log()
+    if(x){
+      const y=await StaffMember.findOne({_id:x.member});
+      console.log(y)
+      curCor.name=y.name;
+      curCor.id=y.id;
+    }
+    console.log(curCor)
+    if (!cor) {
+      res.status(400).send({ msg: "No Course found for that ID" });
+      return;
+    }
+    const acad = cor.academic_staff;
+    const staff = [];
+    
+    for(let i=0;i<acad.length;i++){
+      let a=acad[i];
+      try {
+        const ac = await AcademicStaff.findOne({ _id: a });
+        const m = await StaffMember.findOne({ _id: ac.member });
+
+        if (ac.type === "Teaching Assistant") {
+          const account = {
+            name: m.name,
+            acadId: ac._id,
+            id:m.id,
+          };
+          staff.push(account)
+        
+        }
+      } catch (err) {
+        console.log("FINDING ACADEMIC PROFILE ERROR ");
+      }
+    };
+    
+
+    res.send({staff:staff,curCor:curCor});
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ msg: err.message });
+    return;
+  }
+});
+
 module.exports = router;
