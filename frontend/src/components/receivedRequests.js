@@ -838,9 +838,9 @@ class ViewReceivedRequests extends Component{
             }
             {this.state.reqType=="Annual Leave" &&
             <div >
-            <span className="maternityH2">{this.state.reqTitle}</span>
-            <Dropdown as={ButtonGroup} className="buttonsAnnual2">
-                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtnAnnual" >State</Dropdown.Toggle>
+            <span className="maternityH">{this.state.reqTitle}</span>
+            <Dropdown as={ButtonGroup} className="buttonsChange2">
+                    <Dropdown.Toggle id="dropdown-custom-3" className="pickBtn" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
                     {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
              
@@ -859,6 +859,46 @@ class ViewReceivedRequests extends Component{
                 </Dropdown>
                 </div>
                 
+            }
+            {this.state.reqType=="Replacement" &&
+            <Dropdown as={ButtonGroup} className="buttonsChange2">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
+            }
+            {this.state.reqType=="Slot Linking" &&
+            <Dropdown as={ButtonGroup} className="buttonsChange2">
+                    <Dropdown.Toggle id="dropdown-custom-2" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Menu className="drop1">
+                    {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
+             
+                  
+                    {this.state.reqState!="All" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >} 
+                    {this.state.reqState=="All" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"All")}>All</Button></Dropdown.Item >}
+                    {this.state.reqState!="Accepted" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Accepted" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Accepted")}>Accepted</Button></Dropdown.Item >} 
+                    {this.state.reqState!="Rejected" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Rejected" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Rejected")}>Rejected</Button></Dropdown.Item >}
+                    {this.state.reqState!="Pending" && <Dropdown.Item > <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >} 
+                    {this.state.reqState=="Pending" && <Dropdown.Item active> <Button variant="primary" size="sm" className="acceptButton" onClick={(e)=>this.handleStateClick(e,"Pending")}>Pending</Button></Dropdown.Item >}
+                    
+                    
+                    </Dropdown.Menu>
+                </Dropdown>
             }
 
 
@@ -1215,9 +1255,11 @@ class ViewReceivedRequests extends Component{
                 </div>
                 }
                 {this.state.loadingBool==false &&
-                <div className="alert noReqAlert" role="alert" >
+                <div className="all">
+                <div className="war alert-primary alert" role="alert" >
                No requests yet!
                 </div>  
+                </div>
                 }
                 {this.state.loadingBool===true &&
                 <div  >
