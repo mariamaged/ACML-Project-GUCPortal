@@ -194,6 +194,9 @@ top:2vw;
   position:relative;
   top:1vw !important;
 }  
+.pickBtnAnnual{
+  /* height:2vw!important; */
+}
 .btn{
   text-align:center !important;
   /* padding:0.05rem !important; */
@@ -219,10 +222,18 @@ top:2vw;
 .pickBtnAnnual{
   height:2.2vw !important;
     position:relative !important;
-    left:2vw !important;
+    left:4vw !important;
  /* top:0vw !important; */
  margin-left: 20vw !important;
 } 
+.controlCrazy{
+  position:relative !important;
+    left:0vw !important;
+    top:-4.5vw!important;
+}
+.btn{
+  height:2.3vw !important;
+}
 .pickBtnAnnual2{
     height:vw !important;
   /* position:relative;
@@ -368,7 +379,7 @@ text-align:center;
 }
 
 .annualTable{
-  width:80% !important;
+  width:95% !important;
   overflow-x: scroll !important;
 }
 .dropdown-custom-3{

@@ -598,8 +598,9 @@ class ViewSubmittedRequests extends Component{
             {this.state.reqType=="Annual Leave" &&
             <div >
             <span className="maternityH">{this.state.reqTitle}</span>
+            <div className="controlCrazy">
             <Dropdown as={ButtonGroup} className="buttonsChange2">
-                    <Dropdown.Toggle id="dropdown-custom-3" className="pickBtn" >State</Dropdown.Toggle>
+                    <Dropdown.Toggle id="dropdown-custom-3" className="pickBtnAnnual" >State</Dropdown.Toggle>
                     <Dropdown.Menu className="drop1">
                     {/* <Dropdown.Item ><Link to="/ViewAcceptedMaternityRequests">Accepted</Link></Dropdown.Item> */}
              
@@ -616,6 +617,7 @@ class ViewSubmittedRequests extends Component{
                     
                     </Dropdown.Menu>
                 </Dropdown>
+                </div>
                 </div>
                 
             }
