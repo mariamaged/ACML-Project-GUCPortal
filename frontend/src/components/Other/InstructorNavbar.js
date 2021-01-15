@@ -57,21 +57,10 @@ class InstructorNavbar extends Component {
                             <div class="dropdown-menu">
                                 <NavLink to='/instructor/instructorCoursesCoverage/all'><a class="dropdown-item"> Coverage of assigned courses</a></NavLink>
                                 <NavLink to='/instructor/instructorTeachingAssignment'><a class="dropdown-item">Teaching assignments of assigned courses</a></NavLink>
-                                <NavLink to='/instructor/instructorTeachingAssignment'><a class="dropdown-item">Teaching assignments of assigned courses</a></NavLink>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
-                            </div>
-                        </li>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Staff</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item">Action</a>
-                                <a class="dropdown-item">Another action</a>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
+                                <NavLink to='/instructor/assignCourseCoordinator'><a class="dropdown-item">Assign Course Coordinator</a></NavLink>
+                                <NavLink to='/instructor/assignMember'><a class="dropdown-item">Assign academic member to course</a></NavLink>
+                                <NavLink to='/instructor/deleteMemberAssignment'><a class="dropdown-item">Delete academic member assignment from course</a></NavLink>
+                                <NavLink to='/instructor/removeMember'><a class="dropdown-item">Remove academic member from course</a></NavLink>
                             </div>
                         </li>
 
@@ -79,31 +68,29 @@ class InstructorNavbar extends Component {
                             <a class="nav-link" >Schedule</a>
                         </li></NavLink>
 
+                        <NavLink to='/instructor/attendance'><li class="nav-item">
+                            <a class="nav-link" >Attendance</a>
+                        </li></NavLink>
+
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Attendance</a>
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Profile</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item">Action</a>
-                                <a class="dropdown-item">Another action</a>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
+                                <NavLink to='/instructor/viewProfile'><a class="dropdown-item"> View Profile</a></NavLink>
+                                <NavLink to='/instructor/updateProfile'><a class="dropdown-item">Update Profile</a></NavLink>
                             </div>
                         </li>
-
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Requests</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item">Action</a>
-                                <a class="dropdown-item">Another action</a>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
+                                <a class="dropdown-item"><Link to={{ pathname: '/instructor/receivedRequests', state: { reqType: "Sick Leave", reqTitle: "Sick Leave Requests" } }}>View Received Requests</Link></a>
+                                <a class="dropdown-item"><Link to={{ pathname: '/instructor/submittedRequests', state: { reqType: "Sick Leave", reqTitle: "Sick Leave Requests" } }}>View Submitted Requests</Link></a>
+                                <a class="dropdown-item"><Link to={{ pathname: '/instructor/requestsForms', state: { formType: "Accidental Leave", formTitle: "Accidental Leave Request Form" } }} >Submit Requests</Link></a>
                             </div>
                         </li>
 
                         <NavLink to='/instructor/schedule'><li class="nav-item">
-                            <MdNotificationsActive/>
+                            <MdNotificationsActive />
                         </li></NavLink>
                     </ul>
                 </div>

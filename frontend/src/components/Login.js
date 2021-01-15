@@ -1,6 +1,6 @@
 import React from "react";
-//import "./Login.css";
-import GUC from "../assets/GUC.png";
+import "./Login.css";
+import GUC from "../assets/GUC.jpeg";
 import axios from "axios";
 
 class Login extends React.Component {
@@ -19,15 +19,13 @@ class Login extends React.Component {
     axios
       .post("http://localhost:5000/staff/login", {
         email: this.state.email,
-        password: this.state.password
+        password: this.state.password,
       })
       .then(async (res) => {
         console.log("REQUEST SUCCESS");
         const token = res.headers['auth-token'];
-        console.log(token);
-        localStorage.setItem("auth-token", token);
         const user = res.data.user;
-
+        localStorage.setItem("auth-token", token);
         localStorage.setItem("role", user.role)
         localStorage.setItem("newMember", user.newMember)
         if (user.role === "HR") {
@@ -46,61 +44,70 @@ class Login extends React.Component {
           alert(error.response.data.msg);
         } else {
           console.error(error);
-          alert("ERROR???/n" + error.message);
+          alert("ERROR???\n" + error.message + " " + error);
         }
       });
   };
+  componentDidMount = () => {
+    console.log("MOUNTED")
+    document.getElementById("b").className = "back"
+  }
+  componentWillUnmount = () => {
+    console.log("UNMOUNTED");
+    document.getElementById('b').className = "";
+
+  }
 
   render() {
     return (
-      <div className="container cont text-center parent">
-        <main className="form-signin">
-          <form onSubmit={this.handleClick.bind(this)}>
-            <img
-              className="mb-4 logo"
-              src={GUC}
-              alt="eeehhh"
-              width="72"
-              height="72"
-            />
-            <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
-            <label htmlFor="inputEmail" className="visually-hidden">
-              Email address
+      <div className="">
+        <div className="container-fluid cont text-center parent">
+          <main className="form-signin mt-5">
+            <form onSubmit={this.handleClick.bind(this)}>
+              <img
+                className="mb-4 logo"
+                src={GUC}
+                alt="eeehhh"
+                width="72"
+                height="72"
+              />
+              <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
+              <label htmlFor="inputEmail" className="visually-hidden">
+                Email address
             </label>
-            <input
-              value={this.state.email}
-              name="email"
-              onChange={this.handleChange}
-              type="email"
-              id="inputEmail"
-              className="form-control"
-              placeholder="Email address"
-              required
-              autoFocus
-            />
-            <label htmlFor="inputPassword" className="visually-hidden">
-              Password
+              <input
+                value={this.state.email}
+                name="email"
+                onChange={this.handleChange}
+                type="email"
+                id="inputEmail"
+                className="form-control"
+                placeholder="Email address"
+                required
+                autoFocus
+              />
+              <label htmlFor="inputPassword" className="visually-hidden">
+                Password
             </label>
-            <input
-              value={this.state.password}
-              name="password"
-              onChange={this.handleChange}
-              type="password"
-              id="inputPassword"
-              className="form-control"
-              placeholder="Password"
-              required
-            />
+              <input
+                value={this.state.password}
+                name="password"
+                onChange={this.handleChange}
+                type="password"
+                id="inputPassword"
+                className="form-control"
+                placeholder="Password"
+                required
+              />
 
-            <input type="submit" className="w-100 btn btn-lg btn-primary" />
-          </form>
-        </main>
+              <input type="submit" className="w-100 btn btn-lg btn-primary" />
+            </form>
+          </main>
+        </div>
       </div>
     );
   }
 }
-/*
-    <button onClick={this.handleClick} className="w-100 btn btn-lg btn-primary">Sign in</button>
-*/
+
 
 export default Login;

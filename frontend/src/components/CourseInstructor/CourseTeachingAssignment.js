@@ -1,6 +1,6 @@
 // Our Components
 import Warning from '../Other/warning.js';
-import SlotsStaff from './slotsstaff.js';
+import SlotsStaff from '../HOD/slotsstaff.js';
 
 // React Components
 // React

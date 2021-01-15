@@ -1,0 +1,78 @@
+.maternityH{
+font-size:2vw!important;
+color:rgba(0, 0, 0, 0.801)!important;
+}
+
+.warningMsg{
+  color:rgb(180, 16, 16);
+  font-size:1vw !important;
+  position:relative;
+  top:3vw;
+}
+.accidentalSuccess{
+  color:rgb(9, 88, 65);
+  font-size:1.2vw !important;
+  position:relative;
+  top:3vw;
+
+}
+.successMsg{
+  color:rgb(9, 88, 65);
+  font-size:1vw !important;
+  position:relative;
+  top:3vw;
+}
+.containMaternityTable{
+  /* width:0.5vw !important; */
+  /* border-radius:1vw ; */
+  /* background:#869e98 !important; */
+  /* height: 0.5vw !important;  */
+  position:relative;
+  top:3vw!important;
+  max-height:300px !important;
+  overflow-y: scroll;
+  width:97vw !important;
+}
+.containMaternityTable::-webkit-scrollbar {
+  width:0.5vw !important;
+  border-radius:1vw ;
+  background:#869e98 !important;
+  height: 0.5vw !important;
+  color:black!important; 
+  font: weight 200!important;
+}
+.containMaternityTable td {
+  color:black!important; 
+  font-weight :600!important;
+}
+.containMaternityTable thead{
+  color:rgba(0, 0, 0, 0.781)!important; 
+  /* font-weight: 400!important; */
+}
+.cancelWarning{
+  color:rgb(180, 16, 16);
+  font-size:1.2vw !important;
+}
+.dropdown-menu >  a:hover {
+  background-image: none;
+  background-color: rgb(218, 211, 211);
+}
+.cancelButton{
+  border:1px solid transparent!important;
+  position:relative !important;
+  top:0vw !important;
+  background-color:transparent !important;
+  border: transparent !important;
+  /* box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6) !important; */
+}
+.all {
+  position:relative;
+  top:5vw !important;
+  left:2vw !important;
+  width:50% !important;
+} 
+.dropFinal{
+  position:relative;
+  top:3vw !important;
+  left:2vw !important;
+}

@@ -46,54 +46,32 @@ class InstructorNavbar extends Component {
                 <div class="collapse navbar-collapse" id="navbarColor01">
                     <ul class="navbar-nav mr-auto">
                         {this.state.isCourseCoordinator &&
-                            <NavLink to='/instructor/hod'><li class="nav-item">
+                            <NavLink to='/assistant/coursecoordinator'><li class="nav-item">
                                 <a class="nav-link" >My Courses</a>
                             </li></NavLink>}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Courses</a>
-                            <div class="dropdown-menu">
-                                <NavLink to='/instructor/instructorCoursesCoverage'><a class="dropdown-item">Courses Coverage</a></NavLink>
-                                <a class="dropdown-item">Another action</a>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Staff</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item">Action</a>
-                                <a class="dropdown-item">Another action</a>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
-                            </div>
-                        </li>
 
                         <NavLink to='/assistant/schedule'><li class="nav-item">
                             <a class="nav-link" >Schedule</a>
                         </li></NavLink>
 
+                        <NavLink to='/assistant/attendance'><li class="nav-item">
+                            <a class="nav-link" >Attendance</a>
+                        </li></NavLink>
+
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Attendance</a>
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Profile</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item">Action</a>
-                                <a class="dropdown-item">Another action</a>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
+                                <NavLink to='/assistant/viewProfile'><a class="dropdown-item">View Profile</a></NavLink>
+                                <NavLink to='/assistant/updateProfile'><a class="dropdown-item">Update Profile</a></NavLink>
                             </div>
                         </li>
-
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Requests</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item">Action</a>
-                                <a class="dropdown-item">Another action</a>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
+                                <a class="dropdown-item"><Link to={{ pathname: '/assistant/receivedRequests', state: { reqType: "Sick Leave", reqTitle: "Sick Leave Requests" } }}>View Received Requests</Link></a>
+                                <a class="dropdown-item"><Link to={{ pathname: '/assistant/submittedRequests', state: { reqType: "Sick Leave", reqTitle: "Sick Leave Requests" } }}>View Submitted Requests</Link></a>
+                                <a class="dropdown-item"><Link to={{ pathname: '/assistant/requestsForms', state: { formType: "Accidental Leave", formTitle: "Accidental Leave Request Form" } }} >Submit Requests</Link></a>
                             </div>
                         </li>
                     </ul>
