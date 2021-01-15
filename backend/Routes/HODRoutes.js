@@ -40,6 +40,26 @@ router.get('/isHod', authenticateToken, async (req, res) => {
 });
 
 // 1
+router.post('/assignCoursetoCourseInstructor', authenticateToken, async (req, res) => {
+    const {courseID, academicMemberID} = req.body;
+    if(!courseID || academicMemberID) return res.status(400).send("Fill all required fields");
+
+    const course = await CourseModel.findOne({id: courseID});
+    if(!course) res.status(400).send('There is no course with that id.');
+
+    const staff = await StaffMemberModel.findById(req.user.id);
+    if(!staff) res.status(400).send('The staff member does not exist');
+    const academic = await AcademicStaffModel.findOne({member: staff._id});
+    if(!academic) res.status(400).send('The academic member does not exist');
+    
+    course.academic_staff.push(academic._id);
+    await course.save();
+
+    academic.courses.push(course._id);
+    await academic.save();
+
+    return res.status(200).send('Operation Successfull');
+});
 
 // 2 (a)
 router.get('/viewDepartmentStaffPerCourse/:courseID', authenticateToken, async (req, res) => {
