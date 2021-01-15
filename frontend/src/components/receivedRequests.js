@@ -732,7 +732,7 @@ class ViewReceivedRequests extends Component{
             return(
 
                 <div className="containAll">
-                <h4>{this.state.Warning}</h4>
+                {/* <h4>{this.state.Warning}</h4> */}
             
             
             <div className="containDrop">
