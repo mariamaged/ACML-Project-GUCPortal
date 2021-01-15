@@ -12,7 +12,7 @@ const StaffMemberSchema = mongoose.Schema({
     password: {type: String, default: "123456"},
     salary: {type: Number, required: true}, // No academic member can change that.
     office: {type: ObjectID, ref: 'Location', required: true},
-    gender: {type: String, required: true, enum: ['Male, Female']},
+    gender: {type: String, required: true, enum: ['Male', 'Female']},
 
     // Login Information.
     newStaffMember: {type: Boolean, default: true},
@@ -26,12 +26,11 @@ const StaffMemberSchema = mongoose.Schema({
     attendCompensationDay: {type: Boolean},
     missingDays: {type: [String], default: []},
     time_attended: {type: [monthlyHoursSchema], default: []},
-    // requestsReceived:[{type: ObjectID, ref: 'request'}],
-    // requestsSent:[{type: ObjectID, ref: 'request'}],
     lastUpdatedAnnual: {type: Date},
     accidentalDaysLeft: {type:Number},
     attendCompensationDay: {type:Boolean},
-    notifications: [{type: String, default: []}]
+    notifications: [{type: String, default: []}],
+    oldNotifications: [{type: String, default: []}]
 },
 
 {

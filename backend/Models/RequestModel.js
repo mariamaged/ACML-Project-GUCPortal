@@ -3,6 +3,7 @@ const ObjectID = mongoose.Schema.Types.ObjectId;
 const CounterModel = require('./CounterModel.js');
 
 const RequestSchema = mongoose.Schema({
+  counter:{type:Number},
    requestID: {type: String, unique: true},
 
    // For all requests
@@ -152,3 +153,4 @@ RequestSchema.pre('save', function(next) {
 });
 
 module.exports = mongoose.model('request', RequestSchema);
+module.exports.reqSchema=RequestSchema
