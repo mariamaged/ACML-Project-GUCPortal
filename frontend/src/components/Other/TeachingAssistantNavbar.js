@@ -19,10 +19,10 @@ class InstructorNavbar extends Component {
             headers: {
                 'x-auth-token': localStorage.getItem("auth-token")
             }
-    })
+        })
             .then(response => {
-                if(response.data.courses) this.setState({ isCourseCoordinator: response.data.isCourseCoordinator, courses: response.data.courses });
-                else this.setState({ isCourseCoordinator: response.data.isCourseCoordinator});
+                if (response.data.courses) this.setState({ isCourseCoordinator: response.data.isCourseCoordinator, courses: response.data.courses });
+                else this.setState({ isCourseCoordinator: response.data.isCourseCoordinator });
                 console.log(this.state);
             })
 
@@ -35,8 +35,8 @@ class InstructorNavbar extends Component {
         return (
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
                 <NavLink to='/instructor'><a class="navbar-brand">Teaching Assistant</a>
-                    {this.state.isCourseCoordinator &&
-                        <a class="navbar-brand" style={{fontSize: "0.8em"}}>Course Coordinator of {this.state.courses.toString()}</a>}
+                    {this.state.isCourseCoordinator && this.state.courses.length > 1 && <a class="navbar-brand" style={{ fontSize: "0.8em" }}>Course Coordinator of {this.state.courses[0].toString()}, etc.</a>}
+                    {this.state.isCourseCoordinator && this.state.courses.length == 1 && <a class="navbar-brand" style={{ fontSize: "0.8em" }}>Course Coordinator of {this.state.courses[0].toString()}</a>}
                 </NavLink>
 
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,7 @@ class InstructorNavbar extends Component {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Courses</a>
                             <div class="dropdown-menu">
-                            <NavLink to='/instructor/instructorCoursesCoverage'><a class="dropdown-item">Courses Coverage</a></NavLink>
+                                <NavLink to='/instructor/instructorCoursesCoverage'><a class="dropdown-item">Courses Coverage</a></NavLink>
                                 <a class="dropdown-item">Another action</a>
                                 <a class="dropdown-item">Something else here</a>
                                 <div class="dropdown-divider"></div>
@@ -69,16 +69,10 @@ class InstructorNavbar extends Component {
                                 <a class="dropdown-item">Separated link</a>
                             </div>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Schedule</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item">Action</a>
-                                <a class="dropdown-item">Another action</a>
-                                <a class="dropdown-item">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item">Separated link</a>
-                            </div>
-                        </li>
+
+                        <NavLink to='/assistant/schedule'><li class="nav-item">
+                            <a class="nav-link" >Schedule</a>
+                        </li></NavLink>
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Attendance</a>

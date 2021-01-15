@@ -91,11 +91,9 @@ class addCourseSlot extends Component {
                             <Row>
                                 <Col md="auto">
                                     <button type="button" class="btn roundButton" 
-                                        onClick={() => this.props.addSlot(this.state.date, this.state.number, this.state.locationID, this.props.ind, false)}>+</button>
-                                </Col>
-                                <Col md="auto">
-                                    <button type="button" class="btn submitButton" 
-                                        onClick={() => this.props.addSlot(this.state.date, this.state.number, this.state.locationID, this.props.ind, true)}> Submit</button>
+                                        onClick={() => this.props.addSlot(this.state.date, this.state.number, this.state.locationID, this.props.ind)}>
+                                            <i class="fas fa-check"></i>
+                                        </button>
                                 </Col>
                             </Row>
                         </Col>

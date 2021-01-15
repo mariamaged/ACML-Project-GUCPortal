@@ -491,12 +491,82 @@ router.route("/Assignment").post(authenticateToken, async (req, res) => {
               }
             }
           }
-        } else res.status(400).json({ msg: "Access denied" });
+        } else res.status(401).json({ msg: "Access denied" });
       }
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// 5 (a) Delete an academic member assignment in courses he is assigned.
+router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) => {
+  const { courseID, academicMemberID, number, location, date } = req.body;
+  if (!courseID || !academicMemberID || !number || !location || !date) return res.status(400).json({ msg: 'Please fill all required fields!' });
+
+  const instr = await StaffMember.findOne({ _id: req.user.id });
+  if (!instr) return res.status(400).json({ msg: "Something went wrong" });
+
+  const inst = await AcademicStaff.findOne({ member: req.user.id });
+  if (!inst) return res.status(400).json({ msg: "Something went wrong" });
+
+  const thecourse = await course.findOne({ id: courseID });
+  if (!thecourse) return res.status(400).json({ msg: 'The course does not exist' });
+
+  const thelocation = await location.findOne({ id: location});
+  if(!thelocation) return res.status(400).json({ msg: 'The location does not exist' }); 
+
+  const removedStaffMember = await StaffMember.findOne({ id: academicMemberID });
+  if (!removedStaffMember) return res.status(400).json({ msg: 'There is no staff member with this id' });
+
+  const removedAcademicMember = await AcademicStaff.findOne({ member: removedStaffMember._id });
+  if (!removedAcademicMember) return res.status(400).json({ msg: 'The staff member is not an academic member' });
+
+  if (removedAcademicMember.type == 'Course Instructor') {
+    var assigned = false;
+    const coursesAssigned = inst.courses;
+    for (var i = 0; i < coursesAssigned.length; i++) {
+      if (coursesAssigned[i].equals(thecourse._id)) {
+        assigned = true;
+        break;
+      }
+    }
+    if (!assigned) return res.status(403).json({ msg: 'You are not assigned to this course' });
+
+    var removedAssigned = false;
+    for (var i = 0; i < thecourse.academic_staff.length; i++) {
+      if (thecourse.academic_staff[i].equals(removedAcademicMember._id)) {
+        position = i;
+        removedAssigned = true;
+        break;
+      }
+    }
+    if (!removedAssigned) return res.status(400).json({ msg: 'The academic member you want to delete his assignment from one of the slots is not assigned to this course.' });
+
+    const withoutRemoved = thecourse.schedule.filter((slot) => {
+      if (slot.academic_member_id && removedAcademicMember._id.equals(slot.academic_member_id)) return !(slot.day == day && slot.number == number && slot.location == thelocation._id);
+      else return true;
+    });
+
+    const slotsRemovedNum = thecourse.slots_covered - withoutRemoved.length;
+    thecourse.slots_covered -= slotsRemovedNum;
+    thecourse.schedule = withoutRemoved;
+    await thecourse.save();
+
+    if(slotsRemoved == 0) return res.status(400).json({msg: 'There are not slots with such details that the academic member is assigned to.'});
+
+    const withoutRemovedCourses = removedAcademicMember.schedule.filter((slot) => {
+      if (slot.course && thecourse._id.equals(slot.course)) return !(slot.day == day && slot.number == number && slot.location == thelocation._id);
+      else return true;
+    });
+
+    removedAcademicMember.schedule = withoutRemovedCourses;
+    await removedAcademicMember.save();
+
+    return res.status(200).json({ msg: 'Operation successful' });
+  }
+  else return res.status(403).send('Access Denied');
+
 });
 
 // 6- Remove an academic member in courses he is assigned.
@@ -545,7 +615,8 @@ router.delete('/removeAssignedAcademic', authenticateToken, async (req, res) => 
 
     thecourse.academic_staff.splice(position, 1);
     const withoutRemoved = thecourse.schedule.filter((slot) => {
-      if (slot.academic_member_id) return !slot.academic_member_id.equals(removedAcademicMember._id)
+      if (slot.academic_member_id) return !slot.academic_member_id.equals(removedAcademicMember._id) 
+      else return true
     });
     const slotsRemovedNum = thecourse.slots_covered - withoutRemoved.length;
     thecourse.slots_covered -= slotsRemovedNum;

@@ -1,5 +1,5 @@
 // Our Components
-import AddCourseSlot from './addCourseSlot.js';
+import TwoSlots from './twoSlots.js';
 import Warning from '../Other/warning.js';
 
 // React Components
@@ -15,9 +15,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 // CSS and images
-import moment from 'moment';
 
-class PostCourseSlots extends Component {
+class UpdateCourseSlots extends Component {
     state = {
         locations: [],
         slots: [],
@@ -46,10 +45,9 @@ class PostCourseSlots extends Component {
 
     }
 
-    addSlot = async (date, number, location, ind, flag) => {
+    addTwoSlots = async (slots, ind, flag) => {
         const oldSlots = this.state.slots;
-        const slot = { date: moment(date).format('YYYY-MM-DD'), number: number, locationID: location };
-        const newSlots = [...oldSlots, slot];
+        const newSlots = [...oldSlots, slots[0], slots[1]];
 
         const oldShowButtons = this.state.showButtons;
         oldShowButtons[ind] = false;
@@ -67,7 +65,8 @@ class PostCourseSlots extends Component {
             const requestBody = { courseID: this.state.courseID, details: this.state.slots };
             console.log(requestBody);
 
-            axios.post('http://localhost:5000/coursecoordinator/courseSlots', requestBody, {
+            axios.delete('http://localhost:5000/coursecoordinator/courseSlots', {
+                data : requestBody,
                 headers: {
                     'x-auth-token': localStorage.getItem("auth-token")
                 }
@@ -89,12 +88,11 @@ class PostCourseSlots extends Component {
     handleOnChange = (e) => {
         this.setState({ courseID: e.target.value });
     }
-
     render() {
         const allEntries = [];
         for (var i = 0; i < this.state.number; i++) {
             allEntries.push(<div key={i}>
-                <AddCourseSlot locations={this.state.locations} showButton={this.state.showButtons[i]} addSlot={this.addSlot} ind={i} />
+                <TwoSlots locations={this.state.locations} showButton={this.state.showButtons[i]} addTwoSlots={this.addTwoSlots} ind={i} />
             </div>);
         }
 
@@ -123,8 +121,7 @@ class PostCourseSlots extends Component {
                     {!this.state.warningFlag &&
                         <Jumbotron>
                             {allEntries}
-                        </Jumbotron>
-                    }
+                        </Jumbotron>}
 
                     {
                         this.state.warningFlag &&
@@ -136,5 +133,5 @@ class PostCourseSlots extends Component {
     }
 }
 
-export default PostCourseSlots;
+export default UpdateCourseSlots;
 

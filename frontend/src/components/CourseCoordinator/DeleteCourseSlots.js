@@ -17,7 +17,7 @@ import axios from 'axios';
 // CSS and images
 import moment from 'moment';
 
-class PostCourseSlots extends Component {
+class DeleteCourseSlots extends Component {
     state = {
         locations: [],
         slots: [],
@@ -67,7 +67,8 @@ class PostCourseSlots extends Component {
             const requestBody = { courseID: this.state.courseID, details: this.state.slots };
             console.log(requestBody);
 
-            axios.post('http://localhost:5000/coursecoordinator/courseSlots', requestBody, {
+            axios.delete('http://localhost:5000/coursecoordinator/courseSlots', {
+                data : requestBody,
                 headers: {
                     'x-auth-token': localStorage.getItem("auth-token")
                 }
@@ -89,7 +90,6 @@ class PostCourseSlots extends Component {
     handleOnChange = (e) => {
         this.setState({ courseID: e.target.value });
     }
-
     render() {
         const allEntries = [];
         for (var i = 0; i < this.state.number; i++) {
@@ -123,8 +123,7 @@ class PostCourseSlots extends Component {
                     {!this.state.warningFlag &&
                         <Jumbotron>
                             {allEntries}
-                        </Jumbotron>
-                    }
+                        </Jumbotron>}
 
                     {
                         this.state.warningFlag &&
@@ -136,5 +135,5 @@ class PostCourseSlots extends Component {
     }
 }
 
-export default PostCourseSlots;
+export default DeleteCourseSlots;
 

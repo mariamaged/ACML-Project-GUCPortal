@@ -25,6 +25,9 @@ import Schedule from './components/Academic/ScheduleOptions.js';
 import Toast from './components/Toasts/toast.js';
 
 import PostCourseSlots from './components/CourseCoordinator/PostCourseSlots.js';
+import DeleteCourseSlots from './components/CourseCoordinator/DeleteCourseSlots.js';
+import UpdateCourseSlots from './components/CourseCoordinator/UpdateCourseSlots.js';
+
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -46,11 +49,11 @@ const App = () => {
 
       {token ? (
         <div className="App">
-        
+
           {/*Navbars*/}
           <Route path='/instructor' component={InstructorNavbar} />
           <Route path='/assistant' component={TeachingAssistantNavbar} />
-          <Route path='/hr' component={} />
+          {/*<Route path='/hr' component={} />*/}
 
           {/*Homepages*/}
           <Route path='/instructor/homepage' component={Toast} />
@@ -107,11 +110,12 @@ const App = () => {
             <Route path='/instructor/instructorTeachingAssignment/:courseID' component={InstructorTeachingAssignment} />
           </Switch>
 
-          <Route path='/instructor/schedule' component={Schedule} />
+          <Route path="/(instructor|assistant|hr)/schedule" component={Schedule} />
 
           {/*Teaching Assistant Navbar*/}
           <Route path='/assistant/postCourseSlots' component={PostCourseSlots} />
-
+          <Route path='/assistant/deleteCourseSlots' component={DeleteCourseSlots} />
+          <Route path='/assistant/updateCourseSlots' component={UpdateCourseSlots} />
 
           {/*HR Navbar */}
 
