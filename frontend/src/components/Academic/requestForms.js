@@ -17,8 +17,8 @@ import Form from 'react-bootstrap/Form'
 class requestsForms extends Component{
 
     state={
-        formType:"Accidental Leave",
-        formTitle:"Accidental Leave",
+        formType:"",
+        formTitle:"",
         fields:[],
 
         accidentalDate:"",
