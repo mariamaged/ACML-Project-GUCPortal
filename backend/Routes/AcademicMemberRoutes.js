@@ -17,14 +17,16 @@ var moment = require('moment');
 const request=require('../Models/RequestModel.js')
 const slotSchema=require('../Models/SlotSchema')
 //const authenticateToken=require('../Routes/StaffMemberRoutes')
-const CounterModel=require('../Models/CounterModel')
+const CounterModel=require('../Models/CounterModel');
+const blacklist=require("../blacklist");
 function authenticateToken(req,res,next){
     
-    const token=req.header('x-auth-token');
+    const token=req.header('auth-token');
     if(!token){
     return res.sendStatus(401).status('Access deined please log in first')
     
     }
+    console.log(blacklist.getTokens());
     const verified= jwt.verify(token, process.env.TOKEN_SECRET)
     req.user=verified
     console.log("in auth "+req.user)
@@ -1033,7 +1035,6 @@ router.get('/acceptedRequests',authenticateToken,async(req,res)=>{
     }
     res.end();
 })
-
 //received requests that got accepted
 router.get('/acceptedReceivedRequests',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
@@ -1146,8 +1147,6 @@ router.get('/acceptedReceivedRequests',authenticateToken,async(req,res)=>{
     }
     res.end();
 })
-
-
 //sent requests that are pending
 router.get('/pendingRequests',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
@@ -1368,8 +1367,6 @@ router.get('/pendingReceivedRequests',authenticateToken,async(req,res)=>{
     }
     res.end();
 })
-
-
 //sent requests that are rejected
 router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)
@@ -1480,7 +1477,6 @@ router.get('/rejectedRequests',authenticateToken,async(req,res)=>{
     }
     res.end();
 })
-
 //received requests that are rejected
 router.get('/rejectedReceivedRequests',authenticateToken,async(req,res)=>{
     const staff=await StaffMemberModel.findById(req.user.id)

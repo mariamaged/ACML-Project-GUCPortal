@@ -42,12 +42,16 @@ class Attendance extends React.Component {
         this.updateMissing();
       })
       .catch((error) => {
-        console.log(error);
-        alert("ERROR OCCURED:\n" + error.response.data.msg);
+        if(error.response){
+          console.log(error.response);
+          alert(error.response.data.msg);
+        }else{
+          console.log(error);
+          alert("ERROR OCCURED:\n" + error.message);
+        }
+       
       })
-      .catch((error) => {
-        alert(error.message);
-      });
+     
   };
   signOut = () => {
     return (
@@ -79,17 +83,15 @@ class Attendance extends React.Component {
         this.updateMissing();
       })
       .catch((error) => {
-        console.log(error.message);
-        console.log(error);
-        if (error.response.data) {
+        if(error.response){
+          console.log(error.response);
           alert(error.response.data.msg);
-        } else {
-          alert(error.message);
+        }else{
+          console.log(error);
+          alert("ERROR OCCURED:\n" + error.message);
         }
+       
       })
-      .catch((error) => {
-        alert(error.message);
-      });
   };
   viewAttendance = () => {
     return (
@@ -175,9 +177,15 @@ class Attendance extends React.Component {
         this.setState({table:res.data.records})
       })
       .catch((error) => {
-        console.log(error);
-        console.log(error.response);
-      });
+        if(error.response){
+          console.log(error.response);
+          alert(error.response.data.msg);
+        }else{
+          console.log(error);
+          alert("ERROR OCCURED:\n" + error.message);
+        }
+       
+      })
   };
   missingDays = () => {
     //console.log(this.state.days)
@@ -241,13 +249,21 @@ class Attendance extends React.Component {
       })
       .then((res) => {
         //console.log("MISSING HOURS");
-        //console.log(res.data);
+        console.log("EEEEEHHHH")
+        console.log("missing hours")
+        console.log(res.data);
         this.setState({ hours: res.data });
       })
-      .catch((err) => {
-        console.log(err);
-        console.log(err.message);
-      });
+      .catch((error) => {
+        if(error.response){
+          console.log(error.response);
+          alert(error.response.data.msg);
+        }else{
+          console.log(error);
+          alert("ERROR OCCURED:\n" + error.message);
+        }
+       
+      })
   };
   getDays = () => {
     axios
@@ -260,10 +276,16 @@ class Attendance extends React.Component {
         // console.log(res.data);
         this.setState({ days: res.data });
       })
-      .catch((err) => {
-        console.log(err.message);
-        console.log(err.response);
-      });
+      .catch((error) => {
+        if(error.response){
+          console.log(error.response);
+          alert(error.response.data.msg);
+        }else{
+          console.log(error);
+          alert("ERROR OCCURED:\n" + error.message);
+        }
+       
+      })
   };
 
   updateMissing = () => {
@@ -273,7 +295,6 @@ class Attendance extends React.Component {
   };
   componentDidMount = () => {
     this.updateMissing();
-    this.getRecords();
   };
 
   render() {

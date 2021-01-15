@@ -11,6 +11,10 @@ import Instructor from "./Components/Instructor";
 
 class App extends React.Component {
 
+
+  StaffMemberRoutes=()=>{
+   
+  }
   render (){
     return (
       <BrowserRouter>
@@ -19,6 +23,10 @@ class App extends React.Component {
          <Route path="/hr" component={HR} />
          <Route path='/instructor' component={Instructor}/>
          <Route path='/assistant' component={Assisant}/>
+
+
+
+
       </BrowserRouter>
 
       )

@@ -20,9 +20,15 @@ class UpdateProfile extends React.Component {
         this.setState({ loading: false, offices: res.data });
       })
       .catch((error) => {
-        console.log(error);
-        alert("ERROR OCCURED :\n" + error.message);
-      });
+        if(error.response){
+          console.log(error.response);
+          alert(error.response.data.msg);
+        }else{
+          console.log(error);
+          alert("ERROR OCCURED:\n" + error.message);
+        }
+       
+      })
   }
   handleDropdown = async (e) => {
     await this.setState({ selectedOffice: e.target.value });
@@ -45,9 +51,15 @@ class UpdateProfile extends React.Component {
         },
       }).then((res)=>{
         alert("INFO CHANGED SUCCESSFULLY")
-    }).catch((error)=>{
-        console.log();
-        alert("ERROR\n"+error.response.data.msg)
+    }).catch((error) => {
+      if(error.response){
+        console.log(error.response);
+        alert(error.response.data.msg);
+      }else{
+        console.log(error);
+        alert("ERROR OCCURED:\n" + error.message);
+      }
+     
     })
   };
   handlePass=async(e)=>{
@@ -72,17 +84,15 @@ class UpdateProfile extends React.Component {
               },
           }).then((res)=>{
               alert("SUCCESS")
-          }).catch((error)=>{
-              
+          }).catch((error) => {
+            if(error.response){
               console.log(error.response);
-              console.error(error.message);
-              console.log(error)
-              if(error.response){
-                alert(error.response.data.msg)    
-              }else{
-                  alert("ERROR OCCURED\n"+error.message )
-              }
-              
+              alert(error.response.data.msg);
+            }else{
+              console.log(error);
+              alert("ERROR OCCURED:\n" + error.message);
+            }
+           
           })
       }
   }

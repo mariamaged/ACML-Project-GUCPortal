@@ -4,6 +4,9 @@ import UpdateProfile from "./StaffMember/UpdateProfile";
 import Attendance from "./StaffMember/Attendance";
 import axios from "axios";
 
+import Logout from "./Logout";
+
+
 class HR extends React.Component{
     state={
         user:{},
@@ -12,38 +15,11 @@ class HR extends React.Component{
         passCheck:""
 
     }
-
-    componentDidMount(){
-        console.log(this.state.newMember)
-    //const user=localStorage.getItem('user');
-   // const parsed= JSON.parse(user);
-    //this.setState({user:parsed})
-  
-}
-
-
-    render(){
-        if(!localStorage.getItem("auth-token")){
-            this.props.history.push('/');
-        }
-       
-        return(
-          <div>
-              
-              {this.state.newMember==="true"?this.passwordReset():this.routes()}
-             
-          </div>
-        )
-    }
-
-
     routes=()=>{
         return(
             <div>
-                tmam
+
             </div>
-
-
         )
     }
     passwordReset=()=>{
@@ -81,15 +57,36 @@ class HR extends React.Component{
        }).then(res=>{
            alert("Password changed successfully");
            this.setState({newMember:false});
-       }).catch(err=>{
-           if(err.response){
-               alert(err.response.data.msg);
-               console.log(err.message);
-           }else{
-               alert("Error Ocurred\n"+err.message);
-               console.log(err)
-           }
-       })
+       })  .catch((error) => {
+        if(error.response){
+          console.log(error.response);
+          alert(error.response.data.msg);
+        }else{
+          console.log(error);
+          alert("ERROR OCCURED:\n" + error.message);
+        }
+       
+      })
+    }
+    
+    render(){
+        if(!localStorage.getItem("auth-token")){
+            this.props.history.push('/');
+        }
+        if(localStorage.getItem("role")!="HR"){
+            this.props.history.push('/');
+        }
+     
+       
+        return(
+          <div>
+              
+              {this.state.newMember==="true"?this.passwordReset():this.routes()}
+            
+                
+             
+          </div>
+        )
     }
 }
 export default HR

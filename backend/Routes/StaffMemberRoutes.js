@@ -15,12 +15,16 @@ const AttendanceSchema = StaffMemberModel.attendanceSchema;
 const monthlyHoursSchema = StaffMemberModel.monthlyHoursSchema;
 var moment = require("moment");
 const request = require("../Models/RequestModel.js");
-let blacklist = [];
+const blacklist=require("../blacklist");
 
 async function authenticateToken(req, res, next) {
   const token = req.header("auth-token");
   if (!token) {
     res.status(401).send({ msg: "Access deined please log in first." });
+    return;
+  }
+  if(blacklist.getTokens().includes(token)){
+    res.status(401).send({msg:"Already Logged out!"});
     return;
   }
   try {
@@ -51,6 +55,7 @@ router.post("/login", async (req, res, next) => {
       res.status(400).send({ msg: "This user is not registered." });
       return;
     } else {
+      console.log(password)
       const isMatched = await bcrypt.compare(password, existingUser.password);
       if (isMatched === false) {
         res.status(400).send({ msg: "Please enter correct password." });
@@ -142,8 +147,10 @@ router.get("/logout", async (req, res) => {
   const token = req.header("auth-token");
   if (!token) {
     res.status(400).send({ msg: "Auth Token Missing" });
+    return;
   }
-  blacklist.push(token);
+  blacklist.addToken(token);
+  res.send({msg:"Log out successful"});
 });
 
 router.get("/profile", authenticateToken, async (req, res) => {
@@ -1271,6 +1278,7 @@ router.get("/missingDays", authenticateToken, async (req, res) => {
 });
 
 router.get("/missingHours", authenticateToken, async (req, res) => {
+  console.log("HENAAAA AAHHHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
   const user = await StaffMemberModel.findById(req.user.id);
   const monthly = user.time_attended;
   const month = new moment().format("M");
@@ -1289,7 +1297,15 @@ router.get("/missingHours", authenticateToken, async (req, res) => {
       }
     }
   } else {
-    const newMonthly = new monthlyHoursSchema({
+    // const newMonthly = new monthlyHoursSchema({
+    //   num: month,
+    //   yearNum: year,
+    //   extraHours: 0,
+    //   extraMinutes: 0,
+    //   missingHours: 0,
+    //   missingMinutes: 0,
+    // });
+    const newMonthly = ({
       num: month,
       yearNum: year,
       extraHours: 0,
@@ -1297,11 +1313,12 @@ router.get("/missingHours", authenticateToken, async (req, res) => {
       missingHours: 0,
       missingMinutes: 0,
     });
+    let arr=[];
     if (check == false && monthly.length == 0) {
-      const arr = new Array();
+     // const arr = new Array();
       arr[0] = newMonthly;
     } else {
-      const arr = monthly;
+      arr = monthly;
       arr[arr.length - 1] = newMonthly;
     }
     const userUp = await StaffMemberModel.findByIdAndUpdate(req.user.id, {

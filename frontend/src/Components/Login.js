@@ -24,14 +24,11 @@ class Login extends React.Component {
       .then(async(res) => {
         console.log("REQUEST SUCCESS");
         const token=res.headers['auth-token'];
-        localStorage.setItem("auth-token",token);
         const user=res.data.user;
-        //console.log(JSON.stringify(user));
-        //localStorage.setItem('user',JSON.stringify(user));
+        localStorage.setItem("auth-token",token);
         localStorage.setItem("role",user.role)
         localStorage.setItem("newMember",user.newMember)
         if(user.role==="HR"){
-          
           this.props.history.push('/hr');
         }
         if(user.role==="Course Instructor"){
@@ -47,15 +44,25 @@ class Login extends React.Component {
           alert(error.response.data.msg);
         } else {
           console.error(error);
-          alert("ERROR???/n"+error.message);
+          alert("ERROR???\n"+error.message+" "+error);
         }
       });
   };
+  componentDidMount=()=>{
+    console.log("MOUNTED")
+    document.getElementById("b").className="back"
+  }
+  componentWillUnmount=()=>{
+    console.log("UNMOUNTED");
+    document.getElementById('b').className="";
+    
+  }
 
   render() {
     return (
-      <div className="container cont text-center parent">
-        <main className="form-signin">
+      <div className="">
+      <div className="container-fluid cont text-center parent">
+        <main className="form-signin mt-5">
           <form onSubmit={this.handleClick.bind(this)}>
             <img
               className="mb-4 logo"
@@ -97,13 +104,10 @@ class Login extends React.Component {
           </form>
         </main>
       </div>
+      </div>
     );
   }
 }
-/*
 
-    <button onClick={this.handleClick} className="w-100 btn btn-lg btn-primary">Sign in</button>
-
-*/
 
 export default Login;
