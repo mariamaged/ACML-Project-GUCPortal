@@ -18,7 +18,7 @@ class TeachingAssignment extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5000/instructor/slotsAssignment', {
+        axios.get('http://localhost:5000/Instructor/slotsAssignment', {
             headers: {
                 'x-auth-token': localStorage.getItem("auth-token")
             }

@@ -18,10 +18,11 @@ function authenticateToken(req, res, next) {
   next();
 }
 
-// 1- Course coverage
+//------------------------------------------------------------1--------------------------------------------------
+// 1 (a) Course coverage
 router.get("/coursecoverage", authenticateToken, async (req, res) => {
   try {
-    const instr = await StaffMember.findById(req.user.id);
+    const instr = await StaffMember.findOne({ _id: req.user.id });
     if (!instr) res.status(400).send("Something went wrong");
     else {
       const inst = await AcademicStaff.findOne({ member: instr._id });
@@ -35,12 +36,12 @@ router.get("/coursecoverage", authenticateToken, async (req, res) => {
             if (c.slots_needed != 0)
               coverage.push({
                 "course id": c.id,
-                coverage: (100 * c.slots_covered) / c.slots_needed + "%",
+                coverage: (100 * c.slots_covered) / c.slots_needed + "%"
               });
             else
               coverage.push({
                 "course id": c.id,
-                courseDoesNotHaveSlotsAssigned: true,
+                courseDoesNotHaveSlotsAssigned: true
               });
           }
           res.status(200).json(coverage);
@@ -51,8 +52,44 @@ router.get("/coursecoverage", authenticateToken, async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
+// 1 (b)
+router.get("/coursecoverage/:courseID", authenticateToken, async (req, res) => {
+  try {
+    const courseID = req.params.courseID;
+    const instr = await StaffMember.findOne({ _id: req.user.id });
+    if (!instr) res.status(400).send("Something went wrong");
+    else {
+      const inst = await AcademicStaff.findOne({ member: instr._id });
+      if (!inst) res.status(400).send("Something went wrong");
+      else {
+        if (inst.type == "Course Instructor") {
+          const thecourse = await course.findOne({ id: courseID });
+          if (!thecourse) return res.status(400).send("Course does not exist");
+          if(!thecourse.department.equals(inst.department)) return res.status(403).send("You are not assigned to this department");
+          
+          const coverage = {};
+          if (thecourse.slots_needed != 0)
+            coverage = {
+              "course id": c.id,
+              coverage: (100 * c.slots_covered) / c.slots_needed + "%",
+            };
+          else
+            coverage = {
+              "course id": c.id,
+              courseDoesNotHaveSlotsAssigned: true,
+            };
+
+          res.status(200).json(coverage);
+        } else res.status(401).send("Access denied");
+      }
+    }
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 //------------------------------------------------------------2--------------------------------------------------
-// 2 (a) slots assignment for all courses assigned to the course instructor
+// 2 (a) Slots assignment for all courses assigned to the course instructor
 router.get(
   "/slotsAssignment",
   authenticateToken,
@@ -367,6 +404,7 @@ router.get("/staffpercourse", authenticateToken, async (req, res) => {
   }
 });
 
+//------------------------------------------------------------4--------------------------------------------------
 // 4- Assigned to an unassigned slot.
 router.route("/Assignment").post(authenticateToken, async (req, res) => {
   try {
@@ -499,9 +537,10 @@ router.route("/Assignment").post(authenticateToken, async (req, res) => {
   }
 });
 
+//------------------------------------------------------------5--------------------------------------------------
 // 5 (a) Delete an academic member assignment in courses he is assigned.
 router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) => {
-  const { courseID, academicMemberID, number, locationID, day} = req.body;
+  const { courseID, academicMemberID, number, locationID, day } = req.body;
   if (!courseID || !academicMemberID || !number || !locationID || !day) return res.status(400).json({ msg: 'Please fill all required fields!' });
 
   const instr = await StaffMember.findOne({ _id: req.user.id });
@@ -513,8 +552,8 @@ router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) =
   const thecourse = await course.findOne({ id: courseID });
   if (!thecourse) return res.status(400).json({ msg: 'The course does not exist' });
 
-  const thelocation = await location.findOne({ id: locationID});
-  if(!thelocation) return res.status(400).json({ msg: 'The location does not exist' }); 
+  const thelocation = await location.findOne({ id: locationID });
+  if (!thelocation) return res.status(400).json({ msg: 'The location does not exist' });
 
   const removedStaffMember = await StaffMember.findOne({ id: academicMemberID });
   if (!removedStaffMember) return res.status(400).json({ msg: 'There is no staff member with this id' });
@@ -553,7 +592,7 @@ router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) =
     thecourse.schedule = withoutRemoved;
     await thecourse.save();
 
-    if(slotsRemovedNum == 0) return res.status(400).json({msg: 'There are not slots with such details that the academic member is assigned to.'});
+    if (slotsRemovedNum == 0) return res.status(400).json({ msg: 'There are not slots with such details that the academic member is assigned to.' });
 
     const withoutRemovedCourses = removedAcademicMember.schedule.filter((slot) => {
       if (slot.course && thecourse._id.equals(slot.course)) return !(slot.day == day && slot.number == number && slot.location.equals(thelocation._id));
@@ -616,7 +655,7 @@ router.delete('/removeAssignedAcademic', authenticateToken, async (req, res) => 
 
     thecourse.academic_staff.splice(position, 1);
     const withoutRemoved = thecourse.schedule.filter((slot) => {
-      if (slot.academic_member_id) return !slot.academic_member_id.equals(removedAcademicMember._id) 
+      if (slot.academic_member_id) return !slot.academic_member_id.equals(removedAcademicMember._id)
       else return true
     });
     const slotsRemovedNum = thecourse.slots_covered - withoutRemoved.length;

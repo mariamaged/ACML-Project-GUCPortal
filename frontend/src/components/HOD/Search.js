@@ -28,6 +28,7 @@ class Search extends Component {
             case 3: urlPrefix = '/instructor/hodCoursesCoverage/';break;
             case 4: urlPrefix = '/instructor/hodteachingAssignment/';
             case 5: urlPrefix = '/instructor/instructorCoursesCoverage/';
+            case 5: urlPrefix = '/instructor/instructorTeachingAssignment/';
         }
         return (
             <div>

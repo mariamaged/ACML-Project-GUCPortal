@@ -18,7 +18,8 @@ import CourseTeachingAssignment from './components/HOD/CourseTeachingAssignment.
 
 import InstructorAllCoursesCoverage from './components/CourseInstructor/AllCoursesCoverage.js';
 import InstructorOneCourseCoverage from './components/CourseInstructor/OneCourseCoverage.js';
-import InstructorTeachingAssignment from './components/CourseInstructor/TeachingAssignment.js';
+import InstructorAllTeachingAssignment from './components/CourseInstructor/TeachingAssignment.js';
+import InstructorOneTeachingAssignment from './components/CourseInstructor/CourseTeachingAssignment.jsjs';
 
 import Schedule from './components/Academic/ScheduleOptions.js';
 
@@ -106,8 +107,8 @@ const App = () => {
           )} />
 
           <Switch>
-            <Route path='/instructor/instructorTeachingAssignment/all' component={InstructorTeachingAssignment} />
-            <Route path='/instructor/instructorTeachingAssignment/:courseID' component={InstructorTeachingAssignment} />
+            <Route path='/instructor/instructorTeachingAssignment/all' component={InstructorAllTeachingAssignment} />
+            <Route path='/instructor/instructorTeachingAssignment/:courseID' component={InstructorOneTeachingAssignment} />
           </Switch>
 
           <Route path="/(instructor|assistant|hr)/schedule" component={Schedule} />
