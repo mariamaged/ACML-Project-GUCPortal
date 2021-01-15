@@ -501,8 +501,8 @@ router.route("/Assignment").post(authenticateToken, async (req, res) => {
 
 // 5 (a) Delete an academic member assignment in courses he is assigned.
 router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) => {
-  const { courseID, academicMemberID, number, location, date } = req.body;
-  if (!courseID || !academicMemberID || !number || !location || !date) return res.status(400).json({ msg: 'Please fill all required fields!' });
+  const { courseID, academicMemberID, number, locationID, day} = req.body;
+  if (!courseID || !academicMemberID || !number || !locationID || !day) return res.status(400).json({ msg: 'Please fill all required fields!' });
 
   const instr = await StaffMember.findOne({ _id: req.user.id });
   if (!instr) return res.status(400).json({ msg: "Something went wrong" });
@@ -513,7 +513,7 @@ router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) =
   const thecourse = await course.findOne({ id: courseID });
   if (!thecourse) return res.status(400).json({ msg: 'The course does not exist' });
 
-  const thelocation = await location.findOne({ id: location});
+  const thelocation = await location.findOne({ id: locationID});
   if(!thelocation) return res.status(400).json({ msg: 'The location does not exist' }); 
 
   const removedStaffMember = await StaffMember.findOne({ id: academicMemberID });
@@ -522,7 +522,7 @@ router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) =
   const removedAcademicMember = await AcademicStaff.findOne({ member: removedStaffMember._id });
   if (!removedAcademicMember) return res.status(400).json({ msg: 'The staff member is not an academic member' });
 
-  if (removedAcademicMember.type == 'Course Instructor') {
+  if (inst.type == 'Course Instructor') {
     var assigned = false;
     const coursesAssigned = inst.courses;
     for (var i = 0; i < coursesAssigned.length; i++) {
@@ -536,7 +536,6 @@ router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) =
     var removedAssigned = false;
     for (var i = 0; i < thecourse.academic_staff.length; i++) {
       if (thecourse.academic_staff[i].equals(removedAcademicMember._id)) {
-        position = i;
         removedAssigned = true;
         break;
       }
@@ -544,21 +543,23 @@ router.delete('/deleteAcademicAssignment', authenticateToken, async (req, res) =
     if (!removedAssigned) return res.status(400).json({ msg: 'The academic member you want to delete his assignment from one of the slots is not assigned to this course.' });
 
     const withoutRemoved = thecourse.schedule.filter((slot) => {
-      if (slot.academic_member_id && removedAcademicMember._id.equals(slot.academic_member_id)) return !(slot.day == day && slot.number == number && slot.location == thelocation._id);
+      if (slot.academic_member_id && removedAcademicMember._id.equals(slot.academic_member_id)) return !(slot.day == day && slot.number == number && slot.location.equals(thelocation._id));
       else return true;
     });
 
+    console.log(withoutRemoved);
     const slotsRemovedNum = thecourse.slots_covered - withoutRemoved.length;
     thecourse.slots_covered -= slotsRemovedNum;
     thecourse.schedule = withoutRemoved;
     await thecourse.save();
 
-    if(slotsRemoved == 0) return res.status(400).json({msg: 'There are not slots with such details that the academic member is assigned to.'});
+    if(slotsRemovedNum == 0) return res.status(400).json({msg: 'There are not slots with such details that the academic member is assigned to.'});
 
     const withoutRemovedCourses = removedAcademicMember.schedule.filter((slot) => {
-      if (slot.course && thecourse._id.equals(slot.course)) return !(slot.day == day && slot.number == number && slot.location == thelocation._id);
+      if (slot.course && thecourse._id.equals(slot.course)) return !(slot.day == day && slot.number == number && slot.location.equals(thelocation._id));
       else return true;
     });
+    console.log(withoutRemovedCourses);
 
     removedAcademicMember.schedule = withoutRemovedCourses;
     await removedAcademicMember.save();

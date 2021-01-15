@@ -68,7 +68,7 @@ class DeleteCourseSlots extends Component {
             console.log(requestBody);
 
             axios.delete('http://localhost:5000/coursecoordinator/courseSlots', {
-                data : requestBody,
+                data: requestBody,
                 headers: {
                     'x-auth-token': localStorage.getItem("auth-token")
                 }
@@ -109,21 +109,22 @@ class DeleteCourseSlots extends Component {
                 <br />
                 <br />
                 <div style={frameStyle}>
-                    <Container>
-                        <Row>
-                            <Col md="auto"> <h4 class="card-title" style={colorLabel} >Course ID: </h4></Col>
-                            <Col md="auto">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="courseID" onChange={this.handleOnChange} />
-                                </div>
-                            </Col>
-                        </Row>
-                    </Container>
-
                     {!this.state.warningFlag &&
-                        <Jumbotron>
-                            {allEntries}
-                        </Jumbotron>}
+                        <Container>
+                            <Row>
+                                <Col md="auto"> <h4 class="card-title" style={colorLabel} >Course ID: </h4></Col>
+                                <Col md="auto">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="courseID" onChange={this.handleOnChange} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <Jumbotron>
+                                {allEntries}
+                            </Jumbotron>
+                        </Container>
+
+                    }
 
                     {
                         this.state.warningFlag &&

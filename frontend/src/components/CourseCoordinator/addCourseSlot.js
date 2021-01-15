@@ -59,6 +59,7 @@ class addCourseSlot extends Component {
             );
         }) : (<div></div>);
 
+
         let colorLabel = { color: "#4d4d4d" };
         return (
             <Container>

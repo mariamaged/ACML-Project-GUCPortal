@@ -3,6 +3,7 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { CheckCircleFill } from 'react-bootstrap-icons';
 
 // React
 import React, { Component } from 'react';
@@ -52,7 +53,7 @@ class addCourseSlot extends Component {
         }
     }
     render() {
-        console.log(this.props.locations);
+        console.log(this.props.showButton);
         const locations = this.props.locations.length ? this.props.locations.map(location => {
             return (
                 <option>{location}</option>
@@ -64,7 +65,8 @@ class addCourseSlot extends Component {
             <Container>
                 <Row>
                     <Col md="auto">
-                        <h4 class="card-title" style={colorLabel} >Slot Number: </h4>
+                        {this.props.ind == 0 &&<h5 class="card-title" style={colorLabel} >Old Slot Number </h5>}
+                        {this.props.ind == 1 &&<h5 class="card-title" style={colorLabel} >New Slot Number </h5>}
                         <div class="btn-group mr-2" role="group" aria-label="First group" id="buttons">
                             <button type="button" className="btn btn-secondary active" onClick={this.handleOnClick} id="button1">1</button>
                             <button type="button" className="btn btn-secondary" onClick={this.handleOnClick} id="button2">2</button>
@@ -72,9 +74,10 @@ class addCourseSlot extends Component {
                             <button type="button" className="btn btn-secondary" onClick={this.handleOnClick} id="button4">4</button>
                             <button type="button" className="btn btn-secondary" onClick={this.handleOnClick} id="button5">5</button>
                         </div>
+                        
                     </Col>
                     <Col md="auto">
-                        <h4 class="card-title" style={colorLabel}> Location: </h4>
+                        <h5 class="card-title" style={colorLabel}> Location: </h5>
                         <div class="form-group">
                             <select class="form-control" onChange={this.handleOnChange}>
                                 {locations}
@@ -83,18 +86,18 @@ class addCourseSlot extends Component {
                     </Col>
 
                     <Col md="auto">
-                        <h4 class="card-title" style={colorLabel} > Date: </h4>
+                        <h5 class="card-title" style={colorLabel} > Date: </h5>
                         <DatePicker selected={this.state.date} onChange={(date) => { this.changeDate(date) }} />
                     </Col>
+
                     {this.props.showButton &&
                         <Col md="auto">
                             <Row>
-                                <Col md="auto">
-                                    <button type="button" class="btn roundButton" 
-                                        onClick={() => this.props.addSlot(this.state.date, this.state.number, this.state.locationID, this.props.ind)}>
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                </Col>
+                                {this.props.showButton &&
+                                    <Col md="auto">
+                                        <CheckCircleFill className="cancelBtn" size={30} color="#888" onClick={() => { this.props.addSlot(this.state.date, this.state.number, this.state.locationID, this.props.ind) }}/>
+                                    </Col>
+                                }
                             </Row>
                         </Col>
                     }

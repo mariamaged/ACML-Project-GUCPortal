@@ -39,6 +39,8 @@ router.get('/isHod', authenticateToken, async (req, res) => {
     else return res.status(200).json({ isHOD: false });
 });
 
+// 1
+
 // 2 (a)
 router.get('/viewDepartmentStaffPerCourse/:courseID', authenticateToken, async (req, res) => {
     const courseID = req.params.courseID;

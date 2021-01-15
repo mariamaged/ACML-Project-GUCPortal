@@ -47,7 +47,7 @@ class UpdateCourseSlots extends Component {
 
     addTwoSlots = async (slots, ind, flag) => {
         const oldSlots = this.state.slots;
-        const newSlots = [...oldSlots, slots[0], slots[1]];
+        const newSlots = [...oldSlots, slots];
 
         const oldShowButtons = this.state.showButtons;
         oldShowButtons[ind] = false;
@@ -65,8 +65,8 @@ class UpdateCourseSlots extends Component {
             const requestBody = { courseID: this.state.courseID, details: this.state.slots };
             console.log(requestBody);
 
-            axios.delete('http://localhost:5000/coursecoordinator/courseSlots', {
-                data : requestBody,
+            /*axios.delete('http://localhost:5000/coursecoordinator/courseSlots', {
+                data: requestBody,
                 headers: {
                     'x-auth-token': localStorage.getItem("auth-token")
                 }
@@ -80,7 +80,7 @@ class UpdateCourseSlots extends Component {
                     this.setState({ warningFlag: true, warning: error.response.message })
                     console.log(error);
                     console.log(error.response.data);
-                });
+                });*/
         }
 
     }
@@ -93,6 +93,8 @@ class UpdateCourseSlots extends Component {
         for (var i = 0; i < this.state.number; i++) {
             allEntries.push(<div key={i}>
                 <TwoSlots locations={this.state.locations} showButton={this.state.showButtons[i]} addTwoSlots={this.addTwoSlots} ind={i} />
+                <hr class="solid"></hr>
+                <div style={{height: "5px"}}></div>
             </div>);
         }
 
@@ -107,21 +109,21 @@ class UpdateCourseSlots extends Component {
                 <br />
                 <br />
                 <div style={frameStyle}>
-                    <Container>
-                        <Row>
-                            <Col md="auto"> <h4 class="card-title" style={colorLabel} >Course ID: </h4></Col>
-                            <Col md="auto">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="courseID" onChange={this.handleOnChange} />
-                                </div>
-                            </Col>
-                        </Row>
-                    </Container>
-
                     {!this.state.warningFlag &&
-                        <Jumbotron>
-                            {allEntries}
-                        </Jumbotron>}
+                        <Container>
+                            <Row>
+                                <Col md="auto"> <h4 class="card-title" style={colorLabel} >Course ID: </h4></Col>
+                                <Col md="auto">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="courseID" onChange={this.handleOnChange} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <Jumbotron>
+                                {allEntries}
+                            </Jumbotron>
+                        </Container>
+                    }
 
                     {
                         this.state.warningFlag &&
