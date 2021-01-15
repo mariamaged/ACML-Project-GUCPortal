@@ -2,6 +2,16 @@ const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const CounterModel = require('./CounterModel.js');
 
+
+//mielstone2
+const acceptedReplacementSchema=mongoose.Schema({
+      replacementID:{type: ObjectID, ref: 'StaffMemberModel'},
+      slotNum:{type:Number},
+      slotLoc:{type:String},
+      
+      // courseID:{type: ObjectID, ref: 'CourseModel', required: true}
+})
+
 const RequestSchema = mongoose.Schema({
   counter:{type:Number},
    requestID: {type: String, unique: true},
@@ -22,6 +32,10 @@ const RequestSchema = mongoose.Schema({
     slotNum: {type: Number},
     slotLoc: {type: String},
     replacementStaff: {type: ObjectID, ref: 'StaffMemberModel'},
+    //--------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------
+    //-------------------------------- MILETONE 2----------------------------------------
+    acceptedReplacement:[acceptedReplacementSchema],
 
     // for Slot Linking
     slotDay: {type: String, enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday']},
@@ -31,12 +45,17 @@ const RequestSchema = mongoose.Schema({
     reason: {type: String},
     medicalDoc: {type: String},
     maternityDoc: {type: String},
+    startDate:{type:Date},
+    endDate:{type:Date},
     accidentDate: {type: Date},
     sickDay: {type: Date},
     missedDay:{type: Date},
 
     // Acceptance
-    RejectionReason: {type: String}
+    RejectionReason: {type: String,default:""},
+
+    //compensation day
+    compensatedDay:{type:Date}
 });
 
 RequestSchema.pre('save', function(next) {
@@ -154,3 +173,6 @@ RequestSchema.pre('save', function(next) {
 
 module.exports = mongoose.model('request', RequestSchema);
 module.exports.reqSchema=RequestSchema
+
+//mileston2
+module.exports.acceptedReplacementSchema=acceptedReplacementSchema

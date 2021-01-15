@@ -26,6 +26,8 @@ const StaffMemberSchema = mongoose.Schema({
     attendCompensationDay: {type: Boolean},
     missingDays: {type: [String], default: []},
     time_attended: {type: [monthlyHoursSchema], default: []},
+    // requestsReceived:[{type: ObjectID, ref: 'request'}],
+    // requestsSent:[{type: ObjectID, ref: 'request'}],
     lastUpdatedAnnual: {type: Date},
     accidentalDaysLeft: {type:Number},
     attendCompensationDay: {type:Boolean},

@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId;
 const slotSchema = require('./SlotSchema.js');
 
-
 const AcademicStaffSchema = mongoose.Schema({
     // Personal Information.
     member: {type: ObjectID, ref: 'Staff', required: true},

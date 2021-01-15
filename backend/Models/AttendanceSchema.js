@@ -14,7 +14,9 @@ const attendanceSchema = mongoose.Schema({
     last_signIn: {type: Date},
     last_signOut: {type: Date},
     day: {type: String},
-    accepted_leave: {type: Boolean, default: false}
+    accepted_leave: {type: Boolean, default: false},
+    signins:{type:[String], default:[]},
+    signouts:{type:[String], default:[]}
 });
 
 module.exports = attendanceSchema;
