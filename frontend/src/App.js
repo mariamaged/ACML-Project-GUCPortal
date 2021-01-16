@@ -37,6 +37,7 @@ import AllCoursesCoverage from './components/HOD/AllCoursesCoverage.js';
 import OneCourseCoverage from './components/HOD/OneCourseCoverage.js';
 import TeachingAssignment from './components/HOD/TeachingAssignment.js';
 import CourseTeachingAssignment from './components/HOD/CourseTeachingAssignment.js';
+import AssignCoursetoInstructor from './components/HOD/AssignCoursetoInstructor.js';
 
 import InstructorAllCoursesCoverage from './components/CourseInstructor/AllCoursesCoverage.js';
 import InstructorOneCourseCoverage from './components/CourseInstructor/OneCourseCoverage.js';
@@ -62,13 +63,16 @@ import UpdateProfile from './components/Staff/UpdateProfile.js';
 import ViewProfile from './components/Staff/ViewProfile.js';
 
 import Toast from './components/Toasts/toast.js';
+
+import Homepage from "./components/Other/Homepage";
+import FirstLogin from "./components/Other/FirstLogin";
+
+// React Components
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// React Components
-
 // React
-import React from 'react';
+import { React, useState } from 'react';
 
 // Reacter Router and axios
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
@@ -77,6 +81,10 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 // Component
 const App = () => {
+  const [value, setValue] = useState(localStorage.getItem("newMember"));
+  const force = () => {
+    setValue(value + 1)
+  }
   return (
     <BrowserRouter>
       <div className="App">
@@ -85,13 +93,16 @@ const App = () => {
         <Route exact path='/' component={Login} />
         <Route exact path='/Login' component={Login} />
 
+        {localStorage.getItem("newMember")=="true"?(<FirstLogin force={force}/>):(
+          <div>
+
         {/*Navbars*/}
         <Route path='/instructor' component={InstructorNavbar} />
         <Route path='/assistant' component={TeachingAssistantNavbar} />
         <Route path='/hr' component={HRNavbar} />
 
         {/*Homepages*/}
-        <Route path='/instructor/homepage' component={Toast} />
+        <Route path='/(instructor|assistant|hr)/homepage' component={Homepage} />
 
         {/*HR Navbar */}
         <Route path='/hr/AddCourse' component={AddCourse} />
@@ -117,6 +128,7 @@ const App = () => {
 
         {/*HOD Navbar*/}
         <Route path='/instructor/hod' component={StaffContainer} />
+        <Route path='/instructor/assignCourseToInstructor' component={AssignCoursetoInstructor} />       
         <Route path='/instructor/hodDepartmentStaff' component={DepartmentStaff} />
         <Route path='/instructor/hodCourseStaff' render={(props) => (
           <Search {...props} placeholder="Course ID" roleID="1" />
@@ -170,7 +182,7 @@ const App = () => {
         <Route path='/instructor/assignCourseCoordinator' component={AssignCourseCoordinator} />
         <Route path='/instructor/assignMember' component={AssignMember} />
         <Route path='/instructor/deleteMemberAssignment' component={DeleteMemberAssignment} />
-        <Route path='/instructor/removeMember' component={RemoveMember} /> 
+        <Route path='/instructor/removeMember' component={RemoveMember} />
 
         {/*Course Coordinator*/}
         <Route path='/assistant/postCourseSlots' component={PostCourseSlots} />
@@ -188,9 +200,9 @@ const App = () => {
 
         {/*Staff*/}
         <Route path='/(instructor|assistant|hr)/attendance' component={Attendance} />
-        <Route path='/(instructor|assistant|hr)/updateProfile' component={UpdateProfile} />   
+        <Route path='/(instructor|assistant|hr)/updateProfile' component={UpdateProfile} />
         <Route path='/(instructor|assistant|hr)/viewProfile' component={ViewProfile} />
-           
+
         {/*Toast Component*/}
         <ToastContainer
           position="bottom-left"
@@ -203,6 +215,8 @@ const App = () => {
           draggable
           pauseOnHover
         />
+        </div>)}
+
       </div>
     </BrowserRouter >
   );

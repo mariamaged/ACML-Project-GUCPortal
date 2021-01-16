@@ -29,13 +29,13 @@ class Login extends React.Component {
         localStorage.setItem("role", user.role)
         localStorage.setItem("newMember", user.newMember)
         if (user.role === "HR") {
-          this.props.history.push('/hr');
+          this.props.history.push('/hr/homepage');
         }
         if (user.role === "Course Instructor") {
-          this.props.history.push('/instructor');
+          this.props.history.push('/instructor/homepage');
         }
         if (user.role === "Teaching Assistant") {
-          this.props.history.push('/assistant');
+          this.props.history.push('/assistant/homepage');
         }
       })
       .catch((error) => {

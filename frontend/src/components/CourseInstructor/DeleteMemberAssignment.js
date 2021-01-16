@@ -2,17 +2,17 @@ import React, { Component } from 'react'
 import axios from 'axios';
 
 
-class UpdateAssignment extends Component{
+class RemoveAcMem extends Component {
     state = {
-        courseId:"",
-        memid:"",
-        number:"",
-        slocation:"",
-        day:"",
-        
-        warning:"-1",
-        warningmsg:""
+        courseId: "",
+        day: "",
+        number: "",
+        slocation: "",
+        memid: "",
+        warning: "-1",
+        warningmsg: ""
     }
+
     changecid(event) {
         this.setState({
             courseId: event.target.value
@@ -41,65 +41,69 @@ class UpdateAssignment extends Component{
     changeclick(event) {
         event.preventDefault();
         console.log(this.state);
-        
-        
 
-        axios.post('http://localhost:5000/Instructor/Assignment', {
-            courseid:this.state.courseId,
-            day:this.state.day,
-            number:this.state.number,
-            slocation:this.state.slocation,
-            memid:this.state.memid},
+
+
+        axios.delete('http://localhost:5000/Instructor/deleteAcademicAssignment',
+
             {
-            headers: {
-                'auth-token': localStorage.getItem("auth-token")
+                data: {
+                    courseID: this.state.courseId,
+                    day: this.state.day,
+                    number: this.state.number,
+                    locationID: this.state.slocation,
+                    academicMemberID: this.state.memid
+                },
+
+                headers: {
+                    'auth-token': localStorage.getItem("auth-token")
+                },
             }
-        })
-        
+
+        )
+
             .then(res => {
-                this.setState({warning:1});
+                this.setState({ warning: 1 });
                 let result = res.data;
                 console.log(result);
             })
             .catch(e => {
-                this.setState({warning:0,warningmsg:e.response.data.msg});
+                this.setState({ warning: 0, warningmsg: e.response.data.msg });
                 console.log(e.response);
             });
 
-
-
     }
 
 
-    render(){
+    render() {
 
         const warning = this.state.warning;
         let button;
-        if(warning===-1){
+        if (warning === -1) {
             button = <div></div>
         }
-        else{
+        else {
 
-        if (warning===0) {
-          button = <div class="alert alert-dismissible alert-danger">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <strong>Oh snap!</strong> <a href="#" class="alert-link">{this.state.warningmsg}</a>.
+            if (warning === 0) {
+                button = <div class="alert alert-dismissible alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Oh snap!</strong> <a href="#" class="alert-link">{this.state.warningmsg}</a>.
         </div>;
-        
-        } else {
-            if(warning===1){
-          button = <div class="alert alert-dismissible alert-success">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <strong>Operation Successfull!</strong> You successfully assigned a member to this assignment slot <a href="#" class="alert-link"></a>.
+
+            } else {
+                if (warning === 1) {
+                    button = <div class="alert alert-dismissible alert-success">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <strong>Operation Successful!</strong> You successfully deleted the assignment of {this.state.memid} to {this.state.courseId} course <a href="#" class="alert-link"></a>.
         </div>;
+                }
             }
         }
-    }
-        
-        return(
+
+        return (
             <div>
 
-                <h1 >Assign an Acadmeic Member To an Unassigned Slot</h1>
+                <h1 >Delete Assignment of Academic Member in Course </h1>
 
                 <div class="form-group">
                     <label for="exampleInputEmail1">Course Name:</label>
@@ -140,13 +144,13 @@ class UpdateAssignment extends Component{
                     <input class="form-control" placeholder="Enter Member ID" onChange={this.changemid.bind(this)}></input>
                 </div>
 
-                <button type="button" class="btn btn-primary btn-lg btn-block" onClick={this.changeclick.bind(this)} >Submit</button>
+                <button type="button" class="btn btn-primary btn-lg btn-block" onClick={this.changeclick.bind(this)} >Delete</button>
 
-              {button}
+                {button}
 
             </div>
         )
     }
 }
 
-export default UpdateAssignment
+export default RemoveAcMem
