@@ -42,16 +42,34 @@ router.get('/isHod', authenticateToken, async (req, res) => {
 // 1
 router.post('/assignCoursetoCourseInstructor', authenticateToken, async (req, res) => {
     const {courseID, academicMemberID} = req.body;
-    if(!courseID || academicMemberID) return res.status(400).send("Fill all required fields");
+
+    const HODStaff = await StaffMemberModel.findById(req.user.id);
+    const HODAcademic = await AcademicStaffModel.findOne({member: HODStaff._id});
+
+    if(!courseID || !academicMemberID) return res.status(400).send("Fill all required fields");
 
     const course = await CourseModel.findOne({id: courseID});
     if(!course) res.status(400).send('There is no course with that id.');
 
-    const staff = await StaffMemberModel.findById(req.user.id);
+    const staff = await StaffMemberModel.findOne({id: academicMemberID});
     if(!staff) res.status(400).send('The staff member does not exist');
     const academic = await AcademicStaffModel.findOne({member: staff._id});
     if(!academic) res.status(400).send('The academic member does not exist');
-    
+    if(academic.type != 'Course Instructor') return res.status(403).send('The academic member is not a course instructor');
+    if(!academic.department.equals(HODAcademic.department)) return res.status(403).send('The course instructor is not in your department.');
+
+    console.log(academic);
+    console.log(academic._id);
+    var assigned = false;
+    for(var i = 0; i < course.academic_staff.length; i++) {
+        if(course.academic_staff[i].equals(academic._id)) {
+            assigned = true;
+            break;
+        }
+    }
+
+    if(assigned) return res.status(400).send('The course instructor is already assigned to this course');
+
     course.academic_staff.push(academic._id);
     await course.save();
 

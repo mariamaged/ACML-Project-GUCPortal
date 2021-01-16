@@ -17,7 +17,7 @@ class ViewProfile extends React.Component {
     getDeduction = () => {
         axios.get("http://localhost:5000/staff/missingDays", {
             headers: {
-                "auth-token": localStorage.getItem("auth-token")
+                "x-auth-token": localStorage.getItem("auth-token")
             }
         }).then(res => {
             this.setState({ deduction: this.state.deduction + 1 })
@@ -34,7 +34,7 @@ class ViewProfile extends React.Component {
         });
         axios.get("http://localhost:5000/staff/missingHours", {
             headers: {
-                "auth-token": localStorage.getItem("auth-token")
+                "x-auth-token": localStorage.getItem("auth-token")
             }
         }).then(res => {
             this.setState({ deduction: this.state.deduction + 1 });
@@ -61,7 +61,7 @@ class ViewProfile extends React.Component {
         axios
             .get("http://localhost:5000/staff/profile", {
                 headers: {
-                    "auth-token": localStorage.getItem("auth-token"),
+                    "x-auth-token": localStorage.getItem("auth-token"),
                 },
             })
             .then((res) => {

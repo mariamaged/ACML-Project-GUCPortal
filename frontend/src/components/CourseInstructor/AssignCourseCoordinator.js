@@ -16,7 +16,7 @@ class AssignCoord extends React.Component {
         axios
             .get("http://localhost:5000/Instructor/coursecoverage", {
                 headers: {
-                    "auth-token": localStorage.getItem("auth-token"),
+                    "x-auth-token": localStorage.getItem("auth-token"),
                 },
             })
             .then((res) => {
@@ -101,7 +101,7 @@ class AssignCoord extends React.Component {
                                             coordinatorid: s.id
                                         }, {
                                             headers: {
-                                                "auth-token": localStorage.getItem("auth-token")
+                                                "x-auth-token": localStorage.getItem("auth-token")
                                             }
                                         }).then((res) => {
                                             alert(res.data.msg);
@@ -149,7 +149,7 @@ class AssignCoord extends React.Component {
 
         axios.get("http://localhost:5000/Instructor/getcoursestaff", {
             headers: {
-                "auth-token": localStorage.getItem("auth-token")
+                "x-auth-token": localStorage.getItem("auth-token")
             },
             params: {
                 cid: this.state.selectCourse

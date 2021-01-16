@@ -10,6 +10,24 @@
    top:3vw;
    left:2vw;
 }
+.reqFormDrop{
+   margin-left: 60vw !important;
+ }
+ .changeDay{
+    width:40%!important;
+ }
+ .successMsg{
+   color:rgb(9, 88, 65);
+   font-size:1vw !important;
+   position:relative;
+   top:4vw !important;
+ }
+ .warningMsg{
+   color:rgb(180, 16, 16);
+   font-size:1vw !important;
+   position:relative;
+   top:4vw !important;
+ }
 
 .formTest {
    width:40% !important;

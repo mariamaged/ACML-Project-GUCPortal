@@ -11,7 +11,7 @@ class Attendance extends React.Component {
         loadingHours: true,
         month: ""
     };
-    
+
     singIn = () => {
         return (
             <div className="col-sm">
@@ -32,7 +32,7 @@ class Attendance extends React.Component {
                 {},
                 {
                     headers: {
-                        "auth-token": localStorage.getItem("auth-token"),
+                        "x-auth-token": localStorage.getItem("auth-token"),
                     },
                 }
             )
@@ -73,7 +73,7 @@ class Attendance extends React.Component {
                 {},
                 {
                     headers: {
-                        "auth-token": localStorage.getItem("auth-token"),
+                        "x-auth-token": localStorage.getItem("auth-token"),
                     },
                 }
             )
@@ -168,7 +168,7 @@ class Attendance extends React.Component {
                     month: this.state.month,
                 },
                 headers: {
-                    "auth-token": localStorage.getItem("auth-token"),
+                    "x-auth-token": localStorage.getItem("auth-token"),
                 },
             })
             .then((res) => {
@@ -244,7 +244,7 @@ class Attendance extends React.Component {
         axios
             .get("http://localhost:5000/staff/missingHours", {
                 headers: {
-                    "auth-token": localStorage.getItem("auth-token"),
+                    "x-auth-token": localStorage.getItem("auth-token"),
                 },
             })
             .then((res) => {
@@ -269,7 +269,7 @@ class Attendance extends React.Component {
         axios
             .get("http://localhost:5000/staff/missingDays", {
                 headers: {
-                    "auth-token": localStorage.getItem("auth-token"),
+                    "x-auth-token": localStorage.getItem("auth-token"),
                 },
             })
             .then((res) => {

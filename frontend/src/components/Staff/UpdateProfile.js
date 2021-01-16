@@ -47,7 +47,7 @@ class UpdateProfile extends React.Component {
             office: this.state.selectedOffice
         }, {
             headers: {
-                "auth-token": localStorage.getItem("auth-token"),
+                "x-auth-token": localStorage.getItem("auth-token"),
             },
         }).then((res) => {
             alert("INFO CHANGED SUCCESSFULLY")
@@ -80,7 +80,7 @@ class UpdateProfile extends React.Component {
                 checkPass: this.state.checkPass
             }, {
                 headers: {
-                    "auth-token": localStorage.getItem("auth-token"),
+                    "x-auth-token": localStorage.getItem("auth-token"),
                 },
             }).then((res) => {
                 alert("SUCCESS")
