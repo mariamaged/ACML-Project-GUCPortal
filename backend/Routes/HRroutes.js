@@ -10,10 +10,11 @@ const department=require('../Models/DepartmentModel');
 const course=require('../Models/CourseModel');
 const jwt=require('jsonwebtoken');
 
+const blacklist=require("../blacklist");
 
 function authenticateToken(req,res,next){
     
-    const token=req.header('x-auth-token');
+    const token=req.header('auth-token');
     if(!token){
     return res.sendStatus(401).status('Access deined please log in first.')
     }
@@ -499,15 +500,17 @@ router.route('/course').post(authenticateToken,async(req,res)=>{
 //elmafrood a bcrypt el password hatta lw default?
 //when academic staff add lel table/delete/update
 const bcrypt=require('bcrypt');
-router.route('/staffmember').post(authenticateToken,async(req,res)=>{
+
+router.route('/staffmember').post(async(req,res)=>{
     try{
         //to authorize
-        const st=await StaffMember.findOne({"id":req.user.id});
-        if(st.staff_type=="HR")
-    res.status(401).send('Access Denied');
-    else{
+        //const st=await StaffMember.findOne({"_id":req.user.id});
+    //     if(st.staff_type!="HR")
+    // res.status(401).send('Access Denied');
+    // else{
        const{name,email,salary,officelocation,type,dayoff,gender,actype,departmentname,facultyname}=req.body;
-       if(!email||!salary||!officelocation|| !gender||!type) res.status(400).json({msg:"please fill all the fields"});
+       console.log(gender)
+       if(!email||!salary||!officelocation|| !gender||!type||!name) res.status(400).json({msg:"please fill all the fields"});
        else{
            var flag=false;
            const isemail=await StaffMember.findOne({"email":email});
@@ -534,7 +537,7 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                      }}else{
                         var fac;
                         var dep;
-                         if(!actype||!departmentname||!facultyname)message="please fill the required data fields";
+                         if(!actype||!departmentname||!facultyname)message="please fill all the academic staff data fields";
                          else{
                           for(var i=num;i>=0;i--){
                              if(i==0){
@@ -544,12 +547,14 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                             var tuple=await StaffMember.findOne({"id":"ac-"+i});
                             if(tuple!=null) {sid="ac-"+(i+1); break;} 
                             }
-                            }
+                            
                              dep=await department.findOne({"name":departmentname});
                              fac=await faculty.findOne({"name":facultyname});
-                            if(dep==null||fac==null) message="the data you entered is incorrect";
+                            if(dep==null||fac==null) message="the data you entered is incorrect"+facultyname+"   ,"+departmentname;
                             else flag=true;
-                     }
+                     }}
+                     console.log("ablo aho");
+                     if(type=="HR"|| flag){
                      const salt=await bcrypt.genSalt(10);
                      const hashedPassword=await bcrypt.hash("123456",salt);
                      const toAdd=await new StaffMember({"password":hashedPassword,"newStaffMember":true,"id":sid,"email":email,"salary":salary,"name":name,"office":office._id,"staff_type":type,"dayoff":doff,"gender":gender});
@@ -560,20 +565,22 @@ router.route('/staffmember').post(authenticateToken,async(req,res)=>{
                      const ac= await new AcademicStaff({"member":toAdd._id,"day_off":dayoff,"faculty":fac._id,"department":dep._id,"type":actype});
                      await ac.save();
                     }
-                    else {const hr=new HR({"member":toAdd._id,"day_off":"Saturday"}); 
+                    else if(type=="HR"){const hr=new HR({"member":toAdd._id,"day_off":"Saturday"}); 
                      await hr.save();
                     } 
                     
-                     res.send(message);
-                 }
+                    
+                 }}
              }
+             res.send({msg:message});
            }
            else res.status(400).json({msg:"this email is already registered"})
-       }}
+       }//}
     }catch(err){
         res.status(500).json({error:err.message});
     }
 })
+
 .delete(authenticateToken,async (req,res)=>{
     try{
         //to authorize

@@ -15,6 +15,7 @@ const moment = require('moment');
 // For routing.
 const express = require('express');
 const router = express.Router();
+const blacklist=require("../blacklist");
 
 function authenticateToken(req, res, next) {
     const token = req.header('x-auth-token');
