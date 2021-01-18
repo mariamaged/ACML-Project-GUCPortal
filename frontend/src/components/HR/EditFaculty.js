@@ -16,7 +16,7 @@ function EditFaculty() {
                 <button type="button" className="btn btn-primary" onClick={() => {
                     var oldname = document.getElementById("inputDefault0").value;
                     var name = document.getElementById("inputDefault1").value;
-                    axios.put('http://localhost:5000/HR/Faculty', { oldname: oldname, name: name }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                    axios.put('http://localhost:5000/HR/Faculty', { oldname: oldname, name: name }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                     ).then(async (response) => {
                         alert(response.data.msg);
                     }

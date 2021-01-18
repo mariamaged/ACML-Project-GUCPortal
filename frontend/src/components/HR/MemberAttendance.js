@@ -10,7 +10,7 @@ class MemberAttendance extends Component {
         axios.get('http://localhost:5000/HR/attendance/' + id,
             {
                 headers: {
-                    'auth-token': localStorage.getItem('auth-token')
+                    'x-auth-token': localStorage.getItem('auth-token')
                 }
             }
         ).then(res => {

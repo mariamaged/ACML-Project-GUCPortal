@@ -72,7 +72,7 @@ function EditMember() {
                 var annualdays = document.getElementById("inputDefault4").value;
                 var lastUpdatedannual = document.getElementById("inputDefault5").value;
                 var accidentaldaysleft = document.getElementById("inputDefault6").value;
-                axios.put('http://localhost:5000/HR/staffmember', { id: id, email: email, password: password, office: office, newStaffMember: newstaffmember, attendcompensationday: attendcompensationday, annualdays: annualdays, lastUpdatedannual: lastUpdatedannual, accidentaldaysleft: accidentaldaysleft }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                axios.put('http://localhost:5000/HR/staffmember', { id: id, email: email, password: password, office: office, newStaffMember: newstaffmember, attendcompensationday: attendcompensationday, annualdays: annualdays, lastUpdatedannual: lastUpdatedannual, accidentaldaysleft: accidentaldaysleft }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                 ).then(async (response) => {
                     console.log("fel thennnnn");
                     alert(response.data.msg);

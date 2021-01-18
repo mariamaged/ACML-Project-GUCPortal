@@ -1,13 +1,46 @@
-~~# Advanced Computer Lab - GUCPortal
+
+# Advanced Computer Lab - GUCPortal
 ## Milestone 1
+- Team 36
 ### Collaborators
 1. Maria Maged 43-1498.
 2. Monica George 43-0818.
 3. Maya Ahmed 43-6655.
+4. Mark Maged 43-4147 (Merged in Milestone 2).
+5. Hesham Yasser 43-5646 (Merged in Milestone 2).
 ## Port Number
-3000.
+> In milestone 1, the backend ran on 3000.
+ - Frontend: 3000.
+ - Backend: 5000.
 ## Which file to run
-	run index.js by running the npm start command.
+- <u>Milestone 1:</u> run npm start.
+- <u>Milestone 2:</u> cd backend then npm start, and open another terminal and cd frontend then npm start.
+## 1. Sample Pages
+### Login Page
+![enter image description here](https://lh3.googleusercontent.com/pw/ACtC-3d8F-VoNh9mnKpGbEy1JwRhlyouFq47a9uFr4PEJ7-_sZEK0_2-jhppY8Z46kkszfhvH8QRGzEffCXwoIvr83cWXr6YkXEfFd3s_YH78lAg199ORJkXv_OWd97iZxpQGeXlJ9eh9QJgRMZbmV-FP-I6=w1006-h423-no?authuser=0)
+
+### Homepage
+![enter image description here](https://lh3.googleusercontent.com/pw/ACtC-3fQb8YrZdbVyOIez9obK0ui7w-_zDNDQfpLVVWiC2pHc1DXsVKE1FlCHBsR7H13OMZiwvJcs-vDrCRQCmil-s8mGXaf1IaFukPr6ZEgcL0HWL0GkqJCwZumii_oxHD5-w5kO6fqBM9LLXanyMzFsL6d=w1006-h476-no?authuser=0)
+
+### Sample Course Instructor Pages - (Head of Department Viewing Teaching Assignment of Courses in His Department)
+![enter image description here](https://lh3.googleusercontent.com/pw/ACtC-3d5dU5hFwKY8Jczj8SU7VmRQ4HyE3Ter1_DVgLdeuYmNm1Dc_O1tp13bXqXedDGFrjYxKsHMbkPEb8Cdcr1gkpotmuHK48APb-L-qzCUO6krz6WD3yLAfAyVTFJcqAQOJCXYDbTJvyVi_G9YPd7sMJB=w1006-h464-no?authuser=0)
+
+### Sample Teaching Assistant Pages (Course Coordinator Updating Slots in Course He Supervises)
+![enter image description here](https://lh3.googleusercontent.com/pw/ACtC-3cw2czqfx1KSKM6MHfpUtK5AULHW17-7V9MlHRHzndKl-Ew0GBYKYhLdFxPNLuEB5Y1b2MCG2bmO8osCd9uKtz0XFY5BnlXX2uXTj9FvZG5bc82nPzeeo8dw6Q5o2yHZ5HjCVEcyEJ4lN6_SOnc9odG=w1007-h444-no?authuser=0)
+
+### Sample HR Pages
+![enter image description here](https://lh3.googleusercontent.com/pw/ACtC-3fF-O1tsqSpmISdDHPHnhDCsoTSYhijxnf338QN_jt8okWgYojLJUrwVgA9UxjFzXjRhrO92tI8QkiO8pexhE-1huK37kNWkWz9TbuDV0TjkYR20oDO4_WwdvKkjdEE810_OoeV-GmSh2KyzB31pEDg=w1006-h440-no?authuser=0)
+
+### Sample General Pages
+	Schedule
+![enter image description here](https://lh3.googleusercontent.com/pw/ACtC-3dTdIRDbHxho3zHAk77aghPzLQrkXzc1npqNnBgDSA5LJhYuUPsb2I5bGdFmQWk4vPKbFG9cbS1lUuJ9DlTPw1R3xty_LSRbuz4iU-ggD0Ro5w5lTg-9qg1nGJ0BtS-OjXIkJ7xMD-WdPP7LPOl7mVk=w1006-h463-no?authuser=0)
+
+	Profile
+![enter image description here](https://lh3.googleusercontent.com/pw/ACtC-3eHUrxeGDVYD8cChS1AUOEhCX6VoYfxpgUqlV1McdIFsGPNHd22nBMqyA0IDwIZ0IZrwEiJsxBuHOJ1TrjhL58-NSUG0mL0vmNMiarNBWmwpvQFh0YsIDegLEyBJP4BK9JyfCfl-I5-ZGS5rmsjFkF4=w1006-h414-no?authuser=0)
+
+	Submitted Requests
+![enter image description here](https://lh3.googleusercontent.com/pw/ACtC-3cmxYbGlepQth17sO9b6gkOsHGSJOwoNZlcIweCGPKLcHZ7fX0tONsh2NQEQUWvrL3zl1bAwLJ57TZP38I087OpAedf-RaFZ6jPdK7Aam0Inhu9_4FN2T6_AtK3SvxX5eMKKfZSID6SKFbEXHNsSOU_=w1006-h443-no?authuser=0)
+
 ## 2. GUC Staff Members Functionalities
 ### Any GUC staff member can do the following:
 	1. Log in with a unique email and a password.
@@ -646,39 +679,25 @@ will be only retrieved from it with making any changes to it.
 ### Any HOD can do the following
 	 1(a) Assign a course instructor for each course in his department.
 - **Functionality:** the user who is an HOD should be capable of assigning certain courses under his department to certain `course instructors` who are under his department as well.
-- **Route:** /assignCourseInstructorforCourses
+- **Route:** /assignCoursetoCourseInstructor
 - **Request type:** POST.
 - **Request body:**
-   - Should be an array of objects with two properties: -->
+   - Should be an object with two properties: -->
       1. courseID [where courseID is a `string` like `CSEN704`].
-      2. member [where member is the staff member id as a `string` like `ac-12`].
-    - This implies that the HOD is trying to assign each academic member in the array the course referred to in the same object.
+      2. academicMemberID [where member is the staff member id as a `string` like `ac-12`].
+    - This implies that the HOD is trying to assign the academic member in the object the course referred to in the same object.
 - **Example request body:**
 ```json
-[
-{
-"courseID": "CSEN704",
-"member": "ac-12"
-},
 {
 "courseID": "CSEN703",
-"member": "ac-13"
+"academicMemberID": "ac-1"
 }
-]
 ```
 - **Response body:**
    - `Case 1:` If the user is not an HOD and therefore not authorized to issue this action, the response sends back the message: **`Access Denied!`** with status **`401`**.\
    &nbsp;
    - `Case 2:` If the operation is successful, and each of the individual course instructors gets assigned to their respective course, the response sends back the message **`Operation done successfully!`** with status **`200`**.\
-   &nbsp;
-   - `Case 3:` If any of the constraints do not apply to one of the input objects in the array, an array of **`request defects`** is sent back with a detailed analysis with what was wrong with the input with status **`400`**.
-     - The six possible errors are:
-        - unfoundCourse.
-        - unfoundAcademicMember.
-        - memberNotCourseInstructor.
-        - courseNotunderHODDepartment.
-        - memberNotBelongingtoCourseDep.
-        - courseInstructorAlreadyAssigned.
+
 - **Example response body:**
 ```json
 Access denied!
@@ -2372,7 +2391,7 @@ You are not an academic member!
  ***
 	2 (b) View sent “replacement” request(s).**
  - **Functionality:** any academic member should be able to view replacement requests he sent.
- - **Route:**/academic/sentReplacementRequests
+ - **Route:**/academic/sentReplacementRequest
  - **Request type:** GET
  - **Request Body:** no request body needed
  - **Response body:**
@@ -2395,7 +2414,7 @@ You are not an academic member!
 ***
 	2 (b) View received “replacement” request(s).**
   - **Functionality:** any academic member should be able to view replacement requests he received.
- - **Route:** /academic/receivedReplacementRequests
+ - **Route:** /academic/receivedReplacementRequest
  - **Request type:** GET
  - **Request Body:** no request body needed
  - **Response body:**

@@ -31,7 +31,7 @@ function EditLocation() {
                     var id = document.getElementById("inputDefault1").value;
                     var maximum_capacity = document.getElementById("inputDefault2").value;
                     var type = document.getElementById("exampleSelect1").value;
-                    axios.put('http://localhost:5000/HR/Location', { oldid: oldid, id: id, type: type, maximum_capacity: maximum_capacity }, { headers: { "auth-token": localStorage.getItem('auth-token') }, data: { id: id } },
+                    axios.put('http://localhost:5000/HR/Location', { oldid: oldid, id: id, type: type, maximum_capacity: maximum_capacity }, { headers: { "x-auth-token": localStorage.getItem('auth-token') }, data: { id: id } },
                     ).then(async (response) => {
                         alert(response.data.msg);
                     }

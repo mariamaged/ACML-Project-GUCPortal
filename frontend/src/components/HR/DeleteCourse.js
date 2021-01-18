@@ -11,7 +11,7 @@ function DeleteCourse() {
             </div>
             <button type="button" className="btn btn-primary" onClick={() => {
                 var id = document.getElementById("inputDefault0").value;
-                axios.delete('http://localhost:5000/HR/course', { headers: { "auth-token": localStorage.getItem('auth-token') }, data: { id: id } },
+                axios.delete('http://localhost:5000/HR/course', { headers: { "x-auth-token": localStorage.getItem('auth-token') }, data: { id: id } },
                 ).then(async (response) => {
                     alert(response.data.msg);
                 }

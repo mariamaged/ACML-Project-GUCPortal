@@ -31,12 +31,12 @@ class ViewSubmittedRequests extends Component {
         loadingBool: true
     }
     componentDidMount(props) {
-        console.log("in maternity view " + localStorage.getItem('jwtToken'))
+        console.log("in maternity view " + localStorage.getItem('auth-token'))
         console.log("start state= " + this.state.reqState)
         axios.get('http://localhost:5000/academic/submittedRequest',
             {
                 headers: {
-                    'x-auth-token': localStorage.getItem('jwtToken')
+                    'x-auth-token': localStorage.getItem('auth-token')
                 }
             }
         ).then(res => {
@@ -65,13 +65,13 @@ class ViewSubmittedRequests extends Component {
     handleClick(e, value) {
         e.preventDefault();
         console.log("in cancel btn clicked")
-        console.log("token " + localStorage.getItem('jwtToken'))
+        console.log("token " + localStorage.getItem('auth-token'))
 
         axios.request({
             method: 'POST',
             url: 'http://localhost:5000/academic/cancelRequest',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 requestID: value

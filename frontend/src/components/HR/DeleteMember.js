@@ -10,7 +10,7 @@ function DeleteMember() {
             </div>
             <button type="button" className="btn btn-primary" onClick={() => {
                 var email = document.getElementById("inputDefault0").value;
-                axios.delete('http://localhost:5000/HR/staffmember', { headers: { "auth-token": localStorage.getItem('auth-token') }, data: { email: email } },
+                axios.delete('http://localhost:5000/HR/staffmember', { headers: { "x-auth-token": localStorage.getItem('auth-token') }, data: { email: email } },
                 ).then(async (response) => {
                     alert(response.data.msg);
                 }
