@@ -72,7 +72,7 @@ function AddMember() {
                 var departmentname = document.getElementById("inputDefault4").value;
                 console.log(departmentname);
                 console.log(facultyname);
-                axios.post('http://localhost:5000/HR/staffmember', { name: name, email: email, salary: salary, officelocation: office, type: type, actype: actype, dayoff: dayoff, gender: gender, facultyname: facultyname, departmentname: departmentname }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                axios.post('http://localhost:5000/HR/staffmember', { name: name, email: email, salary: salary, officelocation: office, type: type, actype: actype, dayoff: dayoff, gender: gender, facultyname: facultyname, departmentname: departmentname }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                 ).then(async (response) => {
                     console.log("fel thennnnn");
                     alert(response.data.msg);

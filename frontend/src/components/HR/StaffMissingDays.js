@@ -10,7 +10,7 @@ class StaffMissingDays extends Component {
         axios.get('http://localhost:5000/HR/viewMissingdays',
             {
                 headers: {
-                    'auth-token': localStorage.getItem('auth-token')
+                    'x-auth-token': localStorage.getItem('auth-token')
                 }
             }
         ).then(res => {

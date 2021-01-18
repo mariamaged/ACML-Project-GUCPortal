@@ -3143,7 +3143,6 @@ router.get('/acceptedRequests', authenticateToken, async (req, res) => {
             const coordinatorID = sent[i].sentTo
             const coordinator = await StaffMemberModel.findById(coordinatorID)
             const coordinatorName = coordinator.name
-            res.write("Request ID: " + sent[i].requestID + "\n")
 
             const reqNew = {
                 counter: k + 1, requestID: sent[i].requestID, reqType: sent[i].reqType,
@@ -3588,7 +3587,6 @@ router.get('/rejectedRequests', authenticateToken, async (req, res) => {
             const coordinatorID = sent[i].sentTo
             const coordinator = await StaffMemberModel.findById(coordinatorID)
             const coordinatorName = coordinator.name
-            res.write("Request ID: " + sent[i].requestID + "\n")
 
             const reqNew = {
                 counter: k + 1, requestID: sent[i].requestID, reqType: sent[i].reqType,

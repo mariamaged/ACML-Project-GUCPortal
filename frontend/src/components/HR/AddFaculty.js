@@ -10,7 +10,7 @@ function AddFaculty() {
             </div>
             <button type="button" className="btn btn-primary" onClick={() => {
                 var name = document.getElementById("inputDefault1").value;
-                axios.post('http://localhost:5000/HR/Faculty', { name: name }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                axios.post('http://localhost:5000/HR/Faculty', { name: name }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                 ).then(async (response) => {
                     console.log("fel thennnnn");
                     alert(response.data.msg);

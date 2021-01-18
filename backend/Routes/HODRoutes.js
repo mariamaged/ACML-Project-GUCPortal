@@ -44,8 +44,9 @@ router.post('/assignCoursetoCourseInstructor', authenticateToken, async (req, re
     const {courseID, academicMemberID} = req.body;
 
     const HODStaff = await StaffMemberModel.findById(req.user.id);
+    if(!HODStaff) return res.status(401).send('Staff Member does not exist in database.');
     const HODAcademic = await AcademicStaffModel.findOne({member: HODStaff._id});
-
+    if(!HODAcademic) return res.status(401).send('Academic Staff Member does not exist in database.');
     if(!courseID || !academicMemberID) return res.status(400).send("Fill all required fields");
 
     const course = await CourseModel.findOne({id: courseID});

@@ -29,7 +29,7 @@ function AddLocation() {
                 //  {
                 // id:id,type:type,maximum_capacity:maximum_capacity
                 // }
-                axios.post('http://localhost:5000/HR/Location', { id: id, type: type, maximum_capacity: maximum_capacity }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                axios.post('http://localhost:5000/HR/Location', { id: id, type: type, maximum_capacity: maximum_capacity }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                 ).then(async (response) => {
                     console.log("fel thennnnn");
                     alert(response.data.msg);

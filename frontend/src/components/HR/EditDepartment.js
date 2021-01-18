@@ -27,7 +27,7 @@ function EditDepartment() {
                     var name = document.getElementById("inputDefault1").value;
                     var facultyname = document.getElementById("inputDefault2").value;
                     var hodid = document.getElementById("inputDefault3").value;
-                    axios.put('http://localhost:5000/HR/department', { oldname: oldname, name: name, facultyname: facultyname, hodid: hodid }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                    axios.put('http://localhost:5000/HR/department', { oldname: oldname, name: name, facultyname: facultyname, hodid: hodid }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                     ).then(async (response) => {
                         alert(response.data.msg);
                     }

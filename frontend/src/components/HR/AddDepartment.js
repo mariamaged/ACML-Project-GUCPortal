@@ -23,7 +23,7 @@ function AddDepartment() {
                 var name = document.getElementById("inputDefault0").value;
                 var facultyname = document.getElementById("inputDefault1").value;
                 var hod = document.getElementById("inputDefault2").value;
-                axios.post('http://localhost:5000/HR/department', { name: name, facultyname: facultyname, hod: hod }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                axios.post('http://localhost:5000/HR/department', { name: name, facultyname: facultyname, hod: hod }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                 ).then(async (response) => {
                     console.log("fel thennnnn");
                     alert(response.data.msg);

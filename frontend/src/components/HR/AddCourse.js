@@ -21,7 +21,7 @@ function AddCourse() {
         <button type="button" className="btn btn-primary" onClick={()=>{ var name = document.getElementById("inputDefault0").value;
         var id = document.getElementById("inputDefault1").value;
         var departmentname = document.getElementById("inputDefault2").value;
-         axios.post('http://localhost:5000/HR/course',{name:name,id:id,departmentname:departmentname},{headers:{"auth-token":localStorage.getItem('auth-token')}},
+         axios.post('http://localhost:5000/HR/course',{name:name,id:id,departmentname:departmentname},{headers:{"x-auth-token":localStorage.getItem('auth-token')}},
         ).then(async(response)=>{
             console.log("fel thennnnn");
                alert(response.data.msg);}

@@ -88,7 +88,7 @@ class requestsForms extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/accidentalLeave',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 accidentDate: this.state.accidentalDate,
@@ -112,7 +112,7 @@ class requestsForms extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/annualLeave',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 slotDate: this.state.slotDate,
@@ -136,7 +136,7 @@ class requestsForms extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/changeDayOff',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 newDayOff: this.state.newDayOff,
@@ -161,7 +161,7 @@ class requestsForms extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/compensationLeave',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 missedDay: this.state.missedDay,
@@ -185,7 +185,7 @@ class requestsForms extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/maternityLeave',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 startDate: this.state.startDate,
@@ -212,7 +212,7 @@ class requestsForms extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/sendReplacementRequest',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 slotNum: this.state.slotNum,
@@ -238,7 +238,7 @@ class requestsForms extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/sickLeave',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 sickDay: this.state.sickDay,
@@ -265,7 +265,7 @@ class requestsForms extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/slotLinkingRequest',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 slotDay: this.state.slotDay,

@@ -40,7 +40,7 @@ function EditCourse() {
                 var slots_needed = document.getElementById("inputDefault4").value;
                 var slots_covered = document.getElementById("inputDefault5").value;
                 //no schedule
-                axios.put('http://localhost:5000/HR/course', { oldid: oldid, id: id, name: name, departmentname: departmentname, slotsneeded: slots_needed, slotscovered: slots_covered }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                axios.put('http://localhost:5000/HR/course', { oldid: oldid, id: id, name: name, departmentname: departmentname, slotsneeded: slots_needed, slotscovered: slots_covered }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                 ).then(async (response) => {
                     console.log("fel thennnnn");
                     alert(response.data.msg);

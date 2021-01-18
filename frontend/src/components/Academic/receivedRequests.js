@@ -42,7 +42,7 @@ class ViewReceivedRequests extends Component {
         axios.get('http://localhost:5000/academic/receivedRequest',
             {
                 headers: {
-                    'x-auth-token': localStorage.getItem('jwtToken')
+                    'x-auth-token': localStorage.getItem('auth-token')
                 }
             }
         ).then(res => {
@@ -72,13 +72,13 @@ class ViewReceivedRequests extends Component {
     // handleAcceptClick(e,value){
     //     e.preventDefault();
     //     console.log("in cancel btn clicked")
-    //     console.log("token "+localStorage.getItem('jwtToken'))
+    //     console.log("token "+localStorage.getItem('auth-token'))
 
     //     axios.request({
     //         method: 'POST',
     //         url: 'http://localhost:5000/academic/acceptRequest',
     //         headers: {
-    //             'x-auth-token':localStorage.getItem('jwtToken')
+    //             'x-auth-token':localStorage.getItem('auth-token')
     //         },
     //         data: {
     //             requestID: value
@@ -209,7 +209,7 @@ class ViewReceivedRequests extends Component {
             method: 'POST',
             url: 'http://localhost:5000/academic/rejectRequest',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 requestID: value,
@@ -242,7 +242,7 @@ class ViewReceivedRequests extends Component {
             method: 'PUT',
             url: 'http://localhost:5000/academic/acceptRequest',
             headers: {
-                'x-auth-token': localStorage.getItem('jwtToken')
+                'x-auth-token': localStorage.getItem('auth-token')
             },
             data: {
                 requestID: value

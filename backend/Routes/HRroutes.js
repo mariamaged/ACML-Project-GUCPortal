@@ -13,7 +13,7 @@ const Attendance = require('../Models/AttendanceSchema');
 
 
 async function authenticateToken(req, res, next) {
-    const token = req.header("auth-token");
+    const token = req.header("x-auth-token");
     if (!token) {
         res.status(401).send({ msg: "Access deined please log in first." });
         return;

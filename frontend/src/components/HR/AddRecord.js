@@ -42,7 +42,7 @@ function AddRecord() {
                 var signintime = document.getElementById("inputDefault2").value + "";
                 var signouttime = document.getElementById("inputDefault3").value + "";
                 var day = document.getElementById("exampleSelect1").value;
-                axios.put('http://localhost:5000/HR/addrecord', { day: day, userid: userid, thedate: thedate, signintime: signintime, signouttime: signouttime }, { headers: { "auth-token": localStorage.getItem('auth-token') } },
+                axios.put('http://localhost:5000/HR/addrecord', { day: day, userid: userid, thedate: thedate, signintime: signintime, signouttime: signouttime }, { headers: { "x-auth-token": localStorage.getItem('auth-token') } },
                 ).then(async (response) => {
                     console.log("fel thennnnn");
                     alert(response.data.msg);
